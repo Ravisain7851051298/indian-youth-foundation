@@ -1,0 +1,80 @@
+### ==============================================================================
+### MEMBERSHIP & VOLUNTEER APPLICATION WORKFLOW APIS
+### Real zero-fraud flow: User applies -> Pending -> Admin verifies payment proof -> Approved
+### ==============================================================================
+
+@baseUrl = http://localhost:5000/api
+@userToken = REPLACE_WITH_USER_BEARER_TOKEN
+@adminToken = REPLACE_WITH_ADMIN_BEARER_TOKEN
+@adminSecretKey = BYK_SUPER_ADMIN_ALIGARH_SECRET_2026
+
+### 1. User Applies for Membership (Selects Plan, Uploads Screenshot & UTR)
+POST {{baseUrl}}/members/apply
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+  "planId": "PLAN_ID_HERE",
+  "paymentScreenshot": "/uploads/payment_proof_123.jpg",
+  "utrNumber": "UPI428198759231"
+}
+
+### 2. User Applies for Volunteer Wing (Uploads ID Proof & Skills)
+POST {{baseUrl}}/volunteers/apply
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+  "skills": ["Event Management", "Digital Media", "Field Organizing"],
+  "availability": "Weekends & Evenings",
+  "idProofDocument": "/uploads/aadhaar_front_back.pdf",
+  "motivation": "I want to dedicate my skills for youth empowerment and education in Aligarh."
+}
+
+### 3. Admin: List All Pending Membership Applications
+GET {{baseUrl}}/applications/members?status=pending
+Authorization: Bearer {{adminToken}}
+x-admin-secret-key: {{adminSecretKey}}
+
+### 4. Admin: List All Pending Volunteer Applications
+GET {{baseUrl}}/applications/volunteers?status=pending
+Authorization: Bearer {{adminToken}}
+x-admin-secret-key: {{adminSecretKey}}
+
+### 5. Admin: Approve Membership Application
+### (Unlocks ID Card & Appointment Letter and emails verified credentials to applicant)
+PUT {{baseUrl}}/applications/members/MEM_APP_ID_HERE/approve
+Authorization: Bearer {{adminToken}}
+x-admin-secret-key: {{adminSecretKey}}
+Content-Type: application/json
+
+{}
+
+### 6. Admin: Reject Membership Application
+PUT {{baseUrl}}/applications/members/MEM_APP_ID_HERE/reject
+Authorization: Bearer {{adminToken}}
+x-admin-secret-key: {{adminSecretKey}}
+Content-Type: application/json
+
+{
+  "reason": "UTR number does not match bank settlement records."
+}
+
+### 7. Admin: Approve Volunteer Application
+### (Unlocks Volunteer badge & offer letter and auto-emails to volunteer)
+PUT {{baseUrl}}/applications/volunteers/VOL_APP_ID_HERE/approve
+Authorization: Bearer {{adminToken}}
+x-admin-secret-key: {{adminSecretKey}}
+Content-Type: application/json
+
+{}
+
+### 8. Admin: Reject Volunteer Application
+PUT {{baseUrl}}/applications/volunteers/VOL_APP_ID_HERE/reject
+Authorization: Bearer {{adminToken}}
+x-admin-secret-key: {{adminSecretKey}}
+Content-Type: application/json
+
+{
+  "reason": "Submitted ID proof image is blurred."
+}

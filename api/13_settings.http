@@ -1,0 +1,39 @@
+### ==============================================================================
+### NGO TRUST SETTINGS & DYNAMIC SMTP EMAIL CONFIGURATION APIS
+### ==============================================================================
+
+@baseUrl = http://localhost:5000/api
+@adminToken = REPLACE_WITH_ADMIN_BEARER_TOKEN
+@adminSecretKey = BYK_SUPER_ADMIN_ALIGARH_SECRET_2026
+
+### 1. Get Public Site Settings & Registration Identifiers
+GET {{baseUrl}}/settings
+
+### 2. Update Official Settings & Dynamic SMTP Gmail Credentials (Admin Only)
+PUT {{baseUrl}}/settings
+Authorization: Bearer {{adminToken}}
+x-admin-secret-key: {{adminSecretKey}}
+Content-Type: application/json
+
+{
+  "ngoName": "Indian Youth Foundation",
+  "tagline": "सशक्त युवा, समर्थ भारत",
+  "registrationNumber": "IV-4521/2020",
+  "section80GNumber": "CIT(E)/DELHI/80G/2021-22/A/10452",
+  "section12ANumber": "CIT(E)/DELHI/12A/2020-21/A/9874",
+  "panNumber": "AAATB1234F",
+  "email": "samasyasamadhanparishad@gmail.com",
+  "phone": "+91 93196 98759",
+  "address": "Head Office - Krishna Vihar Pala Road Aligarh, Uttar Pradesh - 202001",
+  "bankName": "HDFC Bank Ltd.",
+  "accountNumber": "50200084729104",
+  "ifscCode": "HDFC0001824",
+  "upiId": "bharatiyauva@okhdfcbank",
+  "smtpHost": "smtp.gmail.com",
+  "smtpPort": 587,
+  "smtpUser": "samasyasamadhanparishad@gmail.com",
+  "smtpPass": "YOUR_GMAIL_APP_PASSWORD_HERE"
+}
+
+### 3. Track Page Views (PWA / Web Analytics)
+POST {{baseUrl}}/settings/view

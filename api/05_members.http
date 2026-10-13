@@ -1,0 +1,51 @@
+### ==============================================================================
+### MEMBER DIRECTORY, VERIFICATION, & COORDINATOR STATS APIS
+### ==============================================================================
+
+@baseUrl = http://localhost:5000/api
+@adminToken = REPLACE_WITH_ADMIN_BEARER_TOKEN
+@adminSecretKey = BYK_SUPER_ADMIN_ALIGARH_SECRET_2026
+
+### 1. List All Members (Supports role, status, and search filters)
+GET {{baseUrl}}/members?role=Member&status=active&search=Ravi
+Authorization: Bearer {{adminToken}}
+x-admin-secret-key: {{adminSecretKey}}
+
+### 2. Update Member Status (Active / Suspended / Rejected)
+PUT {{baseUrl}}/members/MEMBER_USER_ID_HERE/status
+Authorization: Bearer {{adminToken}}
+x-admin-secret-key: {{adminSecretKey}}
+Content-Type: application/json
+
+{
+  "status": "active"
+}
+
+### 3. Verify Member Directly (Set Designation & Fee Paid)
+PUT {{baseUrl}}/members/MEMBER_USER_ID_HERE/verify
+Authorization: Bearer {{adminToken}}
+x-admin-secret-key: {{adminSecretKey}}
+Content-Type: application/json
+
+{
+  "feePaid": true,
+  "feeAmount": 500,
+  "designation": "Executive Coordinator (Aligarh District)"
+}
+
+### 4. Export Members Directory to Excel (.xlsx)
+GET {{baseUrl}}/members/export/excel
+Authorization: Bearer {{adminToken}}
+x-admin-secret-key: {{adminSecretKey}}
+
+### 5. Get Today's Birthday Members & Poster Candidates
+GET {{baseUrl}}/stats/birthday-members
+
+### 6. Get Coordinator Personal Report & Referral Stats
+GET {{baseUrl}}/stats/coordinator-report
+Authorization: Bearer {{adminToken}}
+
+### 7. Get All Coordinators Leaderboard & Recruitment Analytics
+GET {{baseUrl}}/stats/coordinator-leaderboard
+Authorization: Bearer {{adminToken}}
+x-admin-secret-key: {{adminSecretKey}}

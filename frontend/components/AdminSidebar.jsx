@@ -1,0 +1,231 @@
+'use client';
+
+import React, { useState } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { 
+  FiGrid, 
+  FiCreditCard, 
+  FiActivity, 
+  FiUserPlus, 
+  FiUsers, 
+  FiUserCheck, 
+  FiCompass, 
+  FiLayers, 
+  FiFileText, 
+  FiTarget, 
+  FiAward, 
+  FiMessageSquare, 
+  FiAlertCircle, 
+  FiCalendar, 
+  FiImage, 
+  FiBookOpen, 
+  FiSettings, 
+  FiUser,
+  FiLogOut,
+  FiExternalLink,
+  FiShield,
+  FiMenu,
+  FiX
+} from 'react-icons/fi';
+import { useNGO } from '../context/NGOContext';
+
+// Master 18 modules for Admin
+export const ADMIN_NAV_ITEMS = [
+  { label: "Dashboard", href: "/dashboard", icon: FiGrid },
+  { label: "Donations", href: "/donation", icon: FiCreditCard },
+  { label: "Our Services", href: "/services", icon: FiActivity },
+  { label: "Volunteer", href: "/volunteer", icon: FiUserPlus },
+  { label: "Members", href: "/members", icon: FiUsers },
+  { label: "Team Members", href: "/team-members", icon: FiUserCheck },
+  { label: "Mission & Vision", href: "/mission-vision", icon: FiCompass },
+  { label: "Programs", href: "/programs", icon: FiLayers },
+  { label: "News & Blogs", href: "/blogs", icon: FiFileText },
+  { label: "Campaigns", href: "/campaigns", icon: FiTarget },
+  { label: "Certificates", href: "/certificates", icon: FiAward },
+  { label: "Reviews & Feedback", href: "/feedback", icon: FiMessageSquare },
+  { label: "Complaints & Inquiries", href: "/complaints", icon: FiAlertCircle },
+  { label: "Event", href: "/event", icon: FiCalendar },
+  { label: "Gallery", href: "/gallery", icon: FiImage },
+  { label: "Story", href: "/story", icon: FiBookOpen },
+  { label: "Contact & NGO Settings", href: "/settings", icon: FiSettings },
+  { label: "Profile", href: "/profile", icon: FiUser }
+];
+
+// Role-based limited navigation items
+export const ROLE_NAV_ITEMS = {
+  Admin: ADMIN_NAV_ITEMS,
+
+  TeamMember: [
+    { label: "Overview", href: "/dashboard", icon: FiGrid },
+    { label: "Officer Profile & ID", href: "/profile", icon: FiUser },
+    { label: "Team Directory", href: "/team-members", icon: FiUserCheck },
+    { label: "Members Directory", href: "/members", icon: FiUsers },
+    { label: "Programs Oversight", href: "/programs", icon: FiLayers },
+    { label: "Campaigns & Drives", href: "/campaigns", icon: FiTarget },
+    { label: "Events Roster", href: "/event", icon: FiCalendar },
+    { label: "Certificates Desk", href: "/certificates", icon: FiAward },
+    { label: "Stories & Impact", href: "/story", icon: FiBookOpen },
+    { label: "Feedback & Reviews", href: "/feedback", icon: FiMessageSquare },
+  ],
+
+  Volunteer: [
+    { label: "Volunteer Profile & ID Card", href: "/profile?tab=idcard", icon: FiUser },
+    { label: "Appointment Letter", href: "/profile?tab=letter", icon: FiFileText },
+    { label: "Birthday Poster Canvas", href: "/profile?tab=birthday", icon: FiAward },
+    { label: "My Certificates", href: "/certificates", icon: FiAward },
+    { label: "Upcoming Events & Tasks", href: "/event", icon: FiCalendar },
+    { label: "Active Campaigns", href: "/campaigns", icon: FiTarget },
+    { label: "Welfare Programs", href: "/programs", icon: FiLayers },
+    { label: "Submit Feedback", href: "/feedback", icon: FiMessageSquare },
+    { label: "Help Desk / Grievance", href: "/profile?tab=grievance", icon: FiAlertCircle },
+  ],
+
+  Member: [
+    { label: "Member Profile & ID Card", href: "/profile?tab=idcard", icon: FiUser },
+    { label: "Appointment Letter", href: "/profile?tab=letter", icon: FiFileText },
+    { label: "Birthday Poster Canvas", href: "/profile?tab=birthday", icon: FiAward },
+    { label: "My 80G Donations", href: "/donation", icon: FiCreditCard },
+    { label: "Appreciation Certificates", href: "/certificates", icon: FiAward },
+    { label: "Welfare Programs", href: "/programs", icon: FiLayers },
+    { label: "Community Events", href: "/event", icon: FiCalendar },
+    { label: "Submit Feedback", href: "/feedback", icon: FiMessageSquare },
+    { label: "Grievance Redressal", href: "/profile?tab=grievance", icon: FiAlertCircle },
+  ]
+};
+
+export default function AdminSidebar({ activeRole = null }) {
+  const pathname = usePathname();
+  const { currentUser, logout, settings } = useNGO();
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+
+  // Determine effective role
+  const role = activeRole || currentUser?.role || 'Member';
+  const navItems = ROLE_NAV_ITEMS[role] || ROLE_NAV_ITEMS.Member;
+
+  const roleBadgeText = {
+    Admin: 'Master Admin Panel (All 18 Modules)',
+    TeamMember: 'Team Officer Panel (Operations)',
+    Volunteer: 'Volunteer Portal (Field Services)',
+    Member: 'Member Portal (Identity & Tax)'
+  }[role] || 'Member Portal';
+
+  return (
+    <>
+      {/* Mobile Sticky Bar Toggle */}
+      <div className="lg:hidden w-full bg-slate-900 text-white px-4 py-3 flex items-center justify-between border-b border-slate-800 sticky top-20 z-40">
+        <div className="flex items-center gap-2">
+          <span className="w-2.5 h-2.5 rounded-full bg-orange-500 animate-pulse" />
+          <span className="text-xs font-bold truncate">
+            {roleBadgeText}
+          </span>
+        </div>
+        <button
+          onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+          className="p-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white flex items-center gap-1.5 text-xs font-semibold cursor-pointer"
+        >
+          {mobileSidebarOpen ? <FiX className="w-4 h-4" /> : <FiMenu className="w-4 h-4" />}
+          <span>{mobileSidebarOpen ? 'Close Menu' : 'Portal Menu'}</span>
+        </button>
+      </div>
+
+      {/* Desktop Fixed Sidebar & Mobile Drawer */}
+      <aside 
+        className={`
+          ${mobileSidebarOpen ? 'block fixed inset-y-0 left-0 z-50 w-72' : 'hidden'}
+          lg:flex lg:flex-col lg:w-64 lg:shrink-0
+          bg-slate-900 text-slate-100 border-r border-slate-800 shadow-2xl
+          lg:sticky lg:top-20 lg:h-[calc(100vh-5rem)] lg:overflow-y-auto
+        `}
+      >
+        {/* Brand Header */}
+        <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+          <div className="flex items-center gap-3 overflow-hidden">
+            <div className="w-10 h-10 rounded-xl bg-orange-600 flex items-center justify-center font-bold text-white shadow-md shadow-orange-600/30 shrink-0">
+              IYF
+            </div>
+            <div className="overflow-hidden">
+              <h2 className="font-bold text-xs tracking-wide text-white truncate">
+                {settings?.ngoName || 'Indian Youth Foundation'}
+              </h2>
+              <span className="text-[10px] text-orange-400 font-bold px-2 py-0.5 rounded-full bg-orange-500/10 inline-block mt-0.5">
+                {role}
+              </span>
+            </div>
+          </div>
+          {/* Mobile close button */}
+          <button
+            onClick={() => setMobileSidebarOpen(false)}
+            className="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-white"
+          >
+            <FiX className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* User Card */}
+        <div className="px-4 py-3 bg-slate-950/50 border-b border-slate-800/80 flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-orange-400 text-xs font-black shrink-0 border border-slate-700">
+            {currentUser?.name ? currentUser.name.charAt(0) : 'U'}
+          </div>
+          <div className="overflow-hidden text-xs">
+            <div className="font-bold text-slate-200 truncate">{currentUser?.name || 'Authorized User'}</div>
+            <div className="text-[10px] text-slate-500 truncate">{currentUser?.memberId || roleBadgeText}</div>
+          </div>
+        </div>
+
+        {/* Navigation links */}
+        <nav className="flex-1 overflow-y-auto p-3 space-y-1">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            // Handle query strings matching
+            const itemPath = item.href.split('?')[0];
+            const isActive = pathname === itemPath;
+
+            return (
+              <Link
+                key={item.label}
+                href={item.href}
+                onClick={() => setMobileSidebarOpen(false)}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all ${
+                  isActive
+                    ? 'bg-orange-600 text-white shadow-md shadow-orange-600/25'
+                    : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                }`}
+              >
+                <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+                <span className="truncate">{item.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Footer User Bar & Quick Links */}
+        <div className="p-3 border-t border-slate-800 space-y-2 bg-slate-950/40">
+          <Link
+            href="/"
+            onClick={() => setMobileSidebarOpen(false)}
+            className="flex items-center justify-center gap-2 w-full py-2 px-3 text-xs rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition font-medium"
+          >
+            <FiExternalLink className="w-3.5 h-3.5" />
+            <span>View Public Site</span>
+          </Link>
+          <button
+            onClick={() => { logout(); setMobileSidebarOpen(false); }}
+            className="flex items-center justify-center gap-2 w-full py-2 px-3 text-xs rounded-xl text-rose-400 hover:bg-rose-500/10 transition cursor-pointer font-medium"
+          >
+            <FiLogOut className="w-3.5 h-3.5" />
+            <span>Logout</span>
+          </button>
+        </div>
+      </aside>
+
+      {/* Mobile Backdrop */}
+      {mobileSidebarOpen && (
+        <div 
+          onClick={() => setMobileSidebarOpen(false)}
+          className="lg:hidden fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-40"
+        />
+      )}
+    </>
+  );
+}

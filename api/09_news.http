@@ -1,0 +1,32 @@
+### ==============================================================================
+### NEWS & PRESS RELEASES APIS
+### ==============================================================================
+
+@baseUrl = http://localhost:5000/api
+@adminToken = REPLACE_WITH_ADMIN_BEARER_TOKEN
+@adminSecretKey = BYK_SUPER_ADMIN_ALIGARH_SECRET_2026
+
+### 1. List All Published News Articles
+GET {{baseUrl}}/news
+
+### 2. Publish New Article / Press Release
+POST {{baseUrl}}/news
+Authorization: Bearer {{adminToken}}
+x-admin-secret-key: {{adminSecretKey}}
+Content-Type: application/json
+
+{
+  "title": "Indian Youth Foundation Launches District Skill Development Cell in Aligarh",
+  "titleHi": "भारतीय युवा क्रांति ने अलीगढ़ में जिला कौशल विकास प्रकोष्ठ की स्थापना की",
+  "content": "The initiative aims to provide computer literacy and vocational training to over 500 rural youth in the first phase.",
+  "contentHi": "इस पहल का उद्देश्य प्रथम चरण में 500 से अधिक ग्रामीण युवाओं को कंप्यूटर साक्षरता एवं व्यावसायिक प्रशिक्षण प्रदान करना है।",
+  "date": "2026-10-15",
+  "image": "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=600",
+  "tags": ["Skill Development", "Youth Empowerment", "Aligarh News"],
+  "author": "Chief Editor, Indian Youth Foundation"
+}
+
+### 3. Delete News Article
+DELETE {{baseUrl}}/news/NEWS_ID_HERE
+Authorization: Bearer {{adminToken}}
+x-admin-secret-key: {{adminSecretKey}}

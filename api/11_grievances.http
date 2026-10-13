@@ -1,0 +1,35 @@
+### ==============================================================================
+### GRIEVANCES & CITIZEN COMPLAINT REDRESSAL APIS
+### ==============================================================================
+
+@baseUrl = http://localhost:5000/api
+@adminToken = REPLACE_WITH_ADMIN_BEARER_TOKEN
+@adminSecretKey = BYK_SUPER_ADMIN_ALIGARH_SECRET_2026
+
+### 1. Submit Public / Member Grievance
+POST {{baseUrl}}/grievances
+Content-Type: application/json
+
+{
+  "name": "Manish Sharma",
+  "email": "manish.sharma@example.com",
+  "phone": "9812309876",
+  "subject": "Delay in volunteer badge dispatch",
+  "message": "I was approved as volunteer last week but have not received my physical badge."
+}
+
+### 2. Admin: List Grievances (Filter by pending / in_progress / resolved)
+GET {{baseUrl}}/grievances?status=pending
+Authorization: Bearer {{adminToken}}
+x-admin-secret-key: {{adminSecretKey}}
+
+### 3. Admin: Update Grievance & Mark Resolved
+PUT {{baseUrl}}/grievances/GRIEVANCE_ID_HERE
+Authorization: Bearer {{adminToken}}
+x-admin-secret-key: {{adminSecretKey}}
+Content-Type: application/json
+
+{
+  "status": "resolved",
+  "resolutionNotes": "Physical badge dispatched via speed post. Tracking ID sent via SMS."
+}

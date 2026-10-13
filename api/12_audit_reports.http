@@ -1,0 +1,29 @@
+### ==============================================================================
+### STATUTORY FINANCIAL AUDIT REPORTS & TRANSPARENCY APIS
+### ==============================================================================
+
+@baseUrl = http://localhost:5000/api
+@adminToken = REPLACE_WITH_ADMIN_BEARER_TOKEN
+@adminSecretKey = BYK_SUPER_ADMIN_ALIGARH_SECRET_2026
+
+### 1. List Public Financial Audit Reports
+GET {{baseUrl}}/audit-reports
+
+### 2. Upload Statutory CA Audit Report (Admin Only)
+POST {{baseUrl}}/audit-reports
+Authorization: Bearer {{adminToken}}
+x-admin-secret-key: {{adminSecretKey}}
+Content-Type: application/json
+
+{
+  "title": "Annual Statutory Balance Sheet & Income-Expenditure Statement",
+  "financialYear": "2024-2025",
+  "fileUrl": "/uploads/audit_report_fy_2024_2025.pdf",
+  "caName": "M/s R.K. Agrawal & Co., Chartered Accountants",
+  "remarks": "Unqualified clean audit opinion submitted to Income Tax Department."
+}
+
+### 3. Delete Audit Report (Admin Only)
+DELETE {{baseUrl}}/audit-reports/AUDIT_ID_HERE
+Authorization: Bearer {{adminToken}}
+x-admin-secret-key: {{adminSecretKey}}

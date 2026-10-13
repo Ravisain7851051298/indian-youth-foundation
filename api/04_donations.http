@@ -1,0 +1,71 @@
+### ==============================================================================
+### DONATIONS & SECTION 80G TAX EXEMPTION RECEIPT WORKFLOW APIS
+### Zero-fraud statutory compliance: No direct fake receipts! Admin reviews before 80G receipt dispatch!
+### ==============================================================================
+
+@baseUrl = http://localhost:5000/api
+@userToken = REPLACE_WITH_USER_BEARER_TOKEN
+@adminToken = REPLACE_WITH_ADMIN_BEARER_TOKEN
+@adminSecretKey = BYK_SUPER_ADMIN_ALIGARH_SECRET_2026
+
+### 1. Initiate Donation / Create Order
+POST {{baseUrl}}/donations/create-order
+Content-Type: application/json
+
+{
+  "amount": 2500,
+  "donorName": "Suresh Aggarwal",
+  "email": "suresh.aggarwal@example.com",
+  "phone": "9812345678",
+  "pan": "ABCDE1234F",
+  "address": "Civil Lines, Aligarh, UP",
+  "campaignTitle": "Winter Warmth & Youth Education Drive"
+}
+
+### 2. Submit Donation with Payment Proof / UTR
+### (Stores status 'pending'. NO official 80G receipt is generated yet)
+POST {{baseUrl}}/donations/submit
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+  "amount": 2500,
+  "donorName": "Suresh Aggarwal",
+  "email": "suresh.aggarwal@example.com",
+  "phone": "9812345678",
+  "pan": "ABCDE1234F",
+  "address": "Civil Lines, Aligarh, UP",
+  "campaignTitle": "Winter Warmth & Youth Education Drive",
+  "orderId": "order_1791885414165",
+  "transactionId": "UPI428198759231",
+  "paymentScreenshot": "/uploads/donation_screenshot_1.jpg"
+}
+
+### 3. Admin: List All Donations (Filter by Pending / Approved)
+GET {{baseUrl}}/donations?status=pending
+Authorization: Bearer {{adminToken}}
+x-admin-secret-key: {{adminSecretKey}}
+
+### 4. Admin: Approve Donation
+### (Generates official BYK-80G-2026-XXXX receipt number and auto-emails 80G PDF receipt to donor)
+PUT {{baseUrl}}/donations/DONATION_ID_HERE/approve
+Authorization: Bearer {{adminToken}}
+x-admin-secret-key: {{adminSecretKey}}
+Content-Type: application/json
+
+{}
+
+### 5. Admin: Reject Donation
+PUT {{baseUrl}}/donations/DONATION_ID_HERE/reject
+Authorization: Bearer {{adminToken}}
+x-admin-secret-key: {{adminSecretKey}}
+Content-Type: application/json
+
+{
+  "reason": "Payment not credited to Trust Bank account."
+}
+
+### 6. Admin: Export All 80G Donations to Excel (.xlsx)
+GET {{baseUrl}}/donations/export/excel
+Authorization: Bearer {{adminToken}}
+x-admin-secret-key: {{adminSecretKey}}

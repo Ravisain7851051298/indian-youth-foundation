@@ -1,0 +1,33 @@
+### ==============================================================================
+### EVENTS MANAGEMENT APIS
+### ==============================================================================
+
+@baseUrl = http://localhost:5000/api
+@adminToken = REPLACE_WITH_ADMIN_BEARER_TOKEN
+@adminSecretKey = BYK_SUPER_ADMIN_ALIGARH_SECRET_2026
+
+### 1. List All Events (Upcoming / Past)
+GET {{baseUrl}}/events?upcoming=true
+
+### 2. Create Event
+POST {{baseUrl}}/events
+Authorization: Bearer {{adminToken}}
+x-admin-secret-key: {{adminSecretKey}}
+Content-Type: application/json
+
+{
+  "title": "State Youth Leadership Summit 2026",
+  "titleHi": "राज्य युवा नेतृत्व महासम्मेलन 2026",
+  "description": "Annual convention of delegates, social activists, and youth coordinators.",
+  "descriptionHi": "सामाजिक कार्यकर्ताओं एवं युवा समन्वयकों का वार्षिक महाधिवेशन।",
+  "date": "2026-11-20",
+  "time": "10:00 AM - 04:00 PM",
+  "location": "Krishna Vihar Pala Road Aligarh, Uttar Pradesh",
+  "image": "https://images.unsplash.com/photo-1511578314322-379afb476865?w=600",
+  "isUpcoming": true
+}
+
+### 3. Delete Event
+DELETE {{baseUrl}}/events/EVENT_ID_HERE
+Authorization: Bearer {{adminToken}}
+x-admin-secret-key: {{adminSecretKey}}

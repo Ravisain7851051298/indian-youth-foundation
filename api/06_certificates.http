@@ -1,0 +1,28 @@
+### ==============================================================================
+### DIGITAL CERTIFICATES & RECOGNITION APIS
+### ==============================================================================
+
+@baseUrl = http://localhost:5000/api
+@adminToken = REPLACE_WITH_ADMIN_BEARER_TOKEN
+@adminSecretKey = BYK_SUPER_ADMIN_ALIGARH_SECRET_2026
+
+### 1. List All Issued Certificates
+GET {{baseUrl}}/certificates
+Authorization: Bearer {{adminToken}}
+
+### 2. Issue Official Certificate (Admin Only)
+### (Generates unique BYK-CERT-2026-XXXX ID, dynamic verification QR, and emails certificate to recipient)
+POST {{baseUrl}}/certificates
+Authorization: Bearer {{adminToken}}
+x-admin-secret-key: {{adminSecretKey}}
+Content-Type: application/json
+
+{
+  "recipientName": "Pooja Verma",
+  "recipientEmail": "pooja.verma@example.com",
+  "title": "Certificate of Exemplary Youth Leadership",
+  "titleHi": "उत्कृष्ट युवा नेतृत्व सम्मान पत्र",
+  "reason": "For leading social impact drives and organizing blood donation camps across Aligarh district.",
+  "reasonHi": "अलीगढ़ जिले में सामाजिक प्रभाव अभियानों और रक्तदान शिविरों के सफल आयोजन हेतु।",
+  "roleOrDesignation": "Senior Youth Volunteer"
+}

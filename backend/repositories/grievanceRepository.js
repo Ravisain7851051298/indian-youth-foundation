@@ -1,0 +1,26 @@
+const Grievance = require('../models/Grievance');
+
+class GrievanceRepository {
+  async create(data) {
+    const grievance = new Grievance(data);
+    return grievance.save();
+  }
+
+  async findById(id) {
+    return Grievance.findById(id);
+  }
+
+  async find(query = {}, sort = { createdAt: -1 }) {
+    return Grievance.find(query).sort(sort);
+  }
+
+  async updateById(id, data) {
+    return Grievance.findByIdAndUpdate(id, data, { new: true });
+  }
+
+  async count(query = {}) {
+    return Grievance.countDocuments(query);
+  }
+}
+
+module.exports = new GrievanceRepository();

@@ -1,0 +1,84 @@
+### ==============================================================================
+### AUTHENTICATION & PASSWORD MANAGEMENT APIS
+### Bharatiya Yuva Kranti (Indian Youth Foundation)
+### ==============================================================================
+
+@baseUrl = http://localhost:5000/api
+@adminSecretKey = BYK_SUPER_ADMIN_ALIGARH_SECRET_2026
+
+### 1. Register New Member / Volunteer Account
+# @name register
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Ravi Kumar",
+  "email": "ravi.kumar@example.com",
+  "phone": "9876543211",
+  "password": "Password@123",
+  "role": "Member",
+  "designation": "Applicant (Registered Member)",
+  "bloodGroup": "B+",
+  "dob": "1998-05-12",
+  "address": "Civil Lines, Aligarh",
+  "district": "Aligarh",
+  "state": "Uttar Pradesh"
+}
+
+### 2. Login as User
+# @name userLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "ravi.kumar@example.com",
+  "password": "Password@123"
+}
+
+### 3. Login as Admin
+# @name adminLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+x-admin-secret-key: {{adminSecretKey}}
+
+{
+  "email": "samasyasamadhanparishad@gmail.com",
+  "password": "admin123"
+}
+
+### Store Auth Tokens
+@userToken = {{userLogin.response.body.token}}
+@adminToken = {{adminLogin.response.body.token}}
+
+### 4. Get Current User Profile (Me)
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{userToken}}
+
+### 5. Update User Profile
+PUT {{baseUrl}}/auth/profile
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+  "name": "Ravi Kumar Sharma",
+  "bloodGroup": "O+",
+  "address": "Krishna Vihar Pala Road Aligarh",
+  "photoUrl": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=300"
+}
+
+### 6. Forgot Password - Request Reset Link
+POST {{baseUrl}}/auth/forgot-password
+Content-Type: application/json
+
+{
+  "email": "ravi.kumar@example.com"
+}
+
+### 7. Reset Password with Token
+POST {{baseUrl}}/auth/reset-password
+Content-Type: application/json
+
+{
+  "token": "REPLACE_WITH_RESET_TOKEN_FROM_EMAIL",
+  "newPassword": "NewSecurePassword@123"
+}

@@ -1,0 +1,15 @@
+### ==============================================================================
+### PUBLIC TRUST & CREDENTIAL VERIFICATION APIS (Scan QR Code Endpoints)
+### Open to the general public, law enforcement, and donors without login
+### ==============================================================================
+
+@baseUrl = http://localhost:5000/api
+
+### 1. Verify Member ID Card (QR code on physical or digital ID card scans here)
+GET {{baseUrl}}/verify/member/BYK-MEM-2026-1001
+
+### 2. Verify Certificate of Recognition / Appreciation
+GET {{baseUrl}}/verify/certificate/BYK-CERT-2026-0001
+
+### 3. Verify Section 80G Tax Exemption Donation Receipt
+GET {{baseUrl}}/verify/donation/BYK-80G-2026-0001
