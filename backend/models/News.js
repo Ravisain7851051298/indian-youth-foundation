@@ -13,4 +13,6 @@ const newsSchema = new mongoose.Schema({
   timestamps: true
 });
 
+newsSchema.plugin(require('./plugins/fileCleanupPlugin'));
+
 module.exports = mongoose.model('News', newsSchema);

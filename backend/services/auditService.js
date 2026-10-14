@@ -15,6 +15,8 @@ class AuditService {
   async deleteAuditReport(id) {
     const report = await auditRepository.deleteById(id);
     if (!report) throw new Error('Audit report not found');
+    const { deleteDocumentFiles } = require('../utils/fileCleaner');
+    await deleteDocumentFiles(report);
     return report;
   }
 }

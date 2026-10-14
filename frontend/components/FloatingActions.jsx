@@ -13,16 +13,6 @@ export default function FloatingActions() {
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3 no-print">
-      {/* Birthday Banner Quick Tool */}
-      <Link
-        href="/profile?tab=birthday"
-        className="flex items-center gap-2 px-3.5 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-full shadow-lg hover:shadow-indigo-500/40 text-xs font-bold hover:scale-105 transition-all group"
-        title="Create Member Birthday Wishes Poster"
-      >
-        <FiGift className="w-4 h-4 text-amber-300 animate-bounce" />
-        <span className="hidden md:inline">🎂 Birthday Poster Tool</span>
-      </Link>
-
       {/* Floating Call Button */}
       <a
         href={`tel:${settings?.phone || '+919876543210'}`}

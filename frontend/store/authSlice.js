@@ -1,6 +1,34 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../services/api';
 
+/**
+ * Dynamic Admin Account Creation using X-ADMIN-SECRET-KEY
+ */
+export const createAdminUser = createAsyncThunk(
+  'auth/createAdminUser',
+  async ({ adminData, adminSecretKey }, { rejectWithValue }) => {
+    try {
+      const res = await api.post('/auth/create-admin', adminData, {
+        headers: {
+          'x-admin-secret-key': adminSecretKey
+        }
+      });
+      if (res.data.success) {
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem('byk_user', JSON.stringify(res.data.user));
+        }
+        return res.data;
+      }
+      return rejectWithValue(res.data.message || 'Admin creation failed');
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message || 'Error creating admin');
+    }
+  }
+);
+
+/**
+ * Sign in (Browser automatically handles secure HTTP-Only cookie)
+ */
 export const loginUser = createAsyncThunk(
   'auth/loginUser',
   async ({ email, password }, { rejectWithValue }) => {
@@ -8,8 +36,7 @@ export const loginUser = createAsyncThunk(
       const res = await api.post('/auth/login', { email, password });
       if (res.data.success) {
         if (typeof window !== 'undefined') {
-          localStorage.setItem('byk_token', res.data.token);
-          localStorage.setItem('byk_user', JSON.stringify(res.data.user));
+          sessionStorage.setItem('byk_user', JSON.stringify(res.data.user));
         }
         return res.data;
       }
@@ -20,6 +47,9 @@ export const loginUser = createAsyncThunk(
   }
 );
 
+/**
+ * Register Member or Volunteer
+ */
 export const registerUser = createAsyncThunk(
   'auth/registerUser',
   async (userData, { rejectWithValue }) => {
@@ -27,8 +57,7 @@ export const registerUser = createAsyncThunk(
       const res = await api.post('/auth/register', userData);
       if (res.data.success) {
         if (typeof window !== 'undefined') {
-          localStorage.setItem('byk_token', res.data.token);
-          localStorage.setItem('byk_user', JSON.stringify(res.data.user));
+          sessionStorage.setItem('byk_user', JSON.stringify(res.data.user));
         }
         return res.data;
       }
@@ -39,6 +68,30 @@ export const registerUser = createAsyncThunk(
   }
 );
 
+/**
+ * Logout User: Revokes token in MongoDB TTL blacklist & clears HTTP-Only cookies
+ */
+export const logoutUser = createAsyncThunk(
+  'auth/logoutUser',
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await api.post('/auth/logout');
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('byk_user');
+      }
+      return res.data;
+    } catch (err) {
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('byk_user');
+      }
+      return rejectWithValue(err.response?.data?.message || 'Logout error');
+    }
+  }
+);
+
+/**
+ * Fetch Current User from backend using HTTP-Only cookie session
+ */
 export const fetchCurrentUser = createAsyncThunk(
   'auth/fetchCurrentUser',
   async (_, { rejectWithValue }) => {
@@ -46,12 +99,15 @@ export const fetchCurrentUser = createAsyncThunk(
       const res = await api.get('/auth/me');
       if (res.data.success) {
         if (typeof window !== 'undefined') {
-          localStorage.setItem('byk_user', JSON.stringify(res.data.user));
+          sessionStorage.setItem('byk_user', JSON.stringify(res.data.user));
         }
         return res.data.user;
       }
       return rejectWithValue('User fetch failed');
     } catch (err) {
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('byk_user');
+      }
       return rejectWithValue(err.response?.data?.message || 'Error fetching user');
     }
   }
@@ -60,7 +116,7 @@ export const fetchCurrentUser = createAsyncThunk(
 const getInitialUser = () => {
   if (typeof window !== 'undefined') {
     try {
-      const saved = localStorage.getItem('byk_user');
+      const saved = sessionStorage.getItem('byk_user');
       return saved ? JSON.parse(saved) : null;
     } catch {
       return null;
@@ -69,18 +125,10 @@ const getInitialUser = () => {
   return null;
 };
 
-const getInitialToken = () => {
-  if (typeof window !== 'undefined') {
-    return localStorage.getItem('byk_token') || null;
-  }
-  return null;
-};
-
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
     user: getInitialUser(),
-    token: getInitialToken(),
     loading: false,
     error: null,
     successMessage: null
@@ -88,18 +136,16 @@ const authSlice = createSlice({
   reducers: {
     logout: (state) => {
       state.user = null;
-      state.token = null;
       state.error = null;
       state.successMessage = null;
       if (typeof window !== 'undefined') {
-        localStorage.removeItem('byk_token');
-        localStorage.removeItem('byk_user');
+        sessionStorage.removeItem('byk_user');
       }
     },
     setUser: (state, action) => {
       state.user = action.payload;
       if (typeof window !== 'undefined') {
-        localStorage.setItem('byk_user', JSON.stringify(action.payload));
+        sessionStorage.setItem('byk_user', JSON.stringify(action.payload));
       }
     },
     clearError: (state) => {
@@ -111,6 +157,20 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // Create Admin
+      .addCase(createAdminUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createAdminUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload.user;
+        state.successMessage = 'Admin account verified & initialized!';
+      })
+      .addCase(createAdminUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Admin creation failed';
+      })
       // Login
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
@@ -119,7 +179,6 @@ const authSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload.user;
-        state.token = action.payload.token;
         state.successMessage = 'Login successful!';
       })
       .addCase(loginUser.rejected, (state, action) => {
@@ -134,16 +193,28 @@ const authSlice = createSlice({
       .addCase(registerUser.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload.user;
-        state.token = action.payload.token;
         state.successMessage = action.payload.message || 'Registration successful!';
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Registration failed';
       })
+      // Logout
+      .addCase(logoutUser.fulfilled, (state) => {
+        state.user = null;
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(logoutUser.rejected, (state) => {
+        state.user = null;
+        state.loading = false;
+      })
       // Fetch Current User
       .addCase(fetchCurrentUser.fulfilled, (state, action) => {
         state.user = action.payload;
+      })
+      .addCase(fetchCurrentUser.rejected, (state) => {
+        state.user = null;
       });
   }
 });

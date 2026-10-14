@@ -124,7 +124,7 @@ export default function SettingsPage() {
           </p>
           <Link
             href="/login"
-            className="mt-6 inline-block px-6 py-2.5 bg-orange-600 text-white rounded-xl text-xs font-bold transition hover:bg-orange-700"
+            className="mt-6 inline-block px-6 py-2.5 bg-red-600 text-white rounded-xl text-xs font-bold transition hover:bg-red-700 shadow-md shadow-red-600/20"
           >
             Login as Administrator
           </Link>
@@ -138,23 +138,23 @@ export default function SettingsPage() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-200">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-100 text-orange-700 text-xs font-bold mb-1">
-              <FiSettings className="w-3.5 h-3.5" />
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 border border-red-200 text-red-700 text-xs font-bold mb-1">
+              <FiSettings className="w-3.5 h-3.5 text-red-600" />
               <span>Admin Master CMS Control</span>
             </div>
-            <h1 className="text-3xl font-black text-slate-900 tracking-tight">
+            <h1 className="text-3xl font-black text-black tracking-tight">
               Contact & NGO Master Settings
             </h1>
-            <p className="text-xs sm:text-sm text-slate-600 mt-1">
+            <p className="text-xs sm:text-sm text-gray-700 mt-1 font-medium">
               Complete dynamic CRUD: Logo, Official Seal, Signatures, Contact Info, Bank/UPI, About Us & Mission/Vision. All files saved to uploads directory.
             </p>
           </div>
 
           <Link
             href="/dashboard"
-            className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold rounded-xl transition self-start sm:self-auto"
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-black text-xs font-bold rounded-xl transition self-start sm:self-auto"
           >
-            <FiArrowLeft className="w-4 h-4" />
+            <FiArrowLeft className="w-4 h-4 text-red-600" />
             <span>Dashboard</span>
           </Link>
         </div>
@@ -172,7 +172,7 @@ export default function SettingsPage() {
             type="button"
             onClick={() => setActiveTab('branding')}
             className={`px-4 py-2.5 rounded-xl transition cursor-pointer whitespace-nowrap ${
-              activeTab === 'branding' ? 'bg-orange-600 text-white shadow-md' : 'bg-white text-slate-700 hover:bg-slate-100'
+              activeTab === 'branding' ? 'bg-red-600 text-white shadow-md' : 'bg-white text-black hover:bg-red-50 border border-slate-200'
             }`}
           >
             1. Logo, Seal & Signature
@@ -181,7 +181,7 @@ export default function SettingsPage() {
             type="button"
             onClick={() => setActiveTab('statutory')}
             className={`px-4 py-2.5 rounded-xl transition cursor-pointer whitespace-nowrap ${
-              activeTab === 'statutory' ? 'bg-orange-600 text-white shadow-md' : 'bg-white text-slate-700 hover:bg-slate-100'
+              activeTab === 'statutory' ? 'bg-red-600 text-white shadow-md' : 'bg-white text-black hover:bg-red-50 border border-slate-200'
             }`}
           >
             2. Statutory 12A / 80G & PAN
@@ -190,7 +190,7 @@ export default function SettingsPage() {
             type="button"
             onClick={() => setActiveTab('contact')}
             className={`px-4 py-2.5 rounded-xl transition cursor-pointer whitespace-nowrap ${
-              activeTab === 'contact' ? 'bg-orange-600 text-white shadow-md' : 'bg-white text-slate-700 hover:bg-slate-100'
+              activeTab === 'contact' ? 'bg-red-600 text-white shadow-md' : 'bg-white text-black hover:bg-red-50 border border-slate-200'
             }`}
           >
             3. Contact & Head Office
@@ -199,7 +199,7 @@ export default function SettingsPage() {
             type="button"
             onClick={() => setActiveTab('bank')}
             className={`px-4 py-2.5 rounded-xl transition cursor-pointer whitespace-nowrap ${
-              activeTab === 'bank' ? 'bg-orange-600 text-white shadow-md' : 'bg-white text-slate-700 hover:bg-slate-100'
+              activeTab === 'bank' ? 'bg-red-600 text-white shadow-md' : 'bg-white text-black hover:bg-red-50 border border-slate-200'
             }`}
           >
             4. Bank Details & UPI QR
@@ -208,7 +208,7 @@ export default function SettingsPage() {
             type="button"
             onClick={() => setActiveTab('about')}
             className={`px-4 py-2.5 rounded-xl transition cursor-pointer whitespace-nowrap ${
-              activeTab === 'about' ? 'bg-orange-600 text-white shadow-md' : 'bg-white text-slate-700 hover:bg-slate-100'
+              activeTab === 'about' ? 'bg-red-600 text-white shadow-md' : 'bg-white text-black hover:bg-red-50 border border-slate-200'
             }`}
           >
             5. About Us & Mission/Vision
@@ -217,7 +217,7 @@ export default function SettingsPage() {
             type="button"
             onClick={() => setActiveTab('smtp')}
             className={`px-4 py-2.5 rounded-xl transition cursor-pointer whitespace-nowrap ${
-              activeTab === 'smtp' ? 'bg-orange-600 text-white shadow-md' : 'bg-white text-slate-700 hover:bg-slate-100'
+              activeTab === 'smtp' ? 'bg-red-600 text-white shadow-md' : 'bg-white text-black hover:bg-red-50 border border-slate-200'
             }`}
           >
             6. SMTP Email Server & Security
@@ -228,55 +228,55 @@ export default function SettingsPage() {
           {/* TAB 1: BRANDING, LOGO, SEAL, SIGNATURE */}
           {activeTab === 'branding' && (
             <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm space-y-6">
-              <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-2 border-b pb-3">
-                <FiImage className="text-orange-600" />
+              <h2 className="text-base font-extrabold text-black flex items-center gap-2 border-b pb-3">
+                <FiImage className="text-red-600" />
                 <span>1. Organization Branding, Official Stamp & Signatures</span>
               </h2>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">NGO Full English Name *</label>
+                  <label className="font-bold text-black block mb-1">NGO Full English Name *</label>
                   <input
                     type="text"
                     required
                     name="ngoName"
                     value={form.ngoName}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-orange-500 font-bold"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-bold text-black"
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">NGO Name in Hindi *</label>
+                  <label className="font-bold text-black block mb-1">NGO Name in Hindi *</label>
                   <input
                     type="text"
                     required
                     name="ngoNameHi"
                     value={form.ngoNameHi}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-orange-500 font-bold"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-bold text-black"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Official Tagline (English)</label>
+                  <label className="font-bold text-black block mb-1">Official Tagline (English)</label>
                   <input
                     type="text"
                     name="tagline"
                     value={form.tagline}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-orange-500"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-black"
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Membership / Registration Fee (₹)</label>
+                  <label className="font-bold text-black block mb-1">Membership / Registration Fee (₹)</label>
                   <input
                     type="number"
                     name="membershipFee"
                     value={form.membershipFee}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-orange-500 font-mono font-bold"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-mono font-bold text-black"
                   />
                 </div>
               </div>
@@ -286,7 +286,7 @@ export default function SettingsPage() {
                 {/* 1. Official Logo */}
                 <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
                   <div className="flex items-center justify-between">
-                    <label className="font-bold text-slate-800 block text-xs">Official Logo</label>
+                    <label className="font-bold text-black block text-xs">Official Logo</label>
                     {form.logoUrl && (
                       <img src={form.logoUrl} alt="Logo" className="w-8 h-8 rounded-lg object-contain bg-white p-0.5 border" />
                     )}
@@ -297,10 +297,10 @@ export default function SettingsPage() {
                     name="logoUrl"
                     value={form.logoUrl}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs text-black"
                   />
                   <div>
-                    <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-[11px] transition">
+                    <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-[11px] transition shadow-md shadow-red-600/20">
                       <FiUploadCloud className="w-3.5 h-3.5" />
                       <span>{uploadingField === 'logoUrl' ? 'Uploading...' : 'Upload Logo to uploads/'}</span>
                       <input
@@ -379,47 +379,47 @@ export default function SettingsPage() {
           {/* TAB 2: STATUTORY COMPLIANCES */}
           {activeTab === 'statutory' && (
             <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm space-y-4">
-              <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-2 border-b pb-3">
-                <FiShield className="text-orange-600" />
+              <h2 className="text-base font-extrabold text-black flex items-center gap-2 border-b pb-3">
+                <FiShield className="text-red-600" />
                 <span>2. Statutory Registrations & Tax Exemption Numbers</span>
               </h2>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Registration / Trust Deed No.</label>
+                  <label className="font-bold text-black block mb-1">Registration / Trust Deed No.</label>
                   <input
                     type="text"
                     name="registrationNo"
                     value={form.registrationNo}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 font-mono"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 font-mono text-black"
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">NITI Aayog Darpan ID</label>
+                  <label className="font-bold text-black block mb-1">NITI Aayog Darpan ID</label>
                   <input
                     type="text"
                     name="nitiAayogDarpanId"
                     value={form.nitiAayogDarpanId}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 font-mono"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 font-mono text-black"
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">PAN Card Number</label>
+                  <label className="font-bold text-black block mb-1">PAN Card Number</label>
                   <input
                     type="text"
                     name="panNo"
                     value={form.panNo}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 font-mono uppercase"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 font-mono uppercase text-black"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Section 12A Order Number</label>
+                  <label className="font-bold text-black block mb-1">Section 12A Order Number</label>
                   <input
                     type="text"
                     name="exemption12A"
@@ -429,23 +429,23 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Section 80G Approval Number</label>
+                  <label className="font-bold text-black block mb-1">Section 80G Approval Number</label>
                   <input
                     type="text"
                     name="exemption80G"
                     value={form.exemption80G}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 font-mono font-bold text-orange-600"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 font-mono font-bold text-red-600"
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">CSR-1 Registration Number</label>
+                  <label className="font-bold text-black block mb-1">CSR-1 Registration Number</label>
                   <input
                     type="text"
                     name="csr1No"
                     value={form.csr1No}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 font-mono"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 font-mono text-black"
                   />
                 </div>
               </div>
@@ -455,66 +455,66 @@ export default function SettingsPage() {
           {/* TAB 3: CONTACT & HEAD OFFICE */}
           {activeTab === 'contact' && (
             <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm space-y-4">
-              <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-2 border-b pb-3">
-                <FiPhone className="text-orange-600" />
+              <h2 className="text-base font-extrabold text-black flex items-center gap-2 border-b pb-3">
+                <FiPhone className="text-red-600" />
                 <span>3. Contact Numbers, Email & Head Office Location</span>
               </h2>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Helpline Phone Number *</label>
+                  <label className="font-bold text-black block mb-1">Helpline Phone Number *</label>
                   <input
                     type="text"
                     required
                     name="phone"
                     value={form.phone}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 font-bold"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-bold text-black"
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">WhatsApp Helpline *</label>
+                  <label className="font-bold text-black block mb-1">WhatsApp Helpline *</label>
                   <input
                     type="text"
                     name="whatsapp"
                     value={form.whatsapp}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 font-bold"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-bold text-black"
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Official Email Address *</label>
+                  <label className="font-bold text-black block mb-1">Official Email Address *</label>
                   <input
                     type="email"
                     required
                     name="email"
                     value={form.email}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 font-bold"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-bold text-black"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Head Office Full Address *</label>
+                <label className="font-bold text-black block mb-1">Head Office Full Address *</label>
                 <textarea
                   rows={2}
                   required
                   name="address"
                   value={form.address}
                   onChange={handleChange}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 font-medium"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium text-black"
                 />
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Google Maps Embed URL</label>
+                <label className="font-bold text-black block mb-1">Google Maps Embed URL</label>
                 <input
                   type="text"
                   name="googleMapEmbed"
                   value={form.googleMapEmbed}
                   onChange={handleChange}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 font-mono text-[11px]"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-mono text-[11px] text-black"
                 />
               </div>
             </div>
@@ -523,80 +523,80 @@ export default function SettingsPage() {
           {/* TAB 4: BANK & UPI DETAILS */}
           {activeTab === 'bank' && (
             <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm space-y-4">
-              <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-2 border-b pb-3">
-                <FiCreditCard className="text-orange-600" />
+              <h2 className="text-base font-extrabold text-black flex items-center gap-2 border-b pb-3">
+                <FiCreditCard className="text-red-600" />
                 <span>4. Bank Account Details & UPI Donation QR Code</span>
               </h2>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Bank Account Holder Name</label>
+                  <label className="font-bold text-black block mb-1">Bank Account Holder Name</label>
                   <input
                     type="text"
                     name="accountName"
                     value={form.accountName}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 font-bold"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-bold text-black"
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Bank Account Number</label>
+                  <label className="font-bold text-black block mb-1">Bank Account Number</label>
                   <input
                     type="text"
                     name="accountNumber"
                     value={form.accountNumber}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 font-mono font-bold"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-mono font-bold text-black"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">IFSC Code</label>
+                  <label className="font-bold text-black block mb-1">IFSC Code</label>
                   <input
                     type="text"
                     name="ifscCode"
                     value={form.ifscCode}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 font-mono uppercase"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-mono uppercase text-black"
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Bank Name</label>
+                  <label className="font-bold text-black block mb-1">Bank Name</label>
                   <input
                     type="text"
                     name="bankName"
                     value={form.bankName}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-black"
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Branch Name</label>
+                  <label className="font-bold text-black block mb-1">Branch Name</label>
                   <input
                     type="text"
                     name="branch"
                     value={form.branch}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-black"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 border-t">
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Official UPI VPA ID</label>
+                  <label className="font-bold text-black block mb-1">Official UPI VPA ID</label>
                   <input
                     type="text"
                     name="upiId"
                     value={form.upiId}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 font-mono font-bold text-orange-600"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-mono font-bold text-red-600"
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="font-bold text-slate-700 block mb-1">UPI QR Code Image</label>
+                  <label className="font-bold text-black block mb-1">UPI QR Code Image</label>
                   <div className="flex items-center gap-3">
                     <input
                       type="text"
@@ -604,9 +604,9 @@ export default function SettingsPage() {
                       placeholder="QR code image URL"
                       value={form.upiQrImage}
                       onChange={handleChange}
-                      className="flex-1 px-3 py-2 rounded-xl border border-slate-300 text-xs font-mono"
+                      className="flex-1 px-3 py-2 rounded-xl border border-slate-300 text-xs font-mono text-black"
                     />
-                    <label className="cursor-pointer px-3 py-2 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs whitespace-nowrap">
+                    <label className="cursor-pointer px-3 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs whitespace-nowrap shadow-md shadow-red-600/20">
                       <span>{uploadingField === 'upiQrImage' ? 'Uploading...' : 'Upload QR'}</span>
                       <input
                         type="file"
@@ -624,63 +624,63 @@ export default function SettingsPage() {
           {/* TAB 5: DYNAMIC ABOUT US & MISSION/VISION */}
           {activeTab === 'about' && (
             <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm space-y-4">
-              <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-2 border-b pb-3">
-                <FiCompass className="text-orange-600" />
+              <h2 className="text-base font-extrabold text-black flex items-center gap-2 border-b pb-3">
+                <FiCompass className="text-red-600" />
                 <span>5. Dynamic About Us Story & Mission / Vision Statements</span>
               </h2>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">About Us Main Heading</label>
+                <label className="font-bold text-black block mb-1">About Us Main Heading</label>
                 <input
                   type="text"
                   name="aboutHeading"
                   value={form.aboutHeading}
                   onChange={handleChange}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 font-bold"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-bold text-black"
                 />
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">About Us Subtitle</label>
+                <label className="font-bold text-black block mb-1">About Us Subtitle</label>
                 <input
                   type="text"
                   name="aboutSubtitle"
                   value={form.aboutSubtitle}
                   onChange={handleChange}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-black"
                 />
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Comprehensive About Us Story</label>
+                <label className="font-bold text-black block mb-1">Comprehensive About Us Story</label>
                 <textarea
                   rows={4}
                   name="aboutStory"
                   value={form.aboutStory}
                   onChange={handleChange}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 leading-relaxed"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 leading-relaxed text-black"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Statutory Mission Statement</label>
+                  <label className="font-bold text-black block mb-1">Statutory Mission Statement</label>
                   <textarea
                     rows={3}
                     name="missionStatement"
                     value={form.missionStatement}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 leading-relaxed"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 leading-relaxed text-black"
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Vision Statement</label>
+                  <label className="font-bold text-black block mb-1">Vision Statement</label>
                   <textarea
                     rows={3}
                     name="visionStatement"
                     value={form.visionStatement}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 leading-relaxed"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 leading-relaxed text-black"
                   />
                 </div>
               </div>
@@ -691,8 +691,8 @@ export default function SettingsPage() {
           {activeTab === 'smtp' && (
             <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm space-y-6">
               <div className="flex items-center justify-between border-b pb-3">
-                <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-                  <FiShield className="text-orange-600" />
+                <h2 className="text-base font-extrabold text-black flex items-center gap-2">
+                  <FiShield className="text-red-600" />
                   <span>6. Dynamic SMTP Email Server & Security Settings</span>
                 </h2>
                 <span className="text-[10px] px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-bold">
@@ -706,67 +706,67 @@ export default function SettingsPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">SMTP Host</label>
+                  <label className="font-bold text-black block mb-1">SMTP Host</label>
                   <input
                     type="text"
                     name="smtpHost"
                     value={form.smtpHost}
                     onChange={handleChange}
                     placeholder="smtp.gmail.com"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-black"
                   />
-                  <span className="text-[10px] text-slate-400 mt-1 block">Default: smtp.gmail.com</span>
+                  <span className="text-[10px] text-gray-500 mt-1 block">Default: smtp.gmail.com</span>
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">SMTP Port</label>
+                  <label className="font-bold text-black block mb-1">SMTP Port</label>
                   <input
                     type="number"
                     name="smtpPort"
                     value={form.smtpPort}
                     onChange={handleChange}
                     placeholder="587"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-black"
                   />
-                  <span className="text-[10px] text-slate-400 mt-1 block">Standard TLS Port: 587 (or 465 for SSL)</span>
+                  <span className="text-[10px] text-gray-500 mt-1 block">Standard TLS Port: 587 (or 465 for SSL)</span>
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Official SMTP Email Address (Username)</label>
+                  <label className="font-bold text-black block mb-1">Official SMTP Email Address (Username)</label>
                   <input
                     type="email"
                     name="smtpUser"
                     value={form.smtpUser}
                     onChange={handleChange}
                     placeholder="samasyasamadhanparishad@gmail.com"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 font-medium"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium text-black"
                   />
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">SMTP App Password (Gmail 16-character App Password)</label>
+                  <label className="font-bold text-black block mb-1">SMTP App Password (Gmail 16-character App Password)</label>
                   <input
                     type="password"
                     name="smtpPass"
                     value={form.smtpPass}
                     onChange={handleChange}
                     placeholder="••••••••••••••••"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 font-mono"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-mono text-black"
                   />
-                  <span className="text-[10px] text-slate-400 mt-1 block">Generated from Google Account → Security → App Passwords</span>
+                  <span className="text-[10px] text-gray-500 mt-1 block">Generated from Google Account → Security → App Passwords</span>
                 </div>
               </div>
 
               <div className="pt-4 border-t border-slate-200">
-                <label className="font-bold text-slate-700 block mb-1">Super Admin Secret Key (x-admin-secret-key)</label>
+                <label className="font-bold text-black block mb-1">Super Admin Secret Key (x-admin-secret-key)</label>
                 <input
                   type="text"
                   name="adminSecretKey"
                   value={form.adminSecretKey}
                   onChange={handleChange}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 font-mono bg-slate-50 text-slate-800"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-mono bg-slate-50 text-black"
                 />
-                <span className="text-[10px] text-slate-500 mt-1 block">
+                <span className="text-[10px] text-gray-600 mt-1 block">
                   Mandatory secret header for privileged administrative operations. Matches X_ADMIN_SECRET_KEY in .env.
                 </span>
               </div>
@@ -775,12 +775,12 @@ export default function SettingsPage() {
 
           {/* Submit Button */}
           <div className="pt-4 flex items-center justify-between">
-            <span className="text-xs text-slate-500 font-semibold">
+            <span className="text-xs text-gray-600 font-semibold">
               * Any modifications saved here take effect immediately across the public website and dynamic generators.
             </span>
             <button
               type="submit"
-              className="flex items-center gap-2 px-8 py-3.5 rounded-2xl bg-orange-600 hover:bg-orange-700 text-white font-extrabold text-sm shadow-xl shadow-orange-600/30 transition cursor-pointer"
+              className="flex items-center gap-2 px-8 py-3.5 rounded-2xl bg-red-600 hover:bg-red-700 text-white font-extrabold text-sm shadow-xl shadow-red-600/30 transition cursor-pointer"
             >
               <FiSave className="w-4 h-4" />
               <span>Save & Publish All Master Settings</span>

@@ -90,6 +90,20 @@ const verifyPublicDonation = async (req, res) => {
   }
 };
 
+const deleteDonation = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await donationService.deleteDonation(id);
+    return res.json({
+      success: true,
+      message: 'Donation record and associated receipt/screenshot files deleted successfully',
+      id
+    });
+  } catch (error) {
+    return res.status(400).json({ success: false, message: error.message });
+  }
+};
+
 module.exports = {
   createDonationOrder,
   submitDonation,
@@ -98,5 +112,6 @@ module.exports = {
   rejectDonation,
   getDonations,
   exportDonationsExcel,
-  verifyPublicDonation
+  verifyPublicDonation,
+  deleteDonation
 };

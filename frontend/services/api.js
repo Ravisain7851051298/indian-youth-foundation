@@ -1,24 +1,24 @@
 import axios from 'axios';
 
-// Create base Axios instance
+// Create base Axios instance with credentials enabled for HTTP-only cookies
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api',
-  timeout: 20000,
+  timeout: 25000,
+  withCredentials: true, // Automatically sends HTTP-Only secure cookies with every request
   headers: {
     'Content-Type': 'application/json'
   }
 });
 
 // ==========================================
-// REQUEST INTERCEPTOR: Inject JWT Bearer Token
+// REQUEST INTERCEPTOR: Dynamic Request Handler
 // ==========================================
 api.interceptors.request.use(
   (config) => {
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('byk_token');
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
+    // Note: Tokens are stored in secure HTTP-Only cookies, eliminating local storage exposure
+    config.withCredentials = true;
+    if (typeof FormData !== 'undefined' && config.data instanceof FormData) {
+      delete config.headers['Content-Type'];
     }
     return config;
   },
@@ -28,7 +28,7 @@ api.interceptors.request.use(
 );
 
 // ==========================================
-// RESPONSE INTERCEPTOR: Global Error & 401 Handler
+// RESPONSE INTERCEPTOR: Dynamic 401 / Session Revocation Handler
 // ==========================================
 api.interceptors.response.use(
   (response) => {
@@ -36,15 +36,16 @@ api.interceptors.response.use(
   },
   (error) => {
     if (error.response) {
-      // 401 Unauthorized: Session Expired or Invalid Token
+      // 401 Unauthorized: Session Expired, Revoked, or Blacklisted
       if (error.response.status === 401) {
         if (typeof window !== 'undefined') {
-          // If token was invalid, clear local storage
+          // Dispatch a custom event so Context/Redux can dynamically reset state
+          window.dispatchEvent(new CustomEvent('byk_auth_unauthorized'));
+          sessionStorage.removeItem('byk_user');
+
           const currentPath = window.location.pathname;
           if (currentPath.startsWith('/dashboard') || currentPath.startsWith('/profile')) {
-            localStorage.removeItem('byk_token');
-            localStorage.removeItem('byk_user');
-            // Allow user to redirect or re-login
+            window.location.href = '/login?expired=true';
           }
         }
       }

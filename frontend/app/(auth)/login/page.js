@@ -1,116 +1,141 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { FiUser, FiLock, FiShield, FiUsers, FiHeart, FiArrowRight, FiEye, FiEyeOff } from 'react-icons/fi';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { 
+  FiUser, 
+  FiLock, 
+  FiEye, 
+  FiEyeOff, 
+  FiCheckCircle, 
+  FiAlertTriangle,
+  FiLogIn,
+  FiShield,
+  FiKey,
+  FiArrowRight
+} from 'react-icons/fi';
 import { useNGO } from '@/context/NGOContext';
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
-  const { login, currentUser, settings } = useNGO();
-  const [email, setEmail] = useState('');
+  const searchParams = useSearchParams();
+  const redirectTarget = searchParams.get('redirect');
+  const isExpired = searchParams.get('expired');
+  const { login, settings } = useNGO();
+
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState(isExpired ? 'Your session expired. Please sign in again.' : '');
+  const [success, setSuccess] = useState('');
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-    const res = await login(email, password);
-    setLoading(false);
-    if (res.success) {
-      if (res.user.role === 'Admin') {
-        router.push('/dashboard');
-      } else {
-        router.push('/profile');
-      }
-    } else {
-      setError(res.message || 'Invalid email or password. Please verify your credentials.');
-    }
-  };
+    setSuccess('');
 
-  // 1-Click quick role logins for demo / evaluation
-  const quickLogin = async (roleEmail, rolePass) => {
-    setEmail(roleEmail);
-    setPassword(rolePass);
-    setLoading(true);
-    setError('');
-    const res = await login(roleEmail, rolePass);
+    const res = await login(identifier.trim(), password);
     setLoading(false);
+
     if (res.success) {
-      if (res.user.role === 'Admin') {
-        router.push('/dashboard');
-      } else {
-        router.push('/profile');
-      }
+      setSuccess(`Authentication verified! Welcome back, ${res.user.name}.`);
+      setTimeout(() => {
+        // If an Admin logs in, direct to Admin Dashboard (unless explicit redirect specified)
+        if (res.user.role === 'Admin') {
+          router.push(redirectTarget || '/dashboard');
+        } else {
+          router.push(redirectTarget || '/profile');
+        }
+      }, 500);
     } else {
-      setError(res.message || 'Unable to sign in with demo credentials.');
+      setError(res.message || 'Invalid credentials. Please verify your registered email/phone and password.');
     }
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center p-6 bg-slate-100">
-      <div className="max-w-md w-full bg-white rounded-3xl p-8 border border-slate-200 shadow-xl">
+    <div className="min-h-[85vh] flex items-center justify-center p-4 sm:p-6 bg-slate-50 text-black">
+      <div className="max-w-md w-full bg-white rounded-3xl p-6 sm:p-8 border border-gray-200 shadow-xl relative overflow-hidden">
+        
+        {/* Decorative Top Accent Glow */}
+        <div className="absolute -top-24 -right-24 w-48 h-48 bg-red-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        {/* Brand Banner */}
         <div className="text-center mb-6">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-500 text-white font-black text-xl flex items-center justify-center mx-auto mb-3 shadow-lg shadow-orange-500/25">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-red-600 to-rose-600 text-white font-black text-xl flex items-center justify-center mx-auto mb-3 shadow-lg shadow-red-500/20">
             IYF
           </div>
-          <h1 className="text-2xl font-black text-slate-900">Member & Admin Portal</h1>
-          <p className="text-xs text-slate-500 mt-1">
-            {settings?.ngoName || 'Indian Youth Foundation'} — Official Authentication Gateway
+          <h1 className="text-2xl font-black text-black">Sign In to Portal</h1>
+          <p className="text-xs text-black/70 mt-1">
+            {settings?.ngoName || 'Indian Youth Foundation'} — Official Central Gateway
           </p>
+          <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 border border-red-200 text-[10px] text-red-700 font-semibold">
+            <span className="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse"></span>
+            Unified Member &amp; Trustee Secure Gateway
+          </div>
         </div>
 
+        {/* Alert Notifications */}
         {error && (
-          <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold text-center">
-            {error}
+          <div className="mb-4 p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-medium flex items-start gap-2.5">
+            <FiAlertTriangle className="w-4 h-4 shrink-0 text-rose-600 mt-0.5" />
+            <span>{error}</span>
           </div>
         )}
 
+        {success && (
+          <div className="mb-4 p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium flex items-start gap-2.5">
+            <FiCheckCircle className="w-4 h-4 shrink-0 text-emerald-600 mt-0.5" />
+            <span>{success}</span>
+          </div>
+        )}
+
+        {/* UNIFIED LOGIN FORM FOR USERS & ADMINS */}
         <form onSubmit={handleLogin} className="space-y-4 text-xs">
           <div>
-            <label className="font-bold text-slate-700 block mb-1">Email or Mobile Number</label>
+            <label className="font-bold text-black block mb-1.5">
+              Registered Email or Mobile Number
+            </label>
             <div className="relative">
-              <FiUser className="absolute left-3.5 top-3.5 text-slate-400 w-4 h-4" />
+              <FiUser className="absolute left-3.5 top-3.5 text-gray-400 w-4 h-4" />
               <input
                 type="text"
                 required
-                placeholder="admin@bharatiyayuvakranti.org"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 focus:outline-orange-500 text-xs font-medium"
+                placeholder="name@domain.org or 98XXXXXXXX"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white border border-gray-300 text-black placeholder-gray-400 focus:outline-none focus:border-red-500 text-xs font-medium transition"
               />
             </div>
           </div>
 
           <div>
-            <label className="font-bold text-slate-700 block mb-1">Password</label>
+            <label className="font-bold text-black block mb-1.5">Password</label>
             <div className="relative">
-              <FiLock className="absolute left-3.5 top-3.5 text-slate-400 w-4 h-4" />
+              <FiLock className="absolute left-3.5 top-3.5 text-gray-400 w-4 h-4" />
               <input
                 type={showPassword ? 'text' : 'password'}
                 required
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-300 focus:outline-orange-500 text-xs font-medium"
+                className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-white border border-gray-300 text-black placeholder-gray-400 focus:outline-none focus:border-red-500 text-xs font-medium transition"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3.5 top-3 text-slate-400 hover:text-slate-600"
+                className="absolute right-3.5 top-3 text-gray-400 hover:text-black"
               >
                 {showPassword ? <FiEyeOff className="w-4 h-4" /> : <FiEye className="w-4 h-4" />}
               </button>
             </div>
           </div>
 
-          <div className="flex items-center justify-between text-xs">
-            <span className="text-slate-500">Need help accessing?</span>
-            <Link href="/forgot-password" className="text-orange-600 hover:text-orange-700 font-bold hover:underline">
+          <div className="flex items-center justify-between text-xs pt-1">
+            <span className="text-gray-500">Can&apos;t remember?</span>
+            <Link href="/forgot-password" className="text-red-600 hover:text-red-700 font-bold hover:underline">
               Forgot password?
             </Link>
           </div>
@@ -118,64 +143,52 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs shadow-md transition cursor-pointer"
+            className="w-full py-3.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-lg shadow-red-600/20 transition cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
           >
-            {loading ? 'Authenticating credentials...' : 'Sign In to Portal'}
+            {loading ? (
+              <span>Verifying credentials...</span>
+            ) : (
+              <>
+                <FiLogIn className="w-4 h-4" />
+                <span>Sign In to Portal</span>
+              </>
+            )}
           </button>
+
+          {/* Navigation to User Register & Admin Creation */}
+          <div className="mt-6 text-center text-xs text-black/70 border-t border-gray-200 pt-4 space-y-2.5">
+            <div>
+              Don&apos;t have an account yet?{' '}
+              <Link 
+                href={`/register${redirectTarget ? `?redirect=${encodeURIComponent(redirectTarget)}` : ''}`} 
+                className="text-red-600 font-bold hover:underline"
+              >
+                Create User Account →
+              </Link>
+            </div>
+
+            <div className="pt-1.5 border-t border-gray-100">
+              <span className="text-gray-500 text-[11px]">Trust Executive or Official? </span>
+              <Link 
+                href="/admin-register" 
+                className="text-red-600 hover:text-red-700 font-bold hover:underline inline-flex items-center gap-1 text-[11px]"
+              >
+                <FiKey className="w-3 h-3" />
+                Create Admin Account (Secret Key Required) →
+              </Link>
+            </div>
+          </div>
         </form>
 
-        {/* 4 EXACT ROLES ONE-CLICK LOGIN BUTTONS */}
-        <div className="mt-8 pt-6 border-t border-slate-100">
-          <div className="text-[11px] font-bold text-slate-400 uppercase text-center mb-3">
-            Quick 1-Click Role Access (Instant Evaluation)
-          </div>
-
-          <div className="grid grid-cols-2 gap-2 text-[11px]">
-            <button
-              onClick={() => quickLogin('admin@bharatiyayuvakranti.org', 'admin123')}
-              className="p-2.5 rounded-xl border border-orange-200 bg-orange-50 hover:bg-orange-100 text-orange-800 font-bold flex flex-col items-center text-center transition cursor-pointer"
-            >
-              <FiShield className="w-4 h-4 mb-1 text-orange-600" />
-              <span>1. Admin</span>
-              <span className="text-[9px] text-orange-600/80">Full Master Panel</span>
-            </button>
-
-            <button
-              onClick={() => quickLogin('team@bharatiyayuvakranti.org', 'team123')}
-              className="p-2.5 rounded-xl border border-purple-200 bg-purple-50 hover:bg-purple-100 text-purple-800 font-bold flex flex-col items-center text-center transition cursor-pointer"
-            >
-              <FiUsers className="w-4 h-4 mb-1 text-purple-600" />
-              <span>2. TeamMember</span>
-              <span className="text-[9px] text-purple-600/80">Operations & Roster</span>
-            </button>
-
-            <button
-              onClick={() => quickLogin('volunteer@bharatiyayuvakranti.org', 'vol123')}
-              className="p-2.5 rounded-xl border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-800 font-bold flex flex-col items-center text-center transition cursor-pointer"
-            >
-              <FiHeart className="w-4 h-4 mb-1 text-blue-600" />
-              <span>3. Volunteer</span>
-              <span className="text-[9px] text-blue-600/80">Field Identity & Tasks</span>
-            </button>
-
-            <button
-              onClick={() => quickLogin('member@bharatiyayuvakranti.org', 'member123')}
-              className="p-2.5 rounded-xl border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold flex flex-col items-center text-center transition cursor-pointer"
-            >
-              <FiUser className="w-4 h-4 mb-1 text-emerald-600" />
-              <span>4. Member</span>
-              <span className="text-[9px] text-emerald-600/80">ID Card & 80G Receipts</span>
-            </button>
-          </div>
-        </div>
-
-        <div className="mt-6 text-center text-xs text-slate-500">
-          Want to register as a new member?{' '}
-          <Link href="/volunteer" className="text-orange-600 font-bold hover:underline">
-            Complete Registration Form →
-          </Link>
-        </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-slate-50 flex items-center justify-center text-xs text-gray-500">Loading sign in gateway...</div>}>
+      <LoginForm />
+    </Suspense>
   );
 }

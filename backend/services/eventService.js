@@ -21,6 +21,8 @@ class EventService {
   async deleteEvent(id) {
     const event = await eventRepository.deleteById(id);
     if (!event) throw new Error('Event not found');
+    const { deleteDocumentFiles } = require('../utils/fileCleaner');
+    await deleteDocumentFiles(event);
     return event;
   }
 }

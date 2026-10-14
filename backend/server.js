@@ -31,9 +31,9 @@ const startServer = async () => {
       console.log(`====================================================`);
       console.log(`🌐 Server running live at: http://localhost:${PORT}`);
       console.log(`📡 Health Check: http://localhost:${PORT}/api/health`);
-      console.log(`🛡️ Admin Credentials: admin@bharatiyayuvakranti.org / admin123`);
-      console.log(`👔 Manager Credentials: manager@bharatiyayuvakranti.org / manager123`);
-      console.log(`🤝 Coordinator Credentials: coordinator@bharatiyayuvakranti.org / coord123`);
+      console.log(`🛡️ Admin Bootstrap: POST /api/auth/create-admin`);
+      console.log(`🔑 Header Required: X-ADMIN-SECRET-KEY`);
+      console.log(`🔒 Token Architecture: HTTP-Only Cookie + Space-Optimized TTL Blacklist`);
       console.log(`====================================================`);
     });
   } catch (error) {

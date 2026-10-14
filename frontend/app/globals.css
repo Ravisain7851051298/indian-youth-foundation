@@ -1,35 +1,53 @@
 @import "tailwindcss";
 
 :root {
-  --primary: #f97316;
-  --primary-dark: #ea580c;
-  --secondary: #047857;
-  --accent: #2563eb;
-  --bg-light: #f8fafc;
-  --text-dark: #0f172a;
+  --primary: #dc2626;
+  --primary-dark: #b91c1c;
+  --secondary: #991b1b;
+  --accent: #ef4444;
+  --bg-light: #ffffff;
+  --text-dark: #000000;
 }
 
 body {
-  background-color: #f8fafc;
-  color: #1e293b;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background-color: #ffffff;
+  color: #000000;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom scrollbars */
+/* Ensure crisp high-contrast black text */
+h1, h2, h3, h4, h5, h6 {
+  color: #000000;
+}
+
+/* Ensure inputs and selects have crisp pitch black text and clean styling */
+input,
+select,
+textarea {
+  color: #000000;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #64748b;
+}
+
+/* Custom scrollbars with white & red accent */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #f8fafc;
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #fca5a5;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #ef4444;
 }
 
 /* Print Styles for ID Card, 80G Receipt & Appointment Letter */

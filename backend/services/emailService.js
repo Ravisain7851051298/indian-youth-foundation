@@ -73,7 +73,19 @@ const sendEmail = async ({ to, subject, htmlText, template = 'general' }) => {
 };
 
 // 1. Donation Approved -> Form 10BD / 80G Tax Receipt Email
-const sendDonationApprovalEmail = async ({ to, donorName, receiptNumber, amount, panNumber, campaignTitle }) => {
+const sendDonationApprovalEmail = async (data) => {
+  const to = data.to || data.donorEmail || data.email;
+  const donorName = data.donorName || 'Generous Contributor';
+  const receiptNumber = data.receiptNumber || 'BYK-80G-PENDING';
+  const amount = data.amount || 0;
+  const panNumber = data.panNumber || data.pan || '';
+  const campaignTitle = data.campaignTitle || 'General Welfare Fund';
+
+  if (!to) {
+    console.warn('⚠️ [EMAIL NOTICE] No recipient email found for donation approval notification.');
+    return null;
+  }
+
   const subject = `Official 80G Donation Receipt #${receiptNumber} - Indian Youth Foundation`;
   const htmlText = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px;">

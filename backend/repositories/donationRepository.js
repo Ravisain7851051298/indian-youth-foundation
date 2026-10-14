@@ -7,7 +7,7 @@ class DonationRepository {
   }
 
   async findById(id) {
-    return Donation.findById(id).populate('donor');
+    return Donation.findById(id).populate('donor', 'name email phone memberId photoUrl');
   }
 
   async findByOrderId(orderId) {
@@ -19,7 +19,7 @@ class DonationRepository {
   }
 
   async find(query = {}, sort = { createdAt: -1 }) {
-    return Donation.find(query).populate('donor').sort(sort);
+    return Donation.find(query).populate('donor', 'name email phone memberId photoUrl').sort(sort);
   }
 
   async updateById(id, updateData) {
@@ -36,6 +36,10 @@ class DonationRepository {
       { $group: { _id: null, totalAmount: { $sum: '$amount' } } }
     ]);
     return result[0]?.totalAmount || 0;
+  }
+
+  async deleteById(id) {
+    return Donation.findByIdAndDelete(id);
   }
 }
 

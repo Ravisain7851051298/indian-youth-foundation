@@ -1,45 +1,15 @@
-const bcrypt = require('bcryptjs');
-const User = require('../models/User');
 const Setting = require('../models/Setting');
 const MembershipPlan = require('../models/MembershipPlan');
+const User = require('../models/User');
 
 const initDatabase = async () => {
   try {
-    // 1. Ensure Super Admin Account exists in MongoDB
-    const adminEmail = process.env.SMTP_USER || 'samasyasamadhanparishad@gmail.com';
-    const existingAdmin = await User.findOne({
-      $or: [
-        { email: adminEmail },
-        { email: 'admin@bharatiyayuvakranti.org' },
-        { role: 'Admin' }
-      ]
-    });
-
-    if (!existingAdmin) {
-      const hashedPassword = await bcrypt.hash('admin123', 10);
-      await User.create({
-        name: 'National Trustee & Admin',
-        email: adminEmail,
-        phone: '9319698759',
-        password: hashedPassword,
-        role: 'Admin',
-        status: 'active',
-        memberId: 'BYK-TRUSTEE-001',
-        designation: 'National President & Trustee',
-        bloodGroup: 'O+',
-        dob: '1985-01-01',
-        address: 'Head Office - Krishna Vihar Pala Road Aligarh, Uttar Pradesh',
-        district: 'Aligarh',
-        state: 'Uttar Pradesh',
-        photoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&auto=format&fit=crop&q=80',
-        referralCode: 'BYK-PRESIDENT',
-        feePaid: true,
-        feeAmount: 0,
-        idCardGenerated: true,
-        appointmentLetterGenerated: true,
-        verifiedAt: new Date()
-      });
-      console.log('✅ Real Super Admin account initialized in MongoDB.');
+    // 1. Check if any Admin Account exists in MongoDB
+    const adminCount = await User.countDocuments({ role: 'Admin' });
+    if (adminCount === 0) {
+      console.log('ℹ️ No default admin account seeded. Create a secure admin account via POST /api/auth/create-admin using header X-ADMIN-SECRET-KEY.');
+    } else {
+      console.log(`✅ MongoDB initialized with ${adminCount} verified administrator account(s).`);
     }
 
     // 2. Ensure Official Trust Settings exist in MongoDB
@@ -65,9 +35,13 @@ const initDatabase = async () => {
         smtpPort: parseInt(process.env.SMTP_PORT || '587', 10),
         smtpUser: process.env.SMTP_USER || 'samasyasamadhanparishad@gmail.com',
         smtpPass: process.env.SMTP_PASS || '',
-        adminSecretKey: process.env.X_ADMIN_SECRET_KEY || 'BYK_SUPER_ADMIN_ALIGARH_SECRET_2026'
+        adminSecretKey: process.env.X_ADMIN_SECRET_KEY || 'ravi123'
       });
       console.log('✅ Official Trust Settings initialized in MongoDB.');
+    } else if (process.env.X_ADMIN_SECRET_KEY && setting.adminSecretKey !== process.env.X_ADMIN_SECRET_KEY) {
+      setting.adminSecretKey = process.env.X_ADMIN_SECRET_KEY;
+      await setting.save();
+      console.log(`🔄 Synced Setting.adminSecretKey to environment variable (${process.env.X_ADMIN_SECRET_KEY}).`);
     }
 
     // 3. Ensure Dynamic Membership Plans exist in MongoDB
@@ -131,6 +105,21 @@ const initDatabase = async () => {
         }
       ]);
       console.log('✅ Dynamic Membership Plans initialized in MongoDB.');
+    }
+
+    // 4. Ensure donations collection receiptNumber index is sparse unique
+    try {
+      const Donation = require('../models/Donation');
+      const donCol = Donation.collection;
+      const donIndexes = await donCol.indexes();
+      const receiptIdx = donIndexes.find(i => i.name === 'receiptNumber_1');
+      if (receiptIdx && !receiptIdx.sparse) {
+        await donCol.dropIndex('receiptNumber_1');
+        await donCol.createIndex({ receiptNumber: 1 }, { unique: true, sparse: true });
+        console.log('✅ Synchronized donations.receiptNumber index to sparse unique.');
+      }
+    } catch {
+      // index already configured
     }
   } catch (error) {
     console.error('⚠️ Database init error:', error.message);

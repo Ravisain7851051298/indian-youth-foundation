@@ -7,13 +7,13 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   role: { 
     type: String, 
-    enum: ['Admin', 'Member', 'Volunteer', 'TeamMember'], 
-    default: 'Member' 
+    enum: ['Admin', 'Member', 'Volunteer', 'TeamMember', 'Donor'], 
+    default: 'Donor' 
   },
   status: { 
     type: String, 
     enum: ['active', 'blocked', 'deactivated', 'pending'], 
-    default: 'pending' 
+    default: 'active' 
   },
   memberId: { type: String, unique: true, sparse: true },
   designation: { type: String, default: 'Applicant - Member Wing' },
@@ -40,5 +40,7 @@ const userSchema = new mongoose.Schema({
 }, {
   timestamps: true
 });
+
+userSchema.plugin(require('./plugins/fileCleanupPlugin'));
 
 module.exports = mongoose.model('User', userSchema);

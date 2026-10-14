@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const donationSchema = new mongoose.Schema({
+  donor: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
   donorName: { type: String, required: true },
   donorEmail: { type: String, required: true },
   donorPhone: { type: String, required: true },
@@ -9,6 +10,7 @@ const donationSchema = new mongoose.Schema({
   campaignId: { type: String, default: 'general' },
   campaignTitle: { type: String, default: 'General NGO Social Welfare Fund' },
   paymentId: { type: String, default: '' },
+  transactionId: { type: String, default: '' },
   orderId: { type: String, default: '' },
   paymentMethod: { type: String, default: 'UPI' },
   paymentScreenshot: { type: String, default: '' },
@@ -18,7 +20,7 @@ const donationSchema = new mongoose.Schema({
     default: 'pending' 
   },
   is80GEligible: { type: Boolean, default: true },
-  receiptNumber: { type: String, unique: true, sparse: true },
+  receiptNumber: { type: String, sparse: true, default: undefined },
   address: { type: String, default: '' },
   note: { type: String, default: '' },
   approvedAt: { type: Date, default: null },
@@ -28,5 +30,13 @@ const donationSchema = new mongoose.Schema({
 }, {
   timestamps: true
 });
+
+donationSchema.pre('save', function () {
+  if (!this.receiptNumber) {
+    this.receiptNumber = undefined;
+  }
+});
+
+donationSchema.plugin(require('./plugins/fileCleanupPlugin'));
 
 module.exports = mongoose.model('Donation', donationSchema);

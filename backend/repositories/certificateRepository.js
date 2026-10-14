@@ -21,6 +21,10 @@ class CertificateRepository {
   async count(query = {}) {
     return Certificate.countDocuments(query);
   }
+
+  async deleteById(id) {
+    return Certificate.findByIdAndDelete(id);
+  }
 }
 
 module.exports = new CertificateRepository();

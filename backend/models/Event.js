@@ -14,4 +14,6 @@ const eventSchema = new mongoose.Schema({
   timestamps: true
 });
 
+eventSchema.plugin(require('./plugins/fileCleanupPlugin'));
+
 module.exports = mongoose.model('Event', eventSchema);

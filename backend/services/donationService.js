@@ -28,25 +28,31 @@ class DonationService {
       orderId, transactionId, paymentScreenshot
     } = donationData;
 
-    if (!amount || !donorName || !email) {
+    const finalName = (donorName || '').trim();
+    const finalEmail = (email || donationData.donorEmail || '').toLowerCase().trim();
+    const finalPhone = (phone || donationData.donorPhone || '').trim();
+    const finalPan = (pan || donationData.panNumber || '').toUpperCase().trim();
+
+    if (!amount || !finalName || !finalEmail) {
       throw new Error('Amount, donor name, and email are required');
     }
 
     const donation = await donationRepository.create({
       donor: donorUserId || null,
-      donorName,
-      email: email.toLowerCase().trim(),
-      phone: phone || '',
-      pan: pan ? pan.toUpperCase().trim() : '',
+      donorName: finalName,
+      donorEmail: finalEmail,
+      donorPhone: finalPhone,
+      panNumber: finalPan,
       address: address || '',
       amount: Number(amount),
-      campaignTitle: campaignTitle || 'General Welfare Fund',
+      campaignId: donationData.campaignId || 'general',
+      campaignTitle: campaignTitle || donationData.campaignTitle || 'General Welfare Fund',
       orderId: orderId || `BYK-ORD-${Date.now()}`,
-      transactionId: transactionId || `BYK-UTR-${Date.now()}`,
+      transactionId: transactionId || donationData.transactionId || '',
+      paymentId: donationData.paymentId || '',
+      paymentMethod: donationData.paymentMethod || 'UPI',
       paymentScreenshot: paymentScreenshot || '',
-      status: 'pending',
-      receiptNumber: null,
-      receiptGenerated: false
+      status: 'pending'
     });
 
     return donation;
@@ -128,6 +134,14 @@ class DonationService {
     const workbook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(workbook, worksheet, '80G Donations');
     return xlsx.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+  }
+
+  async deleteDonation(donationId) {
+    const donation = await donationRepository.findById(donationId);
+    if (!donation) throw new Error('Donation record not found');
+    const { deleteDocumentFiles } = require('../utils/fileCleaner');
+    await deleteDocumentFiles(donation);
+    return donationRepository.deleteById(donationId);
   }
 }
 

@@ -45,6 +45,14 @@ class ApplicationRepository {
   async countVolunteerApps(query = {}) {
     return VolunteerApplication.countDocuments(query);
   }
+
+  async deleteMembershipApp(id) {
+    return MembershipApplication.findByIdAndDelete(id);
+  }
+
+  async deleteVolunteerApp(id) {
+    return VolunteerApplication.findByIdAndDelete(id);
+  }
 }
 
 module.exports = new ApplicationRepository();

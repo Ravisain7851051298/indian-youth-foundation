@@ -11,6 +11,13 @@ const getNews = async (req, res) => {
 
 const createNews = async (req, res) => {
   try {
+    if (req.file) {
+      const category = req.file.category || 'news';
+      req.body.image = `/uploads/${category}/${req.file.filename}`;
+    } else if (req.body.imageUrl && !req.body.image) {
+      req.body.image = req.body.imageUrl;
+    }
+
     const news = await newsService.createNews(req.body);
     return res.status(201).json({
       success: true,
@@ -25,6 +32,13 @@ const createNews = async (req, res) => {
 const updateNews = async (req, res) => {
   try {
     const { id } = req.params;
+    if (req.file) {
+      const category = req.file.category || 'news';
+      req.body.image = `/uploads/${category}/${req.file.filename}`;
+    } else if (req.body.imageUrl && !req.body.image) {
+      req.body.image = req.body.imageUrl;
+    }
+
     const news = await newsService.updateNews(id, req.body);
     return res.json({
       success: true,

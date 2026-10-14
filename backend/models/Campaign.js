@@ -2,9 +2,9 @@ const mongoose = require('mongoose');
 
 const campaignSchema = new mongoose.Schema({
   title: { type: String, required: true },
-  titleHi: { type: String, required: true },
+  titleHi: { type: String, default: '' },
   description: { type: String, required: true },
-  descriptionHi: { type: String, required: true },
+  descriptionHi: { type: String, default: '' },
   category: { type: String, default: 'Education & Youth' },
   goalAmount: { type: Number, required: true },
   raisedAmount: { type: Number, default: 0 },
@@ -16,5 +16,7 @@ const campaignSchema = new mongoose.Schema({
 }, {
   timestamps: true
 });
+
+campaignSchema.plugin(require('./plugins/fileCleanupPlugin'));
 
 module.exports = mongoose.model('Campaign', campaignSchema);

@@ -43,8 +43,23 @@ const updateGrievance = async (req, res) => {
   }
 };
 
+const deleteGrievance = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await grievanceService.deleteGrievance(id);
+    return res.json({
+      success: true,
+      message: 'Grievance ticket and any attached files deleted successfully',
+      id
+    });
+  } catch (error) {
+    return res.status(400).json({ success: false, message: error.message });
+  }
+};
+
 module.exports = {
   submitGrievance,
   getGrievances,
-  updateGrievance
+  updateGrievance,
+  deleteGrievance
 };

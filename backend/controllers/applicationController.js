@@ -108,6 +108,34 @@ const rejectVolunteerApplication = async (req, res) => {
   }
 };
 
+const deleteMembershipApplication = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await applicationService.deleteMembershipApplication(id);
+    return res.json({
+      success: true,
+      message: 'Membership application and associated proof files deleted successfully',
+      id
+    });
+  } catch (error) {
+    return res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+const deleteVolunteerApplication = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await applicationService.deleteVolunteerApplication(id);
+    return res.json({
+      success: true,
+      message: 'Volunteer application and associated ID files deleted successfully',
+      id
+    });
+  } catch (error) {
+    return res.status(400).json({ success: false, message: error.message });
+  }
+};
+
 module.exports = {
   applyMembership,
   applyVolunteer,
@@ -116,5 +144,7 @@ module.exports = {
   approveMembershipApplication,
   rejectMembershipApplication,
   approveVolunteerApplication,
-  rejectVolunteerApplication
+  rejectVolunteerApplication,
+  deleteMembershipApplication,
+  deleteVolunteerApplication
 };

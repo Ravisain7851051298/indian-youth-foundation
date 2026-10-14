@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 let isConnected = false;
 
 const connectDB = async () => {
-  const uri = process.env.MONGODB_URI || process.env.MONGOODB_URI || 'mongodb://127.0.0.1:27017/indian-youth-foundation';
+  const uri = process.env.MONGODB_URI;
   try {
     mongoose.set('strictQuery', false);
     const conn = await mongoose.connect(uri, {

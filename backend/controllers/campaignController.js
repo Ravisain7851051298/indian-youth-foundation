@@ -16,6 +16,32 @@ const getCampaigns = async (req, res) => {
 
 const createCampaign = async (req, res) => {
   try {
+    if (req.file) {
+      const category = req.file.category || 'campaigns';
+      req.body.bannerImage = `/uploads/${category}/${req.file.filename}`;
+    } else if (req.body.image && !req.body.bannerImage) {
+      req.body.bannerImage = req.body.image;
+    }
+
+    if (!req.body.titleHi && req.body.title) {
+      req.body.titleHi = req.body.title;
+    }
+    if (!req.body.descriptionHi && req.body.description) {
+      req.body.descriptionHi = req.body.description;
+    }
+    if (req.body.targetAmount !== undefined && req.body.goalAmount === undefined) {
+      req.body.goalAmount = Number(req.body.targetAmount);
+    }
+    if (req.body.goalAmount !== undefined) {
+      req.body.goalAmount = Number(req.body.goalAmount);
+    }
+    if (req.body.raisedAmount !== undefined) {
+      req.body.raisedAmount = Number(req.body.raisedAmount);
+    }
+    if (req.body.urgent !== undefined) {
+      req.body.urgent = req.body.urgent === 'true' || req.body.urgent === true;
+    }
+
     const campaign = await campaignService.createCampaign(req.body);
     return res.status(201).json({
       success: true,
@@ -30,6 +56,32 @@ const createCampaign = async (req, res) => {
 const updateCampaign = async (req, res) => {
   try {
     const { id } = req.params;
+    if (req.file) {
+      const category = req.file.category || 'campaigns';
+      req.body.bannerImage = `/uploads/${category}/${req.file.filename}`;
+    } else if (req.body.image && !req.body.bannerImage) {
+      req.body.bannerImage = req.body.image;
+    }
+
+    if (req.body.title && !req.body.titleHi) {
+      req.body.titleHi = req.body.title;
+    }
+    if (req.body.description && !req.body.descriptionHi) {
+      req.body.descriptionHi = req.body.description;
+    }
+    if (req.body.targetAmount !== undefined && req.body.goalAmount === undefined) {
+      req.body.goalAmount = Number(req.body.targetAmount);
+    }
+    if (req.body.goalAmount !== undefined) {
+      req.body.goalAmount = Number(req.body.goalAmount);
+    }
+    if (req.body.raisedAmount !== undefined) {
+      req.body.raisedAmount = Number(req.body.raisedAmount);
+    }
+    if (req.body.urgent !== undefined) {
+      req.body.urgent = req.body.urgent === 'true' || req.body.urgent === true;
+    }
+
     const campaign = await campaignService.updateCampaign(id, req.body);
     return res.json({
       success: true,

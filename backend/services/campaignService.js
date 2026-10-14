@@ -21,6 +21,8 @@ class CampaignService {
   async deleteCampaign(id) {
     const campaign = await campaignRepository.deleteById(id);
     if (!campaign) throw new Error('Campaign not found');
+    const { deleteDocumentFiles } = require('../utils/fileCleaner');
+    await deleteDocumentFiles(campaign);
     return campaign;
   }
 }

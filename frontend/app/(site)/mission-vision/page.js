@@ -28,14 +28,14 @@ export default function MissionVisionPage() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-100 text-orange-700 text-xs font-bold mb-2">
-            <FiCompass className="w-3.5 h-3.5" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-red-700 text-xs font-bold mb-2 border border-red-200">
+            <FiCompass className="w-3.5 h-3.5 text-red-600" />
             <span>Guiding Principles</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+          <h1 className="text-3xl sm:text-4xl font-black text-black tracking-tight">
             Our Vision, Mission & Core Values
           </h1>
-          <p className="text-xs sm:text-sm text-slate-600 mt-2 font-normal">
+          <p className="text-xs sm:text-sm text-black/80 mt-2 font-normal">
             {settings?.tagline || 'Empowering Youth, Transforming Society, Nation First'}
           </p>
         </div>
@@ -43,64 +43,64 @@ export default function MissionVisionPage() {
         {/* Vision & Mission Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
           {/* Vision */}
-          <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm relative overflow-hidden">
-            <div className="w-12 h-12 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center font-bold text-2xl mb-4">
+          <div className="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm relative overflow-hidden hover:border-red-300 transition-all">
+            <div className="w-12 h-12 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-2xl mb-4 border border-red-100">
               <FiCompass className="w-6 h-6" />
             </div>
-            <h2 className="text-xl font-black text-slate-900">Our Vision</h2>
-            <p className="text-xs sm:text-sm text-slate-600 mt-3 leading-relaxed">
+            <h2 className="text-xl font-black text-black">Our Vision</h2>
+            <p className="text-xs sm:text-sm text-black/80 mt-3 leading-relaxed">
               {settings?.visionStatement || 'To build an equitable, self-reliant, and empowered India where every young person is educated, skilled, and actively engaged in nation-building, ensuring healthcare, literacy, and dignified livelihoods reach every marginalized community.'}
             </p>
           </div>
 
           {/* Mission */}
-          <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm relative overflow-hidden">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-2xl mb-4">
+          <div className="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm relative overflow-hidden hover:border-red-300 transition-all">
+            <div className="w-12 h-12 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-2xl mb-4 border border-red-100">
               <FiTarget className="w-6 h-6" />
             </div>
-            <h2 className="text-xl font-black text-slate-900">Our Mission</h2>
-            <p className="text-xs sm:text-sm text-slate-600 mt-3 leading-relaxed">
+            <h2 className="text-xl font-black text-black">Our Mission</h2>
+            <p className="text-xs sm:text-sm text-black/80 mt-3 leading-relaxed">
               {settings?.missionStatement || 'To channel the constructive potential of Indian youth into transformative grassroot movements: educating slum children, providing 24x7 emergency blood relief, empowering women entrepreneurs, and spearheading environmental stewardship.'}
             </p>
           </div>
         </div>
 
         {/* Core Objectives */}
-        <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm mb-12">
-          <h2 className="text-xl font-black text-slate-900 mb-6 flex items-center gap-2">
-            <FiCheckCircle className="text-orange-600" />
+        <div className="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm mb-12">
+          <h2 className="text-xl font-black text-black mb-6 flex items-center gap-2">
+            <FiCheckCircle className="text-red-600" />
             <span>Statutory Objectives of the Society</span>
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-700">
-            <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-start gap-3">
-              <span className="font-black text-orange-600 text-sm">01.</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-black">
+            <div className="p-5 rounded-2xl bg-slate-50 border border-gray-200 flex items-start gap-3">
+              <span className="font-black text-red-600 text-sm">01.</span>
               <div>
-                <strong className="text-slate-900 block font-bold mb-1 text-sm">Child Literacy & Inclusive Education</strong>
+                <strong className="text-black block font-bold mb-1 text-sm">Child Literacy & Inclusive Education</strong>
                 Providing free study kits, school uniforms, bridge learning courses, and tutoring for children from disadvantaged socio-economic backgrounds.
               </div>
             </div>
 
-            <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-start gap-3">
-              <span className="font-black text-orange-600 text-sm">02.</span>
+            <div className="p-5 rounded-2xl bg-slate-50 border border-gray-200 flex items-start gap-3">
+              <span className="font-black text-red-600 text-sm">02.</span>
               <div>
-                <strong className="text-slate-900 block font-bold mb-1 text-sm">Youth Vocational Skills & Livelihood</strong>
+                <strong className="text-black block font-bold mb-1 text-sm">Youth Vocational Skills & Livelihood</strong>
                 Equipping unemployed youth with digital computer literacy, vocational tailoring, and placement mentorship for self-reliance.
               </div>
             </div>
 
-            <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-start gap-3">
-              <span className="font-black text-orange-600 text-sm">03.</span>
+            <div className="p-5 rounded-2xl bg-slate-50 border border-gray-200 flex items-start gap-3">
+              <span className="font-black text-red-600 text-sm">03.</span>
               <div>
-                <strong className="text-slate-900 block font-bold mb-1 text-sm">24x7 Emergency Voluntary Blood Donor Network</strong>
+                <strong className="text-black block font-bold mb-1 text-sm">24x7 Emergency Voluntary Blood Donor Network</strong>
                 Connecting emergency patients, thalassemia children, and disaster victims with verified blood and platelet donors.
               </div>
             </div>
 
-            <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-start gap-3">
-              <span className="font-black text-orange-600 text-sm">04.</span>
+            <div className="p-5 rounded-2xl bg-slate-50 border border-gray-200 flex items-start gap-3">
+              <span className="font-black text-red-600 text-sm">04.</span>
               <div>
-                <strong className="text-slate-900 block font-bold mb-1 text-sm">Climate Action & Environmental Conservation</strong>
+                <strong className="text-black block font-bold mb-1 text-sm">Climate Action & Environmental Conservation</strong>
                 Planting 5,000+ native trees annually with community geotagging, water conservation drives, and plastic pollution mitigation.
               </div>
             </div>
@@ -108,56 +108,56 @@ export default function MissionVisionPage() {
         </div>
 
         {/* Legal Accreditations & Yearly Audit Reports */}
-        <div className="bg-slate-900 text-white rounded-3xl p-8 sm:p-10 border border-slate-800 shadow-xl">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-6 border-b border-slate-800">
+        <div className="bg-white text-black rounded-3xl p-8 sm:p-10 border-2 border-red-200 shadow-xl">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-6 border-b border-gray-200">
             <div>
-              <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest">Transparency & Accreditations</span>
-              <h3 className="text-xl font-black text-white mt-1">100% Verified Statutory Audits & Certifications</h3>
+              <span className="text-xs font-bold text-red-600 uppercase tracking-widest">Transparency & Accreditations</span>
+              <h3 className="text-xl font-black text-black mt-1">100% Verified Statutory Audits & Certifications</h3>
             </div>
             <Link
               href="/donation"
-              className="px-5 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold shadow-md transition"
+              className="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-md transition"
             >
               Donate Online (80G Tax Exemption)
             </Link>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs mb-8">
-            <div className="bg-slate-800 p-4 rounded-2xl border border-slate-700">
-              <div className="text-slate-400 text-[11px]">80G Tax Exemption</div>
-              <div className="font-mono font-bold text-white mt-1 break-all">{settings?.exemption80G}</div>
+            <div className="bg-red-50/50 p-4 rounded-2xl border border-red-100">
+              <div className="text-gray-600 text-[11px]">80G Tax Exemption</div>
+              <div className="font-mono font-bold text-black mt-1 break-all">{settings?.exemption80G}</div>
             </div>
-            <div className="bg-slate-800 p-4 rounded-2xl border border-slate-700">
-              <div className="text-slate-400 text-[11px]">12A Registration No</div>
-              <div className="font-mono font-bold text-white mt-1 break-all">{settings?.exemption12A}</div>
+            <div className="bg-red-50/50 p-4 rounded-2xl border border-red-100">
+              <div className="text-gray-600 text-[11px]">12A Registration No</div>
+              <div className="font-mono font-bold text-black mt-1 break-all">{settings?.exemption12A}</div>
             </div>
-            <div className="bg-slate-800 p-4 rounded-2xl border border-slate-700">
-              <div className="text-slate-400 text-[11px]">NITI Aayog Darpan ID</div>
-              <div className="font-mono font-bold text-white mt-1 break-all">{settings?.nitiAayogDarpanId}</div>
+            <div className="bg-red-50/50 p-4 rounded-2xl border border-red-100">
+              <div className="text-gray-600 text-[11px]">NITI Aayog Darpan ID</div>
+              <div className="font-mono font-bold text-black mt-1 break-all">{settings?.nitiAayogDarpanId}</div>
             </div>
-            <div className="bg-slate-800 p-4 rounded-2xl border border-slate-700">
-              <div className="text-slate-400 text-[11px]">Govt. Society Reg No</div>
-              <div className="font-mono font-bold text-white mt-1 break-all">{settings?.registrationNo}</div>
+            <div className="bg-red-50/50 p-4 rounded-2xl border border-red-100">
+              <div className="text-gray-600 text-[11px]">Govt. Society Reg No</div>
+              <div className="font-mono font-bold text-black mt-1 break-all">{settings?.registrationNo}</div>
             </div>
           </div>
 
-          <h4 className="text-sm font-bold text-slate-200 mb-3 flex items-center gap-2">
-            <FiFileText className="text-orange-500" />
+          <h4 className="text-sm font-bold text-black mb-3 flex items-center gap-2">
+            <FiFileText className="text-red-600" />
             <span>Audited Financial Statements & Returns</span>
           </h4>
           <div className="space-y-3">
             {defaultAudits.map((audit, i) => (
               <div
                 key={i}
-                className="flex items-center justify-between p-4 rounded-2xl bg-slate-800/80 border border-slate-700/80 text-xs"
+                className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-gray-200 text-xs"
               >
                 <div>
-                  <div className="font-bold text-white text-sm">{audit.title}</div>
-                  <div className="text-slate-400 text-[11px] mt-0.5">Audited by: {audit.caName}</div>
+                  <div className="font-bold text-black text-sm">{audit.title}</div>
+                  <div className="text-gray-500 text-[11px] mt-0.5">Audited by: {audit.caName}</div>
                 </div>
                 <button
                   onClick={() => alert(`Downloading ${audit.title}...`)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-orange-600/20 hover:bg-orange-600 text-orange-300 hover:text-white font-bold transition cursor-pointer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-50 hover:bg-red-600 text-red-600 hover:text-white font-bold transition cursor-pointer border border-red-200"
                 >
                   <FiDownload className="w-3.5 h-3.5" />
                   <span>Download Report</span>

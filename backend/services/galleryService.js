@@ -12,9 +12,17 @@ class GalleryService {
     return galleryRepository.create(data);
   }
 
+  async updateGallery(id, data) {
+    const item = await galleryRepository.updateById(id, data);
+    if (!item) throw new Error('Gallery item not found');
+    return item;
+  }
+
   async deleteGallery(id) {
     const item = await galleryRepository.deleteById(id);
     if (!item) throw new Error('Gallery item not found');
+    const { deleteDocumentFiles } = require('../utils/fileCleaner');
+    await deleteDocumentFiles(item);
     return item;
   }
 }

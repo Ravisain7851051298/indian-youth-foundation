@@ -26,19 +26,19 @@ export default function VerificationPage() {
             <img
               src={found.photoUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'}
               alt={found.name}
-              className="w-14 h-14 rounded-full object-cover border-2 border-orange-500 shadow-xs"
+              className="w-14 h-14 rounded-full object-cover border-2 border-red-500 shadow-xs"
             />
             <div>
-              <h4 className="font-extrabold text-base text-slate-900">{found.name}</h4>
-              <span className="text-orange-600 font-bold block">{found.designation}</span>
+              <h4 className="font-extrabold text-base text-black">{found.name}</h4>
+              <span className="text-red-600 font-bold block">{found.designation}</span>
               <div className="font-mono text-slate-500 text-[11px] font-bold">{found.memberId}</div>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-2.5 text-slate-600 pt-1 border-t border-slate-200/60">
-            <div>Blood Group: <strong className="text-rose-600 font-bold">{found.bloodGroup}</strong></div>
-            <div>Role: <strong className="text-slate-800 font-bold">{found.role}</strong></div>
-            <div>State: <strong className="text-slate-800">{found.state || 'Rajasthan'}</strong></div>
-            <div>Status: <strong className="text-emerald-600 font-bold">Authorized & Active</strong></div>
+          <div className="grid grid-cols-2 gap-2.5 text-slate-700 pt-1 border-t border-slate-200/60">
+            <div>Blood Group: <strong className="text-red-600 font-bold">{found.bloodGroup}</strong></div>
+            <div>Role: <strong className="text-black font-bold">{found.role}</strong></div>
+            <div>State: <strong className="text-black">{found.state || 'Rajasthan'}</strong></div>
+            <div>Status: <strong className="text-emerald-600 font-bold">Authorized &amp; Active</strong></div>
           </div>
         </div>
       );
@@ -49,11 +49,11 @@ export default function VerificationPage() {
     if (found) {
       verified = true;
       details = (
-        <div className="space-y-3 text-xs text-left bg-amber-50/60 p-5 rounded-2xl border border-amber-200">
-          <div className="font-mono text-orange-600 font-bold">{found.certificateNo}</div>
-          <h4 className="font-extrabold text-base text-slate-900">{found.recipientName}</h4>
-          <div className="text-amber-800 font-bold">{found.awardTitle}</div>
-          <p className="text-slate-600 leading-relaxed">{found.description}</p>
+        <div className="space-y-3 text-xs text-left bg-red-50/60 p-5 rounded-2xl border border-red-200">
+          <div className="font-mono text-red-600 font-bold">{found.certificateNo}</div>
+          <h4 className="font-extrabold text-base text-black">{found.recipientName}</h4>
+          <div className="text-red-900 font-bold">{found.awardTitle}</div>
+          <p className="text-slate-700 leading-relaxed">{found.description}</p>
           <div className="text-[11px] text-slate-500 font-medium">Issue Date: {found.issueDate}</div>
         </div>
       );
@@ -66,10 +66,10 @@ export default function VerificationPage() {
       details = (
         <div className="space-y-3 text-xs text-left bg-emerald-50/60 p-5 rounded-2xl border border-emerald-200">
           <div className="font-mono text-emerald-700 font-bold">{found.receiptNumber}</div>
-          <h4 className="font-extrabold text-base text-slate-900">{found.donorName}</h4>
+          <h4 className="font-extrabold text-base text-black">{found.donorName}</h4>
           <div className="text-2xl font-black text-emerald-700">₹{Number(found.amount).toLocaleString('en-IN')}</div>
-          <div className="text-slate-600">Donor PAN: <strong className="font-mono">{found.panNumber || 'NA'}</strong></div>
-          <div className="text-slate-600">Cause: {found.campaignTitle}</div>
+          <div className="text-slate-700">Donor PAN: <strong className="font-mono text-black">{found.panNumber || 'NA'}</strong></div>
+          <div className="text-slate-700">Cause: <strong className="text-black">{found.campaignTitle}</strong></div>
           <div className="text-[11px] text-emerald-800 font-bold pt-1 border-t border-emerald-200">
             ✓ Genuine digital tax receipt eligible under Section 80G of Income Tax Act
           </div>
@@ -87,12 +87,12 @@ export default function VerificationPage() {
               <FiCheckCircle className="w-10 h-10" />
             </div>
             <div className="text-xs font-bold text-emerald-700 uppercase tracking-widest mb-1">
-              Verified & Authentic Record
+              Verified &amp; Authentic Record
             </div>
-            <h1 className="text-xl font-black text-slate-900 mb-4">{title}</h1>
+            <h1 className="text-xl font-black text-black mb-4">{title}</h1>
             {details}
             <div className="mt-6 pt-4 border-t border-slate-100 text-[11px] text-slate-500">
-              Organization: <strong className="text-slate-800">{settings?.ngoName || 'Indian Youth Foundation'}</strong> | 12A & 80G Certified
+              Organization: <strong className="text-black">{settings?.ngoName || 'Indian Youth Foundation'}</strong> | 12A &amp; 80G Certified
             </div>
           </>
         ) : (
@@ -100,9 +100,9 @@ export default function VerificationPage() {
             <div className="w-16 h-16 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl shadow-sm">
               <FiXCircle className="w-10 h-10" />
             </div>
-            <h1 className="text-xl font-black text-slate-900">Invalid or Unverified Record!</h1>
-            <p className="text-xs text-slate-600 mt-2">
-              No authenticated record found for ID <strong className="font-mono text-slate-800">{id}</strong> on our official NGO registry. This card or document may be invalid.
+            <h1 className="text-xl font-black text-black">Invalid or Unverified Record!</h1>
+            <p className="text-xs text-slate-700 mt-2">
+              No authenticated record found for ID <strong className="font-mono text-black">{id}</strong> on our official NGO registry. This card or document may be invalid.
             </p>
           </>
         )}

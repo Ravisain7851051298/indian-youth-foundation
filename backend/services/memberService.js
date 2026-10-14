@@ -152,6 +152,14 @@ class MemberService {
       };
     }).sort((a, b) => b.recruitsCount - a.recruitsCount);
   }
+
+  async deleteMember(id) {
+    const user = await userRepository.findById(id);
+    if (!user) throw new Error('Member not found');
+    const { deleteDocumentFiles } = require('../utils/fileCleaner');
+    await deleteDocumentFiles(user);
+    return userRepository.deleteById(id);
+  }
 }
 
 module.exports = new MemberService();

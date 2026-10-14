@@ -38,14 +38,14 @@ export default function StoryPage() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10 pb-6 border-b border-slate-200">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-100 text-orange-700 text-xs font-bold mb-1">
-              <FiBookOpen className="w-3.5 h-3.5" />
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-bold mb-1">
+              <FiBookOpen className="w-3.5 h-3.5 text-red-600" />
               <span>Real Transformations</span>
             </div>
-            <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-              Life Impact & Success Stories
+            <h1 className="text-3xl font-extrabold text-black tracking-tight">
+              Life Impact &amp; Success Stories
             </h1>
-            <p className="text-xs sm:text-sm text-slate-600 mt-1">
+            <p className="text-xs sm:text-sm text-slate-700 mt-1">
               Inspiring real stories of children, women, and youth whose lives transformed through your generous support.
             </p>
           </div>
@@ -53,7 +53,7 @@ export default function StoryPage() {
           {isAdmin && (
             <button
               onClick={() => setShowAdd(true)}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs shadow-md transition cursor-pointer"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-md transition cursor-pointer"
             >
               <FiPlus className="w-4 h-4" />
               <span>Add New Story</span>
@@ -71,73 +71,73 @@ export default function StoryPage() {
               >
                 <FiX className="w-5 h-5" />
               </button>
-              <h3 className="font-extrabold text-lg text-slate-900 mb-4">Add Success Story</h3>
+              <h3 className="font-extrabold text-lg text-black mb-4">Add Success Story</h3>
               <form onSubmit={handleAdd} className="space-y-4 text-xs">
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Story Headline *</label>
+                  <label className="font-bold text-black block mb-1">Story Headline *</label>
                   <input
                     type="text"
                     required
                     placeholder="e.g. From Traffic Signals to Board Examination Topper"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-orange-500 font-medium"
+                    className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-red-500 font-medium text-black bg-white"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="font-bold text-slate-700 block mb-1">Beneficiary Name</label>
+                    <label className="font-bold text-black block mb-1">Beneficiary Name</label>
                     <input
                       type="text"
                       placeholder="e.g. Rahul Kumar (Age 16)"
                       value={beneficiary}
                       onChange={(e) => setBeneficiary(e.target.value)}
-                      className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-orange-500 font-medium"
+                      className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-red-500 font-medium text-black bg-white"
                     />
                   </div>
                   <div>
-                    <label className="font-bold text-slate-700 block mb-1">Category</label>
+                    <label className="font-bold text-black block mb-1">Category</label>
                     <input
                       type="text"
                       placeholder="e.g. Education Impact"
                       value={category}
                       onChange={(e) => setCategory(e.target.value)}
-                      className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-orange-500 font-medium"
+                      className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-red-500 font-medium text-black bg-white"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Photo URL</label>
+                  <label className="font-bold text-black block mb-1">Photo URL</label>
                   <input
                     type="text"
                     placeholder="https://images.unsplash.com/photo-..."
                     value={image}
                     onChange={(e) => setImage(e.target.value)}
-                    className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-orange-500 font-medium"
+                    className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-red-500 font-medium text-black bg-white"
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Story Narrative *</label>
+                  <label className="font-bold text-black block mb-1">Story Narrative *</label>
                   <textarea
                     rows={4}
                     required
                     placeholder="Describe their journey, challenges overcome, and the role of Indian Youth Foundation..."
                     value={summary}
                     onChange={(e) => setSummary(e.target.value)}
-                    className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-orange-500 font-medium"
+                    className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-red-500 font-medium text-black bg-white"
                   />
                 </div>
                 <div className="flex justify-end gap-3 pt-2">
                   <button
                     type="button"
                     onClick={() => setShowAdd(false)}
-                    className="px-4 py-2.5 text-slate-600 font-semibold hover:bg-slate-100 rounded-xl transition cursor-pointer"
+                    className="px-4 py-2.5 text-slate-700 font-semibold hover:bg-slate-100 rounded-xl transition cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-5 py-2.5 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl shadow-md transition cursor-pointer"
+                    className="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl shadow-md transition cursor-pointer"
                   >
                     Save Story
                   </button>
@@ -160,20 +160,20 @@ export default function StoryPage() {
                   alt={s.title}
                   className="w-full h-full object-cover"
                 />
-                <span className="absolute top-4 left-4 bg-orange-600 text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-md">
+                <span className="absolute top-4 left-4 bg-red-600 text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-md">
                   {s.category}
                 </span>
               </div>
 
               <div className="md:col-span-7 p-6 sm:p-8 flex flex-col justify-between">
                 <div>
-                  <span className="text-[11px] font-bold text-slate-400">
-                    Beneficiary: <strong className="text-slate-700">{s.beneficiary}</strong> • {s.date}
+                  <span className="text-[11px] font-bold text-slate-500">
+                    Beneficiary: <strong className="text-black">{s.beneficiary}</strong> • {s.date}
                   </span>
-                  <h3 className="font-black text-xl text-slate-900 mt-2 leading-snug">
+                  <h3 className="font-black text-xl text-black mt-2 leading-snug">
                     {s.title}
                   </h3>
-                  <p className="text-xs text-slate-600 mt-3.5 leading-relaxed font-normal">
+                  <p className="text-xs text-slate-700 mt-3.5 leading-relaxed font-normal">
                     {s.summary}
                   </p>
                 </div>
@@ -181,7 +181,7 @@ export default function StoryPage() {
                 <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
                   <Link
                     href="/donation"
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs shadow-sm transition"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-sm transition"
                   >
                     <FiHeart className="w-3.5 h-3.5 fill-white" />
                     <span>Support Similar Causes</span>

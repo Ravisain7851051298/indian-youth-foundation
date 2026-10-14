@@ -14,6 +14,10 @@ class GalleryRepository {
     return Gallery.find(query).sort(sort);
   }
 
+  async updateById(id, data) {
+    return Gallery.findByIdAndUpdate(id, data, { new: true });
+  }
+
   async deleteById(id) {
     return Gallery.findByIdAndDelete(id);
   }

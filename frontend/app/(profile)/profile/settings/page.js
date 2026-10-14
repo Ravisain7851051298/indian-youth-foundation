@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import { FiUser, FiSave, FiCheckCircle, FiAlertCircle, FiCamera, FiPhone, FiMapPin } from 'react-icons/fi';
+import { FiUser, FiSave, FiCheckCircle, FiAlertCircle, FiCamera, FiPhone, FiMapPin, FiTrash2 } from 'react-icons/fi';
 import { useNGO } from '@/context/NGOContext';
 import api from '@/services/api';
 
 export default function ProfileSettingsPage() {
-  const { currentUser, setCurrentUser, uploadFile } = useNGO();
+  const { currentUser, setCurrentUser, uploadFile, deleteFile } = useNGO();
 
   const [form, setForm] = useState({
     name: currentUser?.name || '',
@@ -31,10 +31,10 @@ export default function ProfileSettingsPage() {
     try {
       setUploading(true);
       setError('');
-      const res = await uploadFile(file);
+      const res = await uploadFile(file, 'avatars');
       if (res.success && res.url) {
         setForm(prev => ({ ...prev, photoUrl: res.url }));
-        setMessage('Photo uploaded! Click Save Profile to apply changes.');
+        setMessage('Photo uploaded to avatars directory! Click Save Profile to apply changes.');
       } else {
         setError(res.message || 'Failed to upload photo');
       }
@@ -43,6 +43,15 @@ export default function ProfileSettingsPage() {
     } finally {
       setUploading(false);
     }
+  };
+
+  const handleRemovePhoto = async () => {
+    if (form.photoUrl && (form.photoUrl.includes('/uploads/') || form.photoUrl.startsWith('uploads/'))) {
+      if (deleteFile) await deleteFile(form.photoUrl);
+      else await api.delete('/upload', { data: { url: form.photoUrl } }).catch(() => {});
+    }
+    setForm(prev => ({ ...prev, photoUrl: '' }));
+    setMessage('Photo removed. Click Save Profile to apply changes.');
   };
 
   const handleSave = async (e) => {
@@ -72,7 +81,7 @@ export default function ProfileSettingsPage() {
       {/* Header */}
       <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-100 text-orange-700 text-xs font-bold mb-2">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-red-700 text-xs font-bold mb-2">
             <FiUser className="w-3.5 h-3.5" />
             <span>Personal Profile</span>
           </div>
@@ -102,15 +111,15 @@ export default function ProfileSettingsPage() {
 
         <form onSubmit={handleSave} className="space-y-6 text-xs">
           {/* Photo Picker */}
-          <div className="flex items-center gap-6 pb-6 border-b border-slate-100">
-            <div className="relative">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-6 pb-6 border-b border-slate-100">
+            <div className="relative w-24 h-24 shrink-0">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={form.photoUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=300&auto=format&fit=crop&q=80'}
                 alt={form.name}
-                className="w-24 h-24 rounded-2xl object-cover border-2 border-orange-500 shadow-md"
+                className="w-24 h-24 rounded-2xl object-cover border-2 border-red-500 shadow-md"
               />
-              <label className="absolute -bottom-2 -right-2 p-2 bg-orange-600 hover:bg-orange-700 text-white rounded-full shadow-lg cursor-pointer transition">
+              <label className="absolute -bottom-2 -right-2 p-2 bg-red-600 hover:bg-red-700 text-white rounded-full shadow-lg cursor-pointer transition">
                 <FiCamera className="w-3.5 h-3.5" />
                 <input
                   type="file"
@@ -121,11 +130,21 @@ export default function ProfileSettingsPage() {
                 />
               </label>
             </div>
-            <div>
+            <div className="space-y-2">
               <h3 className="text-sm font-extrabold text-slate-900">Official ID Passport Photograph</h3>
-              <p className="text-slate-500 mt-0.5 leading-relaxed">
+              <p className="text-slate-500 text-xs leading-relaxed">
                 {uploading ? 'Uploading new photo to server...' : 'Upload a clear passport portrait photograph. Appears on your dual-sided ID card.'}
               </p>
+              {form.photoUrl && (
+                <button
+                  type="button"
+                  onClick={handleRemovePhoto}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white border border-rose-200 text-xs font-bold transition cursor-pointer"
+                >
+                  <FiTrash2 className="w-3.5 h-3.5" />
+                  <span>Remove Photo</span>
+                </button>
+              )}
             </div>
           </div>
 
@@ -213,7 +232,7 @@ export default function ProfileSettingsPage() {
             <button
               type="submit"
               disabled={saving}
-              className="flex items-center gap-2 px-6 py-3 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold transition shadow-lg shadow-orange-600/20 cursor-pointer disabled:opacity-50"
+              className="flex items-center gap-2 px-6 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold transition shadow-lg shadow-red-600/20 cursor-pointer disabled:opacity-50"
             >
               <FiSave className="w-4 h-4" />
               <span>{saving ? 'Saving Changes...' : 'Save Profile Details'}</span>

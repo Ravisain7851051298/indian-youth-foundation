@@ -37,6 +37,14 @@ class GrievanceService {
     await grievance.save();
     return grievance;
   }
+
+  async deleteGrievance(id) {
+    const grv = await grievanceRepository.findById(id);
+    if (!grv) throw new Error('Grievance not found');
+    const { deleteDocumentFiles } = require('../utils/fileCleaner');
+    await deleteDocumentFiles(grv);
+    return grievanceRepository.deleteById(id);
+  }
 }
 
 module.exports = new GrievanceService();

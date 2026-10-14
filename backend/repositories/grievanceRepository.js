@@ -21,6 +21,10 @@ class GrievanceRepository {
   async count(query = {}) {
     return Grievance.countDocuments(query);
   }
+
+  async deleteById(id) {
+    return Grievance.findByIdAndDelete(id);
+  }
 }
 
 module.exports = new GrievanceRepository();

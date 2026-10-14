@@ -63,6 +63,14 @@ class CertificateService {
       issuedBy: cert.issuedBy
     };
   }
+
+  async deleteCertificate(id) {
+    const cert = await certificateRepository.findById(id);
+    if (!cert) throw new Error('Certificate not found');
+    const { deleteDocumentFiles } = require('../utils/fileCleaner');
+    await deleteDocumentFiles(cert);
+    return certificateRepository.deleteById(id);
+  }
 }
 
 module.exports = new CertificateService();

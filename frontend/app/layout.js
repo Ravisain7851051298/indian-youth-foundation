@@ -1,6 +1,15 @@
 import './globals.css';
+import { Plus_Jakarta_Sans } from 'next/font/google';
+import { Toaster } from 'react-hot-toast';
 import ReduxProvider from '@/store/ReduxProvider';
 import { NGOProvider } from '@/context/NGOContext';
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700', '800'],
+  variable: '--font-plus-jakarta',
+  display: 'swap',
+});
 
 export const metadata = {
   title: 'भारतीय युवा क्रांति | Indian Youth Foundation - 12A & 80G Certified NGO',
@@ -13,11 +22,12 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className="h-full antialiased">
-      <body className="min-h-full flex flex-col bg-slate-50 text-slate-800">
+    <html lang="en" className={`h-full antialiased ${plusJakartaSans.className} ${plusJakartaSans.variable}`}>
+      <body className="min-h-full flex flex-col bg-white text-black">
         <ReduxProvider>
           <NGOProvider>
             {children}
+            <Toaster position="top-right" />
           </NGOProvider>
         </ReduxProvider>
       </body>

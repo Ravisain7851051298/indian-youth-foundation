@@ -31,18 +31,28 @@ router.get('/health', (req, res) => {
 });
 
 // Mount Resource Sub-routers
+const createResourceRouter = require('./contentResourceRouter');
+
 router.use('/auth', authRoutes);
 router.use('/applications', applicationRoutes);
+router.use('/memberships', applicationRoutes); // alias
+router.use('/membership', applicationRoutes); // alias
 router.use('/donations', donationRoutes);
+router.use('/donation', donationRoutes); // alias
 router.use('/plans', planRoutes);
 router.use('/members', memberRoutes);
 router.use('/volunteers', volunteerRoutes);
+router.use('/volunteer', volunteerRoutes); // alias
 router.use('/certificates', certificateRoutes);
 router.use('/campaigns', campaignRoutes);
 router.use('/events', eventRoutes);
+router.use('/event', eventRoutes); // alias
 router.use('/news', newsRoutes);
+router.use('/blogs', newsRoutes); // alias
 router.use('/gallery', galleryRoutes);
+router.use('/galleries', galleryRoutes); // alias
 router.use('/grievances', grievanceRoutes);
+router.use('/complaints', grievanceRoutes); // alias
 router.use('/audit-reports', auditRoutes);
 router.use('/settings', settingRoutes);
 router.use('/email-logs', emailLogRoutes);
@@ -51,12 +61,21 @@ router.use('/upload', uploadRoutes); // alias
 router.use('/verify', verifyRoutes);
 router.use('/stats', statsRoutes);
 
-// Backwards-compatible aliases for endpoints requested by legacy pages
-router.get('/birthday-members', (req, res, next) => {
-  const memberController = require('../controllers/memberController');
-  return memberController.getBirthdayMembers(req, res, next);
-});
+// Additional Content Collections from shiv-gorakh-ngo
+router.use('/services', createResourceRouter('services'));
+router.use('/service', createResourceRouter('services'));
+router.use('/programs', createResourceRouter('programs'));
+router.use('/program', createResourceRouter('programs'));
+router.use('/stories', createResourceRouter('stories'));
+router.use('/story', createResourceRouter('stories'));
+router.use('/feedback', createResourceRouter('feedback'));
+router.use('/reviews', createResourceRouter('feedback'));
+router.use('/team-members', createResourceRouter('team-members'));
+router.use('/team', createResourceRouter('team-members'));
+router.use('/mission-vision', createResourceRouter('mission-vision'));
 
+
+// Backwards-compatible aliases for endpoints requested by legacy pages
 router.post('/analytics/view', (req, res, next) => {
   const settingController = require('../controllers/settingController');
   return settingController.incrementPageView(req, res, next);

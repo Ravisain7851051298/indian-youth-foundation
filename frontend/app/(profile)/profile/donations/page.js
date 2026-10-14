@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { 
   FiHeart, 
   FiDownload, 
@@ -9,15 +8,14 @@ import {
   FiClock, 
   FiPrinter, 
   FiUploadCloud, 
-  FiAlertTriangle, 
   FiFileText,
-  FiShield
+  FiTrash2,
+  FiXCircle
 } from 'react-icons/fi';
 import { QRCodeSVG } from 'qrcode.react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchDonations, submitDonation } from '@/store/donationSlice';
 import { useNGO } from '@/context/NGOContext';
-import api from '@/services/api';
 
 export default function ProfileDonationsPage() {
   const dispatch = useDispatch();
@@ -26,17 +24,19 @@ export default function ProfileDonationsPage() {
 
   const [modalReceipt, setModalReceipt] = useState(null);
   const [donateModal, setDonateModal] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [fileName, setFileName] = useState('');
+  const [previewUrl, setPreviewUrl] = useState('');
   const [donateForm, setDonateForm] = useState({
     amount: 1100,
     panNumber: '',
     campaignTitle: 'General Social Welfare Fund',
     paymentMethod: 'UPI QR Transfer',
-    transactionId: '',
-    paymentScreenshot: ''
+    transactionId: ''
   });
-  const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submittedNotice, setSubmittedNotice] = useState(false);
+  const [donateError, setDonateError] = useState('');
 
   useEffect(() => {
     dispatch(fetchDonations());
@@ -44,58 +44,76 @@ export default function ProfileDonationsPage() {
 
   // Filter donations belonging to this user
   const userDonations = donations.filter(d => 
-    (currentUser?.email && d.donorEmail?.toLowerCase() === currentUser.email?.toLowerCase()) ||
-    (currentUser?.phone && d.donorPhone === currentUser.phone)
+    (currentUser?.id && (d.donor === currentUser.id || d.donor?._id === currentUser.id)) ||
+    (currentUser?._id && (d.donor === currentUser._id || d.donor?._id === currentUser._id)) ||
+    (currentUser?.email && (d.donorEmail?.toLowerCase() === currentUser.email?.toLowerCase() || d.email?.toLowerCase() === currentUser.email?.toLowerCase())) ||
+    (currentUser?.phone && (d.donorPhone === currentUser.phone || d.phone === currentUser.phone))
   );
 
-  const handleFileUpload = async (e) => {
-    const file = e.target.files[0];
+  const handleFileSelect = (e) => {
+    const file = e.target.files?.[0];
     if (!file) return;
 
-    try {
-      setUploading(true);
-      const formData = new FormData();
-      formData.append('file', file);
-      const res = await api.post('/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-      if (res.data.success) {
-        setDonateForm(prev => ({ ...prev, paymentScreenshot: res.data.url }));
-      }
-    } catch (err) {
-      alert('Upload failed. Please try again.');
-    } finally {
-      setUploading(false);
+    if (file.size > 15 * 1024 * 1024) {
+      setDonateError('Screenshot file size must be under 15MB.');
+      return;
     }
+
+    setDonateError('');
+    setSelectedFile(file);
+    setFileName(file.name);
+    const localUrl = URL.createObjectURL(file);
+    setPreviewUrl(localUrl);
+  };
+
+  const handleRemoveScreenshot = () => {
+    if (previewUrl && previewUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    setPreviewUrl('');
+    setSelectedFile(null);
+    setFileName('');
+    setDonateError('');
+    const input = document.getElementById('donationScreenshot');
+    if (input) input.value = '';
   };
 
   const handleDonateSubmit = async (e) => {
     e.preventDefault();
     if (!donateForm.amount || donateForm.amount < 10) {
-      alert('Please enter a valid donation amount');
+      setDonateError('Please enter a valid donation amount (minimum ₹10)');
       return;
     }
 
+    setDonateError('');
+
     try {
       setSubmitting(true);
-      await dispatch(submitDonation({
-        donorName: currentUser?.name || 'Supporter',
-        donorEmail: currentUser?.email || 'donor@byk.org',
-        donorPhone: currentUser?.phone || '9876543210',
-        panNumber: donateForm.panNumber,
-        amount: Number(donateForm.amount),
-        campaignTitle: donateForm.campaignTitle,
-        paymentMethod: donateForm.paymentMethod,
-        transactionId: donateForm.transactionId,
-        paymentScreenshot: donateForm.paymentScreenshot
-      })).unwrap();
+      // Single-API call: send form fields + payment screenshot directly
+      const formData = new FormData();
+      formData.append('donorName', currentUser?.name || 'Supporter');
+      formData.append('donorEmail', currentUser?.email || 'donor@byk.org');
+      formData.append('donorPhone', currentUser?.phone || '9876543210');
+      formData.append('panNumber', donateForm.panNumber);
+      formData.append('amount', String(donateForm.amount));
+      formData.append('campaignTitle', donateForm.campaignTitle);
+      formData.append('paymentMethod', donateForm.paymentMethod);
+      formData.append('transactionId', donateForm.transactionId);
+      formData.append('category', 'payments');
+      if (selectedFile) {
+        formData.append('file', selectedFile);
+        formData.append('paymentScreenshot', selectedFile);
+      }
+
+      await dispatch(submitDonation(formData)).unwrap();
 
       setDonateModal(false);
       setSubmittedNotice(true);
       dispatch(fetchDonations());
+      handleRemoveScreenshot();
       setTimeout(() => setSubmittedNotice(false), 8000);
     } catch (err) {
-      alert(err || 'Failed to submit donation');
+      setDonateError(typeof err === 'string' ? err : (err?.message || 'Failed to submit donation'));
     } finally {
       setSubmitting(false);
     }
@@ -106,18 +124,18 @@ export default function ProfileDonationsPage() {
       {/* Title */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div>
-          <h2 className="text-xl font-black text-slate-900 flex items-center gap-2">
-            <FiHeart className="text-rose-600 w-5 h-5" />
+          <h2 className="text-xl font-black text-black flex items-center gap-2">
+            <FiHeart className="text-red-600 w-5 h-5" />
             <span>Contributions &amp; Statutory 80G Tax Receipts</span>
           </h2>
-          <p className="text-xs text-slate-600 mt-1">
+          <p className="text-xs text-black font-medium mt-1">
             Section 80G tax exemption certificates are issued solely upon verification of bank transactions.
           </p>
         </div>
 
         <button
           onClick={() => setDonateModal(true)}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-md shadow-rose-600/20 transition self-start sm:self-auto"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-md shadow-red-600/20 transition self-start sm:self-auto cursor-pointer"
         >
           <FiHeart className="w-4 h-4" />
           <span>Make a Charitable Contribution</span>
@@ -126,17 +144,17 @@ export default function ProfileDonationsPage() {
 
       {/* Submitted Notice */}
       {submittedNotice && (
-        <div className="bg-emerald-50 border border-emerald-300 rounded-2xl p-4 text-xs text-emerald-900 flex items-center gap-3">
-          <FiCheckCircle className="w-5 h-5 text-emerald-600 shrink-0" />
-          <span>
+        <div className="bg-red-50 border-2 border-red-300 rounded-2xl p-4 text-xs text-black flex items-center gap-3">
+          <FiCheckCircle className="w-5 h-5 text-red-600 shrink-0" />
+          <span className="font-medium">
             Contribution received for verification! Once approved by the audit committee, your official 80G Tax Exemption Receipt will unlock and be emailed to you.
           </span>
         </div>
       )}
 
       {/* Anti-Fraud Notice */}
-      <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-xs text-slate-600 space-y-1">
-        <p className="font-bold text-slate-800">
+      <div className="bg-white border border-slate-200 rounded-2xl p-4 text-xs text-black space-y-1 shadow-2xs font-medium">
+        <p className="font-black text-black">
           ⚖️ Statutory Tax Exemption Notice (Income Tax Act 1961 - Section 80G)
         </p>
         <p>
@@ -149,7 +167,7 @@ export default function ProfileDonationsPage() {
       <div className="bg-white rounded-3xl border border-slate-200 shadow-2xs overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase font-bold text-[10px] tracking-wider">
+            <thead className="bg-slate-50 border-b border-slate-200 text-black uppercase font-black text-[10px] tracking-wider">
               <tr>
                 <th className="py-3.5 px-4">Receipt No (80G)</th>
                 <th className="py-3.5 px-4">Amount</th>
@@ -159,34 +177,47 @@ export default function ProfileDonationsPage() {
                 <th className="py-3.5 px-4 text-right">Official Receipt</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+            <tbody className="divide-y divide-slate-100 font-medium text-black">
               {userDonations.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-slate-400">
+                  <td colSpan={6} className="py-12 text-center text-black font-medium">
                     No contributions recorded under this account yet. Click &ldquo;Make a Charitable Contribution&rdquo; to support our causes.
                   </td>
                 </tr>
               ) : (
                 userDonations.map((d) => {
-                  const isApproved = d.status === 'success' && d.receiptNumber;
+                  const isApproved = (d.status === 'approved' || d.status === 'success') && Boolean(d.receiptNumber);
+                  const isRejected = d.status === 'rejected';
                   return (
-                    <tr key={d._id} className="hover:bg-slate-50/60 transition">
-                      <td className="py-3.5 px-4 font-mono font-bold text-slate-900">
-                        {d.receiptNumber || 'Pending Audit'}
+                    <tr key={d._id} className="hover:bg-red-50/20 transition">
+                      <td className="py-3.5 px-4 font-mono font-bold text-black">
+                        {d.receiptNumber || (isRejected ? 'Declined' : 'Pending Audit')}
                       </td>
-                      <td className="py-3.5 px-4 font-black text-slate-900">
+                      <td className="py-3.5 px-4 font-black text-black">
                         ₹{Number(d.amount).toLocaleString('en-IN')}
                       </td>
-                      <td className="py-3.5 px-4">{d.campaignTitle}</td>
-                      <td className="py-3.5 px-4 text-slate-500">
-                        {new Date(d.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      <td className="py-3.5 px-4 text-black font-semibold">{d.campaignTitle}</td>
+                      <td className="py-3.5 px-4 text-black font-medium">
+                        {(d.date || d.createdAt) ? new Date(d.date || d.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
                       </td>
-                      <td className="py-3.5 px-4 whitespace-nowrap">
+                      <td className="py-3.5 px-4">
                         {isApproved ? (
                           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800">
                             <FiCheckCircle className="w-3 h-3 text-emerald-600" />
                             <span>Verified &amp; Approved</span>
                           </span>
+                        ) : isRejected ? (
+                          <div className="space-y-1">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-red-100 text-red-800 border border-red-200">
+                              <FiXCircle className="w-3 h-3 text-red-600" />
+                              <span>Rejected</span>
+                            </span>
+                            {d.rejectionReason && (
+                              <p className="text-[11px] text-red-600 font-bold max-w-xs leading-tight">
+                                Reason: {d.rejectionReason}
+                              </p>
+                            )}
+                          </div>
                         ) : (
                           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-800 border border-amber-200">
                             <FiClock className="w-3 h-3 text-amber-600" />
@@ -199,13 +230,17 @@ export default function ProfileDonationsPage() {
                           <button
                             type="button"
                             onClick={() => setModalReceipt(d)}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs shadow-2xs transition"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-2xs transition cursor-pointer"
                           >
                             <FiDownload className="w-3.5 h-3.5" />
                             <span>Download 80G Receipt</span>
                           </button>
+                        ) : isRejected ? (
+                          <span className="text-[11px] text-red-600 font-bold bg-red-50 px-2.5 py-1 rounded-lg border border-red-200">
+                            Declined: {d.rejectionReason || 'Verification failed'}
+                          </span>
                         ) : (
-                          <span className="text-[11px] text-slate-400 italic">
+                          <span className="text-[11px] text-black font-medium italic">
                             Receipt locked until verified
                           </span>
                         )}
@@ -221,25 +256,25 @@ export default function ProfileDonationsPage() {
 
       {/* ----------------- 80G RECEIPT MODAL ----------------- */}
       {modalReceipt && (
-        <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto print:max-h-none print:shadow-none print:p-0">
             {/* Receipt Modal Header */}
             <div className="flex items-center justify-between pb-3 border-b border-slate-200 print:hidden">
-              <h3 className="font-black text-slate-900 text-base flex items-center gap-2">
-                <FiFileText className="text-orange-600" />
+              <h3 className="font-black text-black text-base flex items-center gap-2">
+                <FiFileText className="text-red-600" />
                 <span>Official 80G Donation Receipt</span>
               </h3>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => window.print()}
-                  className="px-3.5 py-1.5 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs"
+                  className="px-3.5 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs cursor-pointer"
                 >
                   <FiPrinter className="w-3.5 h-3.5" />
                   <span>Print Receipt</span>
                 </button>
                 <button
                   onClick={() => setModalReceipt(null)}
-                  className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-xs"
+                  className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-black flex items-center justify-center font-bold text-xs cursor-pointer"
                 >
                   ✕
                 </button>
@@ -247,65 +282,65 @@ export default function ProfileDonationsPage() {
             </div>
 
             {/* Printable Receipt Body */}
-            <div className="border-2 border-slate-800 rounded-2xl p-6 sm:p-8 space-y-6 text-slate-800 relative bg-white">
+            <div className="border-2 border-red-600 rounded-2xl p-6 sm:p-8 space-y-6 text-black relative bg-white">
               {/* Receipt Top Letterhead */}
-              <div className="text-center border-b-2 border-orange-500 pb-4 space-y-1">
-                <h2 className="text-lg sm:text-xl font-black text-orange-600 uppercase tracking-wide">
+              <div className="text-center border-b-2 border-red-500 pb-4 space-y-1">
+                <h2 className="text-lg sm:text-xl font-black text-red-600 uppercase tracking-wide">
                   INDIAN YOUTH FOUNDATION
                 </h2>
-                <h3 className="text-xs font-black text-slate-800">
+                <h3 className="text-xs font-black text-black">
                   भारतीय युवा क्रांति (राष्ट्रीय सामाजिक संगठन)
                 </h3>
-                <p className="text-[10px] text-slate-600">
+                <p className="text-[10px] text-black font-medium">
                   Trust Reg No: <strong>421/2019</strong> • NITI Aayog Darpan: <strong>{settings?.nitiAayogDarpanId || 'RJ/2022/0319482'}</strong><br/>
                   12A Reg: <strong>{settings?.exemption12A || 'CIT/12A/2021'}</strong> • 80G Approval: <strong>{settings?.exemption80G || 'CIT/80G/2021'}</strong> • PAN: <strong>{settings?.panNo || 'AAATB4321Q'}</strong>
                 </p>
-                <p className="text-[10px] text-slate-500">
+                <p className="text-[10px] text-black">
                   Head Office - Krishna Vihar Pala Road Aligarh, Uttar Pradesh - 202001
                 </p>
               </div>
 
               {/* Receipt Title */}
-              <div className="bg-orange-50 border border-orange-200 text-center py-2 rounded-xl">
-                <span className="text-xs font-black text-orange-900 uppercase tracking-wider">
+              <div className="bg-red-50 border border-red-200 text-center py-2 rounded-xl">
+                <span className="text-xs font-black text-red-900 uppercase tracking-wider">
                   STATUTORY DONATION RECEIPT (SECTION 80G EXEMPTION)
                 </span>
               </div>
 
               {/* Receipt Details Grid */}
-              <div className="grid grid-cols-2 gap-4 text-xs">
+              <div className="grid grid-cols-2 gap-4 text-xs font-medium">
                 <div>
-                  <span className="text-slate-400 block">Receipt Number:</span>
-                  <strong className="font-mono text-orange-600 text-sm">{modalReceipt.receiptNumber}</strong>
+                  <span className="text-black font-semibold block">Receipt Number:</span>
+                  <strong className="font-mono text-red-600 text-sm font-black">{modalReceipt.receiptNumber}</strong>
                 </div>
                 <div className="text-right">
-                  <span className="text-slate-400 block">Date of Donation:</span>
-                  <strong className="text-slate-800">{new Date(modalReceipt.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</strong>
+                  <span className="text-black font-semibold block">Date of Donation:</span>
+                  <strong className="text-black">{(modalReceipt.date || modalReceipt.createdAt) ? new Date(modalReceipt.date || modalReceipt.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) : '-'}</strong>
                 </div>
                 <div>
-                  <span className="text-slate-400 block">Donor Name:</span>
-                  <strong className="text-slate-900 text-sm">{modalReceipt.donorName}</strong>
+                  <span className="text-black font-semibold block">Donor Name:</span>
+                  <strong className="text-black text-sm font-black">{modalReceipt.donorName}</strong>
                 </div>
                 <div className="text-right">
-                  <span className="text-slate-400 block">Donor PAN Card No:</span>
-                  <strong className="font-mono text-slate-800">{modalReceipt.panNumber || 'NA'}</strong>
+                  <span className="text-black font-semibold block">Donor PAN Card No:</span>
+                  <strong className="font-mono text-black font-black">{modalReceipt.panNumber || modalReceipt.pan || 'NA'}</strong>
                 </div>
                 <div>
-                  <span className="text-slate-400 block">Amount Received:</span>
-                  <strong className="text-base font-black text-slate-900">₹{Number(modalReceipt.amount).toLocaleString('en-IN')}</strong>
+                  <span className="text-black font-semibold block">Amount Received:</span>
+                  <strong className="text-base font-black text-black">₹{Number(modalReceipt.amount).toLocaleString('en-IN')}</strong>
                 </div>
                 <div className="text-right">
-                  <span className="text-slate-400 block">Payment Mode:</span>
-                  <strong className="text-slate-800">{modalReceipt.paymentMethod}</strong>
+                  <span className="text-black font-semibold block">Payment Mode:</span>
+                  <strong className="text-black">{modalReceipt.paymentMethod}</strong>
                 </div>
                 <div className="col-span-2">
-                  <span className="text-slate-400 block">Contribution Earmarked For:</span>
-                  <strong className="text-slate-800">{modalReceipt.campaignTitle}</strong>
+                  <span className="text-black font-semibold block">Contribution Earmarked For:</span>
+                  <strong className="text-black">{modalReceipt.campaignTitle}</strong>
                 </div>
               </div>
 
               {/* Tax Exemption Citation */}
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-[11px] text-slate-600 space-y-1">
+              <div className="bg-red-50/50 border border-red-200 rounded-xl p-3 text-[11px] text-black space-y-1 font-medium">
                 <p>✓ <strong>Income Tax Benefit:</strong> This receipt entitles the donor to deduction under Section 80G of the Income Tax Act, 1961.</p>
                 <p>✓ All contributions are exclusively applied towards the charitable purposes of the Trust across India.</p>
               </div>
@@ -317,7 +352,7 @@ export default function ProfileDonationsPage() {
                     value={`https://bharatiyayuvakranti.org/verify/donation/${modalReceipt.receiptNumber}`}
                     size={70}
                   />
-                  <span className="text-[9px] font-bold text-slate-400 mt-1 block">Scan to Verify</span>
+                  <span className="text-[9px] font-bold text-black mt-1 block">Scan to Verify</span>
                 </div>
 
                 <div className="text-center">
@@ -327,7 +362,7 @@ export default function ProfileDonationsPage() {
                     alt="Seal"
                     className="w-12 h-12 object-contain mx-auto"
                   />
-                  <span className="text-[9px] font-bold text-slate-400 block">Trust Seal</span>
+                  <span className="text-[9px] font-bold text-black block">Trust Seal</span>
                 </div>
 
                 <div className="text-right">
@@ -337,8 +372,8 @@ export default function ProfileDonationsPage() {
                     alt="Sign"
                     className="h-8 object-contain ml-auto"
                   />
-                  <span className="text-[10px] font-bold text-slate-800 block">Authorized Trustee Signatory</span>
-                  <span className="text-[9px] text-slate-400 block">National President</span>
+                  <span className="text-[10px] font-bold text-black block">Authorized Trustee Signatory</span>
+                  <span className="text-[9px] text-black block">National President</span>
                 </div>
               </div>
             </div>
@@ -346,33 +381,39 @@ export default function ProfileDonationsPage() {
         </div>
       )}
 
-      {/* ----------------- DONATE MODAL ----------------- */}
+      {/* ----------------- DONATE MODAL (Single-API) ----------------- */}
       {donateModal && (
-        <div className="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-slate-200">
-              <h3 className="font-black text-slate-900 text-base">Make a Charitable Contribution</h3>
+              <h3 className="font-black text-black text-base">Make a Charitable Contribution</h3>
               <button
                 onClick={() => setDonateModal(false)}
-                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-xs"
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-black flex items-center justify-center font-bold text-xs cursor-pointer"
               >
                 ✕
               </button>
             </div>
 
-            <form onSubmit={handleDonateSubmit} className="space-y-4 text-xs">
+            {donateError && (
+              <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-bold">
+                {donateError}
+              </div>
+            )}
+
+            <form onSubmit={handleDonateSubmit} className="space-y-4 text-xs font-medium">
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Donation Amount (₹ INR) *</label>
-                <div className="flex gap-2 mb-2">
+                <label className="block font-bold text-black mb-1">Donation Amount (₹ INR) *</label>
+                <div className="flex flex-wrap gap-2 mb-2">
                   {[500, 1100, 2100, 5100, 11000].map(amt => (
                     <button
                       key={amt}
                       type="button"
                       onClick={() => setDonateForm(prev => ({ ...prev, amount: amt }))}
-                      className={`px-3 py-1.5 rounded-xl font-bold border transition ${
-                        donateForm.amount === amt
-                          ? 'bg-rose-600 text-white border-rose-600'
-                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                      className={`px-3 py-1.5 rounded-xl font-bold border transition cursor-pointer ${
+                        Number(donateForm.amount) === amt
+                          ? 'bg-red-600 text-white border-red-600'
+                          : 'bg-white text-black border-slate-300 hover:bg-red-50'
                       }`}
                     >
                       ₹{amt}
@@ -385,59 +426,96 @@ export default function ProfileDonationsPage() {
                   min="10"
                   value={donateForm.amount}
                   onChange={(e) => setDonateForm(prev => ({ ...prev, amount: e.target.value }))}
-                  className="w-full p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500 font-bold text-sm"
+                  className="w-full p-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 font-bold text-sm text-black bg-white"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Donor PAN Number (Required for 80G Exemption)</label>
+                <label className="block font-bold text-black mb-1">Donor PAN Number (Required for 80G Exemption)</label>
                 <input
                   type="text"
                   placeholder="e.g. ABCDE1234F"
                   value={donateForm.panNumber}
                   onChange={(e) => setDonateForm(prev => ({ ...prev, panNumber: e.target.value.toUpperCase() }))}
-                  className="w-full p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500 font-mono uppercase"
+                  className="w-full p-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 font-mono uppercase text-black bg-white"
                 />
               </div>
 
               {/* UPI QR Display */}
               <div className="bg-slate-50 rounded-2xl p-4 border border-slate-200 text-center space-y-2">
-                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+                <span className="text-[11px] font-bold text-black uppercase tracking-wider block">
                   Scan Official UPI QR to Pay
                 </span>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={settings?.upiQrImage || 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=bharatiyauva@okhdfcbank%26pn=Indian%20Youth%20Foundation%26cu=INR'}
                   alt="UPI QR"
-                  className="w-36 h-36 mx-auto object-contain bg-white p-2 rounded-xl border border-slate-200"
+                  className="w-36 h-36 mx-auto object-contain bg-white p-2 rounded-xl border border-red-300 shadow-2xs"
                 />
-                <span className="font-mono text-xs font-bold text-slate-800 block">
+                <span className="font-mono text-xs font-bold text-black block">
                   {settings?.upiId || 'bharatiyauva@okhdfcbank'}
                 </span>
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Transaction UTR / Reference ID *</label>
+                <label className="block font-bold text-black mb-1">Transaction UTR / Reference ID *</label>
                 <input
                   type="text"
                   required
                   placeholder="Enter UPI reference UTR..."
                   value={donateForm.transactionId}
                   onChange={(e) => setDonateForm(prev => ({ ...prev, transactionId: e.target.value }))}
-                  className="w-full p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500 font-mono"
+                  className="w-full p-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 font-mono text-black bg-white"
                 />
               </div>
 
+              {/* Single-API File Selection */}
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Upload Payment Screenshot (Optional)</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileUpload}
-                  className="w-full text-xs"
-                />
-                {donateForm.paymentScreenshot && (
-                  <span className="text-[11px] text-emerald-600 font-bold block mt-1">✓ Screenshot attached</span>
+                <label className="block font-bold text-black mb-1">Attach Payment Screenshot (Optional)</label>
+                {!selectedFile ? (
+                  <div className="border-2 border-dashed border-slate-300 hover:border-red-500 rounded-2xl p-4 text-center transition bg-slate-50">
+                    <input
+                      type="file"
+                      id="donationScreenshot"
+                      accept="image/*"
+                      onChange={handleFileSelect}
+                      className="hidden"
+                    />
+                    <label htmlFor="donationScreenshot" className="cursor-pointer space-y-1 block">
+                      <FiUploadCloud className="w-5 h-5 text-red-600 mx-auto" />
+                      <span className="text-xs font-bold text-red-600 block hover:underline">
+                        Select Payment Screenshot
+                      </span>
+                      <span className="text-[10px] text-black block">
+                        Uploaded in single API request with contribution
+                      </span>
+                    </label>
+                  </div>
+                ) : (
+                  <div className="p-3 rounded-xl border border-red-200 bg-red-50/50 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      {previewUrl && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={previewUrl}
+                          alt="Screenshot"
+                          className="w-12 h-12 rounded-lg object-contain bg-white border border-slate-200"
+                        />
+                      )}
+                      <div>
+                        <span className="text-[11px] font-bold text-black block">{fileName}</span>
+                        <span className="text-[10px] text-red-700 font-medium">✓ Ready to send with contribution</span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleRemoveScreenshot}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition cursor-pointer"
+                    >
+                      <FiTrash2 className="w-3 h-3" />
+                      <span>Remove</span>
+                    </button>
+                  </div>
                 )}
               </div>
 
@@ -445,14 +523,14 @@ export default function ProfileDonationsPage() {
                 <button
                   type="button"
                   onClick={() => setDonateModal(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs hover:bg-slate-200"
+                  className="px-4 py-2 rounded-xl bg-slate-100 text-black font-bold text-xs hover:bg-slate-200 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  disabled={submitting || uploading}
-                  className="px-6 py-2 rounded-xl bg-rose-600 text-white font-bold text-xs hover:bg-rose-700 shadow-md shadow-rose-600/20"
+                  disabled={submitting}
+                  className="px-6 py-2 rounded-xl bg-red-600 text-white font-bold text-xs hover:bg-red-700 shadow-md shadow-red-600/20 cursor-pointer"
                 >
                   {submitting ? 'Submitting...' : 'Submit Contribution for Verification'}
                 </button>

@@ -15,10 +15,42 @@ const getGallery = async (req, res) => {
 
 const createGallery = async (req, res) => {
   try {
+    if (req.file) {
+      const category = req.file.category || 'gallery';
+      req.body.url = `/uploads/${category}/${req.file.filename}`;
+    } else if (req.body.imageUrl && !req.body.url) {
+      req.body.url = req.body.imageUrl;
+    } else if (req.body.image && !req.body.url) {
+      req.body.url = req.body.image;
+    }
+
     const galleryItem = await galleryService.createGallery(req.body);
     return res.status(201).json({
       success: true,
       message: 'Item added to gallery',
+      galleryItem
+    });
+  } catch (error) {
+    return res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+const updateGallery = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (req.file) {
+      const category = req.file.category || 'gallery';
+      req.body.url = `/uploads/${category}/${req.file.filename}`;
+    } else if (req.body.imageUrl && !req.body.url) {
+      req.body.url = req.body.imageUrl;
+    } else if (req.body.image && !req.body.url) {
+      req.body.url = req.body.image;
+    }
+
+    const galleryItem = await galleryService.updateGallery(id, req.body);
+    return res.json({
+      success: true,
+      message: 'Gallery item updated successfully',
       galleryItem
     });
   } catch (error) {
@@ -43,5 +75,6 @@ const deleteGallery = async (req, res) => {
 module.exports = {
   getGallery,
   createGallery,
+  updateGallery,
   deleteGallery
 };

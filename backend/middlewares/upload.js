@@ -1,42 +1,96 @@
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
+const { uploadDir, ensureCategoryDir, sanitizeCategory } = require('../utils/fileCleaner');
 
-const uploadDir = path.join(__dirname, '..', 'uploads');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-
+/**
+ * Categorized disk storage engine for Multer
+ * Automatically creates and places files into categorized folders:
+ * /uploads/avatars, /uploads/payments, /uploads/applications, etc.
+ */
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, uploadDir);
+    // Determine category from body, query, header, or fieldname
+    const rawCategory = req.body?.category 
+      || req.query?.category 
+      || req.headers?.['x-upload-category'] 
+      || req.headers?.['x-category'] 
+      || file.fieldname 
+      || 'general';
+
+    const { category, dir } = ensureCategoryDir(rawCategory);
+    file.category = category;
+    cb(null, dir);
   },
   filename: function (req, file, cb) {
-    const cleanName = file.originalname.replace(/[^a-zA-Z0-9.]/g, '_');
+    const rawName = file.originalname || 'upload.png';
+    const cleanName = rawName.replace(/[^a-zA-Z0-9.]/g, '_');
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e5);
     const ext = path.extname(cleanName) || '.png';
-    const baseName = path.basename(cleanName, ext);
+    const baseName = path.basename(cleanName, ext).substring(0, 40) || 'file';
     cb(null, `${baseName}-${uniqueSuffix}${ext}`);
   }
 });
 
 const fileFilter = (req, file, cb) => {
-  // Allow images, pdfs, and documents
-  const allowed = /\.(jpg|jpeg|png|webp|svg|pdf|docx|xlsx)$/i;
-  if (file.originalname.match(allowed)) {
+  // Allowed extensions for NGO operations: images, PDFs, office docs
+  const allowedExts = /\.(jpg|jpeg|png|webp|svg|gif|pdf|doc|docx|xls|xlsx)$/i;
+  const allowedMimes = /^(image\/(jpeg|png|webp|svg\+xml|gif)|application\/(pdf|msword|vnd\.openxmlformats-officedocument\.wordprocessingml\.document|vnd\.ms-excel|vnd\.openxmlformats-officedocument\.spreadsheetml\.sheet))$/i;
+
+  if (file.originalname.match(allowedExts) || file.mimetype.match(allowedMimes)) {
     cb(null, true);
   } else {
-    cb(null, true); // Permissive for NGO forms
+    cb(new Error(`Unsupported file type: ${file.originalname}. Allowed: Images (JPG, PNG, WEBP), PDFs, and Documents.`), false);
   }
 };
 
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 15 * 1024 * 1024 }, // 15MB max file size
+  limits: { 
+    fileSize: 15 * 1024 * 1024 // 15MB max file size
+  },
   fileFilter: fileFilter
 });
 
+/**
+ * Middleware that seamlessly accepts optional file upload(s) in the same API request.
+ * Automatically handles both JSON and multipart/form-data.
+ * Sets req.body.idProofUrl, req.body.idProofDocument, req.body.paymentScreenshot, or req.body.fileUrl.
+ */
+const handleOptionalFileUpload = (req, res, next) => {
+  upload.any()(req, res, (err) => {
+    if (err) {
+      if (err instanceof multer.MulterError) {
+        if (err.code === 'LIMIT_FILE_SIZE') {
+          return res.status(400).json({ success: false, message: 'Uploaded file exceeds 15MB limit' });
+        }
+        return res.status(400).json({ success: false, message: `Upload error: ${err.message}` });
+      }
+      return res.status(400).json({ success: false, message: err.message || 'File upload rejected' });
+    }
+
+    if (req.files && req.files.length > 0) {
+      req.file = req.files[0];
+      const category = req.file.category || 'general';
+      const fileUrl = `/uploads/${category}/${req.file.filename}`;
+
+      // Automatically populate relevant schema fields
+      if (!req.body.idProofUrl && !req.body.idProofDocument) {
+        req.body.idProofUrl = fileUrl;
+        req.body.idProofDocument = fileUrl;
+      }
+      if (!req.body.paymentScreenshot && !req.body.screenshot) {
+        req.body.paymentScreenshot = fileUrl;
+      }
+      if (!req.body.fileUrl && !req.body.image) {
+        req.body.fileUrl = fileUrl;
+      }
+    }
+    next();
+  });
+};
+
 module.exports = {
   upload,
-  uploadDir
+  uploadDir,
+  handleOptionalFileUpload
 };

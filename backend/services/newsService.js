@@ -21,6 +21,8 @@ class NewsService {
   async deleteNews(id) {
     const news = await newsRepository.deleteById(id);
     if (!news) throw new Error('News item not found');
+    const { deleteDocumentFiles } = require('../utils/fileCleaner');
+    await deleteDocumentFiles(news);
     return news;
   }
 }

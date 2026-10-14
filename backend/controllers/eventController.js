@@ -15,6 +15,13 @@ const getEvents = async (req, res) => {
 
 const createEvent = async (req, res) => {
   try {
+    if (req.file) {
+      const category = req.file.category || 'events';
+      req.body.image = `/uploads/${category}/${req.file.filename}`;
+    } else if (req.body.imageUrl && !req.body.image) {
+      req.body.image = req.body.imageUrl;
+    }
+
     const event = await eventService.createEvent(req.body);
     return res.status(201).json({
       success: true,
@@ -29,6 +36,13 @@ const createEvent = async (req, res) => {
 const updateEvent = async (req, res) => {
   try {
     const { id } = req.params;
+    if (req.file) {
+      const category = req.file.category || 'events';
+      req.body.image = `/uploads/${category}/${req.file.filename}`;
+    } else if (req.body.imageUrl && !req.body.image) {
+      req.body.image = req.body.imageUrl;
+    }
+
     const event = await eventService.updateEvent(id, req.body);
     return res.json({
       success: true,

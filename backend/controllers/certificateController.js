@@ -5,8 +5,21 @@ const getCertificates = async (req, res) => {
     const { recipientId } = req.query;
     const query = {};
     if (recipientId) query.recipient = recipientId;
-    if (req.user?.role !== 'Admin' && req.user?.role !== 'Manager') {
-      query.$or = [{ recipient: req.user.id }, { recipientEmail: req.user.email }];
+
+    if (req.user) {
+      const userRole = (req.user.role || '').toLowerCase();
+      if (userRole !== 'admin' && userRole !== 'manager') {
+        const orConditions = [];
+        if (req.user.id) orConditions.push({ recipient: req.user.id });
+        if (req.user.email) orConditions.push({ recipientEmail: req.user.email });
+        if (req.user.memberId) orConditions.push({ recipientId: req.user.memberId });
+        if (orConditions.length > 0) {
+          query.$or = orConditions;
+        }
+      }
+    } else if (!recipientId) {
+      // Unauthenticated public request: show verified certificates
+      query.verified = true;
     }
 
     const certificates = await certificateService.getCertificates(query);
@@ -39,8 +52,23 @@ const verifyPublicCertificate = async (req, res) => {
   }
 };
 
+const deleteCertificate = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await certificateService.deleteCertificate(id);
+    return res.json({
+      success: true,
+      message: 'Certificate and associated media files deleted successfully',
+      id
+    });
+  } catch (error) {
+    return res.status(400).json({ success: false, message: error.message });
+  }
+};
+
 module.exports = {
   getCertificates,
   issueCertificate,
-  verifyPublicCertificate
+  verifyPublicCertificate,
+  deleteCertificate
 };

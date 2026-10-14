@@ -72,7 +72,6 @@ export const ROLE_NAV_ITEMS = {
   Volunteer: [
     { label: "Volunteer Profile & ID Card", href: "/profile?tab=idcard", icon: FiUser },
     { label: "Appointment Letter", href: "/profile?tab=letter", icon: FiFileText },
-    { label: "Birthday Poster Canvas", href: "/profile?tab=birthday", icon: FiAward },
     { label: "My Certificates", href: "/certificates", icon: FiAward },
     { label: "Upcoming Events & Tasks", href: "/event", icon: FiCalendar },
     { label: "Active Campaigns", href: "/campaigns", icon: FiTarget },
@@ -84,7 +83,6 @@ export const ROLE_NAV_ITEMS = {
   Member: [
     { label: "Member Profile & ID Card", href: "/profile?tab=idcard", icon: FiUser },
     { label: "Appointment Letter", href: "/profile?tab=letter", icon: FiFileText },
-    { label: "Birthday Poster Canvas", href: "/profile?tab=birthday", icon: FiAward },
     { label: "My 80G Donations", href: "/donation", icon: FiCreditCard },
     { label: "Appreciation Certificates", href: "/certificates", icon: FiAward },
     { label: "Welfare Programs", href: "/programs", icon: FiLayers },
@@ -113,16 +111,16 @@ export default function AdminSidebar({ activeRole = null }) {
   return (
     <>
       {/* Mobile Sticky Bar Toggle */}
-      <div className="lg:hidden w-full bg-slate-900 text-white px-4 py-3 flex items-center justify-between border-b border-slate-800 sticky top-20 z-40">
+      <div className="lg:hidden w-full bg-white text-black px-4 py-3 flex items-center justify-between border-b border-slate-200 sticky top-20 z-40 shadow-xs">
         <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-orange-500 animate-pulse" />
-          <span className="text-xs font-bold truncate">
+          <span className="w-2.5 h-2.5 rounded-full bg-red-600 animate-pulse" />
+          <span className="text-xs font-bold truncate text-black">
             {roleBadgeText}
           </span>
         </div>
         <button
           onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
-          className="p-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white flex items-center gap-1.5 text-xs font-semibold cursor-pointer"
+          className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-black flex items-center gap-1.5 text-xs font-semibold cursor-pointer"
         >
           {mobileSidebarOpen ? <FiX className="w-4 h-4" /> : <FiMenu className="w-4 h-4" />}
           <span>{mobileSidebarOpen ? 'Close Menu' : 'Portal Menu'}</span>
@@ -134,21 +132,21 @@ export default function AdminSidebar({ activeRole = null }) {
         className={`
           ${mobileSidebarOpen ? 'block fixed inset-y-0 left-0 z-50 w-72' : 'hidden'}
           lg:flex lg:flex-col lg:w-64 lg:shrink-0
-          bg-slate-900 text-slate-100 border-r border-slate-800 shadow-2xl
+          bg-white text-black border-r border-slate-200 shadow-sm
           lg:sticky lg:top-20 lg:h-[calc(100vh-5rem)] lg:overflow-y-auto
         `}
       >
         {/* Brand Header */}
-        <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+        <div className="p-4 border-b border-slate-200 flex items-center justify-between">
           <div className="flex items-center gap-3 overflow-hidden">
-            <div className="w-10 h-10 rounded-xl bg-orange-600 flex items-center justify-center font-bold text-white shadow-md shadow-orange-600/30 shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-red-600 flex items-center justify-center font-bold text-white shadow-md shadow-red-600/20 shrink-0">
               IYF
             </div>
             <div className="overflow-hidden">
-              <h2 className="font-bold text-xs tracking-wide text-white truncate">
+              <h2 className="font-bold text-xs tracking-wide text-black truncate">
                 {settings?.ngoName || 'Indian Youth Foundation'}
               </h2>
-              <span className="text-[10px] text-orange-400 font-bold px-2 py-0.5 rounded-full bg-orange-500/10 inline-block mt-0.5">
+              <span className="text-[10px] text-red-600 font-bold px-2 py-0.5 rounded-full bg-red-50 border border-red-200 inline-block mt-0.5">
                 {role}
               </span>
             </div>
@@ -156,20 +154,20 @@ export default function AdminSidebar({ activeRole = null }) {
           {/* Mobile close button */}
           <button
             onClick={() => setMobileSidebarOpen(false)}
-            className="lg:hidden p-1.5 rounded-lg text-slate-400 hover:text-white"
+            className="lg:hidden p-1.5 rounded-lg text-slate-500 hover:text-black"
           >
             <FiX className="w-5 h-5" />
           </button>
         </div>
 
         {/* User Card */}
-        <div className="px-4 py-3 bg-slate-950/50 border-b border-slate-800/80 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-orange-400 text-xs font-black shrink-0 border border-slate-700">
+        <div className="px-4 py-3 bg-red-50/50 border-b border-red-100 flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-white text-xs font-black shrink-0 shadow-xs">
             {currentUser?.name ? currentUser.name.charAt(0) : 'U'}
           </div>
           <div className="overflow-hidden text-xs">
-            <div className="font-bold text-slate-200 truncate">{currentUser?.name || 'Authorized User'}</div>
-            <div className="text-[10px] text-slate-500 truncate">{currentUser?.memberId || roleBadgeText}</div>
+            <div className="font-bold text-black truncate">{currentUser?.name || 'Authorized User'}</div>
+            <div className="text-[10px] text-slate-600 truncate">{currentUser?.memberId || roleBadgeText}</div>
           </div>
         </div>
 
@@ -188,11 +186,11 @@ export default function AdminSidebar({ activeRole = null }) {
                 onClick={() => setMobileSidebarOpen(false)}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all ${
                   isActive
-                    ? 'bg-orange-600 text-white shadow-md shadow-orange-600/25'
-                    : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                    ? 'bg-red-600 text-white shadow-md shadow-red-600/20'
+                    : 'text-slate-700 hover:bg-red-50 hover:text-red-700'
                 }`}
               >
-                <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+                <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-slate-500'}`} />
                 <span className="truncate">{item.label}</span>
               </Link>
             );
@@ -200,18 +198,18 @@ export default function AdminSidebar({ activeRole = null }) {
         </nav>
 
         {/* Footer User Bar & Quick Links */}
-        <div className="p-3 border-t border-slate-800 space-y-2 bg-slate-950/40">
+        <div className="p-3 border-t border-slate-200 space-y-2 bg-slate-50/60">
           <Link
             href="/"
             onClick={() => setMobileSidebarOpen(false)}
-            className="flex items-center justify-center gap-2 w-full py-2 px-3 text-xs rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 transition font-medium"
+            className="flex items-center justify-center gap-2 w-full py-2 px-3 text-xs rounded-xl bg-white border border-slate-200 hover:bg-slate-100 text-black transition font-semibold shadow-2xs"
           >
             <FiExternalLink className="w-3.5 h-3.5" />
             <span>View Public Site</span>
           </Link>
           <button
             onClick={() => { logout(); setMobileSidebarOpen(false); }}
-            className="flex items-center justify-center gap-2 w-full py-2 px-3 text-xs rounded-xl text-rose-400 hover:bg-rose-500/10 transition cursor-pointer font-medium"
+            className="flex items-center justify-center gap-2 w-full py-2 px-3 text-xs rounded-xl text-red-600 hover:bg-red-50 transition cursor-pointer font-bold"
           >
             <FiLogOut className="w-3.5 h-3.5" />
             <span>Logout</span>
@@ -223,7 +221,7 @@ export default function AdminSidebar({ activeRole = null }) {
       {mobileSidebarOpen && (
         <div 
           onClick={() => setMobileSidebarOpen(false)}
-          className="lg:hidden fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-40"
+          className="lg:hidden fixed inset-0 bg-black/40 backdrop-blur-xs z-40"
         />
       )}
     </>

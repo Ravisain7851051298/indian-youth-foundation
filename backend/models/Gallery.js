@@ -10,4 +10,6 @@ const gallerySchema = new mongoose.Schema({
   timestamps: true
 });
 
+gallerySchema.plugin(require('./plugins/fileCleanupPlugin'));
+
 module.exports = mongoose.model('Gallery', gallerySchema);

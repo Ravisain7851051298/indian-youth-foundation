@@ -11,4 +11,6 @@ const auditReportSchema = new mongoose.Schema({
   timestamps: true
 });
 
+auditReportSchema.plugin(require('./plugins/fileCleanupPlugin'));
+
 module.exports = mongoose.model('AuditReport', auditReportSchema);

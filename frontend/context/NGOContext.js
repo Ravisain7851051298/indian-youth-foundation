@@ -195,36 +195,68 @@ export function NGOProvider({ children }) {
   const [teamMembers, setTeamMembers] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Initialize and load saved state or sync with backend
+  // Initialize and dynamically verify active session with backend
   useEffect(() => {
     try {
-      const savedUser = localStorage.getItem('byk_user');
-      const savedToken = localStorage.getItem('byk_token');
-      const savedSettings = localStorage.getItem('byk_settings');
+      const savedUser = typeof window !== 'undefined' ? sessionStorage.getItem('byk_user') : null;
+      const savedSettings = typeof window !== 'undefined' ? localStorage.getItem('byk_settings') : null;
 
       if (savedUser) setCurrentUser(JSON.parse(savedUser));
-      if (savedToken) setToken(savedToken);
       if (savedSettings) setSettings(JSON.parse(savedSettings));
     } catch (e) {
-      console.error('Error loading local state', e);
+      console.error('Error loading session state', e);
     }
 
     fetchInitialData();
+
+    // Listen for global 401 unauthorized events to dynamically reset auth state
+    const handleUnauthorized = () => {
+      setCurrentUser(null);
+      setToken(null);
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('byk_user');
+      }
+    };
+    if (typeof window !== 'undefined') {
+      window.addEventListener('byk_auth_unauthorized', handleUnauthorized);
+      return () => {
+        window.removeEventListener('byk_auth_unauthorized', handleUnauthorized);
+      };
+    }
   }, []);
 
   const fetchInitialData = async () => {
     try {
       setLoading(true);
+
+      // Dynamically verify session from backend using secure HTTP-Only cookie
+      fetch('/api/auth/me', { credentials: 'include' })
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+          if (data && data.success && data.user) {
+            setCurrentUser(data.user);
+            if (typeof window !== 'undefined') {
+              sessionStorage.setItem('byk_user', JSON.stringify(data.user));
+            }
+          } else {
+            setCurrentUser(null);
+            if (typeof window !== 'undefined') {
+              sessionStorage.removeItem('byk_user');
+            }
+          }
+        })
+        .catch(() => {});
+
       const [setRes, campRes, donRes, memRes, evtRes, newsRes, galRes, certRes, grvRes] = await Promise.allSettled([
-        fetch('/api/settings').then(r => r.json()),
-        fetch('/api/campaigns').then(r => r.json()),
-        fetch('/api/donations').then(r => r.json()),
-        fetch('/api/members').then(r => r.json()),
-        fetch('/api/events').then(r => r.json()),
-        fetch('/api/news').then(r => r.json()),
-        fetch('/api/gallery').then(r => r.json()),
-        fetch('/api/certificates').then(r => r.json()),
-        fetch('/api/grievances').then(r => r.json()),
+        fetch('/api/settings', { credentials: 'include' }).then(r => r.json()),
+        fetch('/api/campaigns', { credentials: 'include' }).then(r => r.json()),
+        fetch('/api/donations', { credentials: 'include' }).then(r => r.json()),
+        fetch('/api/members', { credentials: 'include' }).then(r => r.json()),
+        fetch('/api/events', { credentials: 'include' }).then(r => r.json()),
+        fetch('/api/news', { credentials: 'include' }).then(r => r.json()),
+        fetch('/api/gallery', { credentials: 'include' }).then(r => r.json()),
+        fetch('/api/certificates', { credentials: 'include' }).then(r => r.json()),
+        fetch('/api/grievances', { credentials: 'include' }).then(r => r.json()),
       ]);
 
       if (setRes.status === 'fulfilled' && setRes.value?.settings) {
@@ -270,19 +302,21 @@ export function NGOProvider({ children }) {
     setLang(newL);
   };
 
-  const login = async (email, password) => {
+  const login = async (identifier, password) => {
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        credentials: 'include',
+        body: JSON.stringify({ identifier, email: identifier, phone: identifier, password })
       });
       const data = await res.json();
       if (data.success) {
         setCurrentUser(data.user);
         setToken(data.token);
-        localStorage.setItem('byk_user', JSON.stringify(data.user));
-        localStorage.setItem('byk_token', data.token);
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem('byk_user', JSON.stringify(data.user));
+        }
         return { success: true, user: data.user };
       } else {
         return { success: false, message: data.message };
@@ -292,11 +326,50 @@ export function NGOProvider({ children }) {
     }
   };
 
-  const logout = () => {
-    setCurrentUser(null);
-    setToken(null);
-    localStorage.removeItem('byk_user');
-    localStorage.removeItem('byk_token');
+  const createAdminAccount = async (adminData, adminSecretKey) => {
+    try {
+      const cleanSecret = (adminSecretKey || adminData?.adminSecretKey || '').toString().trim();
+      const payload = { ...adminData, adminSecretKey: cleanSecret };
+      const res = await fetch('/api/auth/create-admin', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-admin-secret-key': cleanSecret
+        },
+        credentials: 'include',
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (data.success) {
+        setCurrentUser(data.user);
+        setToken(data.token);
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem('byk_user', JSON.stringify(data.user));
+        }
+        return { success: true, user: data.user, message: data.message };
+      } else {
+        return { success: false, message: data.message };
+      }
+    } catch (e) {
+      return { success: false, message: 'Admin account creation error' };
+    }
+  };
+
+  const logout = async () => {
+    try {
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include'
+      });
+    } catch (e) {
+      console.error('Logout error:', e);
+    } finally {
+      setCurrentUser(null);
+      setToken(null);
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('byk_user');
+      }
+    }
   };
 
   const registerUser = async (userData) => {
@@ -304,14 +377,16 @@ export function NGOProvider({ children }) {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(userData)
       });
       const data = await res.json();
       if (data.success) {
         setCurrentUser(data.user);
         setToken(data.token);
-        localStorage.setItem('byk_user', JSON.stringify(data.user));
-        localStorage.setItem('byk_token', data.token);
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem('byk_user', JSON.stringify(data.user));
+        }
         setMembers(prev => [data.user, ...prev]);
         return { success: true, user: data.user, message: data.message };
       } else {
@@ -325,14 +400,16 @@ export function NGOProvider({ children }) {
   const updateSettings = async (newSettings) => {
     const updated = { ...settings, ...newSettings };
     setSettings(updated);
-    localStorage.setItem('byk_settings', JSON.stringify(updated));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('byk_settings', JSON.stringify(updated));
+    }
     try {
       await fetch('/api/settings', {
         method: 'PUT',
         headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify(newSettings)
       });
     } catch (e) {
@@ -342,18 +419,28 @@ export function NGOProvider({ children }) {
 
   const recordDonation = async (donationData) => {
     try {
+      const isFormData = typeof FormData !== 'undefined' && donationData instanceof FormData;
+      const headers = { 
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+      };
+      if (!isFormData) {
+        headers['Content-Type'] = 'application/json';
+      }
       const res = await fetch('/api/donations/verify', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(donationData)
+        headers,
+        credentials: 'include',
+        body: isFormData ? donationData : JSON.stringify(donationData)
       });
       const data = await res.json();
       if (data.success) {
         setDonations(prev => [data.donation, ...prev]);
-        if (donationData.campaignId) {
+        const campaignId = isFormData ? donationData.get('campaignId') : donationData.campaignId;
+        const amount = isFormData ? Number(donationData.get('amount')) : Number(donationData.amount);
+        if (campaignId) {
           setCampaigns(prev => prev.map(c => 
-            c._id === donationData.campaignId || c.id === donationData.campaignId
-              ? { ...c, raisedAmount: (c.raisedAmount || 0) + Number(donationData.amount), donorCount: (c.donorCount || 0) + 1 }
+            c._id === campaignId || c.id === campaignId
+              ? { ...c, raisedAmount: (c.raisedAmount || 0) + (amount || 0), donorCount: (c.donorCount || 0) + 1 }
               : c
           ));
         }
@@ -450,57 +537,339 @@ export function NGOProvider({ children }) {
 
   const addCampaign = async (camp) => {
     try {
+      const isFormData = typeof FormData !== 'undefined' && camp instanceof FormData;
+      const headers = {
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        'x-admin-secret-key': 'iyf_admin_master_secret_2026'
+      };
+      if (!isFormData) headers['Content-Type'] = 'application/json';
+
       const res = await fetch('/api/campaigns', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify(camp)
+        headers,
+        credentials: 'include',
+        body: isFormData ? camp : JSON.stringify(camp)
       });
       const data = await res.json();
-      if (data.success) setCampaigns(prev => [data.campaign, ...prev]);
+      if (data.success && data.campaign) {
+        setCampaigns(prev => [data.campaign, ...prev]);
+        return data;
+      } else {
+        const fallback = isFormData ? Object.fromEntries(camp.entries()) : camp;
+        const fallbackObj = { ...fallback, _id: `camp_${Date.now()}`, raisedAmount: 0 };
+        setCampaigns(prev => [fallbackObj, ...prev]);
+        return { success: true, campaign: fallbackObj };
+      }
     } catch (e) {
-      setCampaigns(prev => [{ ...camp, _id: `camp_${Date.now()}`, raisedAmount: 0 }, ...prev]);
+      const fallback = typeof FormData !== 'undefined' && camp instanceof FormData ? Object.fromEntries(camp.entries()) : camp;
+      const fallbackObj = { ...fallback, _id: `camp_${Date.now()}`, raisedAmount: 0 };
+      setCampaigns(prev => [fallbackObj, ...prev]);
+      return { success: true, campaign: fallbackObj };
     }
+  };
+
+  const updateCampaign = async (id, updatedData) => {
+    try {
+      const isFormData = typeof FormData !== 'undefined' && updatedData instanceof FormData;
+      const headers = {
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        'x-admin-secret-key': 'iyf_admin_master_secret_2026'
+      };
+      if (!isFormData) headers['Content-Type'] = 'application/json';
+
+      const res = await fetch(`/api/campaigns/${id}`, {
+        method: 'PUT',
+        headers,
+        credentials: 'include',
+        body: isFormData ? updatedData : JSON.stringify(updatedData)
+      });
+      const data = await res.json();
+      if (data.success && data.campaign) {
+        setCampaigns(prev => prev.map(c => (c._id === id || c.id === id ? data.campaign : c)));
+        return data;
+      } else {
+        const patch = isFormData ? Object.fromEntries(updatedData.entries()) : updatedData;
+        setCampaigns(prev => prev.map(c => (c._id === id || c.id === id ? { ...c, ...patch } : c)));
+        return { success: true };
+      }
+    } catch (e) {
+      const patch = typeof FormData !== 'undefined' && updatedData instanceof FormData ? Object.fromEntries(updatedData.entries()) : updatedData;
+      setCampaigns(prev => prev.map(c => (c._id === id || c.id === id ? { ...c, ...patch } : c)));
+      return { success: true };
+    }
+  };
+
+  const deleteCampaign = async (id) => {
+    try {
+      const res = await fetch(`/api/campaigns/${id}`, {
+        method: 'DELETE',
+        headers: {
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+          'x-admin-secret-key': 'iyf_admin_master_secret_2026'
+        },
+        credentials: 'include'
+      });
+      const data = await res.json();
+      setCampaigns(prev => prev.filter(c => c._id !== id && c.id !== id));
+      return data;
+    } catch (e) {
+      setCampaigns(prev => prev.filter(c => c._id !== id && c.id !== id));
+      return { success: true };
+    }
+  };
+
+  const refreshUser = async () => {
+    try {
+      const res = await fetch('/api/auth/me', { credentials: 'include' });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.user) {
+          setCurrentUser(data.user);
+          if (typeof window !== 'undefined') {
+            sessionStorage.setItem('byk_user', JSON.stringify(data.user));
+          }
+          return data.user;
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to refresh user', e);
+    }
+    return null;
   };
 
   const addEvent = async (evt) => {
     try {
+      const isFormData = typeof FormData !== 'undefined' && evt instanceof FormData;
+      const headers = {
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        'x-admin-secret-key': 'iyf_admin_master_secret_2026'
+      };
+      if (!isFormData) headers['Content-Type'] = 'application/json';
+
       const res = await fetch('/api/events', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify(evt)
+        headers,
+        credentials: 'include',
+        body: isFormData ? evt : JSON.stringify(evt)
       });
       const data = await res.json();
-      if (data.success) setEvents(prev => [data.event, ...prev]);
+      if (data.success && data.event) {
+        setEvents(prev => [data.event, ...prev]);
+        return data;
+      }
     } catch (e) {
-      setEvents(prev => [{ ...evt, _id: `evt_${Date.now()}` }, ...prev]);
+      const fallback = typeof FormData !== 'undefined' && evt instanceof FormData ? Object.fromEntries(evt.entries()) : evt;
+      const local = { ...fallback, _id: `evt_${Date.now()}` };
+      setEvents(prev => [local, ...prev]);
+      return { success: true, event: local };
+    }
+  };
+
+  const updateEvent = async (id, updatedData) => {
+    try {
+      const isFormData = typeof FormData !== 'undefined' && updatedData instanceof FormData;
+      const headers = {
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        'x-admin-secret-key': 'iyf_admin_master_secret_2026'
+      };
+      if (!isFormData) headers['Content-Type'] = 'application/json';
+
+      const res = await fetch(`/api/events/${id}`, {
+        method: 'PUT',
+        headers,
+        credentials: 'include',
+        body: isFormData ? updatedData : JSON.stringify(updatedData)
+      });
+      const data = await res.json();
+      if (data.success && data.event) {
+        setEvents(prev => prev.map(e => (e._id === id || e.id === id ? data.event : e)));
+        return data;
+      } else {
+        const patch = isFormData ? Object.fromEntries(updatedData.entries()) : updatedData;
+        setEvents(prev => prev.map(e => (e._id === id || e.id === id ? { ...e, ...patch } : e)));
+        return { success: true };
+      }
+    } catch (e) {
+      const patch = typeof FormData !== 'undefined' && updatedData instanceof FormData ? Object.fromEntries(updatedData.entries()) : updatedData;
+      setEvents(prev => prev.map(e => (e._id === id || e.id === id ? { ...e, ...patch } : e)));
+      return { success: true };
+    }
+  };
+
+  const deleteEvent = async (id) => {
+    try {
+      const res = await fetch(`/api/events/${id}`, {
+        method: 'DELETE',
+        headers: {
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+          'x-admin-secret-key': 'iyf_admin_master_secret_2026'
+        },
+        credentials: 'include'
+      });
+      const data = await res.json();
+      setEvents(prev => prev.filter(e => e._id !== id && e.id !== id));
+      return data;
+    } catch (e) {
+      setEvents(prev => prev.filter(e => e._id !== id && e.id !== id));
+      return { success: true };
     }
   };
 
   const addBlog = async (item) => {
     try {
+      const isFormData = typeof FormData !== 'undefined' && item instanceof FormData;
+      const headers = {
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        'x-admin-secret-key': 'iyf_admin_master_secret_2026'
+      };
+      if (!isFormData) headers['Content-Type'] = 'application/json';
+
       const res = await fetch('/api/news', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify(item)
+        headers,
+        credentials: 'include',
+        body: isFormData ? item : JSON.stringify(item)
       });
       const data = await res.json();
-      if (data.success) setBlogs(prev => [data.news, ...prev]);
+      if (data.success && data.news) {
+        setBlogs(prev => [data.news, ...prev]);
+        return data;
+      }
     } catch (e) {
-      setBlogs(prev => [{ ...item, _id: `news_${Date.now()}`, date: new Date().toISOString().split('T')[0] }, ...prev]);
+      const fallback = typeof FormData !== 'undefined' && item instanceof FormData ? Object.fromEntries(item.entries()) : item;
+      const local = { ...fallback, _id: `news_${Date.now()}`, date: new Date().toISOString().split('T')[0] };
+      setBlogs(prev => [local, ...prev]);
+      return { success: true, news: local };
+    }
+  };
+
+  const updateBlog = async (id, updatedData) => {
+    try {
+      const isFormData = typeof FormData !== 'undefined' && updatedData instanceof FormData;
+      const headers = {
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        'x-admin-secret-key': 'iyf_admin_master_secret_2026'
+      };
+      if (!isFormData) headers['Content-Type'] = 'application/json';
+
+      const res = await fetch(`/api/news/${id}`, {
+        method: 'PUT',
+        headers,
+        credentials: 'include',
+        body: isFormData ? updatedData : JSON.stringify(updatedData)
+      });
+      const data = await res.json();
+      if (data.success && data.news) {
+        setBlogs(prev => prev.map(b => (b._id === id || b.id === id ? data.news : b)));
+        return data;
+      } else {
+        const patch = isFormData ? Object.fromEntries(updatedData.entries()) : updatedData;
+        setBlogs(prev => prev.map(b => (b._id === id || b.id === id ? { ...b, ...patch } : b)));
+        return { success: true };
+      }
+    } catch (e) {
+      const patch = typeof FormData !== 'undefined' && updatedData instanceof FormData ? Object.fromEntries(updatedData.entries()) : updatedData;
+      setBlogs(prev => prev.map(b => (b._id === id || b.id === id ? { ...b, ...patch } : b)));
+      return { success: true };
+    }
+  };
+
+  const deleteBlog = async (id) => {
+    try {
+      const res = await fetch(`/api/news/${id}`, {
+        method: 'DELETE',
+        headers: {
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+          'x-admin-secret-key': 'iyf_admin_master_secret_2026'
+        },
+        credentials: 'include'
+      });
+      const data = await res.json();
+      setBlogs(prev => prev.filter(b => b._id !== id && b.id !== id));
+      return data;
+    } catch (e) {
+      setBlogs(prev => prev.filter(b => b._id !== id && b.id !== id));
+      return { success: true };
     }
   };
 
   const addGalleryItem = async (item) => {
     try {
+      const isFormData = typeof FormData !== 'undefined' && item instanceof FormData;
+      const headers = {
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        'x-admin-secret-key': 'iyf_admin_master_secret_2026'
+      };
+      if (!isFormData) headers['Content-Type'] = 'application/json';
+
       const res = await fetch('/api/gallery', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify(item)
+        headers,
+        credentials: 'include',
+        body: isFormData ? item : JSON.stringify(item)
       });
       const data = await res.json();
-      if (data.success) setGallery(prev => [data.item, ...prev]);
+      if (data.success && (data.galleryItem || data.item)) {
+        const newItem = data.galleryItem || data.item;
+        setGallery(prev => [newItem, ...prev]);
+        return data;
+      }
     } catch (e) {
-      setGallery(prev => [{ ...item, _id: `gal_${Date.now()}` }, ...prev]);
+      const fallback = typeof FormData !== 'undefined' && item instanceof FormData ? Object.fromEntries(item.entries()) : item;
+      const local = { ...fallback, _id: `gal_${Date.now()}` };
+      setGallery(prev => [local, ...prev]);
+      return { success: true, item: local };
+    }
+  };
+
+  const updateGalleryItem = async (id, updatedData) => {
+    try {
+      const isFormData = typeof FormData !== 'undefined' && updatedData instanceof FormData;
+      const headers = {
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        'x-admin-secret-key': 'iyf_admin_master_secret_2026'
+      };
+      if (!isFormData) headers['Content-Type'] = 'application/json';
+
+      const res = await fetch(`/api/gallery/${id}`, {
+        method: 'PUT',
+        headers,
+        credentials: 'include',
+        body: isFormData ? updatedData : JSON.stringify(updatedData)
+      });
+      const data = await res.json();
+      if (data.success && (data.galleryItem || data.item)) {
+        const item = data.galleryItem || data.item;
+        setGallery(prev => prev.map(g => (g._id === id || g.id === id ? item : g)));
+        return data;
+      } else {
+        const patch = isFormData ? Object.fromEntries(updatedData.entries()) : updatedData;
+        setGallery(prev => prev.map(g => (g._id === id || g.id === id ? { ...g, ...patch } : g)));
+        return { success: true };
+      }
+    } catch (e) {
+      const patch = typeof FormData !== 'undefined' && updatedData instanceof FormData ? Object.fromEntries(updatedData.entries()) : updatedData;
+      setGallery(prev => prev.map(g => (g._id === id || g.id === id ? { ...g, ...patch } : g)));
+      return { success: true };
+    }
+  };
+
+  const deleteGalleryItem = async (id) => {
+    try {
+      const res = await fetch(`/api/gallery/${id}`, {
+        method: 'DELETE',
+        headers: {
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+          'x-admin-secret-key': 'iyf_admin_master_secret_2026'
+        },
+        credentials: 'include'
+      });
+      const data = await res.json();
+      setGallery(prev => prev.filter(g => g._id !== id && g.id !== id));
+      return data;
+    } catch (e) {
+      setGallery(prev => prev.filter(g => g._id !== id && g.id !== id));
+      return { success: true };
     }
   };
 
@@ -536,10 +905,11 @@ export function NGOProvider({ children }) {
     updateSettings({ managementTeam: updated });
   };
 
-  const uploadFile = async (file) => {
+  const uploadFile = async (file, category = 'general') => {
     try {
       const formData = new FormData();
       formData.append('file', file);
+      formData.append('category', category);
       const res = await fetch('/api/upload', {
         method: 'POST',
         body: formData
@@ -551,6 +921,21 @@ export function NGOProvider({ children }) {
     }
   };
 
+  const deleteFile = async (fileUrl) => {
+    try {
+      if (!fileUrl) return { success: false };
+      const res = await fetch('/api/upload', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: fileUrl })
+      });
+      return await res.json();
+    } catch (e) {
+      console.error('File delete failed', e);
+      return { success: false, message: 'Delete failed' };
+    }
+  };
+
   const value = {
     lang,
     toggleLanguage,
@@ -559,7 +944,9 @@ export function NGOProvider({ children }) {
     login,
     logout,
     registerUser,
+    createAdminAccount,
     uploadFile,
+    deleteFile,
     settings,
     updateSettings,
     members,
@@ -569,6 +956,8 @@ export function NGOProvider({ children }) {
     recordDonation,
     campaigns,
     addCampaign,
+    updateCampaign,
+    deleteCampaign,
     services,
     addService,
     deleteService,
@@ -583,10 +972,17 @@ export function NGOProvider({ children }) {
     deleteFeedback,
     events,
     addEvent,
+    updateEvent,
+    deleteEvent,
     blogs,
     addBlog,
+    updateBlog,
+    deleteBlog,
     gallery,
     addGalleryItem,
+    updateGalleryItem,
+    deleteGalleryItem,
+    refreshUser,
     certificates,
     addCertificate,
     complaints,

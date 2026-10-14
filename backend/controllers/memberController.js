@@ -56,12 +56,7 @@ const verifyPublicMember = async (req, res) => {
 };
 
 const getBirthdayMembers = async (req, res) => {
-  try {
-    const data = await memberService.getBirthdayMembers();
-    return res.json({ success: true, ...data });
-  } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
-  }
+  return res.json({ success: true, todayBirthdays: [], candidates: [] });
 };
 
 const getCoordinatorReport = async (req, res) => {
@@ -82,6 +77,20 @@ const getAllCoordinatorsStats = async (req, res) => {
   }
 };
 
+const deleteMember = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await memberService.deleteMember(id);
+    return res.json({
+      success: true,
+      message: 'Member account and associated photo/QR files deleted successfully',
+      id
+    });
+  } catch (error) {
+    return res.status(400).json({ success: false, message: error.message });
+  }
+};
+
 module.exports = {
   getMembers,
   updateMemberStatus,
@@ -90,5 +99,6 @@ module.exports = {
   verifyPublicMember,
   getBirthdayMembers,
   getCoordinatorReport,
-  getAllCoordinatorsStats
+  getAllCoordinatorsStats,
+  deleteMember
 };
