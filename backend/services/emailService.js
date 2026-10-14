@@ -1,281 +1,579 @@
+const mongoose = require('mongoose');
 const nodemailer = require('nodemailer');
 const EmailLog = require('../models/EmailLog');
 const Setting = require('../models/Setting');
+const pdfService = require('./pdfService');
 
 // Helper to get active transporter dynamically
-const getTransporter = async () => {
+const getTransporterConfig = async () => {
   let host = process.env.SMTP_HOST || 'smtp.gmail.com';
   let port = Number(process.env.SMTP_PORT) || 587;
   let user = process.env.SMTP_USER || 'samasyasamadhanparishad@gmail.com';
   let pass = process.env.SMTP_PASS || '';
 
   try {
-    const dbSettings = await Setting.findOne({ key: 'global_ngo_settings' });
-    if (dbSettings) {
-      if (dbSettings.smtpHost) host = dbSettings.smtpHost;
-      if (dbSettings.smtpPort) port = Number(dbSettings.smtpPort);
-      if (dbSettings.smtpUser) user = dbSettings.smtpUser;
-      if (dbSettings.smtpPass) pass = dbSettings.smtpPass;
+    if (mongoose.connection && mongoose.connection.readyState === 1) {
+      const dbSettings = await Setting.findOne({ key: 'global_ngo_settings' });
+      if (dbSettings) {
+        if (dbSettings.smtpHost) host = dbSettings.smtpHost;
+        if (dbSettings.smtpPort) port = Number(dbSettings.smtpPort);
+        if (dbSettings.smtpUser) user = dbSettings.smtpUser;
+        if (dbSettings.smtpPass) pass = dbSettings.smtpPass;
+      }
     }
   } catch (err) {
     // Continue with env fallback
   }
 
   if (user && pass) {
-    return nodemailer.createTransport({
+    const transporter = nodemailer.createTransport({
       host,
       port,
       secure: port === 465,
       auth: { user, pass }
     });
+    return { transporter, user };
   }
 
-  return null;
+  return { transporter: null, user };
 };
 
-const sendEmail = async ({ to, subject, htmlText, template = 'general' }) => {
+const sendEmail = async ({ to, subject, htmlText, template = 'general', attachments = [] }) => {
   let deliveryStatus = 'logged_simulated';
-  const transporter = await getTransporter();
+  const { transporter, user: smtpUser } = await getTransporterConfig();
+
+  if (!to) {
+    console.warn(`⚠️ [EMAIL NOTICE] No recipient email specified for subject: "${subject}".`);
+    return { success: false, message: 'No recipient email specified' };
+  }
 
   if (transporter) {
     try {
       const fromName = process.env.NGO_NAME || 'Indian Youth Foundation';
-      const fromEmail = process.env.SMTP_USER || 'samasyasamadhanparishad@gmail.com';
-      await transporter.sendMail({
+      const fromEmail = smtpUser || process.env.SMTP_USER || 'samasyasamadhanparishad@gmail.com';
+      const mailOptions = {
         from: `"${fromName}" <${fromEmail}>`,
         to,
         subject,
         html: htmlText
-      });
+      };
+
+      if (attachments && Array.isArray(attachments) && attachments.length > 0) {
+        mailOptions.attachments = attachments;
+      }
+
+      await transporter.sendMail(mailOptions);
       deliveryStatus = 'delivered_via_smtp';
-      console.log(`📧 [EMAIL SENT VIA SMTP] To: ${to} | Subject: ${subject}`);
+      console.log(`📧 [EMAIL SENT VIA SMTP] To: ${to} | Subject: ${subject} | Attachments: ${attachments.length}`);
     } catch (err) {
       console.warn(`⚠️ [SMTP SEND ERROR, RECORDING AUDIT]: ${err.message}`);
       deliveryStatus = 'logged_locally';
     }
   } else {
-    console.log(`📧 [EMAIL AUDIT LOGGED] To: ${to} | Subject: ${subject}`);
+    console.log(`📧 [EMAIL AUDIT LOGGED] To: ${to} | Subject: ${subject} | Attachments: ${attachments.length} (SMTP credentials not configured)`);
   }
 
-  // Persist real audit log into MongoDB
+  // Persist real audit log into MongoDB if connected
   try {
-    const logDoc = await EmailLog.create({
-      to,
-      subject,
-      template,
-      status: deliveryStatus,
-      sentAt: new Date()
-    });
-    return logDoc;
+    if (mongoose.connection && mongoose.connection.readyState === 1) {
+      const logDoc = await EmailLog.create({
+        to,
+        subject,
+        template,
+        status: deliveryStatus,
+        metadata: {
+          attachments: attachments.map(a => a.filename || 'attachment.pdf')
+        },
+        sentAt: new Date()
+      });
+      return { success: true, status: deliveryStatus, logDoc };
+    }
   } catch (err) {
-    return { to, subject, status: deliveryStatus, sentAt: new Date() };
+    // Continue with in-memory status
   }
+  return { success: true, to, subject, status: deliveryStatus, sentAt: new Date() };
 };
 
-// 1. Donation Approved -> Form 10BD / 80G Tax Receipt Email
+// 1. Donation Approved -> Form 10BD / 80G Tax Receipt Email with PDF Attachment
 const sendDonationApprovalEmail = async (data) => {
-  const to = data.to || data.donorEmail || data.email;
-  const donorName = data.donorName || 'Generous Contributor';
-  const receiptNumber = data.receiptNumber || 'BYK-80G-PENDING';
-  const amount = data.amount || 0;
-  const panNumber = data.panNumber || data.pan || '';
-  const campaignTitle = data.campaignTitle || 'General Welfare Fund';
+  const donationObj = data.toObject ? data.toObject() : data;
+  const to = donationObj.to || donationObj.donorEmail || donationObj.email;
+  const donorName = donationObj.donorName || 'Generous Contributor';
+  const receiptNumber = donationObj.receiptNumber || 'BYK-80G-PENDING';
+  const amount = Number(donationObj.amount) || 0;
+  const panNumber = donationObj.panNumber || donationObj.pan || 'N/A';
+  const campaignTitle = donationObj.campaignTitle || 'General Welfare Fund';
 
   if (!to) {
     console.warn('⚠️ [EMAIL NOTICE] No recipient email found for donation approval notification.');
     return null;
   }
 
-  const subject = `Official 80G Donation Receipt #${receiptNumber} - Indian Youth Foundation`;
+  // Generate Official 80G Receipt PDF
+  let attachments = [];
+  try {
+    const pdfBuffer = await pdfService.generateDonationReceiptPdf(donationObj);
+    attachments.push({
+      filename: `Donation_Receipt_${receiptNumber}.pdf`,
+      content: pdfBuffer,
+      contentType: 'application/pdf'
+    });
+  } catch (err) {
+    console.error('Error generating donation receipt PDF:', err);
+  }
+
+  const subject = `Official 80G Tax Receipt #${receiptNumber} Attached - Indian Youth Foundation`;
   const htmlText = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px;">
-      <div style="background: linear-gradient(135deg, #ea580c, #f59e0b); padding: 16px; border-radius: 8px; text-align: center; color: white;">
-        <h2 style="margin: 0; font-size: 20px;">INDIAN YOUTH FOUNDATION</h2>
-        <p style="margin: 4px 0 0; font-size: 12px;">12A & 80G Certified Non-Profit Organisation (Reg: 421/2019)</p>
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 14px; background-color: #ffffff;">
+      <div style="background: linear-gradient(135deg, #c2410c, #ea580c); padding: 18px; border-radius: 10px; text-align: center; color: white;">
+        <h2 style="margin: 0; font-size: 22px; letter-spacing: 0.5px;">INDIAN YOUTH FOUNDATION</h2>
+        <p style="margin: 4px 0 0; font-size: 12px; opacity: 0.95;">12A & 80G Certified Non-Profit Trust • Reg. No: 421/2019</p>
       </div>
 
       <div style="padding: 20px 0; color: #1e293b;">
-        <h3 style="color: #059669; margin-top: 0;">✓ Donation Payment Verified & Approved</h3>
-        <p>Dear <strong>${donorName}</strong>,</p>
-        <p>We are grateful for your generous contribution of <strong>₹${Number(amount).toLocaleString('en-IN')}</strong> towards <strong>${campaignTitle || 'General Social Welfare Fund'}</strong>.</p>
-        
-        <div style="background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 14px; margin: 16px 0; font-size: 13px;">
-          <p style="margin: 4px 0;"><strong>Receipt Number:</strong> <span style="font-family: monospace; color: #ea580c; font-weight: bold;">${receiptNumber}</span></p>
-          <p style="margin: 4px 0;"><strong>Amount Received:</strong> ₹${Number(amount).toLocaleString('en-IN')}</p>
-          <p style="margin: 4px 0;"><strong>Donor PAN No:</strong> ${panNumber || 'NA'}</p>
-          <p style="margin: 4px 0;"><strong>Tax Exemption:</strong> 50% deduction under Section 80G of Income Tax Act</p>
-          <p style="margin: 4px 0;"><strong>Status:</strong> <span style="color: #059669; font-weight: bold;">Verified & Approved by Trustees</span></p>
+        <div style="display: inline-block; background-color: #ecfdf5; border: 1px solid #a7f3d0; color: #047857; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-bottom: 12px;">
+          ✓ Donation Payment Verified & Tax Receipt Issued
         </div>
 
-        <p style="font-size: 12px; color: #64748b;">
-          Your official digitally stamped 80G receipt is ready for download in your portal account.
+        <p style="font-size: 15px; margin: 8px 0;">Dear <strong>${donorName}</strong>,</p>
+        <p style="font-size: 14px; line-height: 1.6; color: #334155;">
+          Thank you for your generous contribution of <strong>₹${amount.toLocaleString('en-IN')}</strong> towards <strong>${campaignTitle}</strong>. Your support enables us to bring positive change and social empowerment across India.
         </p>
+        
+        <div style="background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; padding: 16px; margin: 18px 0; font-size: 13px;">
+          <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+              <td style="padding: 4px 0; color: #64748b; width: 45%;"><strong>Receipt Number:</strong></td>
+              <td style="padding: 4px 0; font-family: monospace; color: #ea580c; font-weight: bold;">${receiptNumber}</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px 0; color: #64748b;"><strong>Amount Received:</strong></td>
+              <td style="padding: 4px 0; font-weight: bold; color: #059669;">₹${amount.toLocaleString('en-IN')}</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px 0; color: #64748b;"><strong>Donor PAN:</strong></td>
+              <td style="padding: 4px 0; font-family: monospace;">${panNumber}</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px 0; color: #64748b;"><strong>Tax Exemption:</strong></td>
+              <td style="padding: 4px 0; color: #0f172a;">50% deduction under Section 80G of IT Act, 1961</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px 0; color: #64748b;"><strong>Audit Status:</strong></td>
+              <td style="padding: 4px 0; color: #059669; font-weight: bold;">Verified & Approved by Trustees</td>
+            </tr>
+          </table>
+        </div>
 
-        <div style="text-align: center; margin: 24px 0;">
-          <a href="http://localhost:3000/profile/donations" style="background: #ea580c; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px;">
-            Download Official 80G Tax Receipt
+        <div style="background-color: #eff6ff; border-left: 4px solid #3b82f6; padding: 12px 14px; margin: 16px 0; font-size: 12.5px; color: #1e40af; border-radius: 4px;">
+          📎 <strong>PDF Receipt Attached:</strong> Your official Form 10BD / 80G tax receipt with digital seal, QR verification code, and trustee signature is attached to this email as a PDF file.
+        </div>
+
+        <div style="text-align: center; margin: 26px 0 16px;">
+          <a href="http://localhost:3000/profile/donations" style="background: #ea580c; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px; display: inline-block;">
+            View Donations & Receipts in Portal
           </a>
         </div>
       </div>
 
-      <div style="border-top: 1px solid #e2e8f0; padding-top: 12px; font-size: 11px; color: #94a3b8; text-align: center;">
-        Head Office - Krishna Vihar Pala Road Aligarh, Uttar Pradesh | Helpline: +91 93196 98759<br/>
-        Email: samasyasamadhanparishad@gmail.com
+      <div style="border-top: 1px solid #e2e8f0; padding-top: 14px; font-size: 11px; color: #94a3b8; text-align: center; line-height: 1.5;">
+        National Head Office - Krishna Vihar Pala Road Aligarh, Uttar Pradesh - 202001 | Helpline: +91 93196 98759<br/>
+        Email: samasyasamadhanparishad@gmail.com | Website: bharatiyayuvakranti.org
       </div>
     </div>
   `;
-  return await sendEmail({ to, subject, htmlText, template: 'donation_80g' });
+
+  return await sendEmail({
+    to,
+    subject,
+    htmlText,
+    template: 'donation_80g',
+    attachments
+  });
 };
 
-// 2. Membership Approved -> Appointment Letter & Digital ID Card Email
-const sendMembershipApprovalEmail = async ({ to, memberName, role = 'Member', memberId, designation, planName }) => {
-  const subject = `Official Appointment Letter & ID Card Approved (${memberId}) - Indian Youth Foundation`;
+// 2. Membership Approved -> Appointment Letter & Digital ID Card Email with PDFs Attached
+const sendMembershipApprovalEmail = async (param) => {
+  const memberObj = param.toObject ? param.toObject() : param;
+  const to = memberObj.to || memberObj.email || memberObj.user?.email;
+  const memberName = memberObj.memberName || memberObj.name || memberObj.user?.name || 'Valued Member';
+  const memberId = memberObj.memberId || memberObj.user?.memberId || 'BYK-MEM-2026-PENDING';
+  const role = memberObj.role || memberObj.user?.role || 'Member';
+  const designation = memberObj.designation || memberObj.user?.designation || 'Active Social Worker';
+  const planName = memberObj.planName || memberObj.membershipPlan || memberObj.user?.membershipPlan || 'Standard Active Member';
+
+  if (!to) {
+    console.warn('⚠️ [EMAIL NOTICE] No recipient email found for membership approval notification.');
+    return null;
+  }
+
+  // Generate Member Appointment Letter PDF & Member ID Card PDF
+  let attachments = [];
+  try {
+    const [apptPdf, idCardPdf] = await Promise.all([
+      pdfService.generateAppointmentLetterPdf({ ...memberObj, memberId, name: memberName, designation }),
+      pdfService.generateMemberIdCardPdf({ ...memberObj, memberId, name: memberName, designation, role })
+    ]);
+
+    attachments.push(
+      {
+        filename: `Member_Appointment_Letter_${memberId}.pdf`,
+        content: apptPdf,
+        contentType: 'application/pdf'
+      },
+      {
+        filename: `Member_ID_Card_${memberId}.pdf`,
+        content: idCardPdf,
+        contentType: 'application/pdf'
+      }
+    );
+  } catch (err) {
+    console.error('Error generating membership PDFs:', err);
+  }
+
+  const subject = `Official Appointment Letter & ID Card Attached (${memberId}) - Indian Youth Foundation`;
   const htmlText = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px;">
-      <div style="background: linear-gradient(135deg, #ea580c, #f59e0b); padding: 16px; border-radius: 8px; text-align: center; color: white;">
-        <h2 style="margin: 0; font-size: 20px;">INDIAN YOUTH FOUNDATION</h2>
-        <p style="margin: 4px 0 0; font-size: 12px;">Nationwide Non-Profit Movement • NITI Aayog Registered</p>
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 14px; background-color: #ffffff;">
+      <div style="background: linear-gradient(135deg, #b91c1c, #ea580c); padding: 18px; border-radius: 10px; text-align: center; color: white;">
+        <h2 style="margin: 0; font-size: 22px; letter-spacing: 0.5px;">INDIAN YOUTH FOUNDATION</h2>
+        <p style="margin: 4px 0 0; font-size: 12px; opacity: 0.95;">Nationwide Non-Profit Movement • NITI Aayog Registered NGO</p>
       </div>
 
       <div style="padding: 20px 0; color: #1e293b;">
-        <h3 style="color: #059669; margin-top: 0;">🎉 Congratulations! Membership Approved by Trustees</h3>
-        <p>Dear <strong>${memberName}</strong>,</p>
-        <p>We are delighted to confirm that following verification of your credentials and contribution receipt, the National Executive Committee of <strong>Indian Youth Foundation</strong> has officially approved your appointment.</p>
-        
-        <div style="background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 14px; margin: 16px 0; font-size: 13px;">
-          <p style="margin: 4px 0;"><strong>Official Member ID:</strong> <span style="font-family: monospace; color: #ea580c; font-weight: bold;">${memberId}</span></p>
-          <p style="margin: 4px 0;"><strong>Role Assigned:</strong> <span style="font-weight: bold;">${role}</span></p>
-          <p style="margin: 4px 0;"><strong>Designation:</strong> ${designation || 'Active Social Worker'}</p>
-          <p style="margin: 4px 0;"><strong>Membership Plan:</strong> ${planName || 'Standard Active Member'}</p>
-          <p style="margin: 4px 0;"><strong>Status:</strong> <span style="color: #059669; font-weight: bold;">Active & Verified</span></p>
+        <div style="display: inline-block; background-color: #ecfdf5; border: 1px solid #a7f3d0; color: #047857; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-bottom: 12px;">
+          🎉 Congratulations! Membership Approved by National Executive Council
         </div>
 
-        <p style="font-size: 12px; color: #64748b;">
-          Your formal Letter of Appointment (with digital seal & signature) and official Dual-Sided ID Card with QR Verification have been unlocked in your profile portal.
+        <p style="font-size: 15px; margin: 8px 0;">Dear <strong>${memberName}</strong>,</p>
+        <p style="font-size: 14px; line-height: 1.6; color: #334155;">
+          Following thorough verification of your credentials and enrollment details, the Board of Trustees and National Executive Council of <strong>Indian Youth Foundation</strong> have officially approved your appointment as a registered member.
         </p>
+        
+        <div style="background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; padding: 16px; margin: 18px 0; font-size: 13px;">
+          <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+              <td style="padding: 4px 0; color: #64748b; width: 45%;"><strong>Official Member ID:</strong></td>
+              <td style="padding: 4px 0; font-family: monospace; color: #b91c1c; font-weight: bold;">${memberId}</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px 0; color: #64748b;"><strong>Role Assigned:</strong></td>
+              <td style="padding: 4px 0; font-weight: bold; color: #0f172a;">${role}</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px 0; color: #64748b;"><strong>Designation:</strong></td>
+              <td style="padding: 4px 0; color: #0f172a;">${designation}</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px 0; color: #64748b;"><strong>Membership Plan:</strong></td>
+              <td style="padding: 4px 0; color: #0f172a;">${planName}</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px 0; color: #64748b;"><strong>Enrollment Status:</strong></td>
+              <td style="padding: 4px 0; color: #059669; font-weight: bold;">Active, Verified & Sealed</td>
+            </tr>
+          </table>
+        </div>
 
-        <div style="text-align: center; margin: 24px 0;">
-          <a href="http://localhost:3000/profile/appointment-letter" style="background: #0f172a; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px;">
-            View Official Appointment Letter & ID Card
+        <div style="background-color: #f0fdf4; border-left: 4px solid #16a34a; padding: 12px 14px; margin: 16px 0; font-size: 12.5px; color: #166534; border-radius: 4px;">
+          📄 <strong>PDF Credentials Attached to this Email:</strong><br/>
+          • <strong>Member_Appointment_Letter_${memberId}.pdf</strong> (Official Letter of Appointment)<br/>
+          • <strong>Member_ID_Card_${memberId}.pdf</strong> (Dual-Sided Identity Card with QR Verification)
+        </div>
+
+        <div style="text-align: center; margin: 26px 0 16px;">
+          <a href="http://localhost:3000/profile/appointment-letter" style="background: #0f172a; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px; display: inline-block;">
+            Access Official Portal Profile
           </a>
         </div>
       </div>
 
-      <div style="border-top: 1px solid #e2e8f0; padding-top: 12px; font-size: 11px; color: #94a3b8; text-align: center;">
-        Head Office - Krishna Vihar Pala Road Aligarh, Uttar Pradesh | Helpline: +91 93196 98759<br/>
-        Email: samasyasamadhanparishad@gmail.com
+      <div style="border-top: 1px solid #e2e8f0; padding-top: 14px; font-size: 11px; color: #94a3b8; text-align: center; line-height: 1.5;">
+        National Head Office - Krishna Vihar Pala Road Aligarh, Uttar Pradesh - 202001 | Helpline: +91 93196 98759<br/>
+        Email: samasyasamadhanparishad@gmail.com | Website: bharatiyayuvakranti.org
       </div>
     </div>
   `;
-  return await sendEmail({ to, subject, htmlText, template: 'membership_approved' });
+
+  return await sendEmail({
+    to,
+    subject,
+    htmlText,
+    template: 'membership_approved',
+    attachments
+  });
 };
 
-// 3. Volunteer Appointment & Welcome Email
-const sendVolunteerApprovalEmail = async ({ to, volunteerName, volunteerId }) => {
-  const subject = `Volunteer Appointment & Offer Letter Approved (${volunteerId}) - Indian Youth Foundation`;
+// 3. Volunteer Approved -> Offer Letter & ID Card Email with PDFs Attached
+const sendVolunteerApprovalEmail = async (param) => {
+  const volObj = param.toObject ? param.toObject() : param;
+  const to = volObj.to || volObj.email || volObj.user?.email;
+  const volunteerName = volObj.volunteerName || volObj.name || volObj.user?.name || 'Valued Volunteer';
+  const volunteerId = volObj.volunteerId || volObj.memberId || volObj.user?.memberId || 'BYK-VOL-2026-PENDING';
+
+  if (!to) {
+    console.warn('⚠️ [EMAIL NOTICE] No recipient email found for volunteer approval notification.');
+    return null;
+  }
+
+  // Generate Volunteer Offer Letter PDF & Volunteer ID Card PDF
+  let attachments = [];
+  try {
+    const [offerPdf, idCardPdf] = await Promise.all([
+      pdfService.generateVolunteerOfferLetterPdf({ ...volObj, memberId: volunteerId, name: volunteerName }),
+      pdfService.generateVolunteerIdCardPdf({ ...volObj, memberId: volunteerId, name: volunteerName, role: 'Volunteer' })
+    ]);
+
+    attachments.push(
+      {
+        filename: `Volunteer_Offer_Letter_${volunteerId}.pdf`,
+        content: offerPdf,
+        contentType: 'application/pdf'
+      },
+      {
+        filename: `Volunteer_ID_Card_${volunteerId}.pdf`,
+        content: idCardPdf,
+        contentType: 'application/pdf'
+      }
+    );
+  } catch (err) {
+    console.error('Error generating volunteer PDFs:', err);
+  }
+
+  const subject = `Volunteer Offer Letter & ID Card Attached (${volunteerId}) - Indian Youth Foundation`;
   const htmlText = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px;">
-      <div style="background: linear-gradient(135deg, #059669, #10b981); padding: 16px; border-radius: 8px; text-align: center; color: white;">
-        <h2 style="margin: 0; font-size: 20px;">INDIAN YOUTH FOUNDATION</h2>
-        <p style="margin: 4px 0 0; font-size: 12px;">Registered National Non-Profit Trust • Serving Humanity</p>
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 14px; background-color: #ffffff;">
+      <div style="background: linear-gradient(135deg, #059669, #10b981); padding: 18px; border-radius: 10px; text-align: center; color: white;">
+        <h2 style="margin: 0; font-size: 22px; letter-spacing: 0.5px;">INDIAN YOUTH FOUNDATION</h2>
+        <p style="margin: 4px 0 0; font-size: 12px; opacity: 0.95;">Volunteer Wing • Serving Humanity with Compassion</p>
       </div>
 
       <div style="padding: 20px 0; color: #1e293b;">
-        <h3 style="color: #059669; margin-top: 0;">🎉 Welcome to the Mission! Volunteer Enrolment Approved</h3>
-        <p>Dear <strong>${volunteerName}</strong>,</p>
-        <p>We are delighted to welcome you to the volunteer wing of <strong>Indian Youth Foundation</strong>. Your application has been approved by the Executive Committee.</p>
-        
-        <div style="background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 14px; margin: 16px 0; font-size: 13px;">
-          <p style="margin: 4px 0;"><strong>Official Volunteer ID:</strong> <span style="font-family: monospace; color: #059669; font-weight: bold;">${volunteerId}</span></p>
-          <p style="margin: 4px 0;"><strong>Role:</strong> Active Grassroots Volunteer</p>
-          <p style="margin: 4px 0;"><strong>Status:</strong> <span style="color: #059669; font-weight: bold;">Verified & Active</span></p>
+        <div style="display: inline-block; background-color: #ecfdf5; border: 1px solid #a7f3d0; color: #047857; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-bottom: 12px;">
+          🎉 Welcome to the Mission! Volunteer Enrolment Approved
         </div>
 
-        <div style="text-align: center; margin: 24px 0;">
-          <a href="http://localhost:3000/profile/appointment-letter" style="background: #059669; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px;">
-            Access Volunteer Offer Letter & ID Card
+        <p style="font-size: 15px; margin: 8px 0;">Dear <strong>${volunteerName}</strong>,</p>
+        <p style="font-size: 14px; line-height: 1.6; color: #334155;">
+          We are delighted to welcome you to the volunteer wing of <strong>Indian Youth Foundation</strong>. Your application has been approved by the Executive Committee, and you are now an active grassroots ambassador.
+        </p>
+        
+        <div style="background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; padding: 16px; margin: 18px 0; font-size: 13px;">
+          <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+              <td style="padding: 4px 0; color: #64748b; width: 45%;"><strong>Official Volunteer ID:</strong></td>
+              <td style="padding: 4px 0; font-family: monospace; color: #059669; font-weight: bold;">${volunteerId}</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px 0; color: #64748b;"><strong>Wing:</strong></td>
+              <td style="padding: 4px 0; font-weight: bold; color: #0f172a;">Active Grassroots Youth Volunteer</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px 0; color: #64748b;"><strong>Status:</strong></td>
+              <td style="padding: 4px 0; color: #059669; font-weight: bold;">Verified & Active</td>
+            </tr>
+          </table>
+        </div>
+
+        <div style="background-color: #f0fdf4; border-left: 4px solid #059669; padding: 12px 14px; margin: 16px 0; font-size: 12.5px; color: #065f46; border-radius: 4px;">
+          📄 <strong>PDF Credentials Attached to this Email:</strong><br/>
+          • <strong>Volunteer_Offer_Letter_${volunteerId}.pdf</strong> (Formal Appointment Offer Letter)<br/>
+          • <strong>Volunteer_ID_Card_${volunteerId}.pdf</strong> (Dual-Sided QR Verifiable Volunteer ID Card)
+        </div>
+
+        <div style="text-align: center; margin: 26px 0 16px;">
+          <a href="http://localhost:3000/profile/appointment-letter" style="background: #059669; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px; display: inline-block;">
+            Access Volunteer Portal
           </a>
         </div>
       </div>
 
-      <div style="border-top: 1px solid #e2e8f0; padding-top: 12px; font-size: 11px; color: #94a3b8; text-align: center;">
-        Head Office - Krishna Vihar Pala Road Aligarh, Uttar Pradesh | Helpline: +91 93196 98759<br/>
-        Email: samasyasamadhanparishad@gmail.com
+      <div style="border-top: 1px solid #e2e8f0; padding-top: 14px; font-size: 11px; color: #94a3b8; text-align: center; line-height: 1.5;">
+        National Head Office - Krishna Vihar Pala Road Aligarh, Uttar Pradesh - 202001 | Helpline: +91 93196 98759<br/>
+        Email: samasyasamadhanparishad@gmail.com | Website: bharatiyayuvakranti.org
       </div>
     </div>
   `;
-  return await sendEmail({ to, subject, htmlText, template: 'volunteer_approved' });
+
+  return await sendEmail({
+    to,
+    subject,
+    htmlText,
+    template: 'volunteer_approved',
+    attachments
+  });
 };
 
-// 4. Certificate Awarded Email
-const sendCertificateEmail = async ({ to, recipientName, awardTitle, certificateNo }) => {
-  const subject = `Certificate of Appreciation Awarded (${certificateNo}) - Indian Youth Foundation`;
+// 4. Certificate Awarded Email with PDF Attached
+const sendCertificateEmail = async (param) => {
+  const certObj = param.toObject ? param.toObject() : param;
+  const to = certObj.to || certObj.recipientEmail || certObj.email || certObj.recipient?.email;
+  const recipientName = certObj.recipientName || certObj.name || 'Honored Contributor';
+  const awardTitle = certObj.awardTitle || certObj.title || 'Certificate of Appreciation & National Service';
+  const certificateNo = certObj.certificateNo || certObj.certificateId || 'BYK-CERT-PENDING';
+  const reason = certObj.reason || 'In recognition of outstanding dedication and exemplary leadership for societal empowerment.';
+
+  if (!to) {
+    console.warn('⚠️ [EMAIL NOTICE] No recipient email found for certificate notification.');
+    return null;
+  }
+
+  // Generate Certificate PDF
+  let attachments = [];
+  try {
+    const certPdf = await pdfService.generateCertificatePdf({
+      ...certObj,
+      certificateId: certificateNo,
+      recipientName,
+      title: awardTitle,
+      reason
+    });
+
+    attachments.push({
+      filename: `Certificate_${certificateNo}.pdf`,
+      content: certPdf,
+      contentType: 'application/pdf'
+    });
+  } catch (err) {
+    console.error('Error generating certificate PDF:', err);
+  }
+
+  const subject = `Certificate of Appreciation Awarded & Attached (${certificateNo}) - Indian Youth Foundation`;
   const htmlText = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px;">
-      <div style="background: linear-gradient(135deg, #d97706, #f59e0b); padding: 16px; border-radius: 8px; text-align: center; color: white;">
-        <h2 style="margin: 0; font-size: 20px;">INDIAN YOUTH FOUNDATION</h2>
-        <p style="margin: 4px 0 0; font-size: 12px;">Recognition of Meritorious Social Welfare Service</p>
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 14px; background-color: #ffffff;">
+      <div style="background: linear-gradient(135deg, #c2410c, #d97706); padding: 18px; border-radius: 10px; text-align: center; color: white;">
+        <h2 style="margin: 0; font-size: 22px; letter-spacing: 0.5px;">INDIAN YOUTH FOUNDATION</h2>
+        <p style="margin: 4px 0 0; font-size: 12px; opacity: 0.95;">National Honours & Civic Recognition Council</p>
       </div>
 
       <div style="padding: 20px 0; color: #1e293b;">
-        <h3 style="color: #d97706; margin-top: 0;">🎖️ Certificate of Appreciation Awarded</h3>
-        <p>Dear <strong>${recipientName}</strong>,</p>
-        <p>The National Executive Council has conferred upon you the official citation: <strong>"${awardTitle}"</strong>.</p>
-        
-        <div style="background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 14px; margin: 16px 0; font-size: 13px;">
-          <p style="margin: 4px 0;"><strong>Certificate Number:</strong> <span style="font-family: monospace; color: #ea580c; font-weight: bold;">${certificateNo}</span></p>
-          <p style="margin: 4px 0;"><strong>Award Citation:</strong> ${awardTitle}</p>
+        <div style="display: inline-block; background-color: #fef3c7; border: 1px solid #fde68a; color: #92400e; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-bottom: 12px;">
+          🎖️ National Citation Conferred
         </div>
 
-        <div style="text-align: center; margin: 24px 0;">
-          <a href="http://localhost:3000/certificates?view=${certificateNo}" style="background: #d97706; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px;">
-            View Verified Certificate
+        <p style="font-size: 15px; margin: 8px 0;">Dear <strong>${recipientName}</strong>,</p>
+        <p style="font-size: 14px; line-height: 1.6; color: #334155;">
+          The National Executive Council of <strong>Indian Youth Foundation</strong> is proud to confer upon you the official citation: <strong>"${awardTitle}"</strong>.
+        </p>
+        
+        <div style="background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; padding: 16px; margin: 18px 0; font-size: 13px;">
+          <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+              <td style="padding: 4px 0; color: #64748b; width: 45%;"><strong>Certificate Number:</strong></td>
+              <td style="padding: 4px 0; font-family: monospace; color: #c2410c; font-weight: bold;">${certificateNo}</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px 0; color: #64748b;"><strong>Citation Title:</strong></td>
+              <td style="padding: 4px 0; font-weight: bold; color: #0f172a;">${awardTitle}</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px 0; color: #64748b;"><strong>Commendation:</strong></td>
+              <td style="padding: 4px 0; color: #334155;">${reason}</td>
+            </tr>
+          </table>
+        </div>
+
+        <div style="background-color: #fffbeb; border-left: 4px solid #d97706; padding: 12px 14px; margin: 16px 0; font-size: 12.5px; color: #92400e; border-radius: 4px;">
+          📜 <strong>PDF Certificate Attached:</strong> Your high-resolution printable Certificate of Appreciation carrying the official Trust Seal, QR verification code, and President's signature is attached to this email.
+        </div>
+
+        <div style="text-align: center; margin: 26px 0 16px;">
+          <a href="http://localhost:3000/certificates?view=${certificateNo}" style="background: #c2410c; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px; display: inline-block;">
+            Verify Certificate on Portal
           </a>
         </div>
       </div>
+
+      <div style="border-top: 1px solid #e2e8f0; padding-top: 14px; font-size: 11px; color: #94a3b8; text-align: center; line-height: 1.5;">
+        National Head Office - Krishna Vihar Pala Road Aligarh, Uttar Pradesh - 202001 | Helpline: +91 93196 98759<br/>
+        Email: samasyasamadhanparishad@gmail.com | Website: bharatiyayuvakranti.org
+      </div>
     </div>
   `;
-  return await sendEmail({ to, subject, htmlText, template: 'certificate_awarded' });
+
+  return await sendEmail({
+    to,
+    subject,
+    htmlText,
+    template: 'certificate_awarded',
+    attachments
+  });
 };
 
 // 5. Password Reset Email
-const sendPasswordResetEmail = async ({ to, resetToken, userName }) => {
-  const resetUrl = `http://localhost:3000/reset-password?token=${resetToken}`;
+const sendPasswordResetEmail = async (param1, param2) => {
+  let to, resetToken, resetUrl, userName;
+
+  if (param1 && typeof param1 === 'object' && param2 !== undefined) {
+    // Called as (user, resetUrl)
+    to = param1.email || param1.to;
+    userName = param1.name || param1.userName;
+    resetUrl = param2;
+  } else if (param1 && typeof param1 === 'object') {
+    // Called as ({ to, resetToken, resetUrl, userName })
+    to = param1.to || param1.email;
+    userName = param1.userName || param1.name;
+    resetToken = param1.resetToken;
+    resetUrl = param1.resetUrl;
+  }
+
+  const frontendUrl = process.env.FRONTEND_URL || process.env.CLIENT_URL || 'http://localhost:3000';
+  if (!resetUrl && resetToken) {
+    resetUrl = `${frontendUrl}/reset-password?token=${resetToken}&email=${encodeURIComponent(to || '')}`;
+  }
+
+  if (!to) {
+    console.warn('⚠️ [EMAIL NOTICE] No recipient email specified for password reset.');
+    return null;
+  }
+
   const subject = `Password Reset Request - Indian Youth Foundation Portal`;
   const htmlText = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px;">
-      <div style="background: linear-gradient(135deg, #ea580c, #f59e0b); padding: 16px; border-radius: 8px; text-align: center; color: white;">
-        <h2 style="margin: 0; font-size: 20px;">INDIAN YOUTH FOUNDATION</h2>
-        <p style="margin: 4px 0 0; font-size: 12px;">Official Member & Administrative Portal Security</p>
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 14px; background-color: #ffffff;">
+      <div style="background: linear-gradient(135deg, #ea580c, #f59e0b); padding: 18px; border-radius: 10px; text-align: center; color: white;">
+        <h2 style="margin: 0; font-size: 22px; letter-spacing: 0.5px;">INDIAN YOUTH FOUNDATION</h2>
+        <p style="margin: 4px 0 0; font-size: 12px; opacity: 0.95;">Member & Administrative Portal Security</p>
       </div>
 
       <div style="padding: 20px 0; color: #1e293b;">
-        <h3 style="color: #ea580c; margin-top: 0;">🔐 Password Reset Instructions</h3>
-        <p>Dear <strong>${userName || 'Member'}</strong>,</p>
-        <p>We received a request to reset your password for your Indian Youth Foundation portal account.</p>
+        <h3 style="color: #ea580c; margin-top: 0; font-size: 18px;">🔐 Password Reset Instructions</h3>
+        <p style="font-size: 15px; margin: 8px 0;">Dear <strong>${userName || 'Valued Member'}</strong>,</p>
+        <p style="font-size: 14px; line-height: 1.6; color: #334155;">
+          We received a request to reset the password for your Indian Youth Foundation portal account.
+        </p>
         
-        <p style="margin: 20px 0;">
-          Click the secure button below to set a new password. This link is valid for 1 hour:
+        <p style="font-size: 14px; line-height: 1.6; color: #334155; margin: 16px 0;">
+          Click the secure button below to choose a new password. This reset link will expire in <strong>30 minutes</strong> for your account security:
         </p>
 
-        <div style="text-align: center; margin: 24px 0;">
-          <a href="${resetUrl}" style="background: #ea580c; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px;">
+        <div style="text-align: center; margin: 26px 0;">
+          <a href="${resetUrl}" style="background: #ea580c; color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 14px; display: inline-block; box-shadow: 0 4px 6px -1px rgba(234, 88, 12, 0.2);">
             Reset My Password
           </a>
         </div>
 
-        <p style="font-size: 11px; color: #64748b; line-height: 1.5;">
-          If you did not request this password reset, please ignore this email. Your password will remain unchanged.
+        <p style="font-size: 12px; color: #64748b; line-height: 1.6; background-color: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
+          If the button above doesn't work, copy and paste this link into your browser:<br/>
+          <a href="${resetUrl}" style="color: #ea580c; word-break: break-all;">${resetUrl}</a>
+        </p>
+
+        <p style="font-size: 11.5px; color: #94a3b8; line-height: 1.5; margin-top: 16px;">
+          If you did not request this password reset, please ignore this email. Your current password will remain completely secure.
         </p>
       </div>
 
-      <div style="border-top: 1px solid #e2e8f0; padding-top: 12px; font-size: 11px; color: #94a3b8; text-align: center;">
-        Head Office - Krishna Vihar Pala Road Aligarh, Uttar Pradesh | Helpline: +91 93196 98759<br/>
-        Email: samasyasamadhanparishad@gmail.com
+      <div style="border-top: 1px solid #e2e8f0; padding-top: 14px; font-size: 11px; color: #94a3b8; text-align: center; line-height: 1.5;">
+        National Head Office - Krishna Vihar Pala Road Aligarh, Uttar Pradesh - 202001 | Helpline: +91 93196 98759<br/>
+        Email: samasyasamadhanparishad@gmail.com | Website: bharatiyayuvakranti.org
       </div>
     </div>
   `;
-  return await sendEmail({ to, subject, htmlText, template: 'forgot_password' });
+
+  return await sendEmail({
+    to,
+    subject,
+    htmlText,
+    template: 'forgot_password'
+  });
 };
 
 module.exports = {

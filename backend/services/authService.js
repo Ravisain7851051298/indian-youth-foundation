@@ -30,7 +30,7 @@ class AuthService {
       'BYK_SUPER_ADMIN_ALIGARH_SECRET_2026'
     ].filter(Boolean);
 
-    const isMatch = rawSecretTokens.some(token => 
+    const isMatch = rawSecretTokens.some(token =>
       authorizedSecrets.some(secret => secret.toLowerCase() === token.toLowerCase())
     );
 
@@ -79,7 +79,7 @@ class AuthService {
 
     // 3. Strict Validation: Disallow default, placeholder or weak values
     const disallowedPasswords = [
-      'admin123', 'admin', 'password', '12345678', 'admin@123', 
+      'admin123', 'admin', 'password', '12345678', 'admin@123',
       'root', 'byk123', 'iyf123', 'pass123', '123456789', 'administrator'
     ];
     if (disallowedPasswords.includes(password.toLowerCase()) || password.length < 8) {
@@ -138,12 +138,12 @@ class AuthService {
 
     // 8. Sign JWT
     const token = jwt.sign(
-      { 
-        id: newAdmin._id.toString(), 
-        email: newAdmin.email, 
-        role: newAdmin.role, 
-        name: newAdmin.name, 
-        memberId: newAdmin.memberId 
+      {
+        id: newAdmin._id.toString(),
+        email: newAdmin.email,
+        role: newAdmin.role,
+        name: newAdmin.name,
+        memberId: newAdmin.memberId
       },
       JWT_SECRET,
       { expiresIn: '7d' }
@@ -157,21 +157,21 @@ class AuthService {
    * Public Registration for regular Members & Volunteers
    */
   async register(userData) {
-    const { 
-      name, 
-      email, 
-      phone, 
-      password, 
+    const {
+      name,
+      email,
+      phone,
+      password,
       confirmPassword,
-      role, 
-      designation, 
-      bloodGroup, 
-      dob, 
-      address, 
-      district, 
-      state, 
-      photoUrl, 
-      referredBy 
+      role,
+      designation,
+      bloodGroup,
+      dob,
+      address,
+      district,
+      state,
+      photoUrl,
+      referredBy
     } = userData;
 
     if (!name || !email || !phone || !password) {
@@ -233,12 +233,12 @@ class AuthService {
     });
 
     const token = jwt.sign(
-      { 
-        id: newUser._id.toString(), 
-        email: newUser.email, 
-        role: newUser.role, 
-        name: newUser.name, 
-        memberId: newUser.memberId 
+      {
+        id: newUser._id.toString(),
+        email: newUser.email,
+        role: newUser.role,
+        name: newUser.name,
+        memberId: newUser.memberId
       },
       JWT_SECRET,
       { expiresIn: '7d' }
@@ -272,12 +272,12 @@ class AuthService {
     }
 
     const token = jwt.sign(
-      { 
-        id: user._id.toString(), 
-        email: user.email, 
-        role: user.role, 
-        name: user.name, 
-        memberId: user.memberId 
+      {
+        id: user._id.toString(),
+        email: user.email,
+        role: user.role,
+        name: user.name,
+        memberId: user.memberId
       },
       JWT_SECRET,
       { expiresIn: '7d' }
@@ -347,8 +347,14 @@ class AuthService {
     user.resetPasswordExpires = Date.now() + 30 * 60 * 1000; // 30 mins
     await user.save();
 
-    const resetUrl = `http://localhost:3000/reset-password?token=${resetToken}&email=${encodeURIComponent(user.email)}`;
-    await sendPasswordResetEmail(user, resetUrl);
+    const frontendUrl = process.env.CLIENT_URL;
+    const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}&email=${encodeURIComponent(user.email)}`;
+    await sendPasswordResetEmail({
+      to: user.email,
+      userName: user.name,
+      resetToken,
+      resetUrl
+    });
 
     return { message: 'Password reset link sent to your registered email address.' };
   }

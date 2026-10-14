@@ -30,15 +30,27 @@ class MemberService {
 
     const { feePaid, feeAmount, designation } = verificationData;
     user.status = 'active';
+    if (!user.memberId) {
+      const memberSeq = await userRepository.count({ role: user.role || 'Member', status: 'active' });
+      user.memberId = `BYK-MEM-2026-${String(memberSeq + 1).padStart(4, '0')}`;
+    }
     if (feePaid !== undefined) user.feePaid = feePaid;
     if (feeAmount !== undefined) user.feeAmount = Number(feeAmount);
     if (designation) user.designation = designation;
     user.idCardGenerated = true;
     user.appointmentLetterGenerated = true;
 
-    const qrData = `https://bharatiyayuvakranti.org/verify/member/${user.memberId}`;
+    const qrData = `${process.env.CLIENT_URL}/verify/member/${user.memberId}`;
     user.qrCodeUrl = await QRCode.toDataURL(qrData);
     await user.save();
+
+    // Auto send official appointment letter & verified credentials via email with PDFs
+    try {
+      const { sendMembershipApprovalEmail } = require('./emailService');
+      await sendMembershipApprovalEmail(user);
+    } catch (e) {
+      console.warn('Membership approval email warning:', e.message);
+    }
 
     const { password: _, ...userSafe } = user.toObject();
     return userSafe;
