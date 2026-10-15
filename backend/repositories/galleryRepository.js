@@ -15,7 +15,7 @@ class GalleryRepository {
   }
 
   async updateById(id, data) {
-    return Gallery.findByIdAndUpdate(id, data, { new: true });
+    return Gallery.findByIdAndUpdate(id, data, { returnDocument: 'after' });
   }
 
   async deleteById(id) {

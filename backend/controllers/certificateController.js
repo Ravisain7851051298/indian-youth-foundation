@@ -1,4 +1,6 @@
 const certificateService = require('../services/certificateService');
+const pdfService = require('../services/pdfService');
+const certificateRepository = require('../repositories/certificateRepository');
 
 const getCertificates = async (req, res) => {
   try {
@@ -10,9 +12,13 @@ const getCertificates = async (req, res) => {
       const userRole = (req.user.role || '').toLowerCase();
       if (userRole !== 'admin' && userRole !== 'manager') {
         const orConditions = [];
-        if (req.user.id) orConditions.push({ recipient: req.user.id });
-        if (req.user.email) orConditions.push({ recipientEmail: req.user.email });
+        if (req.user.id || req.user._id) orConditions.push({ recipient: req.user.id || req.user._id });
+        if (req.user.email) orConditions.push({ recipientEmail: req.user.email.toLowerCase().trim() });
         if (req.user.memberId) orConditions.push({ recipientId: req.user.memberId });
+        if (req.user.volunteerId) orConditions.push({ recipientId: req.user.volunteerId });
+        if (req.user.volunteerApplication?.volunteerId) orConditions.push({ recipientId: req.user.volunteerApplication.volunteerId });
+        if (req.user.phone) orConditions.push({ recipientPhone: req.user.phone.trim() });
+        if (req.user.name) orConditions.push({ recipientName: req.user.name.trim() });
         if (orConditions.length > 0) {
           query.$or = orConditions;
         }
@@ -52,6 +58,33 @@ const verifyPublicCertificate = async (req, res) => {
   }
 };
 
+const downloadCertificate = async (req, res) => {
+  try {
+    const { id } = req.params;
+    let cert = null;
+    if (id.startsWith('BYK-CERT-')) {
+      cert = await certificateRepository.findByCertificateId(id);
+    }
+    if (!cert && id.match(/^[0-9a-fA-F]{24}$/)) {
+      cert = await certificateRepository.findById(id);
+    }
+    if (!cert) {
+      cert = await certificateRepository.findByCertificateId(id);
+    }
+    if (!cert) {
+      return res.status(404).json({ success: false, message: 'Certificate not found' });
+    }
+
+    const pdfBuffer = await pdfService.generateCertificatePdf(cert);
+    const certCode = cert.certificateId || cert.certificateNo || 'Award_Certificate';
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="Certificate_${certCode}.pdf"`);
+    return res.send(pdfBuffer);
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 const deleteCertificate = async (req, res) => {
   try {
     const { id } = req.params;
@@ -70,5 +103,6 @@ module.exports = {
   getCertificates,
   issueCertificate,
   verifyPublicCertificate,
+  downloadCertificate,
   deleteCertificate
 };

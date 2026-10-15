@@ -18,12 +18,18 @@ class DonationRepository {
     return Donation.findOne({ receiptNumber });
   }
 
+  async findReceiptsWithPrefix(prefix) {
+    return Donation.find({ receiptNumber: new RegExp(`^${prefix}`) })
+      .select('receiptNumber')
+      .lean();
+  }
+
   async find(query = {}, sort = { createdAt: -1 }) {
     return Donation.find(query).populate('donor', 'name email phone memberId photoUrl').sort(sort);
   }
 
   async updateById(id, updateData) {
-    return Donation.findByIdAndUpdate(id, updateData, { new: true });
+    return Donation.findByIdAndUpdate(id, updateData, { returnDocument: 'after' });
   }
 
   async count(query = {}) {

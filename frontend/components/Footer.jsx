@@ -2,189 +2,213 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { 
-  FiHeart, 
-  FiPhone, 
-  FiMail, 
-  FiMapPin, 
-  FiShield, 
-  FiEye, 
-  FiArrowUp
+import {
+  FiPhone,
+  FiMail,
+  FiMapPin,
+  FiShield,
+  FiArrowUp,
+  FiChevronRight,
+  FiCheckCircle,
+  FiMessageSquare
 } from 'react-icons/fi';
 import { useNGO } from '../context/NGOContext';
+import { getContentImageUrl } from '@/lib/authApi';
 
 export default function Footer() {
   const { settings } = useNGO();
-
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   return (
-    <footer className="bg-black text-slate-300 pt-16 pb-10 border-t border-slate-900">
+    <footer className="bg-slate-950 text-slate-300 pt-14 pb-8 border-t border-slate-900 selection:bg-red-600 selection:text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-slate-900">
-          {/* Column 1: NGO Identity & Tax Status */}
-          <div className="space-y-4">
+
+        {/* ---------------- 4 SECTIONS GRID: 4 COLS ON LARGE (lg:), 2x2 ON SMALL (cols-2) ---------------- */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 lg:gap-10 pb-10 border-b border-slate-800/80">
+
+          {/* SECTION 1: NGO IDENTITY & STATUTORY RECOGNITION */}
+          <div className="space-y-3.5">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-red-600 to-red-700 flex items-center justify-center text-white font-black text-xl shadow-lg shadow-red-600/25 overflow-hidden">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-tr from-red-600 to-rose-600 flex items-center justify-center text-white font-black text-lg shadow-lg shadow-red-600/25 shrink-0 overflow-hidden">
                 {settings?.logoUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={settings.logoUrl} alt="Logo" className="w-full h-full object-cover" />
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img
+                    src={getContentImageUrl(settings.logoUrl)}
+                    alt={settings?.ngoName || 'Logo'}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=120&auto=format&fit=crop&q=80';
+                    }}
+                  />
                 ) : (
-                  <span>IYF</span>
+                  <span>युवा</span>
                 )}
               </div>
-              <div>
-                <h3 className="font-black text-white text-base">
-                  {settings?.ngoName || 'Indian Youth Foundation'}
+              <div className="min-w-0">
+                <h3 className="text-red-500 text-sm sm:text-base leading-tight truncate">
+                  <span className='text-red-500 '>{settings?.ngoName || 'Indian Youth Foundation'}</span>
                 </h3>
-                <p className="text-xs text-red-500 font-bold">
-                  {settings?.ngoNameHi || 'Bharatiya Yuva Kranti'}
+                <p className="text-[11px] text-red-400 font-bold leading-tight truncate">
+                  {settings?.ngoNameHi || 'भारतीय युवा क्रांति'}
                 </p>
               </div>
             </div>
 
-            <p className="text-xs text-slate-400 leading-relaxed font-medium">
-              {settings?.footerDescription || 'A registered non-profit organization dedicated to youth development, child education, healthcare relief, and social empowerment. Recognized under Section 12A & 80G of the Income Tax Act.'}
+            <p className="text-xs text-slate-400 leading-relaxed font-normal line-clamp-3">
+              {settings?.footerDescription || 'A nationwide youth movement committed to grassroots social empowerment, free child literacy, blood donor networks, and emergency relief.'}
             </p>
 
-            <div className="bg-slate-950 rounded-2xl p-4 border border-slate-800 space-y-2 text-xs">
+            {/* Statutory Trust Badge */}
+            <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800/90 space-y-1 text-[11px]">
               <div className="flex items-center gap-1.5 text-emerald-400 font-bold">
-                <FiShield className="w-4 h-4 shrink-0" />
-                <span>12A &amp; 80G Certified Non-Profit</span>
+                <FiShield className="w-3.5 h-3.5 shrink-0 text-emerald-400" />
+                <span className="truncate">12A &amp; 80G Registered NGO</span>
               </div>
-              <div className="text-slate-400">
-                80G Order: <span className="text-slate-200 font-mono font-bold">{settings?.exemption80G}</span>
+              <div className="text-slate-400 text-[10px] leading-tight">
+                Reg: <span className="text-slate-200 font-mono font-medium">{settings?.registrationNo || 'REG/2021/NGO/DEL/8741'}</span>
               </div>
-              <div className="text-slate-400">
-                12A Order: <span className="text-slate-200 font-mono font-bold">{settings?.exemption12A}</span>
-              </div>
-              <div className="text-slate-400">
-                NITI Aayog Darpan: <span className="text-slate-200 font-mono font-bold">{settings?.nitiAayogDarpanId}</span>
+              <div className="text-slate-400 text-[10px] leading-tight">
+                NITI Darpan: <span className="text-slate-200 font-mono font-medium">{settings?.nitiAayogDarpanId || 'RJ/2022/0319482'}</span>
               </div>
             </div>
           </div>
 
-          {/* Column 2: Quick Links */}
+          {/* SECTION 2: QUICK NAVIGATION */}
           <div className="space-y-3">
-            <h4 className="text-xs font-black text-white tracking-widest uppercase border-l-2 border-red-600 pl-2.5">
-              Quick Navigation
+            <h4 className="text-xs sm:text-sm font-black text-red-500 uppercase tracking-wider flex items-center gap-2 border-l-2 border-red-600 pl-2">
+              <span className='text-red-500'>Quick Links</span>
             </h4>
-            <ul className="space-y-2 text-xs">
+            <ul className="space-y-2 text-xs font-medium text-slate-300">
               <li>
-                <Link href="/services" className="hover:text-red-500 transition">
-                  Our Social Services
+                <Link href="/who-we-are" className="hover:text-red-400 transition flex items-center gap-1.5 group">
+                  <FiChevronRight className="w-3 h-3 text-red-500 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition" />
+                  <span>Who We Are</span>
                 </Link>
               </li>
               <li>
-                <Link href="/campaigns" className="hover:text-red-500 transition">
-                  Crowdfunding Campaigns
+                <Link href="/about" className="hover:text-red-400 transition flex items-center gap-1.5 group">
+                  <FiChevronRight className="w-3 h-3 text-red-500 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition" />
+                  <span>About Us</span>
                 </Link>
               </li>
               <li>
-                <Link href="/volunteer" className="hover:text-red-500 transition">
-                  Join as Volunteer / Member
+                <Link href="/services" className="hover:text-red-400 transition flex items-center gap-1.5 group">
+                  <FiChevronRight className="w-3 h-3 text-red-500 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition" />
+                  <span>Social Services</span>
                 </Link>
               </li>
               <li>
-                <Link href="/members" className="hover:text-red-500 transition">
-                  Member Directory &amp; ID Verification
+                <Link href="/campaigns" className="hover:text-red-400 transition flex items-center gap-1.5 group">
+                  <FiChevronRight className="w-3 h-3 text-red-500 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition" />
+                  <span>Active Campaigns</span>
                 </Link>
               </li>
               <li>
-                <Link href="/team-members" className="hover:text-red-500 transition">
-                  Core Management Team
+                <Link href="/volunteer" className="hover:text-red-400 transition flex items-center gap-1.5 group">
+                  <FiChevronRight className="w-3 h-3 text-red-500 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition" />
+                  <span>Join as Volunteer</span>
                 </Link>
               </li>
               <li>
-                <Link href="/mission-vision" className="hover:text-red-500 transition">
-                  Mission, Vision &amp; Objectives
+                <Link href="/members" className="hover:text-red-400 transition flex items-center gap-1.5 group">
+                  <FiChevronRight className="w-3 h-3 text-red-500 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition" />
+                  <span>Member Directory</span>
                 </Link>
               </li>
               <li>
-                <Link href="/programs" className="hover:text-red-500 transition">
-                  Flagship Programs
+                <Link href="/certificates" className="hover:text-red-400 transition flex items-center gap-1.5 group">
+                  <FiChevronRight className="w-3 h-3 text-red-500 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition" />
+                  <span>Org Certificates &amp; 80G/12A</span>
                 </Link>
               </li>
               <li>
-                <Link href="/certificates" className="hover:text-red-500 transition">
-                  Certificate Verification
-                </Link>
-              </li>
-              <li>
-                <Link href="/story" className="hover:text-red-500 transition">
-                  Life Impact Stories
+                <Link href="/mission-vision" className="hover:text-red-400 transition flex items-center gap-1.5 group">
+                  <FiChevronRight className="w-3 h-3 text-red-500 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition" />
+                  <span>Mission &amp; Vision</span>
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Column 3: Contact Details & Office */}
+          {/* SECTION 3: HEADQUARTERS & CONTACT */}
           <div className="space-y-3">
-            <h4 className="text-xs font-black text-white tracking-widest uppercase border-l-2 border-red-600 pl-2.5">
-              Contact &amp; Headquarters
+            <h4 className="text-xs sm:text-sm font-black text-red-500 uppercase tracking-wider flex items-center gap-2 border-l-2 border-red-600 pl-2">
+              <span className='text-red-500'>Contact Us</span>
             </h4>
-            <ul className="space-y-3 text-xs text-slate-400">
-              <li className="flex items-start gap-2.5">
-                <FiMapPin className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
-                <span className="leading-relaxed">{settings?.address}</span>
+            <ul className="space-y-2.5 text-xs text-slate-300">
+              <li >
+                <Link href={settings?.googleMapEmbed} className="flex items-start gap-2">
+                  <FiMapPin className="w-3.5 h-3.5 text-red-500 shrink-0 mt-0.5" />
+                  <span className="leading-snug text-slate-300 text-[11px] sm:text-xs line-clamp-2">
+                    {settings?.address || 'Head Office - Krishna Vihar Pala Road Aligarh, Uttar Pradesh'}
+                  </span>
+                </Link>
               </li>
-              <li className="flex items-center gap-2.5">
-                <FiPhone className="w-4 h-4 text-red-500 shrink-0" />
-                <a href={`tel:${settings?.phone}`} className="hover:text-white transition font-medium">
-                  {settings?.phone}
+              <li className="flex items-center gap-2">
+                <FiPhone className="w-3.5 h-3.5 text-red-500 shrink-0" />
+                <a href={`tel:${settings?.phone || '+91 93196 98759'}`} className="hover:text-white transition font-semibold text-[11px] sm:text-xs">
+                  {settings?.phone || '+91 93196 98759'}
                 </a>
               </li>
-              <li className="flex items-center gap-2.5">
-                <FiMail className="w-4 h-4 text-red-500 shrink-0" />
-                <a href={`mailto:${settings?.email}`} className="hover:text-white transition font-medium">
-                  {settings?.email}
+              <li className="flex items-center gap-2">
+                <FiMail className="w-3.5 h-3.5 text-red-500 shrink-0" />
+                <a href={`mailto:${settings?.email || 'samasyasamadhanparishad@gmail.com'}`} className="hover:text-white transition font-medium text-[11px] sm:text-xs truncate max-w-[190px]">
+                  {settings?.email || 'contact@bharatiyayuvakranti.org'}
                 </a>
               </li>
             </ul>
 
-            <div className="pt-2">
+            <div className="pt-1">
               <Link
                 href="/complaints"
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-xs text-red-500 border border-slate-800 font-semibold transition"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-[11px] text-red-400 hover:text-red-300 border border-slate-800 font-semibold transition"
               >
-                <span>Submit Grievance / Inquiry</span>
+                <FiMessageSquare className="w-3 h-3 text-red-500" />
+                <span>Help Desk &amp; Grievance</span>
               </Link>
             </div>
           </div>
 
-          {/* Column 4: Direct UPI QR & Bank Account */}
+          {/* SECTION 4: DIRECT 80G DONATION & BANK DETAILS */}
           <div className="space-y-3">
-            <h4 className="text-xs font-black text-white tracking-widest uppercase border-l-2 border-red-600 pl-2.5">
-              Direct Bank &amp; UPI Donation
+            <h4 className="text-xs sm:text-sm font-black text-red-500 uppercase tracking-wider flex items-center gap-2 border-l-2 border-red-600 pl-2">
+              <span className='text-red-500'>Tax-Exempt Giving</span>
             </h4>
-            <div className="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 flex items-center gap-3">
+
+            {/* UPI QR Code Pill */}
+            <div className="bg-slate-900/90 p-2.5 rounded-2xl border border-slate-800 flex items-center gap-2.5">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={settings?.upiQrImage || 'https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=upi://pay?pa=bharatiyauva@okhdfcbank'}
                 alt="UPI QR Code"
-                className="w-16 h-16 rounded-xl bg-white p-1 shrink-0"
+                className="w-12 h-12 rounded-xl bg-white p-0.5 shrink-0"
               />
-              <div className="text-[11px] space-y-0.5">
-                <div className="font-bold text-white">Scan with any UPI App</div>
-                <div className="text-red-400 font-mono text-[10px] break-all">{settings?.upiId}</div>
-                <div className="text-[10px] text-slate-400">GPay, PhonePe, Paytm accepted</div>
+              <div className="text-[10px] space-y-0.5 overflow-hidden">
+                <div className="font-bold text-white text-[11px] leading-tight">Instant UPI Donation</div>
+                <div className="text-red-400 font-mono text-[10px] truncate">{settings?.upiId || 'bharatiyauva@okhdfcbank'}</div>
+                <div className="text-slate-400 text-[9px]">GPay, PhonePe, Paytm</div>
               </div>
             </div>
 
-            <div className="text-[11px] text-slate-400 bg-slate-950/60 p-3 rounded-xl border border-slate-800 space-y-1">
-              <div>Account: <span className="text-slate-200 font-medium">{settings?.bankDetails?.accountName}</span></div>
-              <div>A/C No: <span className="text-slate-200 font-mono font-bold">{settings?.bankDetails?.accountNumber}</span></div>
-              <div>IFSC: <span className="text-slate-200 font-mono font-bold">{settings?.bankDetails?.ifscCode}</span> ({settings?.bankDetails?.bankName})</div>
+            {/* Bank Credentials */}
+            <div className="text-[10px] sm:text-[11px] text-slate-400 bg-slate-900/60 p-2.5 rounded-xl border border-slate-800/80 space-y-0.5 leading-tight">
+              <div>A/C Name: <span className="text-slate-200 font-medium truncate block sm:inline">{settings?.bankDetails?.accountName || 'Indian Youth Foundation'}</span></div>
+              <div>A/C No: <span className="text-slate-200 font-mono font-bold">{settings?.bankDetails?.accountNumber || '50200088991234'}</span></div>
+              <div>IFSC: <span className="text-slate-200 font-mono font-bold">{settings?.bankDetails?.ifscCode || 'HDFC0001234'}</span> ({settings?.bankDetails?.bankName || 'HDFC Bank'})</div>
             </div>
           </div>
+
         </div>
 
-        {/* Bottom copyright, legal links & Page views */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <div className="flex flex-wrap items-center gap-4">
-            <span>{settings?.footerCopyright || '© 2026 Indian Youth Foundation. All rights reserved.'}</span>
+        {/* ---------------- FOOTER BOTTOM BAR: COPYRIGHT, POLICIES & ATTRIBUTION ---------------- */}
+        <div className="pt-6 flex flex-col md:flex-row items-center justify-between gap-4 text-[11px] text-slate-500">
+          <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-4 gap-y-1">
+            <span>{settings?.footerCopyright || '© 2026 Indian Youth Foundation (Bharatiya Yuva Kranti). All rights reserved.'}</span>
             <Link href="/privacy-policy" className="text-slate-400 hover:text-red-400 transition underline underline-offset-2">
               Privacy Policy
             </Link>
@@ -193,21 +217,26 @@ export default function Footer() {
             </Link>
           </div>
 
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-1.5 text-slate-400">
-              <FiEye className="w-4 h-4 text-red-500" />
-              <span>Verified Page Views: <strong className="text-white font-mono">{Number(settings?.pageViews || 18450).toLocaleString()}</strong></span>
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <div className="flex items-center gap-1.5 text-slate-400 text-xs">
+              <span>Designed by</span>
+              <span className="font-bold text-red-500 hover:text-red-400 transition">
+                ZDC Tech Global Solution Pvt Ltd
+              </span>
             </div>
 
             <button
+              type="button"
               onClick={scrollToTop}
-              className="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white transition cursor-pointer"
+              className="p-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white transition cursor-pointer border border-slate-800 shadow-2xs"
               title="Back to Top"
+              aria-label="Scroll to top"
             >
-              <FiArrowUp className="w-4 h-4" />
+              <FiArrowUp className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
+
       </div>
     </footer>
   );

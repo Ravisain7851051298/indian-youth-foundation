@@ -53,8 +53,8 @@ export default function TeamMembersManagement() {
   const [photoPreview, setPhotoPreview] = useState("");
 
   const loadData = async () => {
-    setLoading(true);
     try {
+      setLoading(true);
       const res = await api.get("/team-members");
       const list = res.data?.data || res.data?.items || [];
       setMembers(Array.isArray(list) ? list : []);
@@ -66,7 +66,17 @@ export default function TeamMembersManagement() {
   };
 
   useEffect(() => {
-    loadData();
+    let isMounted = true;
+    api.get("/team-members").then(res => {
+      const list = res.data?.data || res.data?.items || [];
+      if (isMounted) setMembers(Array.isArray(list) ? list : []);
+    }).catch(err => {
+      if (isMounted) toast.error(err.response?.data?.message || "Failed to load team members");
+    }).finally(() => {
+      if (isMounted) setLoading(false);
+    });
+
+    return () => { isMounted = false; };
   }, []);
 
   const openAdd = () => {
@@ -129,7 +139,7 @@ export default function TeamMembersManagement() {
         const formData = new FormData();
         formData.append("file", photoFile);
         const upRes = await api.post("/upload", formData);
-        if (upRes.data?.success && upRes.data?.url) {
+        if (upRes.data?.url) {
           imageUrl = upRes.data.url;
         }
       }
@@ -179,13 +189,10 @@ export default function TeamMembersManagement() {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white p-4 rounded-b-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-red-700 text-xs font-bold mb-2">
-            <span>Executive Directory</span>
-          </div>
           <h1 className="text-2xl font-black text-black tracking-tight">Team &amp; Board Management</h1>
           <p className="text-xs text-slate-700 mt-1">
             Manage trustees, executive officers, program leads, and departmental coordinators.
@@ -211,7 +218,7 @@ export default function TeamMembersManagement() {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="bg-white mx-3 p-1 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="relative flex-1 w-full max-w-md">
           <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
           <input
@@ -227,7 +234,7 @@ export default function TeamMembersManagement() {
           <select
             value={selectedDept}
             onChange={(e) => setSelectedDept(e.target.value)}
-            className="px-3 py-2 rounded-xl text-xs font-bold border border-slate-200 bg-white text-black"
+            className="px-3 py-1.5 rounded-xl text-xs font-bold border border-slate-200 bg-white text-black"
           >
             {DEPARTMENTS.map((d) => (
               <option key={d} value={d}>
@@ -239,7 +246,7 @@ export default function TeamMembersManagement() {
       </div>
 
       {/* Grid */}
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6">
+      <div className="bg-white mx-3 rounded-3xl border border-slate-200 shadow-sm p-4 sm:p-6">
         {loading ? (
           <div className="p-12 text-center text-slate-700 text-xs space-y-2">
             <FiRefreshCw className="w-6 h-6 animate-spin mx-auto text-red-600" />
@@ -301,17 +308,19 @@ export default function TeamMembersManagement() {
                   <div className="mt-4 pt-3 border-t border-slate-200 flex items-center justify-end gap-2">
                     <button
                       onClick={() => openEdit(m)}
-                      className="p-2 rounded-lg text-slate-600 hover:text-black hover:bg-white transition cursor-pointer"
-                      title="Edit"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 hover:text-black hover:border-slate-300 font-bold text-xs shadow-2xs transition cursor-pointer"
+                      title="Edit Profile"
                     >
-                      <FiEdit2 className="w-4 h-4" />
+                      <FiEdit2 className="w-3.5 h-3.5" />
+                      <span>Edit</span>
                     </button>
                     <button
                       onClick={() => setDeleteModalItem(m)}
-                      className="p-2 rounded-lg text-rose-600 hover:bg-rose-50 transition cursor-pointer"
-                      title="Delete"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 hover:bg-rose-100 font-bold text-xs shadow-2xs transition cursor-pointer"
+                      title="Delete Member"
                     >
-                      <FiTrash2 className="w-4 h-4" />
+                      <FiTrash2 className="w-3.5 h-3.5" />
+                      <span>Delete</span>
                     </button>
                   </div>
                 </div>

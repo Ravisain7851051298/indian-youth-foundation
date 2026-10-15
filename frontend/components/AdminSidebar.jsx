@@ -3,24 +3,24 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { 
-  FiGrid, 
-  FiCreditCard, 
-  FiActivity, 
-  FiUserPlus, 
-  FiUsers, 
-  FiUserCheck, 
-  FiCompass, 
-  FiLayers, 
-  FiFileText, 
-  FiTarget, 
-  FiAward, 
-  FiMessageSquare, 
-  FiAlertCircle, 
-  FiCalendar, 
-  FiImage, 
-  FiBookOpen, 
-  FiSettings, 
+import {
+  FiGrid,
+  FiCreditCard,
+  FiActivity,
+  FiUserPlus,
+  FiUsers,
+  FiUserCheck,
+  FiCompass,
+  FiLayers,
+  FiFileText,
+  FiTarget,
+  FiAward,
+  FiMessageSquare,
+  FiAlertCircle,
+  FiCalendar,
+  FiImage,
+  FiBookOpen,
+  FiSettings,
   FiUser,
   FiLogOut,
   FiExternalLink,
@@ -28,7 +28,9 @@ import {
   FiMenu,
   FiX
 } from 'react-icons/fi';
+import { useSelector } from 'react-redux';
 import { useNGO } from '../context/NGOContext';
+import { getContentImageUrl } from '@/lib/authApi';
 
 // Master 18 modules for Admin
 export const ADMIN_NAV_ITEMS = [
@@ -42,8 +44,8 @@ export const ADMIN_NAV_ITEMS = [
   { label: "Programs", href: "/programs", icon: FiLayers },
   { label: "News & Blogs", href: "/blogs", icon: FiFileText },
   { label: "Campaigns", href: "/campaigns", icon: FiTarget },
-  { label: "Certificates", href: "/certificates", icon: FiAward },
-  { label: "Reviews & Feedback", href: "/feedback", icon: FiMessageSquare },
+  { label: "Org Certificates", href: "/dashboard/certificates", icon: FiAward },
+  { label: "Reviews & Feedback", href: "/dashboard/feedback", icon: FiMessageSquare },
   { label: "Complaints & Inquiries", href: "/complaints", icon: FiAlertCircle },
   { label: "Event", href: "/event", icon: FiCalendar },
   { label: "Gallery", href: "/gallery", icon: FiImage },
@@ -64,41 +66,43 @@ export const ROLE_NAV_ITEMS = {
     { label: "Programs Oversight", href: "/programs", icon: FiLayers },
     { label: "Campaigns & Drives", href: "/campaigns", icon: FiTarget },
     { label: "Events Roster", href: "/event", icon: FiCalendar },
-    { label: "Certificates Desk", href: "/certificates", icon: FiAward },
+    { label: "Org Certificates", href: "/dashboard/certificates", icon: FiAward },
     { label: "Stories & Impact", href: "/story", icon: FiBookOpen },
-    { label: "Feedback & Reviews", href: "/feedback", icon: FiMessageSquare },
+    { label: "Feedback & Reviews", href: "/dashboard/feedback", icon: FiMessageSquare },
   ],
 
   Volunteer: [
-    { label: "Volunteer Profile & ID Card", href: "/profile?tab=idcard", icon: FiUser },
-    { label: "Appointment Letter", href: "/profile?tab=letter", icon: FiFileText },
-    { label: "My Certificates", href: "/certificates", icon: FiAward },
+    { label: "Volunteer Profile & ID Card", href: "/profile/id-card", icon: FiUser },
+    { label: "Appointment Letter", href: "/profile/appointment-letter", icon: FiFileText },
+    { label: "My Certificates", href: "/profile/certificates", icon: FiAward },
     { label: "Upcoming Events & Tasks", href: "/event", icon: FiCalendar },
     { label: "Active Campaigns", href: "/campaigns", icon: FiTarget },
     { label: "Welfare Programs", href: "/programs", icon: FiLayers },
     { label: "Submit Feedback", href: "/feedback", icon: FiMessageSquare },
-    { label: "Help Desk / Grievance", href: "/profile?tab=grievance", icon: FiAlertCircle },
+    { label: "Help Desk / Grievance", href: "/profile/complaints", icon: FiAlertCircle },
   ],
 
   Member: [
-    { label: "Member Profile & ID Card", href: "/profile?tab=idcard", icon: FiUser },
-    { label: "Appointment Letter", href: "/profile?tab=letter", icon: FiFileText },
-    { label: "My 80G Donations", href: "/donation", icon: FiCreditCard },
-    { label: "Appreciation Certificates", href: "/certificates", icon: FiAward },
+    { label: "Member Profile & ID Card", href: "/profile/id-card", icon: FiUser },
+    { label: "Appointment Letter", href: "/profile/appointment-letter", icon: FiFileText },
+    { label: "My 80G Donations", href: "/profile/donations", icon: FiCreditCard },
+    { label: "My Certificates", href: "/profile/certificates", icon: FiAward },
     { label: "Welfare Programs", href: "/programs", icon: FiLayers },
     { label: "Community Events", href: "/event", icon: FiCalendar },
     { label: "Submit Feedback", href: "/feedback", icon: FiMessageSquare },
-    { label: "Grievance Redressal", href: "/profile?tab=grievance", icon: FiAlertCircle },
+    { label: "Grievance Redressal", href: "/profile/complaints", icon: FiAlertCircle },
   ]
 };
 
 export default function AdminSidebar({ activeRole = null }) {
   const pathname = usePathname();
   const { currentUser, logout, settings } = useNGO();
+  const reduxUser = useSelector((state) => state.auth?.user);
+  const effectiveUser = reduxUser || currentUser;
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   // Determine effective role
-  const role = activeRole || currentUser?.role || 'Member';
+  const role = activeRole || effectiveUser?.role || 'Member';
   const navItems = ROLE_NAV_ITEMS[role] || ROLE_NAV_ITEMS.Member;
 
   const roleBadgeText = {
@@ -128,7 +132,7 @@ export default function AdminSidebar({ activeRole = null }) {
       </div>
 
       {/* Desktop Fixed Sidebar & Mobile Drawer */}
-      <aside 
+      <aside
         className={`
           ${mobileSidebarOpen ? 'block fixed inset-y-0 left-0 z-50 w-72' : 'hidden'}
           lg:flex lg:flex-col lg:w-64 lg:shrink-0
@@ -162,12 +166,26 @@ export default function AdminSidebar({ activeRole = null }) {
 
         {/* User Card */}
         <div className="px-4 py-3 bg-red-50/50 border-b border-red-100 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-white text-xs font-black shrink-0 shadow-xs">
-            {currentUser?.name ? currentUser.name.charAt(0) : 'U'}
+          <div className="relative w-8 h-8 rounded-full overflow-hidden border border-red-400 bg-red-600 flex items-center justify-center text-white text-xs font-black shrink-0 shadow-2xs">
+            {effectiveUser?.photoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={getContentImageUrl(effectiveUser.photoUrl)}
+                alt={effectiveUser.name}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+            ) : null}
+            <span className={effectiveUser?.photoUrl ? 'sr-only' : ''}>
+              {effectiveUser?.name ? effectiveUser.name.charAt(0) : 'U'}
+            </span>
           </div>
           <div className="overflow-hidden text-xs">
-            <div className="font-bold text-black truncate">{currentUser?.name || 'Authorized User'}</div>
-            <div className="text-[10px] text-slate-600 truncate">{currentUser?.memberId || roleBadgeText}</div>
+            <div className="font-bold text-black truncate">{effectiveUser?.name || 'Authorized User'}</div>
+            <div className="text-[10px] text-slate-600 truncate">{effectiveUser?.memberId || roleBadgeText}</div>
           </div>
         </div>
 
@@ -184,11 +202,10 @@ export default function AdminSidebar({ activeRole = null }) {
                 key={item.label}
                 href={item.href}
                 onClick={() => setMobileSidebarOpen(false)}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all ${
-                  isActive
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all ${isActive
                     ? 'bg-red-600 text-white shadow-md shadow-red-600/20'
                     : 'text-slate-700 hover:bg-red-50 hover:text-red-700'
-                }`}
+                  }`}
               >
                 <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-slate-500'}`} />
                 <span className="truncate">{item.label}</span>
@@ -219,7 +236,7 @@ export default function AdminSidebar({ activeRole = null }) {
 
       {/* Mobile Backdrop */}
       {mobileSidebarOpen && (
-        <div 
+        <div
           onClick={() => setMobileSidebarOpen(false)}
           className="lg:hidden fixed inset-0 bg-black/40 backdrop-blur-xs z-40"
         />

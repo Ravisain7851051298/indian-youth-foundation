@@ -14,6 +14,12 @@ class CertificateRepository {
     return Certificate.findOne({ certificateId }).populate('recipient');
   }
 
+  async findCertsWithPrefix(prefix) {
+    return Certificate.find({ certificateId: new RegExp(`^${prefix}`) })
+      .select('certificateId')
+      .lean();
+  }
+
   async find(query = {}, sort = { createdAt: -1 }) {
     return Certificate.find(query).populate('recipient').sort(sort);
   }

@@ -19,6 +19,8 @@ const emailLogRoutes = require('./emailLogRoutes');
 const uploadRoutes = require('./uploadRoutes');
 const verifyRoutes = require('./verifyRoutes');
 const statsRoutes = require('./statsRoutes');
+const feedbackRoutes = require('./feedbackRoutes');
+const orgDocumentRoutes = require('./orgDocumentRoutes');
 
 // Health Check
 router.get('/health', (req, res) => {
@@ -68,8 +70,11 @@ router.use('/programs', createResourceRouter('programs'));
 router.use('/program', createResourceRouter('programs'));
 router.use('/stories', createResourceRouter('stories'));
 router.use('/story', createResourceRouter('stories'));
-router.use('/feedback', createResourceRouter('feedback'));
-router.use('/reviews', createResourceRouter('feedback'));
+router.use('/feedback', feedbackRoutes);
+router.use('/feedbacks', feedbackRoutes);
+router.use('/reviews', feedbackRoutes);
+router.use('/org-documents', orgDocumentRoutes);
+router.use('/organization-certificates', orgDocumentRoutes);
 router.use('/team-members', createResourceRouter('team-members'));
 router.use('/team', createResourceRouter('team-members'));
 router.use('/mission-vision', createResourceRouter('mission-vision'));

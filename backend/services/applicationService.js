@@ -111,6 +111,58 @@ class ApplicationService {
     return applicationRepository.findVolunteerApps(filter);
   }
 
+  async generateUniqueMemberId() {
+    const currentYear = new Date().getFullYear();
+    const prefix = `BYK-MEM-${currentYear}-`;
+    const users = await userRepository.find({ memberId: new RegExp(`^${prefix}`) });
+    let maxSeq = 1000;
+    for (const u of users) {
+      if (u.memberId) {
+        const match = u.memberId.match(/(\d+)$/);
+        if (match) {
+          const num = parseInt(match[1], 10);
+          if (!isNaN(num) && num > maxSeq) maxSeq = num;
+        }
+      }
+    }
+    let nextSeq = maxSeq + 1;
+    let candidate = `${prefix}${nextSeq}`;
+    while (await userRepository.findByMemberId(candidate)) {
+      nextSeq++;
+      candidate = `${prefix}${nextSeq}`;
+    }
+    return candidate;
+  }
+
+  async generateUniqueVolunteerId() {
+    const currentYear = new Date().getFullYear();
+    const prefix = `BYK-VOL-${currentYear}-`;
+    const users = await userRepository.find({ 
+      $or: [
+        { volunteerId: new RegExp(`^${prefix}`) },
+        { memberId: new RegExp(`^${prefix}`) }
+      ]
+    });
+    let maxSeq = 500;
+    for (const u of users) {
+      const idToTest = u.volunteerId || u.memberId;
+      if (idToTest) {
+        const match = idToTest.match(/(\d+)$/);
+        if (match) {
+          const num = parseInt(match[1], 10);
+          if (!isNaN(num) && num > maxSeq) maxSeq = num;
+        }
+      }
+    }
+    let nextSeq = maxSeq + 1;
+    let candidate = `${prefix}${nextSeq}`;
+    while (await userRepository.findByVolunteerId(candidate)) {
+      nextSeq++;
+      candidate = `${prefix}${nextSeq}`;
+    }
+    return candidate;
+  }
+
   async approveMembershipApplication(appId, adminUser) {
     const app = await applicationRepository.findMembershipAppById(appId);
     if (!app) throw new Error('Membership application not found');
@@ -124,11 +176,11 @@ class ApplicationService {
 
     const plan = app.plan ? await planRepository.findById(app.plan._id || app.plan) : null;
 
-    const memberSeq = await userRepository.count({ role: 'Member', status: 'active' });
-    const verifiedMemberId = `BYK-MEM-2026-${1000 + memberSeq + 1}`;
+    const verifiedMemberId = user.memberId || await this.generateUniqueMemberId();
 
     user.status = 'active';
     user.role = 'Member';
+    user.isMember = true;
     user.memberId = verifiedMemberId;
     user.designation = plan ? `${plan.title || plan.name} Member` : 'Verified Active Member';
     user.feePaid = true;
@@ -196,12 +248,15 @@ class ApplicationService {
     }
     if (!user) throw new Error('Volunteer account not found');
 
-    const volSeq = await userRepository.count({ role: 'Volunteer', status: 'active' });
-    const verifiedVolId = `BYK-VOL-2026-${500 + volSeq + 1}`;
+    const verifiedVolId = user.volunteerId || await this.generateUniqueVolunteerId();
 
     user.status = 'active';
     user.role = 'Volunteer';
-    user.memberId = verifiedVolId;
+    user.isVolunteer = true;
+    user.volunteerId = verifiedVolId;
+    if (!user.memberId) {
+      user.memberId = verifiedVolId;
+    }
     user.designation = 'Active Volunteer (Youth Wing)';
     user.idCardGenerated = true;
     user.appointmentLetterGenerated = true;

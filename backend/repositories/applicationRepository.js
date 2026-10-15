@@ -17,7 +17,7 @@ class ApplicationRepository {
   }
 
   async updateMembershipApp(id, updateData) {
-    return MembershipApplication.findByIdAndUpdate(id, updateData, { new: true });
+    return MembershipApplication.findByIdAndUpdate(id, updateData, { returnDocument: 'after' });
   }
 
   async countMembershipApps(query = {}) {
@@ -39,7 +39,7 @@ class ApplicationRepository {
   }
 
   async updateVolunteerApp(id, updateData) {
-    return VolunteerApplication.findByIdAndUpdate(id, updateData, { new: true });
+    return VolunteerApplication.findByIdAndUpdate(id, updateData, { returnDocument: 'after' });
   }
 
   async countVolunteerApps(query = {}) {

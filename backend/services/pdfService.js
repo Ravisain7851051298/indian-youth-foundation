@@ -1,5 +1,45 @@
 const PDFDocument = require('pdfkit');
 const QRCode = require('qrcode');
+const path = require('path');
+const fs = require('fs');
+const Setting = require('../models/Setting');
+
+// Helper to resolve image files from uploads/ or URLs safely as buffer
+async function resolveImageBuffer(imgUrl) {
+  if (!imgUrl) return null;
+  try {
+    // 1. Local path starting with /uploads or uploads
+    if (imgUrl.startsWith('/uploads') || imgUrl.startsWith('uploads')) {
+      const cleanPath = imgUrl.startsWith('/') ? imgUrl.slice(1) : imgUrl;
+      const localFilePath = path.join(__dirname, '..', cleanPath);
+      if (fs.existsSync(localFilePath)) {
+        return fs.readFileSync(localFilePath);
+      }
+    }
+    // 2. Contains /uploads/
+    if (imgUrl.includes('/uploads/')) {
+      const parts = imgUrl.split('/uploads/');
+      const localFilePath = path.join(__dirname, '..', 'uploads', parts[1]);
+      if (fs.existsSync(localFilePath)) {
+        return fs.readFileSync(localFilePath);
+      }
+    }
+    // 3. Web URL fallback (non-blocking with 2.5s timeout)
+    if (imgUrl.startsWith('http://') || imgUrl.startsWith('https://')) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2500);
+      const res = await fetch(imgUrl, { signal: controller.signal });
+      clearTimeout(timeoutId);
+      if (res.ok) {
+        const arrayBuf = await res.arrayBuffer();
+        return Buffer.from(arrayBuf);
+      }
+    }
+  } catch (e) {
+    // Graceful fallback without throwing
+  }
+  return null;
+}
 
 // Helper to convert number to Indian currency words
 function numberToWords(num) {
@@ -65,6 +105,34 @@ function formatDate(d) {
 function sanitize(str) {
   if (!str) return '';
   return String(str).replace(/[^\x20-\x7E\n\r\t]/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+/**
+ * Draw a prestigious trust shield in vector graphics
+ */
+function drawVectorShield(doc, x, y, width = 42, height = 50, color = '#b45309') {
+  doc.save();
+  const w = width;
+  const h = height;
+  doc.lineWidth(1.5).strokeColor(color).fillColor('#fef3c7');
+  
+  // Shield path
+  doc.moveTo(x, y)
+     .lineTo(x + w, y)
+     .lineTo(x + w, y + h * 0.55)
+     .quadraticCurveTo(x + w * 0.5, y + h, x + w * 0.5, y + h)
+     .quadraticCurveTo(x, y + h * 0.55, x, y + h * 0.55)
+     .closePath()
+     .fillAndStroke();
+
+  // Shield inner star/badge text
+  doc.font('Helvetica-Bold').fontSize(6.5).fillColor('#9a3412');
+  doc.text('12A/80G', x + 2, y + 14, { width: w - 4, align: 'center' });
+  doc.fontSize(5.5).fillColor('#b45309');
+  doc.text('VERIFIED', x + 2, y + 24, { width: w - 4, align: 'center' });
+  doc.fontSize(4.5).fillColor('#475569');
+  doc.text('GOVT TRUST', x + 2, y + 33, { width: w - 4, align: 'center' });
+  doc.restore();
 }
 
 /**
@@ -356,6 +424,11 @@ async function generateAppointmentLetterPdf(user = {}) {
       doc.on('data', b => buffers.push(b));
       doc.on('end', () => resolve(Buffer.concat(buffers)));
 
+      let dbSettings = null;
+      try {
+        dbSettings = await Setting.findOne();
+      } catch (e) {}
+
       const memberId = sanitize(user.memberId || 'BYK-MEM-2026-0001');
       const name = sanitize(user.name || 'Executive Member');
       const email = sanitize(user.email || 'N/A');
@@ -364,7 +437,7 @@ async function generateAppointmentLetterPdf(user = {}) {
       const city = sanitize(user.district || user.city || 'Aligarh');
       const state = sanitize(user.state || 'Uttar Pradesh');
       const dateStr = formatDate(user.verifiedAt || new Date());
-      const approvedBy = sanitize(user.verifiedBy || 'National President & Board of Trustees');
+      const approvedBy = sanitize(user.verifiedBy || dbSettings?.presidentName || 'Ravi Saini (National President & Trustee)');
 
       // QR Code
       const qrData = `https://bharatiyayuvakranti.org/verify/member/${memberId}`;
@@ -445,7 +518,17 @@ async function generateAppointmentLetterPdf(user = {}) {
       doc.font('Helvetica-Bold').fontSize(7).fillColor('#64748b');
       doc.text('Scan to Verify Online', 45, signY + 75, { width: 80, align: 'center' });
 
-      drawVectorSeal(doc, 290, signY + 35, 34, '#b91c1c');
+      const sealBuf = await resolveImageBuffer(dbSettings?.officialSealUrl);
+      if (sealBuf) {
+        doc.image(sealBuf, 260, signY + 10, { width: 60, height: 60 });
+      } else {
+        drawVectorSeal(doc, 290, signY + 35, 34, '#b91c1c');
+      }
+
+      const sigBuf = await resolveImageBuffer(dbSettings?.presidentSignatureUrl);
+      if (sigBuf) {
+        doc.image(sigBuf, 410, signY + 16, { width: 95, height: 28 });
+      }
 
       doc.font('Helvetica-Bold').fontSize(9).fillColor('#0f172a');
       doc.text('For INDIAN YOUTH FOUNDATION', 370, signY + 5, { width: 175, align: 'center' });
@@ -477,6 +560,11 @@ async function generateIdCardPdf(user = {}, roleType = 'volunteer') {
       const buffers = [];
       doc.on('data', b => buffers.push(b));
       doc.on('end', () => resolve(Buffer.concat(buffers)));
+
+      let dbSettings = null;
+      try {
+        dbSettings = await Setting.findOne();
+      } catch (e) {}
 
       const isVolunteer = (roleType || user.role || '').toLowerCase().includes('volunteer');
       const themeColor = isVolunteer ? '#059669' : '#b91c1c';
@@ -584,15 +672,24 @@ async function generateIdCardPdf(user = {}, roleType = 'volunteer') {
         backRowY += 16;
       });
 
-      // Vector Seal & Signature
-      drawVectorSeal(doc, backX + 55, topY + 265, 26, themeColor);
+      // Seal & Signature
+      const sealBuf = await resolveImageBuffer(dbSettings?.officialSealUrl);
+      if (sealBuf) {
+        doc.image(sealBuf, backX + 32, topY + 248, { width: 44, height: 44 });
+      } else {
+        drawVectorSeal(doc, backX + 55, topY + 265, 26, themeColor);
+      }
 
-      doc.font('Helvetica-Bold').fontSize(7).fillColor('#0f172a');
-      doc.text('Authorized Signatory', backX + 115, topY + 260);
-      doc.font('Helvetica-Oblique').fontSize(6.5).fillColor(themeColor);
-      doc.text('[Digitally Signed]', backX + 115, topY + 272);
-      doc.font('Helvetica-Bold').fontSize(7).fillColor('#0f172a');
-      doc.text('National President', backX + 115, topY + 284);
+      const sigBuf = await resolveImageBuffer(dbSettings?.presidentSignatureUrl);
+      if (sigBuf) {
+        doc.image(sigBuf, backX + 115, topY + 250, { width: 85, height: 24 });
+      }
+
+      const presidentName = sanitize(dbSettings?.presidentName || 'National President');
+      doc.font('Helvetica-Bold').fontSize(6.5).fillColor('#0f172a');
+      doc.text('Authorized Signatory', backX + 115, topY + 238);
+      doc.font('Helvetica-Bold').fontSize(6.5).fillColor('#0f172a');
+      doc.text(presidentName, backX + 115, topY + 282, { width: cardW - 125 });
 
       // Warning Note at bottom of back
       doc.rect(backX + 10, topY + 308, cardW - 20, 60).fillColor('#f8fafc').strokeColor('#cbd5e1').lineWidth(0.8).fillAndStroke();
@@ -635,13 +732,18 @@ async function generateCertificatePdf(cert = {}) {
       doc.on('data', b => buffers.push(b));
       doc.on('end', () => resolve(Buffer.concat(buffers)));
 
+      let dbSettings = null;
+      try {
+        dbSettings = await Setting.findOne();
+      } catch (e) {}
+
       const certId = sanitize(cert.certificateId || cert.certificateNo || 'BYK-CERT-2026-0001');
       const recipientName = sanitize(cert.recipientName || 'Distinguished Contributor');
       const title = sanitize(cert.title || 'Certificate of Appreciation & National Service');
       const reason = sanitize(cert.reason || 'In recognition of outstanding dedication, exemplary leadership, and selfless service towards societal welfare and youth empowerment.');
       const role = sanitize(cert.roleOrDesignation || 'Active Social Contributor');
       const issueDate = formatDate(cert.issueDate || cert.createdAt);
-      const issuedBy = sanitize(cert.issuedBy || 'National President, Indian Youth Foundation');
+      const issuedBy = sanitize(cert.issuedBy || dbSettings?.presidentName || 'Ravi Saini (National President & Trustee)');
 
       // QR Code
       const qrData = `https://bharatiyayuvakranti.org/verify/certificate/${certId}`;
@@ -650,92 +752,115 @@ async function generateCertificatePdf(cert = {}) {
       const w = 841.89;
       const h = 595.28;
 
-      // Outer Golden & Crimson Double Borders
-      doc.rect(20, 20, w - 40, h - 40).lineWidth(4).strokeColor('#c2410c').stroke();
-      doc.rect(26, 26, w - 52, h - 52).lineWidth(1.5).strokeColor('#d97706').stroke();
-      doc.rect(30, 30, w - 60, h - 60).lineWidth(0.5).strokeColor('#cbd5e1').stroke();
+      // Outer Golden & Crimson Luxury Quadruple Borders
+      doc.rect(18, 18, w - 36, h - 36).lineWidth(5).strokeColor('#7f1d1d').stroke();
+      doc.rect(23, 23, w - 46, h - 46).lineWidth(1.2).strokeColor('#d97706').stroke();
+      doc.rect(26, 26, w - 52, h - 52).lineWidth(2).strokeColor('#b45309').stroke();
+      doc.rect(30, 30, w - 60, h - 60).lineWidth(0.6).dash(4, { space: 2 }).strokeColor('#cbd5e1').stroke();
+      doc.undash();
 
-      // Corner Accents
+      // Corner Medallions
       const corners = [
         [32, 32],
-        [w - 52, 32],
-        [32, h - 52],
-        [w - 52, h - 52]
+        [w - 56, 32],
+        [32, h - 56],
+        [w - 56, h - 56]
       ];
       corners.forEach(([cx, cy]) => {
-        doc.rect(cx, cy, 20, 20).fillColor('#fef3c7').strokeColor('#d97706').lineWidth(1).fillAndStroke();
+        doc.rect(cx, cy, 24, 24).fillColor('#fef3c7').strokeColor('#b45309').lineWidth(1.2).fillAndStroke();
+        doc.font('Helvetica-Bold').fontSize(10).fillColor('#b45309');
+        doc.text('✦', cx, cy + 5, { width: 24, align: 'center' });
       });
 
-      // Header Banner
-      doc.font('Helvetica-Bold').fontSize(22).fillColor('#c2410c');
-      doc.text('INDIAN YOUTH FOUNDATION', 50, 48, { align: 'center', width: w - 100 });
+      // Trust Shield in Upper Corner
+      drawVectorShield(doc, w - 100, 38, 44, 52, '#b45309');
+
+      // Top Logo (if uploaded or URL)
+      const logoBuf = await resolveImageBuffer(dbSettings?.logoUrl);
+      if (logoBuf) {
+        doc.image(logoBuf, 56, 38, { width: 50, height: 50 });
+      }
+
+      // Organization Header
+      doc.font('Helvetica-Bold').fontSize(22).fillColor('#7f1d1d');
+      doc.text('INDIAN YOUTH FOUNDATION', 110, 44, { align: 'center', width: w - 220 });
       doc.font('Helvetica-Bold').fontSize(11).fillColor('#0f172a');
-      doc.text('BHARATIYA YUVA KRANTI', 50, 75, { align: 'center', width: w - 100 });
-      doc.font('Helvetica').fontSize(8.5).fillColor('#475569');
-      doc.text('Registered Public Charitable Trust • Reg. No: 421/2019 • Section 12A & 80G Certified NGO', 50, 90, { align: 'center', width: w - 100 });
+      doc.text('BHARATIYA YUVA KRANTI • NATIONAL HONOURS & MERIT COUNCIL', 110, 70, { align: 'center', width: w - 220 });
+      doc.font('Helvetica').fontSize(8).fillColor('#475569');
+      doc.text('A Registered Public Charitable Trust • Reg. No: 421/2019 • Section 12A & 80G Compliant NGO', 110, 84, { align: 'center', width: w - 220 });
 
       // Certificate Title Ribbon
-      doc.rect(170, 112, w - 340, 38).fillColor('#c2410c').fill();
-      doc.font('Helvetica-Bold').fontSize(16).fillColor('#ffffff');
-      doc.text('CERTIFICATE OF APPRECIATION', 170, 122, { align: 'center', width: w - 340 });
+      doc.rect(160, 104, w - 320, 36).fillColor('#7f1d1d').fill();
+      doc.rect(162, 106, w - 324, 32).lineWidth(1).strokeColor('#fde047').stroke();
+      doc.font('Helvetica-Bold').fontSize(15).fillColor('#ffffff');
+      doc.text('CERTIFICATE OF APPRECIATION & CITATION', 160, 114, { align: 'center', width: w - 320 });
 
       // Certificate ID
       doc.font('Helvetica-Bold').fontSize(8.5).fillColor('#b45309');
-      doc.text(`Certificate No: ${certId}`, 50, 160, { align: 'center', width: w - 100 });
+      doc.text(`Official Conformance No: ${certId}`, 50, 148, { align: 'center', width: w - 100 });
 
       // Presentation Line
-      doc.font('Helvetica-Oblique').fontSize(12).fillColor('#475569');
-      doc.text('This is proudly presented to', 50, 185, { align: 'center', width: w - 100 });
+      doc.font('Helvetica-Oblique').fontSize(11).fillColor('#475569');
+      doc.text('This certificate of honor is proudly and gratefully conferred upon', 50, 172, { align: 'center', width: w - 100 });
 
       // Recipient Name
-      doc.font('Helvetica-Bold').fontSize(24).fillColor('#0f172a');
-      doc.text(recipientName, 50, 210, { align: 'center', width: w - 100 });
+      doc.font('Helvetica-Bold').fontSize(26).fillColor('#0f172a');
+      doc.text(recipientName, 50, 196, { align: 'center', width: w - 100 });
+
       // Underline
       const nameWidth = doc.widthOfString(recipientName);
       const nameStartX = (w - nameWidth) / 2;
-      doc.moveTo(nameStartX - 20, 240).lineTo(nameStartX + nameWidth + 20, 240).lineWidth(1.5).strokeColor('#d97706').stroke();
+      doc.moveTo(nameStartX - 25, 228).lineTo(nameStartX + nameWidth + 25, 228).lineWidth(1.8).strokeColor('#d97706').stroke();
 
       // Designation
       doc.font('Helvetica-Bold').fontSize(11).fillColor('#059669');
-      doc.text(`[ ${role} ]`, 50, 252, { align: 'center', width: w - 100 });
+      doc.text(`[ ${role} ]`, 50, 238, { align: 'center', width: w - 100 });
 
       // Award Title & Reason Citation
-      doc.font('Helvetica-Bold').fontSize(12).fillColor('#b91c1c');
-      doc.text(`"${title}"`, 100, 275, { align: 'center', width: w - 200 });
+      doc.font('Helvetica-Bold').fontSize(12).fillColor('#7f1d1d');
+      doc.text(`"${title}"`, 100, 260, { align: 'center', width: w - 200 });
 
-      doc.font('Helvetica').fontSize(10.5).fillColor('#334155').lineGap(3);
-      doc.text(reason, 110, 305, { align: 'center', width: w - 220 });
+      doc.font('Helvetica').fontSize(10).fillColor('#334155').lineGap(3);
+      doc.text(reason, 110, 286, { align: 'center', width: w - 220 });
 
       // Authentication Bar (Date, Seal, Sign, QR)
-      const bottomY = 415;
+      const bottomY = 410;
 
       // Left: QR Code
       doc.image(qrBuffer, 80, bottomY, { width: 75 });
       doc.font('Helvetica-Bold').fontSize(7).fillColor('#64748b');
-      doc.text('Scan to Verify Online', 75, bottomY + 80, { width: 85, align: 'center' });
+      doc.text('Scan to Verify Online', 75, bottomY + 78, { width: 85, align: 'center' });
 
       // Date of Issue
-      doc.font('Helvetica-Bold').fontSize(9).fillColor('#0f172a');
-      doc.text(`Date of Conformance:`, 210, bottomY + 30);
+      doc.font('Helvetica-Bold').fontSize(8.5).fillColor('#0f172a');
+      doc.text(`Date of Conformance:`, 200, bottomY + 28);
       doc.font('Helvetica').fontSize(9).fillColor('#334155');
-      doc.text(issueDate, 210, bottomY + 45);
+      doc.text(issueDate, 200, bottomY + 42);
 
-      // Center: Golden Vector Seal
-      drawVectorSeal(doc, w / 2, bottomY + 40, 42, '#c2410c');
+      // Center: Trust Seal (uploaded or vector)
+      const sealBuf = await resolveImageBuffer(dbSettings?.officialSealUrl);
+      if (sealBuf) {
+        doc.image(sealBuf, (w / 2) - 34, bottomY + 8, { width: 68, height: 68 });
+      } else {
+        drawVectorSeal(doc, w / 2, bottomY + 40, 42, '#7f1d1d');
+      }
 
-      // Right: Authorized Signatures
-      doc.font('Helvetica-Bold').fontSize(10).fillColor('#0f172a');
-      doc.text('For INDIAN YOUTH FOUNDATION', w - 300, bottomY + 15, { width: 220, align: 'center' });
-      doc.font('Helvetica-Oblique').fontSize(8.5).fillColor('#c2410c');
-      doc.text('[Statutory Digital Seal & Signature]', w - 300, bottomY + 40, { width: 220, align: 'center' });
+      // Right: Signatures
+      const sigBuf = await resolveImageBuffer(dbSettings?.presidentSignatureUrl);
+      if (sigBuf) {
+        doc.image(sigBuf, w - 240, bottomY + 18, { width: 100, height: 32 });
+      }
+
+      doc.font('Helvetica-Bold').fontSize(9.5).fillColor('#0f172a');
+      doc.text('For INDIAN YOUTH FOUNDATION', w - 300, bottomY + 8, { width: 220, align: 'center' });
       doc.font('Helvetica-Bold').fontSize(9).fillColor('#0f172a');
-      doc.text(issuedBy, w - 300, bottomY + 58, { width: 220, align: 'center' });
+      doc.text(issuedBy, w - 300, bottomY + 54, { width: 220, align: 'center' });
       doc.font('Helvetica').fontSize(7.5).fillColor('#64748b');
-      doc.text('National Executive / Board of Trustees', w - 300, bottomY + 70, { width: 220, align: 'center' });
+      doc.text('National President & Board of Trustees', w - 300, bottomY + 67, { width: 220, align: 'center' });
 
       // Bottom Security Note
-      doc.font('Helvetica').fontSize(7).fillColor('#94a3b8');
-      doc.text('This is an authentic verified digital award certificate. Credential validity can be verified in real time on the official portal.', 50, h - 38, { align: 'center', width: w - 100 });
+      doc.font('Helvetica').fontSize(6.8).fillColor('#94a3b8');
+      doc.text('This is an authentic verified digital award certificate issued by the National Executive Council of Indian Youth Foundation.', 50, h - 36, { align: 'center', width: w - 100 });
 
       doc.end();
     } catch (err) {

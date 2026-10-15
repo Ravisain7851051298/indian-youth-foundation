@@ -1,309 +1,348 @@
 'use client';
 
-import React, { useState } from 'react';
-import { FiAward, FiPlus, FiSearch, FiPrinter, FiCheckCircle, FiShield, FiX, FiDownload } from 'react-icons/fi';
-import { QRCodeSVG } from 'qrcode.react';
+import React, { useState, useEffect, useMemo } from 'react';
+import Link from 'next/link';
+import {
+  FiAward,
+  FiFileText,
+  FiImage,
+  FiDownload,
+  FiEye,
+  FiSearch,
+  FiCheckCircle,
+  FiShield,
+  FiCalendar,
+  FiCopy,
+  FiCheck,
+  FiExternalLink,
+  FiSettings,
+  FiRefreshCw
+} from 'react-icons/fi';
 import { useNGO } from '@/context/NGOContext';
 
-export default function CertificatesPage() {
-  const { certificates, addCertificate, currentUser, settings } = useNGO();
-  const isAdmin = currentUser?.role === 'Admin';
+export default function PublicOrganizationCertificatesPage() {
+  const { currentUser } = useNGO();
+  const isAdmin = currentUser?.role === 'Admin' || currentUser?.role === 'admin';
 
-  const [searchNo, setSearchNo] = useState('');
-  const [showIssue, setShowIssue] = useState(false);
-  const [recipientName, setRecipientName] = useState('');
-  const [recipientId, setRecipientId] = useState('');
-  const [awardTitle, setAwardTitle] = useState('Certificate of Appreciation for Social Excellence');
-  const [eventOrWork, setEventOrWork] = useState('Shiksha Kranti - Child Literacy & Relief Campaign');
-  const [description, setDescription] = useState('In recognition of exemplary voluntary service, dedication, and active participation in community upliftment.');
+  const [documents, setDocuments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeCategory, setActiveCategory] = useState('all');
+  const [previewDoc, setPreviewDoc] = useState(null);
+  const [copiedId, setCopiedId] = useState('');
 
-  const [selectedCert, setSelectedCert] = useState(null);
-
-  const filteredCerts = certificates.filter(c => {
-    if (!searchNo) return true;
-    return (
-      c.certificateNo?.toLowerCase().includes(searchNo.toLowerCase()) ||
-      c.recipientName?.toLowerCase().includes(searchNo.toLowerCase()) ||
-      c.recipientId?.toLowerCase().includes(searchNo.toLowerCase())
-    );
-  });
-
-  const handleIssue = async (e) => {
-    e.preventDefault();
-    if (!recipientName || !awardTitle) return;
-    const res = await addCertificate({
-      recipientName,
-      recipientId,
-      awardTitle,
-      eventOrWork,
-      issueDate: new Date().toISOString().split('T')[0],
-      description
-    });
-    if (res.success) {
-      setSelectedCert(res.certificate);
-      setShowIssue(false);
-      setRecipientName('');
+  // Fetch organization verified certificates
+  const fetchCertificates = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch('/api/organization-certificates?status=Verified');
+      const data = await res.json();
+      if (data.success && data.documents) {
+        setDocuments(data.documents);
+      }
+    } catch (err) {
+      console.warn('Error fetching organization documents:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handlePrint = () => {
-    window.print();
+  useEffect(() => {
+    fetchCertificates();
+  }, []);
+
+  // Filtered documents
+  const filteredDocuments = useMemo(() => {
+    return documents.filter((doc) => {
+      if (activeCategory !== 'all' && doc.category !== activeCategory) {
+        return false;
+      }
+      if (!searchQuery.trim()) return true;
+      const q = searchQuery.toLowerCase();
+      return (
+        doc.title?.toLowerCase().includes(q) ||
+        doc.documentNumber?.toLowerCase().includes(q) ||
+        doc.issuingAuthority?.toLowerCase().includes(q) ||
+        doc.category?.toLowerCase().includes(q)
+      );
+    });
+  }, [documents, activeCategory, searchQuery]);
+
+  // Copy registration number
+  const handleCopy = (text) => {
+    navigator.clipboard.writeText(text);
+    setCopiedId(text);
+    setTimeout(() => setCopiedId(''), 2000);
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 py-12">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-6 border-b border-gray-200 no-print">
-          <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-red-700 text-xs font-bold mb-1 border border-red-200">
-              <FiAward className="w-3.5 h-3.5 text-red-600" />
-              <span>Recognition & Verification</span>
-            </div>
-            <h1 className="text-3xl font-extrabold text-black tracking-tight">
-              Certificates of Appreciation
-            </h1>
-            <p className="text-xs sm:text-sm text-black/80 mt-1">
-              Verify official NGO credentials, honors, and certificates with instantaneous QR authentication.
-            </p>
+    <div className="min-h-screen bg-slate-50/70 py-10 sm:py-14 text-slate-800">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+        {/* Top Hero Section */}
+        <div className="text-center max-w-3xl mx-auto space-y-3">
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-red-50 text-red-700 text-xs font-bold border border-red-200 shadow-2xs">
+            <FiAward className="w-3.5 h-3.5 text-red-600" />
+            <span>Government Accreditations &amp; Legal Compliance</span>
           </div>
 
-          <div className="flex gap-2">
+          <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+            Organization Statutory Certificates &amp; Documents
+          </h1>
+
+          <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
+            Transparent and verifiable legal documents establishing Indian Youth Foundation (Bharatiya Yuva Kranti) as a registered, 100% compliant, and tax-exempt national youth welfare movement.
+          </p>
+
+          {/* Accreditations Trust Badges Strip */}
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-2 text-xs font-bold text-slate-700">
+            <div className="flex items-center gap-1.5 bg-white px-3.5 py-1.5 rounded-full border border-slate-200 shadow-2xs">
+              <FiCheckCircle className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Section 12A Perpetual Tax Exemption</span>
+            </div>
+
+            <div className="flex items-center gap-1.5 bg-white px-3.5 py-1.5 rounded-full border border-slate-200 shadow-2xs">
+              <FiShield className="w-3.5 h-3.5 text-blue-600" />
+              <span>Section 80G (50% Donor Tax Relief)</span>
+            </div>
+
+            <div className="flex items-center gap-1.5 bg-white px-3.5 py-1.5 rounded-full border border-slate-200 shadow-2xs">
+              <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+              <span>NITI Aayog Darpan Verified</span>
+            </div>
+
             {isAdmin && (
-              <button
-                onClick={() => setShowIssue(true)}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-md transition cursor-pointer"
+              <Link
+                href="/dashboard/certificates"
+                className="flex items-center gap-1.5 bg-red-50 text-red-700 hover:bg-red-100 px-3.5 py-1.5 rounded-full border border-red-200 font-bold transition shadow-2xs"
               >
-                <FiPlus className="w-4 h-4" />
-                <span>Issue New Certificate</span>
-              </button>
+                <FiSettings className="w-3.5 h-3.5" />
+                <span>Upload &amp; Manage Documents (Admin) →</span>
+              </Link>
             )}
           </div>
         </div>
 
-        {/* Certificate Modal / View */}
-        {selectedCert && (
-          <div className="mb-12">
-            <div className="flex items-center justify-between mb-4 no-print">
-              <span className="text-emerald-700 font-bold text-sm flex items-center gap-1.5">
-                <FiCheckCircle className="w-4 h-4 text-emerald-600" />
-                <span>Verified Certificate Ready to Print / Export</span>
-              </span>
-              <div className="flex gap-2">
-                <button
-                  onClick={handlePrint}
-                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-xl shadow-md cursor-pointer flex items-center gap-1.5 transition"
-                >
-                  <FiPrinter className="w-3.5 h-3.5" />
-                  <span>Print / Save as PDF</span>
-                </button>
-                <button
-                  onClick={() => setSelectedCert(null)}
-                  className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-black text-xs font-bold rounded-xl transition cursor-pointer"
-                >
-                  Close Preview
-                </button>
-              </div>
-            </div>
-
-            {/* OFFICIAL PRINTABLE CERTIFICATE */}
-            <div className="max-w-4xl mx-auto bg-white p-10 sm:p-14 rounded-3xl border-8 border-double border-red-600 shadow-2xl text-center relative print-card-container">
-              <div className="border border-red-200 p-8 rounded-2xl bg-red-50/10">
-                {/* Header */}
-                <div className="flex items-center justify-center gap-3 mb-2">
-                  <div className="w-12 h-12 rounded-xl bg-red-600 text-white flex items-center justify-center font-black text-xl shadow-md">
-                    IYF
-                  </div>
-                  <div>
-                    <h2 className="text-2xl sm:text-3xl font-black text-black tracking-tight">
-                      {settings?.ngoName || 'Indian Youth Foundation'}
-                    </h2>
-                    <div className="text-[10px] text-red-700 font-bold uppercase tracking-widest mt-0.5">
-                      12A & 80G Certified Non-Governmental Organization • Reg No: {settings?.registrationNo}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="my-6">
-                  <span className="text-xs uppercase font-serif tracking-widest text-red-800 font-extrabold border-b-2 border-red-500 pb-1">
-                    CERTIFICATE OF APPRECIATION & MERIT
-                  </span>
-                  <div className="text-xs font-mono text-gray-500 mt-2.5 font-bold">
-                    Certificate No: {selectedCert.certificateNo}
-                  </div>
-                </div>
-
-                {/* Recipient */}
-                <p className="text-xs text-black/80">This certificate is proudly and honorably conferred upon:</p>
-                <h3 className="text-2xl sm:text-3xl font-black text-red-600 my-2.5 font-serif tracking-wide">
-                  {selectedCert.recipientName}
-                </h3>
-                {selectedCert.recipientId && (
-                  <span className="text-xs font-mono text-gray-500 font-bold block mb-2">
-                    Member ID: {selectedCert.recipientId}
-                  </span>
-                )}
-
-                <div className="max-w-xl mx-auto my-6 text-xs sm:text-sm text-black leading-relaxed text-justify">
-                  <p>
-                    In recognition of exemplary commitment, tireless voluntary service, and remarkable contribution towards <strong>"{selectedCert.awardTitle}"</strong>.
-                  </p>
-                  <p className="mt-2 text-center text-xs text-gray-500">
-                    The foundation congratulates you and wishes you success in all future social and national endeavors.
-                  </p>
-                </div>
-
-                {/* Footer QR & Signatures */}
-                <div className="mt-8 pt-6 border-t border-red-200 flex items-end justify-between text-xs">
-                  <div className="flex items-center gap-3 text-left">
-                    <QRCodeSVG
-                      value={`https://bharatiyayuvakranti.org/verify/certificate/${selectedCert.certificateNo}`}
-                      size={70}
-                    />
-                    <div className="text-[10px] text-gray-500">
-                      <div className="font-bold text-black">QR Code Verified</div>
-                      <div>Issue Date: {selectedCert.issueDate}</div>
-                    </div>
-                  </div>
-
-                  <div className="text-center">
-                    <div className="font-serif italic text-black text-sm font-semibold">Dr. Vikram Sharma</div>
-                    <div className="border-t border-gray-400 pt-0.5 text-[11px] font-bold text-black">
-                      National President & Founder
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Issue Certificate Modal */}
-        {showIssue && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full border border-gray-200 shadow-2xl relative">
-              <button 
-                onClick={() => setShowIssue(false)}
-                className="absolute top-4 right-4 p-1.5 rounded-full text-gray-400 hover:text-black hover:bg-gray-100 transition"
-              >
-                <FiX className="w-5 h-5" />
-              </button>
-              <h3 className="font-extrabold text-lg text-black mb-4">Issue Appreciation Certificate</h3>
-              <form onSubmit={handleIssue} className="space-y-4 text-xs">
-                <div>
-                  <label className="font-bold text-black block mb-1">Recipient Name *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Rahul Sharma"
-                    value={recipientName}
-                    onChange={(e) => setRecipientName(e.target.value)}
-                    className="w-full px-3.5 py-2.5 border rounded-xl border-gray-300 focus:outline-red-500 font-medium text-black"
-                  />
-                </div>
-                <div>
-                  <label className="font-bold text-black block mb-1">Membership ID (Optional)</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. BYK-MEM-101"
-                    value={recipientId}
-                    onChange={(e) => setRecipientId(e.target.value)}
-                    className="w-full px-3.5 py-2.5 border rounded-xl border-gray-300 focus:outline-red-500 font-medium text-black"
-                  />
-                </div>
-                <div>
-                  <label className="font-bold text-black block mb-1">Award Honor Title *</label>
-                  <input
-                    type="text"
-                    required
-                    value={awardTitle}
-                    onChange={(e) => setAwardTitle(e.target.value)}
-                    className="w-full px-3.5 py-2.5 border rounded-xl border-gray-300 focus:outline-red-500 font-medium text-black"
-                  />
-                </div>
-                <div>
-                  <label className="font-bold text-black block mb-1">Project / Campaign Name</label>
-                  <input
-                    type="text"
-                    value={eventOrWork}
-                    onChange={(e) => setEventOrWork(e.target.value)}
-                    className="w-full px-3.5 py-2.5 border rounded-xl border-gray-300 focus:outline-red-500 font-medium text-black"
-                  />
-                </div>
-                <div>
-                  <label className="font-bold text-black block mb-1">Commendation Text</label>
-                  <textarea
-                    rows={2}
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    className="w-full px-3.5 py-2.5 border rounded-xl border-gray-300 focus:outline-red-500 font-medium text-black"
-                  />
-                </div>
-                <div className="flex justify-end gap-3 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setShowIssue(false)}
-                    className="px-4 py-2.5 text-gray-600 font-semibold hover:bg-gray-100 rounded-xl transition cursor-pointer"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl shadow-md transition cursor-pointer"
-                  >
-                    Issue Certificate
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-
-        {/* Search Bar */}
-        <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm mb-8 no-print">
-          <div className="relative">
-            <FiSearch className="absolute left-4 top-3.5 text-gray-400 w-5 h-5" />
+        {/* Filter and Search Bar */}
+        <div className="bg-white p-4 rounded-3xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+          {/* Search Box */}
+          <div className="relative w-full md:max-w-md">
+            <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
             <input
               type="text"
-              placeholder="Search by Certificate Number (e.g. CERT-2026-001) or Recipient Name..."
-              value={searchNo}
-              onChange={(e) => setSearchNo(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 focus:outline-red-500 text-sm font-medium text-black"
+              placeholder="Search by certificate title, order number, or issuing ministry..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full text-xs pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-red-500 text-slate-900"
             />
+          </div>
+
+          {/* Category Tabs */}
+          <div className="flex items-center gap-1.5 overflow-x-auto text-xs font-bold pb-1 md:pb-0">
+            {[
+              { key: 'all', label: `All Accreditations (${documents.length})` },
+              { key: '12A Registration', label: '12A Order' },
+              { key: '80G Exemption', label: '80G Tax Exemption' },
+              { key: 'NITI Aayog Darpan', label: 'NITI Aayog' },
+              { key: 'Trust Registration', label: 'Trust Deed' },
+              { key: 'CSR-1 Filing', label: 'CSR-1 Registration' },
+              { key: 'PAN Card', label: 'PAN Card' }
+            ].map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveCategory(tab.key)}
+                className={`px-3 py-1.5 rounded-xl transition cursor-pointer whitespace-nowrap text-xs font-black ${
+                  activeCategory === tab.key
+                    ? 'bg-red-600 text-white shadow-xs'
+                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Certificates List */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 no-print">
-          {filteredCerts.map((c) => (
-            <div
-              key={c._id || c.certificateNo}
-              className="bg-white rounded-3xl p-6 border border-gray-200 hover:border-red-300 hover:shadow-lg transition-all flex flex-col justify-between group"
-            >
-              <div>
-                <div className="flex justify-between items-center text-xs mb-2">
-                  <span className="font-mono font-bold text-red-600 bg-red-50 px-2.5 py-1 rounded-lg border border-red-200">
-                    {c.certificateNo}
-                  </span>
-                  <span className="text-gray-400 font-medium">{c.issueDate}</span>
+        {/* Documents Showcase Grid */}
+        {loading ? (
+          <div className="bg-white p-16 rounded-3xl border border-slate-200 text-center space-y-2 shadow-sm">
+            <FiRefreshCw className="w-6 h-6 animate-spin mx-auto text-red-600" />
+            <p className="text-xs text-slate-500">Retrieving official organization certificates...</p>
+          </div>
+        ) : filteredDocuments.length === 0 ? (
+          <div className="bg-white p-12 rounded-3xl border border-slate-200 text-center space-y-2 shadow-sm">
+            <FiShield className="w-8 h-8 mx-auto text-slate-400" />
+            <h3 className="font-extrabold text-sm text-slate-800">No Certificates Found</h3>
+            <p className="text-xs text-slate-500">Try clearing your search query or selecting a different category tab.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredDocuments.map((doc) => {
+              const isPdf = doc.fileType === 'pdf' || /\.pdf(\?|$)/i.test(doc.fileUrl);
+              const issueDateFormatted = doc.issueDate
+                ? new Date(doc.issueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+                : 'Verified';
+
+              return (
+                <div
+                  key={doc._id || doc.id}
+                  className="bg-white rounded-3xl p-6 border border-slate-200 hover:border-red-300 hover:shadow-lg transition-all duration-300 flex flex-col justify-between group"
+                >
+                  <div className="space-y-4">
+                    {/* Header with Icon and Category badge */}
+                    <div className="flex items-start justify-between gap-3">
+                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-xs ${
+                        isPdf ? 'bg-red-50 text-red-600 border border-red-200' : 'bg-blue-50 text-blue-600 border border-blue-200'
+                      }`}>
+                        {isPdf ? <FiFileText className="w-6 h-6" /> : <FiImage className="w-6 h-6" />}
+                      </div>
+
+                      <div className="flex flex-col items-end gap-1">
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-slate-100 text-slate-700">
+                          {doc.category}
+                        </span>
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600">
+                          <FiCheckCircle className="w-3 h-3" />
+                          <span>Govt. Verified</span>
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Title & Description */}
+                    <div>
+                      <h3 className="text-base font-black text-slate-900 group-hover:text-red-600 transition">
+                        {doc.title}
+                      </h3>
+                      {doc.description && (
+                        <p className="text-xs text-slate-600 mt-1.5 leading-relaxed line-clamp-2">
+                          {doc.description}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Order / Registration Number Box with Copy */}
+                    <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-1">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                        Official Order / Registration No.
+                      </span>
+                      <div className="flex items-center justify-between font-mono font-bold text-red-600 text-xs">
+                        <span className="truncate max-w-[220px]" title={doc.documentNumber}>
+                          {doc.documentNumber || 'REG/2021/DEL/492'}
+                        </span>
+                        {doc.documentNumber && (
+                          <button
+                            type="button"
+                            onClick={() => handleCopy(doc.documentNumber)}
+                            className="p-1 text-slate-400 hover:text-slate-800 transition cursor-pointer"
+                            title="Copy Number"
+                          >
+                            {copiedId === doc.documentNumber ? (
+                              <FiCheck className="w-3.5 h-3.5 text-emerald-600" />
+                            ) : (
+                              <FiCopy className="w-3.5 h-3.5" />
+                            )}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Authority and Date Details */}
+                    <div className="text-[11px] text-slate-500 space-y-1 pt-1 border-t border-slate-100">
+                      <div className="flex items-center justify-between">
+                        <span>Issuing Body:</span>
+                        <strong className="text-slate-800 truncate max-w-[170px]" title={doc.issuingAuthority}>
+                          {doc.issuingAuthority || 'Govt. of India'}
+                        </strong>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span>Issue Date:</span>
+                        <strong className="text-slate-800">{issueDateFormatted}</strong>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span>Legal Validity:</span>
+                        <strong className="text-emerald-700">{doc.validity || 'Perpetual'}</strong>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="mt-5 pt-4 border-t border-slate-100 grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setPreviewDoc(doc)}
+                      className="w-full py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs flex items-center justify-center gap-1.5 transition cursor-pointer"
+                    >
+                      <FiEye className="w-3.5 h-3.5 text-slate-600" />
+                      <span>Inspect PDF</span>
+                    </button>
+
+                    <a
+                      href={doc.fileUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      download
+                      className="w-full py-2.5 px-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-red-600/20 transition cursor-pointer"
+                    >
+                      <FiDownload className="w-3.5 h-3.5" />
+                      <span>Download</span>
+                    </a>
+                  </div>
                 </div>
-                <h3 className="font-extrabold text-base text-black">{c.recipientName}</h3>
-                <div className="text-xs font-bold text-red-700 mt-1">{c.awardTitle}</div>
-                <p className="text-xs text-black/80 mt-2 leading-relaxed">{c.description}</p>
+              );
+            })}
+          </div>
+        )}
+
+        {/* High-Resolution Document Inspection Modal */}
+        {previewDoc && (
+          <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4">
+            <div className="bg-white rounded-3xl max-w-4xl w-full p-6 shadow-2xl space-y-4 max-h-[92vh] flex flex-col animate-fadeIn">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+                <div>
+                  <h3 className="font-black text-slate-900 text-base">{previewDoc.title}</h3>
+                  <span className="text-xs text-red-600 font-mono font-bold">
+                    Order No: {previewDoc.documentNumber} • {previewDoc.category}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <a
+                    href={previewDoc.fileUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    download
+                    className="px-3.5 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-red-600/20 cursor-pointer"
+                  >
+                    <FiDownload className="w-3.5 h-3.5" />
+                    <span>Download Original Document</span>
+                  </a>
+                  <button
+                    onClick={() => setPreviewDoc(null)}
+                    className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center text-sm font-bold cursor-pointer"
+                  >
+                    ✕
+                  </button>
+                </div>
               </div>
 
-              <div className="mt-5 pt-4 border-t border-gray-100 flex items-center justify-between text-xs">
-                <span className="text-gray-500 font-mono text-[11px]">{c.recipientId || 'Honored Volunteer'}</span>
-                <button
-                  onClick={() => setSelectedCert(c)}
-                  className="text-red-600 font-bold hover:text-red-700 cursor-pointer flex items-center gap-1 transition"
-                >
-                  <span>View & Print Certificate</span>
-                  <span>→</span>
-                </button>
+              {/* Viewer Body */}
+              <div className="flex-1 bg-slate-100 rounded-2xl overflow-hidden p-2 flex items-center justify-center min-h-[420px]">
+                {previewDoc.fileType === 'pdf' || /\.pdf(\?|$)/i.test(previewDoc.fileUrl) ? (
+                  <iframe
+                    src={previewDoc.fileUrl}
+                    title={previewDoc.title}
+                    className="w-full h-[550px] rounded-xl border border-slate-300"
+                  />
+                ) : (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img
+                    src={previewDoc.fileUrl}
+                    alt={previewDoc.title}
+                    className="max-h-[550px] w-auto object-contain rounded-xl shadow-md"
+                  />
+                )}
               </div>
             </div>
-          ))}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

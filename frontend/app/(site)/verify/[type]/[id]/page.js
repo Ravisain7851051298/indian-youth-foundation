@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { FiCheckCircle, FiShield, FiXCircle, FiAward, FiHeart, FiUser, FiArrowLeft } from 'react-icons/fi';
 import { useNGO } from '@/context/NGOContext';
+import { getContentImageUrl } from '@/lib/authApi';
 
 export default function VerificationPage() {
   const params = useParams();
@@ -15,28 +16,37 @@ export default function VerificationPage() {
   let title = '';
   let details = null;
 
-  if (type === 'member' || type === 'letter') {
-    title = type === 'member' ? 'Official Member ID Card Verification' : 'Official Appointment Letter Verification';
-    const found = members.find(m => m.memberId === id || m._id === id);
-    if (found && found.status === 'active') {
+  if (type === 'member' || type === 'letter' || type === 'volunteer') {
+    title = type === 'volunteer' 
+      ? 'Official Volunteer ID Card Verification' 
+      : type === 'member' 
+        ? 'Official Member ID Card Verification' 
+        : 'Official Appointment Letter Verification';
+    const found = members.find(m => m.memberId === id || m.volunteerId === id || m._id === id);
+    if (found && (found.status === 'active' || found.status === 'approved')) {
       verified = true;
       details = (
         <div className="space-y-3 text-xs text-left bg-slate-50 p-5 rounded-2xl border border-slate-200">
           <div className="flex items-center gap-3.5 mb-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={found.photoUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'}
+              src={getContentImageUrl(found.photoUrl) || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'}
               alt={found.name}
               className="w-14 h-14 rounded-full object-cover border-2 border-red-500 shadow-xs"
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150';
+              }}
             />
             <div>
               <h4 className="font-extrabold text-base text-black">{found.name}</h4>
-              <span className="text-red-600 font-bold block">{found.designation}</span>
-              <div className="font-mono text-slate-500 text-[11px] font-bold">{found.memberId}</div>
+              <span className="text-red-600 font-bold block">{found.designation || (type === 'volunteer' ? 'Registered Volunteer' : 'Member')}</span>
+              <div className="font-mono text-slate-500 text-[11px] font-bold">{found.volunteerId || found.memberId}</div>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-2.5 text-slate-700 pt-1 border-t border-slate-200/60">
-            <div>Blood Group: <strong className="text-red-600 font-bold">{found.bloodGroup}</strong></div>
-            <div>Role: <strong className="text-black font-bold">{found.role}</strong></div>
+            <div>Blood Group: <strong className="text-red-600 font-bold">{found.bloodGroup || 'O+'}</strong></div>
+            <div>Role: <strong className="text-black font-bold">{found.role || (type === 'volunteer' ? 'Active Volunteer' : 'Member')}</strong></div>
             <div>State: <strong className="text-black">{found.state || 'Rajasthan'}</strong></div>
             <div>Status: <strong className="text-emerald-600 font-bold">Authorized &amp; Active</strong></div>
           </div>
@@ -70,8 +80,9 @@ export default function VerificationPage() {
           <div className="text-2xl font-black text-emerald-700">₹{Number(found.amount).toLocaleString('en-IN')}</div>
           <div className="text-slate-700">Donor PAN: <strong className="font-mono text-black">{found.panNumber || 'NA'}</strong></div>
           <div className="text-slate-700">Cause: <strong className="text-black">{found.campaignTitle}</strong></div>
-          <div className="text-[11px] text-emerald-800 font-bold pt-1 border-t border-emerald-200">
-            ✓ Genuine digital tax receipt eligible under Section 80G of Income Tax Act
+          <div className="text-[11px] text-emerald-800 font-bold pt-1 border-t border-emerald-200 flex items-center gap-1.5">
+            <FiCheckCircle className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+            <span>Genuine digital tax receipt eligible under Section 80G of Income Tax Act</span>
           </div>
         </div>
       );

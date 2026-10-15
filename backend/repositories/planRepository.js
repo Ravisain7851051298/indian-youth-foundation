@@ -15,7 +15,7 @@ class PlanRepository {
   }
 
   async updateById(id, data) {
-    return MembershipPlan.findByIdAndUpdate(id, data, { new: true });
+    return MembershipPlan.findByIdAndUpdate(id, data, { returnDocument: 'after' });
   }
 
   async deleteById(id) {

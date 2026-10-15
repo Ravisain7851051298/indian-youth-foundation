@@ -16,6 +16,11 @@ const userSchema = new mongoose.Schema({
     default: 'active' 
   },
   memberId: { type: String, unique: true, sparse: true },
+  volunteerId: { type: String, sparse: true },
+  isMember: { type: Boolean, default: false },
+  isVolunteer: { type: Boolean, default: false },
+  volunteerWing: { type: String, default: 'Grassroots Social Welfare' },
+  volunteerStatus: { type: String, default: 'active' },
   designation: { type: String, default: 'Applicant - Member Wing' },
   bloodGroup: { type: String, default: 'O+' },
   dob: { type: String, default: '2000-01-01' },

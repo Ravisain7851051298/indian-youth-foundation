@@ -248,14 +248,10 @@ export default function VolunteerManagement() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Top Header Card */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white p-4 rounded-b-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-red-700 text-xs font-bold mb-2">
-            <FiShield className="w-3.5 h-3.5" />
-            <span>Grassroots Field Operations</span>
-          </div>
           <h1 className="text-2xl font-black text-black tracking-tight">Volunteer Applications</h1>
           <p className="text-xs text-slate-700 mt-1">
             Audit youth volunteer credentials, verify national ID proofs, and authorize official volunteer badges.
@@ -274,7 +270,7 @@ export default function VolunteerManagement() {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="bg-white mx-3 p-1 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="relative flex-1 w-full max-w-md">
           <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
           <input
@@ -296,19 +292,17 @@ export default function VolunteerManagement() {
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap cursor-pointer ${
-                activeTab === tab.key
-                  ? "bg-red-600 text-white shadow-md shadow-red-600/20"
-                  : "bg-slate-100 text-black hover:bg-red-50 hover:text-red-600"
-              }`}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap cursor-pointer ${activeTab === tab.key
+                ? "bg-red-600 text-white shadow-md shadow-red-600/20"
+                : "bg-slate-100 text-black hover:bg-red-50 hover:text-red-600"
+                }`}
             >
               <span>{tab.label}</span>
               <span
-                className={`px-1.5 py-0.2 rounded-full text-[10px] ${
-                  activeTab === tab.key
-                    ? "bg-white/20 text-white"
-                    : "bg-slate-200 text-black"
-                }`}
+                className={`px-1.5 py-0.2 rounded-full text-[10px] ${activeTab === tab.key
+                  ? "bg-white/20 text-white"
+                  : "bg-slate-200 text-black"
+                  }`}
               >
                 {tab.count}
               </span>
@@ -318,7 +312,7 @@ export default function VolunteerManagement() {
       </div>
 
       {/* Table Container */}
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="bg-white mx-3 rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
         {loading ? (
           <div className="p-12 text-center text-slate-700 text-xs space-y-2">
             <FiRefreshCw className="w-6 h-6 animate-spin mx-auto text-red-600" />
@@ -339,13 +333,13 @@ export default function VolunteerManagement() {
             <table className="w-full text-left text-xs">
               <thead className="bg-slate-50 border-b border-slate-200 text-black font-extrabold">
                 <tr>
-                  <th className="py-3 px-4">Volunteer</th>
-                  <th className="py-3 px-4">Skills &amp; Motivation</th>
-                  <th className="py-3 px-4">Availability</th>
-                  <th className="py-3 px-4">ID Proof Document</th>
-                  <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4">Date</th>
-                  <th className="py-3 px-4 text-right">Actions</th>
+                  <th className="py-3 px-3.5">Volunteer</th>
+                  <th className="py-3 px-3.5">Skills &amp; Motivation</th>
+                  <th className="py-3 px-3.5">Availability</th>
+                  <th className="py-3 px-3.5">ID Proof Document</th>
+                  <th className="py-3 px-3.5">Status</th>
+                  <th className="py-3 px-3.5">Date</th>
+                  <th className="py-3 px-3.5 text-right sticky right-0 bg-slate-50 z-20 shadow-[-6px_0_10px_-2px_rgba(0,0,0,0.06)]">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-black">
@@ -364,22 +358,21 @@ export default function VolunteerManagement() {
                   const assignedId = v.assignedVolunteerId || v.user?.memberId;
 
                   return (
-                    <tr key={id} className="hover:bg-slate-50/80 transition">
-                      <td className="py-3.5 px-4">
-                        <div className="font-extrabold text-black text-sm flex items-center gap-1.5">
+                    <tr key={id} className="group hover:bg-slate-50/80 transition">
+                      <td className="py-3 px-3.5">
+                        <div className="font-extrabold text-black text-sm flex flex-row items-left gap-1.5">
                           <span>{name}</span>
-                          {isApproved && assignedId && (
+                          {/* {isApproved && assignedId && (
                             <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 font-bold border border-blue-200">
                               {assignedId}
                             </span>
-                          )}
+                          )} */}
                         </div>
-                        <div className="text-[11px] text-slate-600 flex items-center gap-2 mt-0.5">
+                        <div className="text-[11px] text-slate-600 flex flex-col items-left gap-2 mt-0.5">
                           <span className="flex items-center gap-1">
                             <FiMail className="w-3 h-3 text-slate-400" />
                             {email}
                           </span>
-                          <span>•</span>
                           <span className="flex items-center gap-1">
                             <FiPhone className="w-3 h-3 text-slate-400" />
                             {phone}
@@ -387,7 +380,7 @@ export default function VolunteerManagement() {
                         </div>
                       </td>
 
-                      <td className="py-3.5 px-4 max-w-xs">
+                      <td className="py-3 px-3.5 max-w-[180px]">
                         <div className="font-bold text-black line-clamp-1">{skillsDisplay}</div>
                         {(v.motivation || v.whyJoin) && (
                           <div className="text-[11px] text-slate-600 line-clamp-1 mt-0.5" title={v.motivation || v.whyJoin}>
@@ -401,14 +394,14 @@ export default function VolunteerManagement() {
                         )}
                       </td>
 
-                      <td className="py-3.5 px-4 text-slate-800 font-semibold whitespace-nowrap">
+                      <td className="py-3 px-3.5 text-slate-800 font-semibold whitespace-nowrap">
                         <span className="inline-flex items-center gap-1">
                           <FiClock className="w-3 h-3 text-slate-400" />
                           {v.availability || "Weekends / Flexible"}
                         </span>
                       </td>
 
-                      <td className="py-3.5 px-4 whitespace-nowrap">
+                      <td className="py-3 px-3.5 whitespace-nowrap">
                         {proof ? (
                           <button
                             onClick={() => setSelectedProof(getContentImageUrl(proof))}
@@ -426,16 +419,15 @@ export default function VolunteerManagement() {
                         )}
                       </td>
 
-                      <td className="py-3.5 px-4 whitespace-nowrap">
+                      <td className="py-3 px-3.5 whitespace-nowrap">
                         <div className="space-y-1">
                           <span
-                            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase ${
-                              isApproved
-                                ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
-                                : isRejected
+                            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase ${isApproved
+                              ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
+                              : isRejected
                                 ? "bg-rose-100 text-rose-800 border border-rose-200"
                                 : "bg-amber-100 text-amber-800 border border-amber-200"
-                            }`}
+                              }`}
                           >
                             {isApproved && <FiCheck className="w-3 h-3" />}
                             {isRejected && <FiX className="w-3 h-3" />}
@@ -451,18 +443,18 @@ export default function VolunteerManagement() {
                         </div>
                       </td>
 
-                      <td className="py-3.5 px-4 text-slate-700 whitespace-nowrap">
+                      <td className="py-3 px-3.5 text-slate-700 whitespace-nowrap font-medium">
                         {v.createdAt ? new Date(v.createdAt).toLocaleDateString("en-IN") : "-"}
                       </td>
 
-                      <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                      <td className="py-3 px-3.5 text-right whitespace-nowrap sticky right-0 bg-white group-hover:bg-slate-50 z-10 shadow-[-6px_0_10px_-2px_rgba(0,0,0,0.06)]">
                         <div className="flex items-center justify-end gap-1.5">
                           {isPending && (
                             <>
                               <button
                                 onClick={() => handleApprove(id)}
                                 disabled={processingId === id}
-                                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] transition cursor-pointer disabled:opacity-50 shadow-sm"
+                                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] transition cursor-pointer disabled:opacity-50 shadow-xs"
                               >
                                 <FiCheck className="w-3.5 h-3.5" />
                                 <span>{processingId === id ? "Approving..." : "Approve"}</span>
@@ -470,7 +462,7 @@ export default function VolunteerManagement() {
                               <button
                                 onClick={() => setRejectModalItem(v)}
                                 disabled={processingId === id}
-                                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-[11px] transition cursor-pointer disabled:opacity-50 shadow-sm"
+                                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-[11px] transition cursor-pointer disabled:opacity-50 shadow-xs"
                               >
                                 <FiX className="w-3.5 h-3.5" />
                                 <span>Reject</span>
@@ -486,21 +478,21 @@ export default function VolunteerManagement() {
                                 setCertTitle("Certificate of Appreciation for Dedicated Volunteer Service");
                                 setCertReason("In recognition of outstanding dedication, volunteer service, and societal leadership.");
                               }}
-                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold text-[11px] transition cursor-pointer shadow-sm"
+                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold text-[11px] transition cursor-pointer shadow-xs"
                               title="Offer Official Certificate"
                             >
                               <FiAward className="w-3.5 h-3.5" />
-                              <span>Offer Certificate</span>
+                              <span>Certificate</span>
                             </button>
                           )}
 
                           <button
                             onClick={() => setDeleteModalItem(v)}
                             disabled={processingId === id}
-                            title="Delete Volunteer Application & ID Documents"
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer border border-transparent hover:border-rose-200"
+                            title="Delete Volunteer Application"
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer"
                           >
-                            <FiTrash2 className="w-3.5 h-3.5" />
+                            <FiTrash2 className="w-4 h-4" />
                           </button>
                         </div>
                       </td>
@@ -515,11 +507,11 @@ export default function VolunteerManagement() {
 
       {/* ID Proof Preview Modal */}
       {selectedProof && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/75 backdrop-blur-xs z-50 flex items-center justify-center p-4"
           onClick={() => setSelectedProof(null)}
         >
-          <div 
+          <div
             className="bg-white rounded-3xl p-6 max-w-2xl w-full border border-slate-200 shadow-2xl relative text-black"
             onClick={(e) => e.stopPropagation()}
           >
@@ -579,11 +571,11 @@ export default function VolunteerManagement() {
 
       {/* Reject Modal */}
       {rejectModalItem && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4"
           onClick={() => setRejectModalItem(null)}
         >
-          <div 
+          <div
             className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full border border-slate-200 shadow-2xl text-center space-y-4 text-black"
             onClick={(e) => e.stopPropagation()}
           >
@@ -625,11 +617,11 @@ export default function VolunteerManagement() {
 
       {/* Delete Confirmation Modal */}
       {deleteModalItem && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4"
           onClick={() => setDeleteModalItem(null)}
         >
-          <div 
+          <div
             className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full border border-slate-200 shadow-2xl text-center space-y-4 text-black"
             onClick={(e) => e.stopPropagation()}
           >
@@ -668,11 +660,11 @@ export default function VolunteerManagement() {
 
       {/* Issue Certificate Modal */}
       {certModalItem && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4"
           onClick={() => setCertModalItem(null)}
         >
-          <div 
+          <div
             className="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full border border-slate-200 shadow-2xl space-y-4 text-black"
             onClick={(e) => e.stopPropagation()}
           >
@@ -737,7 +729,7 @@ export default function VolunteerManagement() {
                   Instant Minting &amp; Delivery:
                 </p>
                 <p className="text-[11px] text-slate-600">
-                  A verifiable certificate with digital hash and QR code will be generated and made available on the volunteer's profile and sent to their email.
+                  A verifiable certificate with digital hash and QR code will be generated and made available on the volunteer&apos;s profile and sent to their email.
                 </p>
               </div>
 

@@ -24,6 +24,29 @@ class MemberService {
     return userSafe;
   }
 
+  async generateUniqueMemberId() {
+    const currentYear = new Date().getFullYear();
+    const prefix = `BYK-MEM-${currentYear}-`;
+    const users = await userRepository.find({ memberId: new RegExp(`^${prefix}`) });
+    let maxSeq = 0;
+    for (const u of users) {
+      if (u.memberId) {
+        const match = u.memberId.match(/(\d+)$/);
+        if (match) {
+          const num = parseInt(match[1], 10);
+          if (!isNaN(num) && num > maxSeq) maxSeq = num;
+        }
+      }
+    }
+    let nextSeq = maxSeq + 1;
+    let candidate = `${prefix}${String(nextSeq).padStart(4, '0')}`;
+    while (await userRepository.findByMemberId(candidate)) {
+      nextSeq++;
+      candidate = `${prefix}${String(nextSeq).padStart(4, '0')}`;
+    }
+    return candidate;
+  }
+
   async verifyMember(id, verificationData) {
     const user = await userRepository.findById(id);
     if (!user) throw new Error('Member not found');
@@ -31,8 +54,7 @@ class MemberService {
     const { feePaid, feeAmount, designation } = verificationData;
     user.status = 'active';
     if (!user.memberId) {
-      const memberSeq = await userRepository.count({ role: user.role || 'Member', status: 'active' });
-      user.memberId = `BYK-MEM-2026-${String(memberSeq + 1).padStart(4, '0')}`;
+      user.memberId = await this.generateUniqueMemberId();
     }
     if (feePaid !== undefined) user.feePaid = feePaid;
     if (feeAmount !== undefined) user.feeAmount = Number(feeAmount);

@@ -10,6 +10,7 @@ import {
 } from 'react-icons/fi';
 import { useEffect } from 'react';
 import { useNGO } from '@/context/NGOContext';
+import { getContentImageUrl } from '@/lib/authApi';
 
 export default function AppointmentLetterPage() {
   const { currentUser, settings, refreshUser } = useNGO();
@@ -99,9 +100,13 @@ export default function AppointmentLetterPage() {
               <div className="flex items-center justify-center gap-3 mb-2">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={settings?.logoUrl || 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=120'}
+                  src={getContentImageUrl(settings?.logoUrl) || 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=120'}
                   alt="Trust Logo"
                   className="w-12 h-12 rounded-full object-cover border border-red-500"
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=120';
+                  }}
                 />
                 <div className="text-left">
                   <h1 className="text-xl sm:text-2xl font-black text-red-600 tracking-wide leading-tight">
@@ -179,9 +184,13 @@ export default function AppointmentLetterPage() {
               <div className="text-center">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={settings?.officialSealUrl || 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=200'}
+                  src={getContentImageUrl(settings?.officialSealUrl) || 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=200'}
                   alt="Official Seal"
                   className="w-16 h-16 object-contain mx-auto"
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=200';
+                  }}
                 />
                 <span className="text-[10px] font-bold text-black uppercase tracking-wider mt-1 block">
                   Official Seal of the Trust
@@ -192,14 +201,20 @@ export default function AppointmentLetterPage() {
               <div className="text-center">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={settings?.presidentSignatureUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200'}
+                  src={getContentImageUrl(settings?.presidentSignatureUrl) || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200'}
                   alt="President Signature"
                   className="h-10 object-contain mx-auto"
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200';
+                  }}
                 />
                 <div className="mt-1">
-                  <h4 className="text-xs font-black text-black">Dr. Vikram Sharma</h4>
-                  <p className="text-[10px] text-black font-bold">National President &amp; Founder</p>
-                  <p className="text-[9px] text-black font-medium">Indian Youth Foundation</p>
+                  <h4 className="text-xs font-black text-black">
+                    {settings?.presidentName || 'Ravi Saini (National President & Trustee)'}
+                  </h4>
+                  <p className="text-[10px] text-black font-bold">National President &amp; Trustee</p>
+                  <p className="text-[9px] text-black font-medium">{settings?.ngoName || 'Indian Youth Foundation'}</p>
                 </div>
               </div>
             </div>

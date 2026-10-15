@@ -1,28 +1,62 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FiUser, FiSave, FiCheckCircle, FiAlertCircle, FiCamera, FiPhone, FiMapPin, FiTrash2 } from 'react-icons/fi';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNGO } from '@/context/NGOContext';
-import api from '@/services/api';
+import { updateUserProfile, uploadAndUpdateAvatar } from '@/store/authSlice';
+import { getContentImageUrl } from '@/lib/authApi';
 
 export default function ProfileSettingsPage() {
-  const { currentUser, setCurrentUser, uploadFile, deleteFile } = useNGO();
+  const dispatch = useDispatch();
+  const { currentUser, setCurrentUser } = useNGO();
+  const reduxUser = useSelector((state) => state.auth?.user);
+  const effectiveUser = reduxUser || currentUser;
 
   const [form, setForm] = useState({
-    name: currentUser?.name || '',
-    phone: currentUser?.phone || '',
-    bloodGroup: currentUser?.bloodGroup || 'O+',
-    dob: currentUser?.dob || '',
-    address: currentUser?.address || '',
-    district: currentUser?.district || 'Aligarh',
-    state: currentUser?.state || 'Uttar Pradesh',
-    photoUrl: currentUser?.photoUrl || ''
+    name: effectiveUser?.name || '',
+    phone: effectiveUser?.phone || '',
+    bloodGroup: effectiveUser?.bloodGroup || 'O+',
+    dob: effectiveUser?.dob || '',
+    address: effectiveUser?.address || '',
+    district: effectiveUser?.district || 'Aligarh',
+    state: effectiveUser?.state || 'Uttar Pradesh',
+    photoUrl: effectiveUser?.photoUrl || ''
   });
 
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+
+  // Keep form synchronized whenever effective user updates
+  useEffect(() => {
+    if (effectiveUser) {
+      setForm(prev => ({
+        ...prev,
+        name: effectiveUser.name || prev.name,
+        phone: effectiveUser.phone || prev.phone,
+        bloodGroup: effectiveUser.bloodGroup || prev.bloodGroup,
+        dob: effectiveUser.dob || prev.dob,
+        address: effectiveUser.address || prev.address,
+        district: effectiveUser.district || prev.district,
+        state: effectiveUser.state || prev.state,
+        photoUrl: effectiveUser.photoUrl !== undefined ? effectiveUser.photoUrl : prev.photoUrl
+      }));
+    }
+  }, [effectiveUser]);
+
+  const hasChanges = (
+    form.name !== (effectiveUser?.name || '') ||
+    form.phone !== (effectiveUser?.phone || '') ||
+    form.bloodGroup !== (effectiveUser?.bloodGroup || 'O+') ||
+    form.dob !== (effectiveUser?.dob || '') ||
+    form.address !== (effectiveUser?.address || '') ||
+    form.district !== (effectiveUser?.district || 'Aligarh') ||
+    form.state !== (effectiveUser?.state || 'Uttar Pradesh')
+  );
+  const isFormValid = (form.name || '').trim().length > 0 && (form.phone || '').trim().length > 0;
+  const canSave = hasChanges && isFormValid && !saving;
 
   const handlePhotoUpload = async (e) => {
     const file = e.target.files?.[0];
@@ -31,12 +65,16 @@ export default function ProfileSettingsPage() {
     try {
       setUploading(true);
       setError('');
-      const res = await uploadFile(file, 'avatars');
-      if (res.success && res.url) {
-        setForm(prev => ({ ...prev, photoUrl: res.url }));
-        setMessage('Photo uploaded to avatars directory! Click Save Profile to apply changes.');
+      setMessage('');
+      
+      const resultAction = await dispatch(uploadAndUpdateAvatar({ file, category: 'avatars' }));
+      if (uploadAndUpdateAvatar.fulfilled.match(resultAction)) {
+        const updated = resultAction.payload;
+        setForm(prev => ({ ...prev, photoUrl: updated.photoUrl }));
+        if (setCurrentUser) setCurrentUser(updated);
+        setMessage('Profile photo uploaded and synchronized in real-time across the app!');
       } else {
-        setError(res.message || 'Failed to upload photo');
+        setError(resultAction.payload || 'Failed to upload photo');
       }
     } catch (err) {
       setError('Upload error occurred');
@@ -46,12 +84,25 @@ export default function ProfileSettingsPage() {
   };
 
   const handleRemovePhoto = async () => {
-    if (form.photoUrl && (form.photoUrl.includes('/uploads/') || form.photoUrl.startsWith('uploads/'))) {
-      if (deleteFile) await deleteFile(form.photoUrl);
-      else await api.delete('/upload', { data: { url: form.photoUrl } }).catch(() => {});
+    try {
+      setSaving(true);
+      setError('');
+      setMessage('');
+      // Do NOT physically delete from disk; document is retained in database
+      const resultAction = await dispatch(updateUserProfile({ photoUrl: '' }));
+      if (updateUserProfile.fulfilled.match(resultAction)) {
+        const updated = resultAction.payload;
+        setForm(prev => ({ ...prev, photoUrl: '' }));
+        if (setCurrentUser) setCurrentUser(updated);
+        setMessage('Profile photo removed successfully.');
+      } else {
+        setError(resultAction.payload || 'Failed to remove photo');
+      }
+    } catch (err) {
+      setError('Error removing photo');
+    } finally {
+      setSaving(false);
     }
-    setForm(prev => ({ ...prev, photoUrl: '' }));
-    setMessage('Photo removed. Click Save Profile to apply changes.');
   };
 
   const handleSave = async (e) => {
@@ -60,17 +111,18 @@ export default function ProfileSettingsPage() {
       setSaving(true);
       setError('');
       setMessage('');
-      const res = await api.put('/auth/profile', form);
-      if (res.data.success) {
+      const resultAction = await dispatch(updateUserProfile(form));
+      if (updateUserProfile.fulfilled.match(resultAction)) {
+        const updated = resultAction.payload;
         setMessage('Profile details updated successfully!');
         if (setCurrentUser) {
-          setCurrentUser(prev => ({ ...prev, ...res.data.user }));
+          setCurrentUser(updated);
         }
       } else {
-        setError(res.data.message || 'Update failed.');
+        setError(resultAction.payload || 'Update failed.');
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Error updating profile.');
+      setError(err.message || 'Error updating profile.');
     } finally {
       setSaving(false);
     }
@@ -115,9 +167,13 @@ export default function ProfileSettingsPage() {
             <div className="relative w-24 h-24 shrink-0">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={form.photoUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=300&auto=format&fit=crop&q=80'}
-                alt={form.name}
+                src={getContentImageUrl(form.photoUrl || effectiveUser?.photoUrl) || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=300&auto=format&fit=crop&q=80'}
+                alt={form.name || effectiveUser?.name || 'User Profile'}
                 className="w-24 h-24 rounded-2xl object-cover border-2 border-red-500 shadow-md"
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=300&auto=format&fit=crop&q=80';
+                }}
               />
               <label className="absolute -bottom-2 -right-2 p-2 bg-red-600 hover:bg-red-700 text-white rounded-full shadow-lg cursor-pointer transition">
                 <FiCamera className="w-3.5 h-3.5" />
@@ -228,14 +284,21 @@ export default function ProfileSettingsPage() {
             />
           </div>
 
-          <div className="pt-4 border-t border-slate-100 flex items-center justify-end">
+          <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <span className="text-xs font-semibold text-slate-500">
+              {!hasChanges 
+                ? 'No changes detected on profile' 
+                : (!isFormValid 
+                    ? 'Name and Phone number are required to save' 
+                    : 'Changes ready to be saved')}
+            </span>
             <button
               type="submit"
-              disabled={saving}
-              className="flex items-center gap-2 px-6 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold transition shadow-lg shadow-red-600/20 cursor-pointer disabled:opacity-50"
+              disabled={!canSave}
+              className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-red-600 hover:bg-red-700 disabled:bg-slate-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none text-white font-bold transition shadow-lg shadow-red-600/20 cursor-pointer"
             >
               <FiSave className="w-4 h-4" />
-              <span>{saving ? 'Saving Changes...' : 'Save Profile Details'}</span>
+              <span>{saving ? 'Saving Changes...' : (!hasChanges ? 'No Changes to Save' : 'Save Profile Details')}</span>
             </button>
           </div>
         </form>

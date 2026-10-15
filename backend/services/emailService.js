@@ -4,43 +4,149 @@ const EmailLog = require('../models/EmailLog');
 const Setting = require('../models/Setting');
 const pdfService = require('./pdfService');
 
-// Helper to get active transporter dynamically
+// Helper to get active transporter dynamically from database Settings
 const getTransporterConfig = async () => {
-  let host = process.env.SMTP_HOST || 'smtp.gmail.com';
-  let port = Number(process.env.SMTP_PORT) || 587;
-  let user = process.env.SMTP_USER || 'samasyasamadhanparishad@gmail.com';
-  let pass = process.env.SMTP_PASS || '';
+  let host = 'smtp.gmail.com';
+  let port = 587;
+  let user = '';
+  let pass = '';
+  let fromName = 'Indian Youth Foundation';
 
   try {
     if (mongoose.connection && mongoose.connection.readyState === 1) {
-      const dbSettings = await Setting.findOne({ key: 'global_ngo_settings' });
+      // Find singleton setting document
+      const dbSettings = await Setting.findOne();
       if (dbSettings) {
-        if (dbSettings.smtpHost) host = dbSettings.smtpHost;
-        if (dbSettings.smtpPort) port = Number(dbSettings.smtpPort);
-        if (dbSettings.smtpUser) user = dbSettings.smtpUser;
-        if (dbSettings.smtpPass) pass = dbSettings.smtpPass;
+        if (dbSettings.smtpHost) host = dbSettings.smtpHost.trim();
+        if (dbSettings.smtpPort) port = Number(dbSettings.smtpPort) || 587;
+        if (dbSettings.smtpUser) user = dbSettings.smtpUser.trim();
+        if (dbSettings.smtpPass) pass = dbSettings.smtpPass.trim();
+        if (dbSettings.smtpFromName) fromName = dbSettings.smtpFromName.trim();
+        else if (dbSettings.ngoName) fromName = dbSettings.ngoName.trim();
       }
     }
   } catch (err) {
-    // Continue with env fallback
+    console.warn('⚠️ [EMAIL CONFIG WARNING] Could not fetch settings from DB:', err.message);
   }
 
-  if (user && pass) {
+  // Backup fallback to process.env only if DB credentials are blank
+  if (!user && process.env.SMTP_USER) user = process.env.SMTP_USER.trim();
+  if (!pass && process.env.SMTP_PASS) pass = process.env.SMTP_PASS.trim();
+  if (!host && process.env.SMTP_HOST) host = process.env.SMTP_HOST.trim();
+  if (process.env.SMTP_PORT && !port) port = Number(process.env.SMTP_PORT) || 587;
+
+  if (user && pass && !pass.includes('•')) {
     const transporter = nodemailer.createTransport({
       host,
       port,
       secure: port === 465,
-      auth: { user, pass }
+      auth: { user, pass },
+      connectionTimeout: 8000,
+      greetingTimeout: 8000,
+      socketTimeout: 10000,
+      tls: {
+        rejectUnauthorized: false
+      }
     });
-    return { transporter, user };
+    return { transporter, user, fromName, host, port };
   }
 
-  return { transporter: null, user };
+  return { transporter: null, user, fromName, host, port };
+};
+
+// Diagnostic SMTP tester
+const testSmtpConnection = async ({ host, port, user, pass, fromName, to }) => {
+  if (!user || !user.trim()) {
+    throw new Error('SMTP Username (Email) is required to test.');
+  }
+  const cleanPass = (pass || '').replace(/\s+/g, '');
+  if (!cleanPass) {
+    throw new Error('SMTP App Password is required to test.');
+  }
+  if (cleanPass.includes('•') || cleanPass.includes('*')) {
+    throw new Error('Please enter your actual 16-character Google App Password (masked bullet characters •••••••• cannot be authenticated).');
+  }
+  if (!to || !to.trim()) {
+    throw new Error('A recipient test email address is required.');
+  }
+
+  const parsedPort = Number(port) || 587;
+  const parsedHost = (host || 'smtp.gmail.com').trim();
+  const parsedUser = user.trim();
+  const senderTitle = (fromName || 'Indian Youth Foundation').trim();
+
+  const transporter = nodemailer.createTransport({
+    host: parsedHost,
+    port: parsedPort,
+    secure: parsedPort === 465,
+    auth: { user: parsedUser, pass: cleanPass },
+    connectionTimeout: 8000,
+    greetingTimeout: 8000,
+    socketTimeout: 10000,
+    tls: {
+      rejectUnauthorized: false
+    }
+  });
+
+  // Verify connection configuration
+  await transporter.verify();
+
+  // Send test email
+  const info = await transporter.sendMail({
+    from: `"${senderTitle}" <${parsedUser}>`,
+    to: to.trim(),
+    subject: `✅ SMTP Diagnostic Test Passed - Indian Youth Foundation`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff;">
+        <div style="text-align: center; margin-bottom: 24px;">
+          <h2 style="color: #dc2626; margin-bottom: 4px;">INDIAN YOUTH FOUNDATION</h2>
+          <p style="color: #64748b; font-size: 13px; margin: 0;">Automated SMTP Server Diagnostics &amp; Validation</p>
+        </div>
+        <div style="background-color: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+          <h3 style="color: #065f46; margin: 0 0 6px 0; font-size: 16px;">✓ Connection Successful!</h3>
+          <p style="color: #047857; margin: 0; font-size: 14px;">Your SMTP credentials saved in the Admin Settings panel are working correctly and ready to dispatch official certificates, ID cards, and receipts.</p>
+        </div>
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px; color: #334155; margin-bottom: 20px;">
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="padding: 8px 0; font-weight: bold; width: 140px;">SMTP Host:</td>
+            <td style="padding: 8px 0;">${parsedHost}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="padding: 8px 0; font-weight: bold;">SMTP Port:</td>
+            <td style="padding: 8px 0;">${parsedPort} (${parsedPort === 465 ? 'SSL' : 'TLS/STARTTLS'})</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="padding: 8px 0; font-weight: bold;">Sender Account:</td>
+            <td style="padding: 8px 0; font-family: monospace;">${parsedUser}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="padding: 8px 0; font-weight: bold;">Sender Title:</td>
+            <td style="padding: 8px 0;">${senderTitle}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="padding: 8px 0; font-weight: bold;">Recipient Tested:</td>
+            <td style="padding: 8px 0; font-family: monospace;">${to}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; font-weight: bold;">Server Response:</td>
+            <td style="padding: 8px 0; color: #059669; font-weight: bold;">250 OK (Accepted)</td>
+          </tr>
+        </table>
+        <p style="font-size: 11px; color: #94a3b8; text-align: center; margin: 0;">Sent automatically from the Indian Youth Foundation Admin CMS.</p>
+      </div>
+    `
+  });
+
+  return {
+    success: true,
+    messageId: info.messageId,
+    accepted: info.accepted
+  };
 };
 
 const sendEmail = async ({ to, subject, htmlText, template = 'general', attachments = [] }) => {
   let deliveryStatus = 'logged_simulated';
-  const { transporter, user: smtpUser } = await getTransporterConfig();
+  const { transporter, user: smtpUser, fromName: dbFromName } = await getTransporterConfig();
 
   if (!to) {
     console.warn(`⚠️ [EMAIL NOTICE] No recipient email specified for subject: "${subject}".`);
@@ -49,8 +155,8 @@ const sendEmail = async ({ to, subject, htmlText, template = 'general', attachme
 
   if (transporter) {
     try {
-      const fromName = process.env.NGO_NAME || 'Indian Youth Foundation';
-      const fromEmail = smtpUser || process.env.SMTP_USER || 'samasyasamadhanparishad@gmail.com';
+      const fromName = dbFromName || 'Indian Youth Foundation';
+      const fromEmail = smtpUser || 'samasyasamadhanparishad@gmail.com';
       const mailOptions = {
         from: `"${fromName}" <${fromEmail}>`,
         to,
@@ -578,6 +684,7 @@ const sendPasswordResetEmail = async (param1, param2) => {
 
 module.exports = {
   sendEmail,
+  testSmtpConnection,
   sendDonationApprovalEmail,
   sendMembershipApprovalEmail,
   sendVolunteerApprovalEmail,

@@ -60,7 +60,7 @@ export default function ContentCollection({ resource }) {
   }, [resource, endpoint]);
 
   function getEmptyForm() {
-    const base = { title: "", description: "", date: "" };
+    const base = { title: "", description: "", content: "", date: "" };
     if (config?.customFields) {
       config.customFields.forEach((f) => {
         base[f.name] = f.type === "select" && f.options?.length ? f.options[0] : "";
@@ -82,8 +82,9 @@ export default function ContentCollection({ resource }) {
   function openEditForm(item) {
     setEditingItem(item);
     const initialForm = {
-      title: item.title || "",
-      description: item.description || item.summary || item.caption || "",
+      title: item.title || item.name || item.headline || "",
+      description: item.description || item.content || item.summary || item.caption || item.bio || "",
+      content: item.content || item.description || item.summary || item.caption || item.bio || "",
       date: item.date ? item.date.slice(0, 10) : "",
     };
     if (config?.customFields) {
@@ -167,14 +168,24 @@ export default function ContentCollection({ resource }) {
 
       // Combine existing images with newly uploaded
       const finalImages = [...existingImages, ...uploadedUrls];
+      const textContent = (form.description || form.content || form.caption || form.summary || "").trim();
+      const textTitle = (form.title || form.name || form.headline || "").trim();
+
       const payload = {
         ...form,
+        title: textTitle,
+        titleHi: form.titleHi || textTitle,
+        content: textContent,
+        contentHi: form.contentHi || textContent,
+        description: textContent,
+        date: form.date || new Date().toISOString().split("T")[0],
         images: finalImages,
         image: finalImages[0] || "",
         imageUrl: finalImages[0] || "",
         bannerImage: finalImages[0] || form.bannerImage || "",
         url: finalImages[0] || form.url || form.videoUrl || "",
-        caption: form.description || form.caption || ""
+        caption: textContent,
+        author: form.author || "संपादक, भारतीय युवा क्रांति"
       };
 
       if (editingItem) {
@@ -215,18 +226,15 @@ export default function ContentCollection({ resource }) {
   const filteredItems = items.filter((item) => {
     const q = searchQuery.toLowerCase();
     const title = (item.title || item.name || "").toLowerCase();
-    const desc = (item.description || item.summary || "").toLowerCase();
+    const desc = (item.description || item.content || item.summary || "").toLowerCase();
     return title.includes(q) || desc.includes(q);
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Top Header Card */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white p-4 rounded-b-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-red-700 text-xs font-bold mb-2">
-            <span>Management Console</span>
-          </div>
           <h1 className="text-2xl font-black text-black tracking-tight">{config.title}</h1>
           <p className="text-xs text-slate-700 mt-1">{config.description}</p>
         </div>
@@ -250,7 +258,7 @@ export default function ContentCollection({ resource }) {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between gap-4">
+      <div className="bg-white mx-3 p-1 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between gap-4">
         <div className="relative flex-1 max-w-md">
           <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
           <input
@@ -261,13 +269,13 @@ export default function ContentCollection({ resource }) {
             className="w-full pl-10 pr-4 py-2 text-xs rounded-xl border border-slate-200 focus:outline-red-500 text-black placeholder:text-slate-400"
           />
         </div>
-        <div className="text-xs font-bold text-slate-700">
-          Total Records: <span className="text-black">{filteredItems.length}</span>
+        <div className="bg-red-500 rounded-xl px-5 py-2 flex items-center text-xs font-bold text-white pr-3">
+          Total Records: <span className="ml-2">{filteredItems.length}</span>
         </div>
       </div>
 
       {/* Items Table / Cards */}
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="bg-white mx-3 rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
         {loading ? (
           <div className="p-12 text-center text-slate-700 text-xs space-y-2">
             <FiRefreshCw className="w-6 h-6 animate-spin mx-auto text-red-600" />
@@ -289,13 +297,13 @@ export default function ContentCollection({ resource }) {
             <table className="w-full text-left text-xs">
               <thead className="bg-slate-50 border-b border-slate-200 text-black font-extrabold">
                 <tr>
-                  <th className="py-3 px-4">Image / Media</th>
-                  <th className="py-3 px-4">Title / Name</th>
+                  <th className="py-3 px-3.5">Image / Media</th>
+                  <th className="py-3 px-3.5">Title / Name</th>
                   {config.customFields?.slice(0, 2).map((f) => (
-                    <th key={f.name} className="py-3 px-4">{f.label}</th>
+                    <th key={f.name} className="py-3 px-3.5">{f.label}</th>
                   ))}
-                  {config.dateField && <th className="py-3 px-4">Date</th>}
-                  <th className="py-3 px-4 text-right">Actions</th>
+                  {config.dateField && <th className="py-3 px-3.5">Date</th>}
+                  <th className="py-3 px-3.5 text-right sticky right-0 bg-slate-50 z-20 shadow-[-6px_0_10px_-2px_rgba(0,0,0,0.06)]">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-black">
@@ -303,8 +311,8 @@ export default function ContentCollection({ resource }) {
                   const id = item._id || item.id;
                   const thumb = item.bannerImage || (Array.isArray(item.images) && item.images[0]) || item.image || item.imageUrl || item.url;
                   return (
-                    <tr key={id} className="hover:bg-slate-50/80 transition">
-                      <td className="py-3 px-4">
+                    <tr key={id} className="group hover:bg-slate-50/80 transition">
+                      <td className="py-3 px-3.5">
                         {thumb ? (
                           <img
                             src={getContentImageUrl(thumb)}
@@ -317,37 +325,39 @@ export default function ContentCollection({ resource }) {
                           </div>
                         )}
                       </td>
-                      <td className="py-3 px-4">
+                      <td className="py-3 px-3.5">
                         <div className="font-extrabold text-black text-sm">{item.title || item.name}</div>
                         <div className="text-[11px] text-slate-600 line-clamp-1 mt-0.5">
-                          {item.description || item.summary || item.bio}
+                          {item.description || item.content || item.summary || item.bio}
                         </div>
                       </td>
                       {config.customFields?.slice(0, 2).map((f) => (
-                        <td key={f.name} className="py-3 px-4 text-slate-800 font-semibold">
+                        <td key={f.name} className="py-3 px-3.5 text-slate-800 font-semibold">
                           {String(item[f.name] ?? "-")}
                         </td>
                       ))}
                       {config.dateField && (
-                        <td className="py-3 px-4 text-slate-700 font-medium">
+                        <td className="py-3 px-3.5 text-slate-700 font-medium whitespace-nowrap">
                           {item.date ? new Date(item.date).toLocaleDateString("en-IN") : "-"}
                         </td>
                       )}
-                      <td className="py-3 px-4 text-right">
-                        <div className="flex items-center justify-end gap-2">
+                      <td className="py-3 px-3.5 text-right whitespace-nowrap sticky right-0 bg-white group-hover:bg-slate-50 z-10 shadow-[-6px_0_10px_-2px_rgba(0,0,0,0.06)]">
+                        <div className="flex items-center justify-end gap-1.5">
                           <button
                             onClick={() => openEditForm(item)}
-                            className="p-2 rounded-lg text-slate-600 hover:text-black hover:bg-slate-100 transition cursor-pointer"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 hover:text-black hover:border-slate-300 font-bold text-xs shadow-2xs transition cursor-pointer"
                             title="Edit Record"
                           >
-                            <FiEdit2 className="w-4 h-4" />
+                            <FiEdit2 className="w-3.5 h-3.5" />
+                            <span>Edit</span>
                           </button>
                           <button
                             onClick={() => setDeleteModalItem(item)}
-                            className="p-2 rounded-lg text-rose-600 hover:bg-rose-50 transition cursor-pointer"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 hover:bg-rose-100 font-bold text-xs shadow-2xs transition cursor-pointer"
                             title="Delete Record"
                           >
-                            <FiTrash2 className="w-4 h-4" />
+                            <FiTrash2 className="w-3.5 h-3.5" />
+                            <span>Delete</span>
                           </button>
                         </div>
                       </td>
@@ -447,8 +457,8 @@ export default function ContentCollection({ resource }) {
                   rows={4}
                   required
                   placeholder={`Describe this ${config.itemLabel}...`}
-                  value={form.description || ""}
-                  onChange={(e) => setForm({ ...form, description: e.target.value })}
+                  value={form.description || form.content || ""}
+                  onChange={(e) => setForm({ ...form, description: e.target.value, content: e.target.value })}
                   className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-red-500 font-medium text-black bg-white"
                 />
               </div>

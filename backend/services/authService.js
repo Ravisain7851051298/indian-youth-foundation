@@ -404,6 +404,24 @@ class AuthService {
       throw new Error('User not found.');
     }
     const { password: _, ...userSafe } = user.toObject();
+
+    try {
+      const MembershipApplication = require('../models/MembershipApplication');
+      const VolunteerApplication = require('../models/VolunteerApplication');
+
+      const [membershipApp, volunteerApp] = await Promise.all([
+        MembershipApplication.findOne({ $or: [{ user: userId }, { userId }] }).sort({ createdAt: -1 }).populate('plan'),
+        VolunteerApplication.findOne({ $or: [{ user: userId }, { userId }] }).sort({ createdAt: -1 })
+      ]);
+
+      userSafe.membershipApplication = membershipApp ? (membershipApp.toObject ? membershipApp.toObject() : membershipApp) : null;
+      userSafe.volunteerApplication = volunteerApp ? (volunteerApp.toObject ? volunteerApp.toObject() : volunteerApp) : null;
+      userSafe.isMember = user.role === 'Member' || user.role === 'Admin' || !!user.memberId;
+      userSafe.isVolunteer = user.role === 'Volunteer' || (volunteerApp && volunteerApp.status === 'approved');
+    } catch (appErr) {
+      console.warn('Note querying user applications in getMe:', appErr.message);
+    }
+
     return userSafe;
   }
 
@@ -422,11 +440,8 @@ class AuthService {
     if (address) user.address = address;
     if (district) user.district = district;
     if (state) user.state = state;
-    if (photoUrl !== undefined && photoUrl !== user.photoUrl) {
-      if (user.photoUrl && (user.photoUrl.includes('/uploads/') || user.photoUrl.startsWith('uploads/'))) {
-        const { deleteFileByUrl } = require('../utils/fileCleaner');
-        await deleteFileByUrl(user.photoUrl);
-      }
+    if (photoUrl !== undefined) {
+      // Do not delete file from disk while document exists in database
       user.photoUrl = photoUrl;
     }
 

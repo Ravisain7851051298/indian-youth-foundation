@@ -39,18 +39,84 @@ const settingSchema = new mongoose.Schema({
   missionStatement: { type: String, default: 'To channel the energy and passion of Indian youth into measurable grassroots social welfare initiatives, ensuring quality education for every underprivileged child, immediate healthcare access, women empowerment, and disaster relief.' },
   visionStatement: { type: String, default: 'To foster an empowered, educated, and self-reliant nation where proactive youth leadership eliminates socioeconomic disparities and creates lasting community prosperity.' },
   
+  // CMS Pages: Who We Are
+  whoWeAreHeading: { type: String, default: 'Who We Are — The Pulse of Indian Youth Foundation' },
+  whoWeAreSubtitle: { type: String, default: 'A Catalyst for Grassroots Youth Empowerment, Civil Welfare & Nation Building' },
+  whoWeAreStory: { 
+    type: String, 
+    default: 'Founded by passionate young patriots and grassroots social activists, Indian Youth Foundation (भारतीय युवा क्रांति) was born from a deep conviction: that India\'s greatest reservoir of untapped power is its youth. Guided by the ethos of "Nation First, Society Always", we bridge the chasm between compassionate intent and concrete ground action.\n\nFrom running evening community literacy circles for slum children and maintaining an agile 24x7 emergency blood donor network across districts, to providing women self-reliance tailoring skills and mounting rapid relief during natural disasters, our youth task force stands on the frontlines of humanitarian transformation.\n\nWe operate with unwavering corporate governance, complete CBDT statutory transparency, zero administrative overhead leakage, and an uncompromising dedication to human dignity.' 
+  },
+  whoWeAreVision: { 
+    type: String, 
+    default: 'To foster an empowered, educated, and self-reliant India where proactive youth leadership eliminates socioeconomic disparities, champions community brotherhood, and builds a prosperous nation.' 
+  },
+  whoWeAreMission: { 
+    type: String, 
+    default: 'To channel the vibrant energy, intellect, and civic dedication of Indian youth into measurable grassroots social welfare initiatives, ensuring quality education for every underprivileged child, immediate healthcare access, women economic self-reliance, and disaster relief.' 
+  },
+  whoWeAreValues: { 
+    type: String, 
+    default: 'Nation First: Every action is dedicated to national strength and social harmony.\nIntegrity & Transparency: 100% statutory adherence, audited accounts, and public receipts.\nYouth Leadership: Placing young changemakers in driving seats of community solutions.\nEmpathy in Action: Rapid, unconditional grassroots aid for every vulnerable citizen.' 
+  },
+  whoWeAreBannerUrl: { 
+    type: String, 
+    default: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1200&auto=format&fit=crop&q=80' 
+  },
+
+  // CMS Pages: Privacy Policy
+  privacyPolicyTitle: { type: String, default: 'Privacy Policy & Data Security' },
+  privacyPolicySubtitle: { type: String, default: 'Indian Youth Foundation (Bharatiya Yuva Kranti) is dedicated to maintaining full transparency, safeguarding donor privacy, and protecting personal data.' },
+  privacyLastUpdated: { type: String, default: 'October 2026' },
+  privacyPolicyContent: { 
+    type: String, 
+    default: '## 1. Information We Collect\nWhen you interact with Indian Youth Foundation through donations, membership registrations, volunteer drives, or contact inquiries, we collect information necessary to fulfill our statutory non-profit functions:\n- Personal Identity: Full name, date of birth, gender, blood group, and residential address.\n- Contact Information: Verified mobile phone number, WhatsApp contact, and email address.\n- Statutory Tax Data (for 80G Receipts): Permanent Account Number (PAN Card No.) and postal address, mandatory under the Income Tax Act, 1961 (Form 10BD reporting).\n- Payment Transaction Data: Unique transaction ID, payment method (UPI, Netbanking, Debit/Credit Card), timestamp, and donation amount. We do NOT store credit card numbers, CVVs, or net banking passwords on our servers.\n\n## 2. How We Use Your Information\nAll personal and financial details collected by the Foundation are used strictly for legitimate charitable administration:\n- Generating and delivering instant, digitally signed Section 80G tax exemption donation receipts.\n- Issuing verified digital membership ID cards, appointment letters, and appreciation certificates.\n- Reporting donor contribution records to the Income Tax Department via Form 10BD for donor tax deductions.\n- Communicating program updates, emergency blood donation appeals, and humanitarian relief bulletins.\n- Investigating grievances, feedback, and community service inquiries submitted to the administration.\n\n## 3. Payment Gateway Security & Encryption\nOnline payments on this portal are processed via Reserve Bank of India (RBI) authorized payment gateways (including Razorpay & UPI rails) utilizing industry-grade 256-bit SSL encryption. Indian Youth Foundation adheres to PCI-DSS compliance standards ensuring seamless, tamper-proof electronic transactions.\n\n## 4. Non-Disclosure & Data Confidentiality\nWe enforce a strict non-disclosure policy. Indian Youth Foundation does never rent, sell, trade, or commercially share our donor or member records with any third-party marketing agency. Information is disclosed solely when mandated by Indian law or competent regulatory bodies (e.g., Income Tax Department, NITI Aayog).\n\n## 5. Your Rights & Grievance Redressal\nDonors and registered members maintain the right to review their records, request correction of inaccurate details, or download their cumulative donation statements. For questions or grievance escalation, reach out directly to our official grievance contacts.' 
+  },
+
+  // CMS Pages: Terms & Conditions
+  termsTitle: { type: String, default: 'Terms & Conditions of Service' },
+  termsSubtitle: { type: String, default: 'Rules, guidelines, and legal agreements governing the use of the Indian Youth Foundation website, online donations, and member services.' },
+  termsEffectiveDate: { type: String, default: 'October 2026' },
+  termsContent: { 
+    type: String, 
+    default: '## 1. Acceptance of Terms\nBy accessing, browsing, registering as a member, or donating on this website, you agree to be legally bound by these Terms and Conditions and our Privacy Policy. If you do not accept these terms, you should discontinue using this portal.\n\n## 2. Online Donations & 80G Tax Receipts\n- All donations contributed through this portal are applied directly towards humanitarian relief, child education, healthcare assistance, and community welfare programs.\n- Donations are eligible for 50% income tax deduction under Section 80G of the Indian Income Tax Act, 1961.\n- To receive a valid Section 80G tax certificate, donors must provide their valid Indian Permanent Account Number (PAN) and postal address during payment.\n- Official digitally verified donation receipts bearing unique receipt numbers and QR codes are issued immediately upon successful transaction completion.\n\n## 3. Non-Refundable Donation Policy\nAs donations are voluntary charitable contributions committed promptly towards ongoing social causes and emergency supplies, they are generally non-refundable. However, in verified instances of technical error (such as erroneous double deductions through the payment gateway), a written refund request can be filed within 7 calendar days accompanied by transaction proof.\n\n## 4. Code of Conduct for Members & Volunteers\n- Every registered Member and Volunteer must conduct themselves in alignment with the national ideals and peaceful constitution of the Foundation.\n- Official Member ID Cards, Appointment Letters, and certificates issued by the Foundation remain the intellectual property of Indian Youth Foundation.\n- Members are strictly prohibited from using foundation identification, seals, or letterheads for personal commercial exploitation, unauthorized political lobbying, or illegal activities. Any misuse results in immediate termination of membership and criminal prosecution.\n\n## 5. Protection of Official Logo, Seals & Signatures\nAll trademarks, logos, official stamps/seals, digital signatures of executive trustees, website graphics, and software workflows displayed across this portal are exclusively owned by Indian Youth Foundation. Unauthorized reproduction, modification, or counterfeit duplication is actionable under Indian Copyright and Intellectual Property laws.\n\n## 6. Governing Law & Legal Jurisdiction\nThese Terms and Conditions are governed by and construed in accordance with the laws of the Republic of India. In the event of any dispute or arbitration, the courts having jurisdiction in Aligarh, Uttar Pradesh shall have exclusive jurisdiction.' 
+  },
+
   // SMTP Email Settings for Admin
   smtpHost: { type: String, default: 'smtp.gmail.com' },
   smtpPort: { type: Number, default: 587 },
   smtpUser: { type: String, default: 'samasyasamadhanparishad@gmail.com' },
   smtpPass: { type: String, default: '' },
+  smtpFromName: { type: String, default: 'Indian Youth Foundation' },
+
+  // Signatory & President Details
+  presidentName: { type: String, default: 'Ravi Saini (National President & Trustee)' },
 
   // Admin Master Secret Key
   adminSecretKey: { type: String, default: 'iyf_admin_master_secret_2026' },
 
   pageViews: { type: Number, default: 18450 }
 }, {
-  timestamps: true
+  timestamps: true,
+  toJSON: {
+    transform: function(doc, ret) {
+      delete ret.smtpHost;
+      delete ret.smtpPort;
+      delete ret.smtpUser;
+      delete ret.smtpPass;
+      delete ret.adminSecretKey;
+      return ret;
+    }
+  },
+  toObject: {
+    transform: function(doc, ret) {
+      delete ret.smtpHost;
+      delete ret.smtpPort;
+      delete ret.smtpUser;
+      delete ret.smtpPass;
+      delete ret.adminSecretKey;
+      return ret;
+    }
+  }
 });
 
 module.exports = mongoose.model('Setting', settingSchema);

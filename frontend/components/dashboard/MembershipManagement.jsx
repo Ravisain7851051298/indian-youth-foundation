@@ -145,13 +145,10 @@ export default function MembershipManagement() {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Top Header Card */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white p-4 rounded-b-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-red-700 text-xs font-bold mb-2">
-            <span>Official Identity &amp; Credentialing</span>
-          </div>
           <h1 className="text-2xl font-black text-black tracking-tight">Membership Management</h1>
           <p className="text-xs text-slate-700 mt-1">
             Review membership applications, verify payment proofs, and issue dual-sided QR ID cards.
@@ -168,7 +165,7 @@ export default function MembershipManagement() {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="bg-white mx-3 p-1 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="relative flex-1 w-full max-w-md">
           <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
           <input
@@ -180,12 +177,12 @@ export default function MembershipManagement() {
           />
         </div>
 
-        <div className="flex items-center gap-2 w-full sm:w-auto">
+        <div className="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
           {["All", "Pending", "Approved", "Rejected"].map((st) => (
             <button
               key={st}
               onClick={() => setActiveTab(st.toLowerCase())}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap cursor-pointer ${
                 activeTab === st.toLowerCase()
                   ? "bg-red-600 text-white shadow-md shadow-red-600/20"
                   : "bg-slate-100 text-black hover:bg-red-50 hover:text-red-600"
@@ -198,7 +195,7 @@ export default function MembershipManagement() {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+      <div className="bg-white mx-3 rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
         {loading ? (
           <div className="p-12 text-center text-slate-700 text-xs space-y-2">
             <FiRefreshCw className="w-6 h-6 animate-spin mx-auto text-red-600" />
@@ -214,13 +211,13 @@ export default function MembershipManagement() {
             <table className="w-full text-left text-xs">
               <thead className="bg-slate-50 border-b border-slate-200 text-black font-extrabold">
                 <tr>
-                  <th className="py-3 px-4">Applicant</th>
-                  <th className="py-3 px-4">Plan / Fee</th>
-                  <th className="py-3 px-4">Transaction / UTR</th>
-                  <th className="py-3 px-4">Payment Proof</th>
-                  <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4">Date</th>
-                  <th className="py-3 px-4 text-right">Actions</th>
+                  <th className="py-3 px-3.5">Applicant</th>
+                  <th className="py-3 px-3.5">Plan / Fee</th>
+                  <th className="py-3 px-3.5">Transaction / UTR</th>
+                  <th className="py-3 px-3.5">Payment Proof</th>
+                  <th className="py-3 px-3.5">Status</th>
+                  <th className="py-3 px-3.5">Date</th>
+                  <th className="py-3 px-3.5 text-right sticky right-0 bg-slate-50 z-20 shadow-[-6px_0_10px_-2px_rgba(0,0,0,0.06)]">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-black">
@@ -232,68 +229,70 @@ export default function MembershipManagement() {
                   const email = m.user?.email || m.email || "-";
                   const phone = m.user?.phone || m.phone || "-";
                   return (
-                    <tr key={id} className="hover:bg-slate-50/80 transition">
-                      <td className="py-3 px-4">
+                    <tr key={id} className="group hover:bg-slate-50/80 transition">
+                      <td className="py-3 px-3.5">
                         <div className="font-extrabold text-black text-sm">{name}</div>
                         <div className="text-[11px] text-slate-600">{email} • {phone}</div>
                       </td>
-                      <td className="py-3 px-4">
+                      <td className="py-3 px-3.5">
                         <div className="font-bold text-black">{m.planName || "Annual Membership"}</div>
                         <div className="text-[11px] text-slate-600">₹{m.feePaid || m.fee || 250}</div>
                       </td>
-                      <td className="py-3 px-4 font-mono text-[11px] font-bold text-slate-800">
+                      <td className="py-3 px-3.5 font-mono text-[11px] font-bold text-slate-800">
                         {m.transactionId || m.utrNumber || "-"}
                       </td>
-                      <td className="py-3 px-4">
+                      <td className="py-3 px-3.5 whitespace-nowrap">
                         {screenshot ? (
                           <button
                             onClick={() => setSelectedScreenshot(getContentImageUrl(screenshot))}
-                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-50 text-red-700 hover:bg-red-100 font-bold text-[11px] transition cursor-pointer"
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-red-50 text-red-700 hover:bg-red-100 font-bold text-[11px] transition cursor-pointer border border-red-200"
                           >
                             <FiEye className="w-3.5 h-3.5" />
                             <span>View Proof</span>
                           </button>
                         ) : (
-                          <span className="text-slate-400 text-[11px]">No Proof</span>
+                          <span className="text-slate-400 text-[11px] italic">No Proof</span>
                         )}
                       </td>
-                      <td className="py-3 px-4">
+                      <td className="py-3 px-3.5 whitespace-nowrap">
                         <span
                           className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase ${
                             status.toLowerCase() === "approved" || status.toLowerCase() === "active"
-                              ? "bg-emerald-100 text-emerald-800"
+                              ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
                               : status.toLowerCase() === "rejected"
-                              ? "bg-rose-100 text-rose-800"
-                              : "bg-amber-100 text-amber-800"
+                              ? "bg-rose-100 text-rose-800 border border-rose-200"
+                              : "bg-amber-100 text-amber-800 border border-amber-200"
                           }`}
                         >
                           {status}
                         </span>
                       </td>
-                      <td className="py-3 px-4 text-slate-700">
+                      <td className="py-3 px-3.5 text-slate-700 whitespace-nowrap font-medium">
                         {m.createdAt ? new Date(m.createdAt).toLocaleDateString("en-IN") : "-"}
                       </td>
-                      <td className="py-3 px-4 text-right">
+                      <td className="py-3 px-3.5 text-right whitespace-nowrap sticky right-0 bg-white group-hover:bg-slate-50 z-10 shadow-[-6px_0_10px_-2px_rgba(0,0,0,0.06)]">
                         <div className="flex items-center justify-end gap-1.5">
                           {status.toLowerCase() === "pending" && (
                             <>
                               <button
                                 onClick={() => handleApprove(id)}
                                 disabled={processingId === id}
-                                className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] transition cursor-pointer disabled:opacity-50"
+                                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] transition cursor-pointer disabled:opacity-50 shadow-xs"
                               >
-                                Approve
+                                <FiCheck className="w-3.5 h-3.5" />
+                                <span>{processingId === id ? "Approving..." : "Approve"}</span>
                               </button>
                               <button
                                 onClick={() => setRejectModalItem(m)}
                                 disabled={processingId === id}
-                                className="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-[11px] transition cursor-pointer disabled:opacity-50"
+                                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-[11px] transition cursor-pointer disabled:opacity-50 shadow-xs"
                               >
-                                Reject
+                                <FiX className="w-3.5 h-3.5" />
+                                <span>Reject</span>
                               </button>
                             </>
                           )}
-                          {status.toLowerCase() === "approved" && (
+                          {(status.toLowerCase() === "approved" || status.toLowerCase() === "active") && (
                             <button
                               onClick={() => {
                                 setCertModalItem(m);
@@ -301,11 +300,11 @@ export default function MembershipManagement() {
                                 setCertTitle("Certificate of Official Membership & Recognition");
                                 setCertReason("In honor of official membership, lifelong commitment to community welfare, and support of the Indian Youth Foundation.");
                               }}
-                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold text-[11px] transition cursor-pointer shadow-sm"
+                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold text-[11px] transition cursor-pointer shadow-xs"
                               title="Offer Official Member Certificate"
                             >
                               <FiAward className="w-3.5 h-3.5" />
-                              <span>Offer Certificate</span>
+                              <span>Certificate</span>
                             </button>
                           )}
                           <button
@@ -314,7 +313,7 @@ export default function MembershipManagement() {
                             title="Delete Application and Attached Payment Proof"
                             className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer"
                           >
-                            <FiTrash2 className="w-3.5 h-3.5" />
+                            <FiTrash2 className="w-4 h-4" />
                           </button>
                         </div>
                       </td>

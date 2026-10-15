@@ -340,9 +340,15 @@ export default function ProfileDonationsPage() {
               </div>
 
               {/* Tax Exemption Citation */}
-              <div className="bg-red-50/50 border border-red-200 rounded-xl p-3 text-[11px] text-black space-y-1 font-medium">
-                <p>✓ <strong>Income Tax Benefit:</strong> This receipt entitles the donor to deduction under Section 80G of the Income Tax Act, 1961.</p>
-                <p>✓ All contributions are exclusively applied towards the charitable purposes of the Trust across India.</p>
+              <div className="bg-red-50/50 border border-red-200 rounded-xl p-3 text-[11px] text-black space-y-1.5 font-medium">
+                <p className="flex items-start gap-1.5">
+                  <FiCheckCircle className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                  <span><strong>Income Tax Benefit:</strong> This receipt entitles the donor to deduction under Section 80G of the Income Tax Act, 1961.</span>
+                </p>
+                <p className="flex items-start gap-1.5">
+                  <FiCheckCircle className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                  <span>All contributions are exclusively applied towards the charitable purposes of the Trust across India.</span>
+                </p>
               </div>
 
               {/* Seal, Signature & QR Verification */}
@@ -504,7 +510,10 @@ export default function ProfileDonationsPage() {
                       )}
                       <div>
                         <span className="text-[11px] font-bold text-black block">{fileName}</span>
-                        <span className="text-[10px] text-red-700 font-medium">✓ Ready to send with contribution</span>
+                        <span className="text-[10px] text-emerald-700 font-medium flex items-center gap-1">
+                          <FiCheckCircle className="w-3 h-3 text-emerald-600 shrink-0" />
+                          <span>Ready to send with contribution</span>
+                        </span>
                       </div>
                     </div>
                     <button

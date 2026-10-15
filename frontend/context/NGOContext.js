@@ -195,36 +195,6 @@ export function NGOProvider({ children }) {
   const [teamMembers, setTeamMembers] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Initialize and dynamically verify active session with backend
-  useEffect(() => {
-    try {
-      const savedUser = typeof window !== 'undefined' ? sessionStorage.getItem('byk_user') : null;
-      const savedSettings = typeof window !== 'undefined' ? localStorage.getItem('byk_settings') : null;
-
-      if (savedUser) setCurrentUser(JSON.parse(savedUser));
-      if (savedSettings) setSettings(JSON.parse(savedSettings));
-    } catch (e) {
-      console.error('Error loading session state', e);
-    }
-
-    fetchInitialData();
-
-    // Listen for global 401 unauthorized events to dynamically reset auth state
-    const handleUnauthorized = () => {
-      setCurrentUser(null);
-      setToken(null);
-      if (typeof window !== 'undefined') {
-        sessionStorage.removeItem('byk_user');
-      }
-    };
-    if (typeof window !== 'undefined') {
-      window.addEventListener('byk_auth_unauthorized', handleUnauthorized);
-      return () => {
-        window.removeEventListener('byk_auth_unauthorized', handleUnauthorized);
-      };
-    }
-  }, []);
-
   const fetchInitialData = async () => {
     try {
       setLoading(true);
@@ -236,18 +206,21 @@ export function NGOProvider({ children }) {
           if (data && data.success && data.user) {
             setCurrentUser(data.user);
             if (typeof window !== 'undefined') {
-              sessionStorage.setItem('byk_user', JSON.stringify(data.user));
+              const str = JSON.stringify(data.user);
+              sessionStorage.setItem('byk_user', str);
+              localStorage.setItem('byk_user', str);
             }
           } else {
             setCurrentUser(null);
             if (typeof window !== 'undefined') {
               sessionStorage.removeItem('byk_user');
+              localStorage.removeItem('byk_user');
             }
           }
         })
         .catch(() => {});
 
-      const [setRes, campRes, donRes, memRes, evtRes, newsRes, galRes, certRes, grvRes] = await Promise.allSettled([
+      const [setRes, campRes, donRes, memRes, evtRes, newsRes, galRes, certRes, grvRes, fbRes, teamRes] = await Promise.allSettled([
         fetch('/api/settings', { credentials: 'include' }).then(r => r.json()),
         fetch('/api/campaigns', { credentials: 'include' }).then(r => r.json()),
         fetch('/api/donations', { credentials: 'include' }).then(r => r.json()),
@@ -257,13 +230,28 @@ export function NGOProvider({ children }) {
         fetch('/api/gallery', { credentials: 'include' }).then(r => r.json()),
         fetch('/api/certificates', { credentials: 'include' }).then(r => r.json()),
         fetch('/api/grievances', { credentials: 'include' }).then(r => r.json()),
+        fetch('/api/feedback', { credentials: 'include' }).then(r => r.json()),
+        fetch('/api/team-members', { credentials: 'include' }).then(r => r.json())
       ]);
 
       if (setRes.status === 'fulfilled' && setRes.value?.settings) {
         setSettings(prev => ({ ...prev, ...setRes.value.settings }));
-        if (setRes.value.settings.managementTeam?.length) {
+        if (typeof window !== 'undefined') {
+          try {
+            localStorage.setItem('byk_settings', JSON.stringify(setRes.value.settings));
+          } catch {}
+        }
+      }
+
+      if (teamRes.status === 'fulfilled') {
+        const teamList = teamRes.value?.data || teamRes.value?.items || [];
+        if (Array.isArray(teamList) && teamList.length) {
+          setTeamMembers(teamList);
+        } else if (setRes.value?.settings?.managementTeam?.length) {
           setTeamMembers(setRes.value.settings.managementTeam);
         }
+      } else if (setRes.value?.settings?.managementTeam?.length) {
+        setTeamMembers(setRes.value.settings.managementTeam);
       }
 
       if (campRes.status === 'fulfilled' && campRes.value?.campaigns) {
@@ -290,12 +278,63 @@ export function NGOProvider({ children }) {
       if (grvRes.status === 'fulfilled' && grvRes.value?.grievances) {
         setComplaints(grvRes.value.grievances);
       }
+      if (fbRes.status === 'fulfilled' && (fbRes.value?.feedbacks || fbRes.value?.data)) {
+        const fetched = fbRes.value.feedbacks || fbRes.value.data;
+        if (Array.isArray(fetched) && fetched.length > 0) {
+          setFeedbacks(fetched);
+        }
+      }
     } catch (err) {
       console.warn('API fetch notice, continuing with local store:', err);
     } finally {
       setLoading(false);
     }
   };
+
+  // Initialize and dynamically verify active session with backend
+  useEffect(() => {
+    // Restore cached storage values safely on client after initial hydration
+    try {
+      const savedUser = sessionStorage.getItem('byk_user') || localStorage.getItem('byk_user');
+      if (savedUser) {
+        setCurrentUser(JSON.parse(savedUser));
+      }
+      const savedSettings = localStorage.getItem('byk_settings');
+      if (savedSettings) {
+        setSettings(prev => ({ ...prev, ...JSON.parse(savedSettings) }));
+      }
+    } catch (e) {
+      console.warn('Storage restoration error:', e);
+    }
+
+    fetchInitialData();
+
+    // Listen for global user updated event to sync context instantly across app
+    const handleUserUpdated = (e) => {
+      if (e.detail) {
+        setCurrentUser(e.detail);
+      }
+    };
+
+    // Listen for global 401 unauthorized events to dynamically reset auth state
+    const handleUnauthorized = () => {
+      setCurrentUser(null);
+      setToken(null);
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('byk_user');
+        localStorage.removeItem('byk_user');
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('byk_auth_unauthorized', handleUnauthorized);
+      window.addEventListener('byk_user_updated', handleUserUpdated);
+      return () => {
+        window.removeEventListener('byk_auth_unauthorized', handleUnauthorized);
+        window.removeEventListener('byk_user_updated', handleUserUpdated);
+      };
+    }
+  }, []);
 
   const toggleLanguage = () => {
     const newL = lang === 'en' ? 'hi' : 'en';
@@ -398,22 +437,75 @@ export function NGOProvider({ children }) {
   };
 
   const updateSettings = async (newSettings) => {
-    const updated = { ...settings, ...newSettings };
+    // Sanitize sensitive credentials from frontend state and localStorage
+    const cleanSettings = { ...newSettings };
+    delete cleanSettings.smtpPass;
+    delete cleanSettings.adminSecretKey;
+    delete cleanSettings.smtpUser;
+    delete cleanSettings.smtpHost;
+    delete cleanSettings.smtpPort;
+
+    const updated = { ...settings, ...cleanSettings };
     setSettings(updated);
     if (typeof window !== 'undefined') {
       localStorage.setItem('byk_settings', JSON.stringify(updated));
     }
     try {
-      await fetch('/api/settings', {
+      const headers = { 
+        'Content-Type': 'application/json'
+      };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      if (newSettings?.adminSecretKey) {
+        headers['x-admin-secret-key'] = newSettings.adminSecretKey;
+      }
+      const res = await fetch('/api/settings', {
         method: 'PUT',
-        headers: { 
-          'Content-Type': 'application/json'
-        },
+        headers,
         credentials: 'include',
         body: JSON.stringify(newSettings)
       });
+      const data = await res.json();
+      if (data?.settings) {
+        setSettings(data.settings);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('byk_settings', JSON.stringify(data.settings));
+        }
+      }
+      return data;
     } catch (e) {
       console.warn('Backend sync failed, saved locally');
+      return { success: true, savedLocally: true };
+    }
+  };
+
+  const testEmailSettings = async (testData) => {
+    try {
+      const headers = { 
+        'Content-Type': 'application/json'
+      };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      if (testData?.adminSecretKey) {
+        headers['x-admin-secret-key'] = testData.adminSecretKey;
+      }
+      const res = await fetch('/api/settings/test-email', {
+        method: 'POST',
+        headers,
+        credentials: 'include',
+        body: JSON.stringify(testData)
+      });
+      const rawText = await res.text();
+      let data;
+      try {
+        data = JSON.parse(rawText);
+      } catch (jsonErr) {
+        return {
+          success: false,
+          message: `Server Error (${res.status}): ${rawText.slice(0, 150) || res.statusText || 'Unexpected server response'}`
+        };
+      }
+      return data;
+    } catch (e) {
+      return { success: false, message: e.message || 'Network error while testing SMTP' };
     }
   };
 
@@ -435,21 +527,22 @@ export function NGOProvider({ children }) {
       const data = await res.json();
       if (data.success) {
         setDonations(prev => [data.donation, ...prev]);
-        const campaignId = isFormData ? donationData.get('campaignId') : donationData.campaignId;
-        const amount = isFormData ? Number(donationData.get('amount')) : Number(donationData.amount);
-        if (campaignId) {
-          setCampaigns(prev => prev.map(c => 
-            c._id === campaignId || c.id === campaignId
-              ? { ...c, raisedAmount: (c.raisedAmount || 0) + (amount || 0), donorCount: (c.donorCount || 0) + 1 }
-              : c
-          ));
-        }
         return { success: true, donation: data.donation };
       }
       return { success: false, message: data.message };
     } catch (e) {
       return { success: false, message: 'Error processing donation' };
     }
+  };
+
+  const refreshCampaigns = async () => {
+    try {
+      const res = await fetch('/api/campaigns', { credentials: 'include' });
+      const data = await res.json();
+      if (data?.campaigns) {
+        setCampaigns(data.campaigns);
+      }
+    } catch (e) {}
   };
 
   const setMemberStatus = async (memberId, status) => {
@@ -501,8 +594,96 @@ export function NGOProvider({ children }) {
   const addStory = (sty) => setStories(prev => [{ ...sty, id: `sty_${Date.now()}` }, ...prev]);
   const deleteStory = (id) => setStories(prev => prev.filter(s => s.id !== id));
 
-  const addFeedback = (fb) => setFeedbacks(prev => [{ ...fb, id: `fb_${Date.now()}` }, ...prev]);
-  const deleteFeedback = (id) => setFeedbacks(prev => prev.filter(f => f.id !== id));
+  const addFeedback = async (fb) => {
+    try {
+      const res = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        credentials: 'include',
+        body: JSON.stringify(fb)
+      });
+      const data = await res.json();
+      if (data.success && data.feedback) {
+        setFeedbacks(prev => [data.feedback, ...prev]);
+        return { success: true, feedback: data.feedback };
+      }
+    } catch (e) {
+      console.warn('API feedback error, fallback local:', e);
+    }
+    const local = { ...fb, id: `fb_${Date.now()}`, createdAt: new Date().toISOString() };
+    setFeedbacks(prev => [local, ...prev]);
+    return { success: true, feedback: local };
+  };
+
+  const replyFeedback = async (id, replyData) => {
+    try {
+      const res = await fetch(`/api/feedback/${id}/reply`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        credentials: 'include',
+        body: JSON.stringify(replyData)
+      });
+      const data = await res.json();
+      if (data.success && data.feedback) {
+        setFeedbacks(prev => prev.map(f => (f._id === id || f.id === id ? data.feedback : f)));
+        return { success: true, feedback: data.feedback };
+      }
+      return { success: false, message: data.message };
+    } catch (e) {
+      setFeedbacks(prev => prev.map(f => {
+        if (f._id === id || f.id === id) {
+          return {
+            ...f,
+            adminReply: replyData.reply,
+            adminRepliedAt: new Date().toISOString(),
+            repliedBy: replyData.repliedBy || 'Administrator',
+            repliedByRole: replyData.repliedByRole || 'Admin'
+          };
+        }
+        return f;
+      }));
+      return { success: true };
+    }
+  };
+
+  const updateFeedbackStatus = async (id, status) => {
+    try {
+      const res = await fetch(`/api/feedback/${id}/status`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        credentials: 'include',
+        body: JSON.stringify({ status })
+      });
+      const data = await res.json();
+      if (data.success && data.feedback) {
+        setFeedbacks(prev => prev.map(f => (f._id === id || f.id === id ? data.feedback : f)));
+        return { success: true };
+      }
+    } catch (e) {}
+    setFeedbacks(prev => prev.map(f => (f._id === id || f.id === id ? { ...f, status } : f)));
+    return { success: true };
+  };
+
+  const deleteFeedback = async (id) => {
+    try {
+      await fetch(`/api/feedback/${id}`, {
+        method: 'DELETE',
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+        credentials: 'include'
+      });
+    } catch (e) {}
+    setFeedbacks(prev => prev.filter(f => f._id !== id && f.id !== id));
+    return { success: true };
+  };
 
   const addComplaint = async (complaintData) => {
     try {
@@ -893,16 +1074,50 @@ export function NGOProvider({ children }) {
     }
   };
 
-  const addTeamMember = (member) => {
-    const updated = [...teamMembers, member];
-    setTeamMembers(updated);
-    updateSettings({ managementTeam: updated });
+  const addTeamMember = async (member) => {
+    try {
+      const res = await api.post('/team-members', member);
+      const created = res.data?.data || res.data?.item;
+      if (created) {
+        setTeamMembers(prev => [created, ...prev]);
+        return { success: true, member: created };
+      }
+    } catch (e) {
+      console.warn('API addTeamMember error, updating local:', e.message);
+    }
+    const local = { ...member, _id: `tm_${Date.now()}` };
+    setTeamMembers(prev => [local, ...prev]);
+    return { success: true, member: local };
   };
 
-  const deleteTeamMember = (idx) => {
-    const updated = teamMembers.filter((_, i) => i !== idx);
-    setTeamMembers(updated);
-    updateSettings({ managementTeam: updated });
+  const updateTeamMember = async (id, member) => {
+    try {
+      const res = await api.put(`/team-members/${id}`, member);
+      const updated = res.data?.data || res.data?.item;
+      if (updated) {
+        setTeamMembers(prev => prev.map(m => (m._id === id || m.id === id ? updated : m)));
+        return { success: true, member: updated };
+      }
+    } catch (e) {
+      console.warn('API updateTeamMember error, updating local:', e.message);
+    }
+    setTeamMembers(prev => prev.map(m => (m._id === id || m.id === id ? { ...m, ...member } : m)));
+    return { success: true };
+  };
+
+  const deleteTeamMember = async (idOrIdx) => {
+    try {
+      const targetId = typeof idOrIdx === 'string' ? idOrIdx : teamMembers[idOrIdx]?._id;
+      if (targetId) {
+        await api.delete(`/team-members/${targetId}`);
+        setTeamMembers(prev => prev.filter(m => m._id !== targetId && m.id !== targetId));
+        return { success: true };
+      }
+    } catch (e) {
+      console.warn('API deleteTeamMember error, updating local:', e.message);
+    }
+    setTeamMembers(prev => prev.filter((_, i) => i !== idOrIdx));
+    return { success: true };
   };
 
   const uploadFile = async (file, category = 'general') => {
@@ -949,12 +1164,14 @@ export function NGOProvider({ children }) {
     deleteFile,
     settings,
     updateSettings,
+    testEmailSettings,
     members,
     setMemberStatus,
     verifyMember,
     donations,
     recordDonation,
     campaigns,
+    refreshCampaigns,
     addCampaign,
     updateCampaign,
     deleteCampaign,
@@ -969,6 +1186,8 @@ export function NGOProvider({ children }) {
     deleteStory,
     feedbacks,
     addFeedback,
+    replyFeedback,
+    updateFeedbackStatus,
     deleteFeedback,
     events,
     addEvent,
@@ -991,6 +1210,7 @@ export function NGOProvider({ children }) {
     auditReports,
     teamMembers,
     addTeamMember,
+    updateTeamMember,
     deleteTeamMember,
     loading
   };

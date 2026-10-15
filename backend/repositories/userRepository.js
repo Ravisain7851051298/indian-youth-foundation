@@ -33,6 +33,10 @@ class UserRepository {
     return User.findOne({ memberId });
   }
 
+  async findByVolunteerId(volunteerId) {
+    return User.findOne({ $or: [{ volunteerId }, { memberId: volunteerId }] });
+  }
+
   async find(query = {}, sort = { createdAt: -1 }) {
     return User.find(query).select('-password').sort(sort);
   }
@@ -47,7 +51,7 @@ class UserRepository {
   }
 
   async updateById(id, updateData) {
-    return User.findByIdAndUpdate(id, updateData, { new: true });
+    return User.findByIdAndUpdate(id, updateData, { returnDocument: 'after' });
   }
 
   async deleteById(id) {

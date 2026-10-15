@@ -30,6 +30,7 @@ import {
   approveDonation, 
   rejectDonation 
 } from '@/store/donationSlice';
+import { fetchCampaigns } from '@/store/ngoSlice';
 
 export default function ApprovalsPage() {
   const dispatch = useDispatch();
@@ -76,9 +77,10 @@ export default function ApprovalsPage() {
   const handleApproveDonation = async (id) => {
     try {
       const res = await dispatch(approveDonation(id)).unwrap();
-      setActionNotice(res.message || 'Donation verified! Official 80G Tax Receipt generated and auto-emailed.');
+      setActionNotice(res.message || 'Donation verified! Official 80G Tax Receipt generated, campaign funding updated, and auto-emailed.');
       setTimeout(() => setActionNotice(null), 5000);
       dispatch(fetchDonations());
+      dispatch(fetchCampaigns());
     } catch (err) {
       alert(err || 'Failed to approve donation');
     }
@@ -96,6 +98,7 @@ export default function ApprovalsPage() {
       } else if (type === 'donation') {
         await dispatch(rejectDonation({ id, reason })).unwrap();
         dispatch(fetchDonations());
+        dispatch(fetchCampaigns());
       }
       setRejectModal({ open: false, type: '', id: '', reason: '' });
       setActionNotice('Application marked as rejected.');
@@ -106,49 +109,46 @@ export default function ApprovalsPage() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Page Title & Statutory Anti-Fraud Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+    <div className="space-y-4">
+      {/* Top Header Card */}
+      <div className="bg-white p-4 rounded-b-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-black text-black flex items-center gap-2">
-            <FiShield className="text-red-600 w-5 h-5" />
-            <span>Trustee Approval & Statutory Verification Center</span>
-          </h2>
-          <p className="text-xs text-gray-700 mt-1 font-medium">
+          <h1 className="text-2xl font-black text-black tracking-tight">Trustee Approvals &amp; Verification Center</h1>
+          <p className="text-xs text-slate-700 mt-1">
             Zero-Fraud Policy: ID cards, appointment letters, and 80G tax receipts are issued ONLY upon manual verification of bank receipts and transaction UTRs.
           </p>
         </div>
 
         <Link
           href="/dashboard"
-          className="text-xs font-bold text-black hover:text-red-600 transition flex items-center gap-1"
+          className="text-xs font-bold text-black hover:text-red-600 transition flex items-center gap-1 self-start md:self-auto"
         >
-          ← Back to Dashboard Overview
+          ← Back to Overview
         </Link>
       </div>
 
       {/* Success Notification Alert */}
       {actionNotice && (
-        <div className="bg-emerald-50 border border-emerald-300 text-emerald-800 p-4 rounded-2xl flex items-center gap-3 text-xs font-semibold shadow-xs">
+        <div className="mx-3 bg-emerald-50 border border-emerald-300 text-emerald-800 p-4 rounded-2xl flex items-center gap-3 text-xs font-semibold shadow-xs">
           <FiCheckCircle className="w-5 h-5 text-emerald-600 shrink-0" />
           <span>{actionNotice}</span>
         </div>
       )}
 
       {/* 3 Verification Category Tabs */}
-      <div className="flex flex-wrap items-center gap-3 border-b border-slate-200 pb-3">
+      <div className="bg-white mx-3 p-1 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap items-center gap-1.5">
         <button
           onClick={() => setActiveTab('members')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-black transition cursor-pointer ${
+          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
             activeTab === 'members'
               ? 'bg-red-600 text-white shadow-md shadow-red-600/20'
-              : 'bg-white text-black hover:bg-red-50 border border-slate-200'
+              : 'bg-slate-100 text-slate-700 hover:bg-red-50 hover:text-red-600'
           }`}
         >
-          <FiCreditCard className="w-4 h-4" />
+          <FiCreditCard className="w-3.5 h-3.5" />
           <span>Membership Applications</span>
-          <span className={`px-2 py-0.5 rounded-full text-[10px] ${
-            activeTab === 'members' ? 'bg-red-800 text-white' : 'bg-red-100 text-red-700 font-bold'
+          <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${
+            activeTab === 'members' ? 'bg-white/20 text-white' : 'bg-slate-200 text-black font-bold'
           }`}>
             {pendingMembers.length}
           </span>
@@ -156,16 +156,16 @@ export default function ApprovalsPage() {
 
         <button
           onClick={() => setActiveTab('volunteers')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-black transition ${
+          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
             activeTab === 'volunteers'
-              ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
-              : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200'
+              ? 'bg-red-600 text-white shadow-md shadow-red-600/20'
+              : 'bg-slate-100 text-slate-700 hover:bg-red-50 hover:text-red-600'
           }`}
         >
-          <FiUserCheck className="w-4 h-4" />
+          <FiUserCheck className="w-3.5 h-3.5" />
           <span>Volunteer Applications</span>
-          <span className={`px-2 py-0.5 rounded-full text-[10px] ${
-            activeTab === 'volunteers' ? 'bg-emerald-800 text-white' : 'bg-emerald-100 text-emerald-700 font-bold'
+          <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${
+            activeTab === 'volunteers' ? 'bg-white/20 text-white' : 'bg-slate-200 text-black font-bold'
           }`}>
             {pendingVolunteers.length}
           </span>
@@ -173,16 +173,16 @@ export default function ApprovalsPage() {
 
         <button
           onClick={() => setActiveTab('donations')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-black transition ${
+          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
             activeTab === 'donations'
-              ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
-              : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200'
+              ? 'bg-red-600 text-white shadow-md shadow-red-600/20'
+              : 'bg-slate-100 text-slate-700 hover:bg-red-50 hover:text-red-600'
           }`}
         >
-          <FiHeart className="w-4 h-4" />
+          <FiHeart className="w-3.5 h-3.5" />
           <span>80G Donations Pending</span>
-          <span className={`px-2 py-0.5 rounded-full text-[10px] ${
-            activeTab === 'donations' ? 'bg-blue-800 text-white' : 'bg-blue-100 text-blue-700 font-bold'
+          <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${
+            activeTab === 'donations' ? 'bg-white/20 text-white' : 'bg-slate-200 text-black font-bold'
           }`}>
             {pendingDonations.length}
           </span>
@@ -191,7 +191,7 @@ export default function ApprovalsPage() {
 
       {/* ----------------- TAB 1: MEMBERSHIP APPLICATIONS ----------------- */}
       {activeTab === 'members' && (
-        <div className="space-y-4">
+        <div className="mx-3 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-black text-slate-900">
               Pending Member Applications ({pendingMembers.length})
@@ -203,8 +203,8 @@ export default function ApprovalsPage() {
 
           {pendingMembers.length === 0 ? (
             <div className="bg-white p-12 rounded-3xl border border-slate-200 text-center">
-              <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-3 text-2xl font-bold">
-                ✓
+              <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-xs">
+                <FiCheckCircle className="w-7 h-7" />
               </div>
               <h4 className="font-bold text-slate-800 text-sm">All Membership Applications Cleared</h4>
               <p className="text-xs text-slate-500 mt-1">There are no pending membership applications waiting for review.</p>
@@ -290,7 +290,7 @@ export default function ApprovalsPage() {
 
       {/* ----------------- TAB 2: VOLUNTEER APPLICATIONS ----------------- */}
       {activeTab === 'volunteers' && (
-        <div className="space-y-4">
+        <div className="mx-3 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-black text-slate-900">
               Pending Volunteer Applications ({pendingVolunteers.length})
@@ -302,8 +302,8 @@ export default function ApprovalsPage() {
 
           {pendingVolunteers.length === 0 ? (
             <div className="bg-white p-12 rounded-3xl border border-slate-200 text-center">
-              <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-3 text-2xl font-bold">
-                ✓
+              <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-xs">
+                <FiCheckCircle className="w-7 h-7" />
               </div>
               <h4 className="font-bold text-slate-800 text-sm">No Pending Volunteer Enrolments</h4>
               <p className="text-xs text-slate-500 mt-1">All volunteer applications have been reviewed.</p>
@@ -380,7 +380,7 @@ export default function ApprovalsPage() {
 
       {/* ----------------- TAB 3: DONATIONS PENDING APPROVAL ----------------- */}
       {activeTab === 'donations' && (
-        <div className="space-y-4">
+        <div className="mx-3 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-black text-slate-900">
               Pending 80G Donations ({pendingDonations.length})
@@ -392,8 +392,8 @@ export default function ApprovalsPage() {
 
           {pendingDonations.length === 0 ? (
             <div className="bg-white p-12 rounded-3xl border border-slate-200 text-center">
-              <div className="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-3 text-2xl font-bold">
-                ✓
+              <div className="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-xs">
+                <FiCheckCircle className="w-7 h-7" />
               </div>
               <h4 className="font-bold text-slate-800 text-sm">All Donations Verified</h4>
               <p className="text-xs text-slate-500 mt-1">There are no pending donations awaiting verification.</p>

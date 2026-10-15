@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import {
   FiCamera,
@@ -15,24 +15,40 @@ import {
   FiX,
   FiSave
 } from "react-icons/fi";
+import { useDispatch, useSelector } from "react-redux";
 import { useNGO } from "@/context/NGOContext";
-import api from "@/services/api";
+import { updateUserProfile, uploadAndUpdateAvatar } from "@/store/authSlice";
 import { getContentImageUrl } from "@/lib/authApi";
 
 export default function AdminProfileManagement() {
-  const { currentUser, setCurrentUser, uploadFile } = useNGO();
+  const dispatch = useDispatch();
+  const { currentUser, setCurrentUser } = useNGO();
+  const reduxUser = useSelector((state) => state.auth?.user);
+  const effectiveUser = reduxUser || currentUser;
 
   const [form, setForm] = useState({
-    name: currentUser?.name || "",
-    email: currentUser?.email || "",
-    phone: currentUser?.phone || "",
-    photoUrl: currentUser?.photoUrl || ""
+    name: effectiveUser?.name || "",
+    email: effectiveUser?.email || "",
+    phone: effectiveUser?.phone || "",
+    photoUrl: effectiveUser?.photoUrl || ""
   });
 
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState("");
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    if (effectiveUser) {
+      setForm((prev) => ({
+        ...prev,
+        name: effectiveUser.name || prev.name,
+        email: effectiveUser.email || prev.email,
+        phone: effectiveUser.phone || prev.phone,
+        photoUrl: effectiveUser.photoUrl !== undefined ? effectiveUser.photoUrl : prev.photoUrl
+      }));
+    }
+  }, [effectiveUser]);
 
   const handleAvatarChange = async (e) => {
     const file = e.target.files?.[0];
@@ -42,10 +58,14 @@ export default function AdminProfileManagement() {
       setAvatarFile(file);
       setAvatarPreview(URL.createObjectURL(file));
 
-      const up = await uploadFile(file);
-      if (up?.success && up?.url) {
-        setForm((prev) => ({ ...prev, photoUrl: up.url }));
-        toast.success("Avatar uploaded! Save profile to finalize.");
+      const resultAction = await dispatch(uploadAndUpdateAvatar({ file, category: 'avatars' }));
+      if (uploadAndUpdateAvatar.fulfilled.match(resultAction)) {
+        const updated = resultAction.payload;
+        setForm((prev) => ({ ...prev, photoUrl: updated.photoUrl }));
+        if (setCurrentUser) setCurrentUser(updated);
+        toast.success("Avatar uploaded and saved in real-time!");
+      } else {
+        toast.error(resultAction.payload || "Avatar upload failed");
       }
     } catch (err) {
       toast.error("Avatar upload failed");
@@ -54,25 +74,41 @@ export default function AdminProfileManagement() {
     }
   };
 
-  const handleRemoveAvatar = () => {
+  const handleRemoveAvatar = async () => {
     setAvatarFile(null);
     setAvatarPreview("");
     setForm((prev) => ({ ...prev, photoUrl: "" }));
+    try {
+      setSaving(true);
+      const resultAction = await dispatch(updateUserProfile({ photoUrl: "" }));
+      if (updateUserProfile.fulfilled.match(resultAction)) {
+        const updated = resultAction.payload;
+        if (setCurrentUser) setCurrentUser(updated);
+        toast.success("Profile photo removed successfully!");
+      }
+    } catch (err) {
+      toast.error("Failed to remove avatar");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleSave = async (e) => {
     e.preventDefault();
     try {
       setSaving(true);
-      const res = await api.put("/auth/profile", form);
-      if (res.data?.success) {
+      const resultAction = await dispatch(updateUserProfile(form));
+      if (updateUserProfile.fulfilled.match(resultAction)) {
+        const updated = resultAction.payload;
         toast.success("Admin profile updated successfully!");
         if (setCurrentUser) {
-          setCurrentUser((prev) => ({ ...prev, ...res.data.user }));
+          setCurrentUser(updated);
         }
+      } else {
+        toast.error(resultAction.payload || "Failed to update profile");
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to update profile");
+      toast.error(err.message || "Failed to update profile");
     } finally {
       setSaving(false);
     }
@@ -100,9 +136,13 @@ export default function AdminProfileManagement() {
           <div className="flex flex-col sm:flex-row sm:items-center gap-6 pb-6 border-b border-slate-100">
             <div className="relative w-24 h-24 shrink-0">
               <img
-                src={avatarPreview || getContentImageUrl(form.photoUrl) || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300"}
-                alt={form.name}
+                src={avatarPreview || getContentImageUrl(form.photoUrl || effectiveUser?.photoUrl) || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300"}
+                alt={form.name || effectiveUser?.name || "Admin"}
                 className="w-24 h-24 rounded-2xl object-cover border-2 border-red-500 shadow-md"
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300";
+                }}
               />
               <label className="absolute -bottom-2 -right-2 p-2 bg-red-600 hover:bg-red-700 text-white rounded-full shadow-lg cursor-pointer transition">
                 <FiCamera className="w-3.5 h-3.5" />

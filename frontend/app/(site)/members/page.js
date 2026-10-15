@@ -19,6 +19,7 @@ import {
 } from 'react-icons/fi';
 import { QRCodeSVG } from 'qrcode.react';
 import { useNGO } from '@/context/NGOContext';
+import { getContentImageUrl } from '@/lib/authApi';
 
 function MembersContent() {
   const { members, verifyMember, setMemberStatus, currentUser } = useNGO();
@@ -76,7 +77,7 @@ function MembersContent() {
               className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-md transition"
             >
               <FiUserPlus className="w-3.5 h-3.5" />
-              <span>Register New Member</span>
+              <span>Apply for Membership</span>
             </Link>
           </div>
         </div>
@@ -129,10 +130,15 @@ function MembersContent() {
               {/* Mini Card */}
               <div className="bg-gradient-to-br from-red-600 via-rose-600 to-red-700 text-white p-5 rounded-2xl shadow-lg relative overflow-hidden text-xs">
                 <div className="flex items-center gap-3.5">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={selectedMember.photoUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'}
+                    src={getContentImageUrl(selectedMember.photoUrl) || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'}
                     alt={selectedMember.name}
                     className="w-16 h-16 rounded-xl object-cover border-2 border-white shadow-md"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150';
+                    }}
                   />
                   <div>
                     <div className="font-extrabold text-sm">{selectedMember.name}</div>
@@ -183,10 +189,15 @@ function MembersContent() {
               <div>
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={member.photoUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'}
+                      src={getContentImageUrl(member.photoUrl) || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'}
                       alt={member.name}
                       className="w-14 h-14 rounded-2xl object-cover border border-gray-200 shadow-2xs"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150';
+                      }}
                     />
                     <div>
                       <h3 className="font-extrabold text-base text-black">{member.name}</h3>

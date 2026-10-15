@@ -1,32 +1,40 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { 
-  FiSettings, 
-  FiSave, 
-  FiCheckCircle, 
-  FiImage, 
-  FiShield, 
-  FiPhone, 
-  FiMapPin, 
-  FiCreditCard, 
-  FiGlobe,
+import {
+  FiSettings,
+  FiSave,
+  FiCheckCircle,
+  FiImage,
+  FiShield,
+  FiPhone,
+  FiCreditCard,
   FiArrowLeft,
   FiUploadCloud,
-  FiFileText,
   FiCompass,
-  FiDollarSign,
-  FiCheck
+  FiSend,
+  FiMail,
+  FiAlertCircle,
+  FiRefreshCw,
+  FiEye,
+  FiEyeOff,
+  FiUsers,
+  FiFileText,
+  FiExternalLink
 } from 'react-icons/fi';
 import { useNGO } from '@/context/NGOContext';
+import toast from "react-hot-toast";
 
 export default function SettingsPage() {
-  const { settings, updateSettings, currentUser, uploadFile } = useNGO();
+  const { settings, updateSettings, testEmailSettings, currentUser, uploadFile } = useNGO();
   const isAdmin = currentUser?.role === 'Admin';
 
   const [activeTab, setActiveTab] = useState('branding');
   const [uploadingField, setUploadingField] = useState(null);
+  const [testReceiverEmail, setTestReceiverEmail] = useState('');
+  const [testingMail, setTestingMail] = useState(false);
+  const [mailTestResult, setMailTestResult] = useState(null);
 
   const [form, setForm] = useState({
     ngoNameHi: settings?.ngoNameHi || 'भारतीय युवा क्रांति',
@@ -36,6 +44,7 @@ export default function SettingsPage() {
     logoUrl: settings?.logoUrl || '',
     officialSealUrl: settings?.officialSealUrl || '',
     presidentSignatureUrl: settings?.presidentSignatureUrl || '',
+    presidentName: settings?.presidentName || 'Ravi Saini (National President & Trustee)',
     registrationNo: settings?.registrationNo || 'REG/2021/NGO/DEL/8741',
     panNo: settings?.panNo || 'AAATB4321Q',
     nitiAayogDarpanId: settings?.nitiAayogDarpanId || 'RJ/2022/0319482',
@@ -62,14 +71,48 @@ export default function SettingsPage() {
     visionStatement: settings?.visionStatement || '',
     footerDescription: settings?.footerDescription || '',
     footerCopyright: settings?.footerCopyright || '',
+    whoWeAreHeading: settings?.whoWeAreHeading || 'Who We Are — The Pulse of Indian Youth Foundation',
+    whoWeAreSubtitle: settings?.whoWeAreSubtitle || 'A Catalyst for Grassroots Youth Empowerment, Civil Welfare & Nation Building',
+    whoWeAreStory: settings?.whoWeAreStory || 'Founded by passionate young patriots and grassroots social activists, Indian Youth Foundation (भारतीय युवा क्रांति) was born from a deep conviction: that India\'s greatest reservoir of untapped power is its youth. Guided by the ethos of "Nation First, Society Always", we bridge the chasm between compassionate intent and concrete ground action.\n\nFrom running evening community literacy circles for slum children and maintaining an agile 24x7 emergency blood donor network across districts, to providing women self-reliance tailoring skills and mounting rapid relief during natural disasters, our youth task force stands on the frontlines of humanitarian transformation.\n\nWe operate with unwavering corporate governance, complete CBDT statutory transparency, zero administrative overhead leakage, and an uncompromising dedication to human dignity.',
+    whoWeAreVision: settings?.whoWeAreVision || 'To foster an empowered, educated, and self-reliant India where proactive youth leadership eliminates socioeconomic disparities, champions community brotherhood, and builds a prosperous nation.',
+    whoWeAreMission: settings?.whoWeAreMission || 'To channel the vibrant energy, intellect, and civic dedication of Indian youth into measurable grassroots social welfare initiatives, ensuring quality education for every underprivileged child, immediate healthcare access, women economic self-reliance, and disaster relief.',
+    whoWeAreValues: settings?.whoWeAreValues || 'Nation First: Every action is dedicated to national strength and social harmony.\nIntegrity & Transparency: 100% statutory adherence, audited accounts, and public receipts.\nYouth Leadership: Placing young changemakers in driving seats of community solutions.\nEmpathy in Action: Rapid, unconditional grassroots aid for every vulnerable citizen.',
+    whoWeAreBannerUrl: settings?.whoWeAreBannerUrl || 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1200&auto=format&fit=crop&q=80',
+    privacyPolicyTitle: settings?.privacyPolicyTitle || 'Privacy Policy & Data Security',
+    privacyPolicySubtitle: settings?.privacyPolicySubtitle || 'Indian Youth Foundation (Bharatiya Yuva Kranti) is dedicated to maintaining full transparency, safeguarding donor privacy, and protecting personal data.',
+    privacyLastUpdated: settings?.privacyLastUpdated || 'October 2026',
+    privacyPolicyContent: settings?.privacyPolicyContent || '## 1. Information We Collect\nWhen you interact with Indian Youth Foundation through donations, membership registrations, volunteer drives, or contact inquiries, we collect information necessary to fulfill our statutory non-profit functions:\n- Personal Identity: Full name, date of birth, gender, blood group, and residential address.\n- Contact Information: Verified mobile phone number, WhatsApp contact, and email address.\n- Statutory Tax Data (for 80G Receipts): Permanent Account Number (PAN Card No.) and postal address, mandatory under the Income Tax Act, 1961 (Form 10BD reporting).\n- Payment Transaction Data: Unique transaction ID, payment method (UPI, Netbanking, Debit/Credit Card), timestamp, and donation amount. We do NOT store credit card numbers, CVVs, or net banking passwords on our servers.\n\n## 2. How We Use Your Information\nAll personal and financial details collected by the Foundation are used strictly for legitimate charitable administration:\n- Generating and delivering instant, digitally signed Section 80G tax exemption donation receipts.\n- Issuing verified digital membership ID cards, appointment letters, and appreciation certificates.\n- Reporting donor contribution records to the Income Tax Department via Form 10BD for donor tax deductions.\n- Communicating program updates, emergency blood donation appeals, and humanitarian relief bulletins.\n- Investigating grievances, feedback, and community service inquiries submitted to the administration.\n\n## 3. Payment Gateway Security & Encryption\nOnline payments on this portal are processed via Reserve Bank of India (RBI) authorized payment gateways (including Razorpay & UPI rails) utilizing industry-grade 256-bit SSL encryption. Indian Youth Foundation adheres to PCI-DSS compliance standards ensuring seamless, tamper-proof electronic transactions.\n\n## 4. Non-Disclosure & Data Confidentiality\nWe enforce a strict non-disclosure policy. Indian Youth Foundation does never rent, sell, trade, or commercially share our donor or member records with any third-party marketing agency. Information is disclosed solely when mandated by Indian law or competent regulatory bodies (e.g., Income Tax Department, NITI Aayog).\n\n## 5. Your Rights & Grievance Redressal\nDonors and registered members maintain the right to review their records, request correction of inaccurate details, or download their cumulative donation statements. For questions or grievance escalation, reach out directly to our official grievance contacts.',
+    termsTitle: settings?.termsTitle || 'Terms & Conditions of Service',
+    termsSubtitle: settings?.termsSubtitle || 'Rules, guidelines, and legal agreements governing the use of the Indian Youth Foundation website, online donations, and member services.',
+    termsEffectiveDate: settings?.termsEffectiveDate || 'October 2026',
+    termsContent: settings?.termsContent || '## 1. Acceptance of Terms\nBy accessing, browsing, registering as a member, or donating on this website, you agree to be legally bound by these Terms and Conditions and our Privacy Policy. If you do not accept these terms, you should discontinue using this portal.\n\n## 2. Online Donations & 80G Tax Receipts\n- All donations contributed through this portal are applied directly towards humanitarian relief, child education, healthcare assistance, and community welfare programs.\n- Donations are eligible for 50% income tax deduction under Section 80G of the Indian Income Tax Act, 1961.\n- To receive a valid Section 80G tax certificate, donors must provide their valid Indian Permanent Account Number (PAN) and postal address during payment.\n- Official digitally verified donation receipts bearing unique receipt numbers and QR codes are issued immediately upon successful transaction completion.\n\n## 3. Non-Refundable Donation Policy\nAs donations are voluntary charitable contributions committed promptly towards ongoing social causes and emergency supplies, they are generally non-refundable. However, in verified instances of technical error (such as erroneous double deductions through the payment gateway), a written refund request can be filed within 7 calendar days accompanied by transaction proof.\n\n## 4. Code of Conduct for Members & Volunteers\n- Every registered Member and Volunteer must conduct themselves in alignment with the national ideals and peaceful constitution of the Foundation.\n- Official Member ID Cards, Appointment Letters, and certificates issued by the Foundation remain the intellectual property of Indian Youth Foundation.\n- Members are strictly prohibited from using foundation identification, seals, or letterheads for personal commercial exploitation, unauthorized political lobbying, or illegal activities. Any misuse results in immediate termination of membership and criminal prosecution.\n\n## 5. Protection of Official Logo, Seals & Signatures\nAll trademarks, logos, official stamps/seals, digital signatures of executive trustees, website graphics, and software workflows displayed across this portal are exclusively owned by Indian Youth Foundation. Unauthorized reproduction, modification, or counterfeit duplication is actionable under Indian Copyright and Intellectual Property laws.\n\n## 6. Governing Law & Legal Jurisdiction\nThese Terms and Conditions are governed by and construed in accordance with the laws of the Republic of India. In the event of any dispute or arbitration, the courts having jurisdiction in Aligarh, Uttar Pradesh shall have exclusive jurisdiction.',
     smtpHost: settings?.smtpHost || 'smtp.gmail.com',
     smtpPort: settings?.smtpPort || 587,
-    smtpUser: settings?.smtpUser || 'samasyasamadhanparishad@gmail.com',
-    smtpPass: settings?.smtpPass || '',
-    adminSecretKey: settings?.adminSecretKey || 'BYK_SUPER_ADMIN_ALIGARH_SECRET_2026'
+    smtpUser: settings?.smtpUser || '',
+    smtpPass: '',
+    smtpFromName: settings?.smtpFromName || 'Indian Youth Foundation',
+    adminSecretKey: ''
   });
 
+  // Keep form in sync when settings are loaded from server
+  useEffect(() => {
+    if (settings) {
+      setForm(prev => ({
+        ...prev,
+        ...settings,
+        adminSecretKey: prev.adminSecretKey || '',
+        smtpPass: prev.smtpPass || '',
+        accountName: settings.bankDetails?.accountName ?? prev.accountName,
+        accountNumber: settings.bankDetails?.accountNumber ?? prev.accountNumber,
+        ifscCode: settings.bankDetails?.ifscCode ?? prev.ifscCode,
+        bankName: settings.bankDetails?.bankName ?? prev.bankName,
+        branch: settings.bankDetails?.branch ?? prev.branch,
+      }));
+    }
+  }, [settings]);
+
   const [saved, setSaved] = useState(false);
+  const [showSmtpPass, setShowSmtpPass] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -99,7 +142,7 @@ export default function SettingsPage() {
 
   const handleSave = async (e) => {
     e.preventDefault();
-    await updateSettings({
+    const res = await updateSettings({
       ...form,
       bankDetails: {
         accountName: form.accountName,
@@ -109,15 +152,54 @@ export default function SettingsPage() {
         branch: form.branch
       }
     });
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+    if (!res.success) {
+      toast.error(res.message || "Failed to save settings!");
+      return;
+    }
+    toast.success(res.message || "Settings saved successfully!");
+  };
+
+  const handleTestEmail = async (e) => {
+    e.preventDefault();
+    if (!testReceiverEmail) {
+      alert('Please enter a recipient email address to send the diagnostic test.');
+      return;
+    }
+    const cleanPass = (form.smtpPass || '').trim();
+    if (cleanPass && (cleanPass.includes('•') || cleanPass.includes('*'))) {
+      alert('⚠️ Important: Please enter your actual 16-character Google App Password in the "SMTP App Password" field above.\n\nMasked bullet dots (••••) cannot be used for SMTP login.\n\nTo generate an App Password:\n1. Open https://myaccount.google.com/apppasswords\n2. Ensure 2-Step Verification is active on your Google Account.\n3. Create an App Name (e.g. "IYF Mail") and copy the 16 characters here.');
+      return;
+    }
+    setTestingMail(true);
+    setMailTestResult(null);
+    try {
+      const res = await testEmailSettings({
+        smtpHost: form.smtpHost,
+        smtpPort: form.smtpPort,
+        smtpUser: form.smtpUser,
+        smtpPass: form.smtpPass,
+        smtpFromName: form.smtpFromName,
+        testReceiverEmail: testReceiverEmail.trim(),
+        adminSecretKey: form.adminSecretKey
+      });
+      setMailTestResult(res);
+    } catch (err) {
+      setMailTestResult({
+        success: false,
+        message: err.message || 'SMTP diagnostic request encountered a failure.'
+      });
+    } finally {
+      setTestingMail(false);
+    }
   };
 
   if (!isAdmin) {
     return (
       <div className="min-h-[70vh] flex items-center justify-center p-6 bg-slate-100">
         <div className="max-w-md w-full bg-white p-8 rounded-3xl shadow-xl text-center border border-slate-200">
-          <div className="text-3xl mb-3">🛡️</div>
+          <div className="w-14 h-14 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center mx-auto mb-3 border border-red-200 shadow-sm">
+            <FiShield className="w-7 h-7" />
+          </div>
           <h2 className="text-xl font-black text-slate-900">Administrator Access Required</h2>
           <p className="text-xs text-slate-600 mt-2">
             Only designated NGO Administrators have permission to modify brand identity, bank details, and statutory settings.
@@ -134,97 +216,121 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 py-12">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-200">
-          <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 border border-red-200 text-red-700 text-xs font-bold mb-1">
-              <FiSettings className="w-3.5 h-3.5 text-red-600" />
-              <span>Admin Master CMS Control</span>
-            </div>
-            <h1 className="text-3xl font-black text-black tracking-tight">
-              Contact & NGO Master Settings
-            </h1>
-            <p className="text-xs sm:text-sm text-gray-700 mt-1 font-medium">
-              Complete dynamic CRUD: Logo, Official Seal, Signatures, Contact Info, Bank/UPI, About Us & Mission/Vision. All files saved to uploads directory.
-            </p>
-          </div>
+    <div className="space-y-4">
+      {/* Top Header Card */}
+      <div className="bg-white p-4 rounded-b-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-lg font-black text-slate-900 tracking-tight flex items-center gap-2">
+            <FiSettings className="text-red-600 w-5 h-5" />
+            Contact & NGO Master Settings
+          </h2>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Complete dynamic CRUD: Logo, Official Seal, Signatures, Contact Info, Bank/UPI, About Us & Mission/Vision.
+          </p>
+        </div>
 
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleSave}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-md shadow-red-600/20 transition cursor-pointer"
+          >
+            <FiSave className="w-3.5 h-3.5" />
+            <span>Save All Settings</span>
+          </button>
           <Link
             href="/dashboard"
-            className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-black text-xs font-bold rounded-xl transition self-start sm:self-auto"
+            className="text-xs font-bold text-slate-500 hover:text-red-600 transition px-2 py-1"
           >
-            <FiArrowLeft className="w-4 h-4 text-red-600" />
-            <span>Dashboard</span>
+            ← Overview
           </Link>
         </div>
+      </div>
 
-        {saved && (
-          <div className="mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2">
-            <FiCheckCircle className="w-5 h-5 text-emerald-600 shrink-0" />
-            <span>Settings saved successfully! Changes are immediately live across Navbar, Footer, Receipts, and ID Cards.</span>
-          </div>
-        )}
-
-        {/* Tab Navigation */}
-        <div className="flex items-center gap-2 border-b border-slate-200 mb-8 overflow-x-auto pb-2 text-xs font-bold">
-          <button
-            type="button"
-            onClick={() => setActiveTab('branding')}
-            className={`px-4 py-2.5 rounded-xl transition cursor-pointer whitespace-nowrap ${
-              activeTab === 'branding' ? 'bg-red-600 text-white shadow-md' : 'bg-white text-black hover:bg-red-50 border border-slate-200'
-            }`}
-          >
-            1. Logo, Seal & Signature
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('statutory')}
-            className={`px-4 py-2.5 rounded-xl transition cursor-pointer whitespace-nowrap ${
-              activeTab === 'statutory' ? 'bg-red-600 text-white shadow-md' : 'bg-white text-black hover:bg-red-50 border border-slate-200'
-            }`}
-          >
-            2. Statutory 12A / 80G & PAN
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('contact')}
-            className={`px-4 py-2.5 rounded-xl transition cursor-pointer whitespace-nowrap ${
-              activeTab === 'contact' ? 'bg-red-600 text-white shadow-md' : 'bg-white text-black hover:bg-red-50 border border-slate-200'
-            }`}
-          >
-            3. Contact & Head Office
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('bank')}
-            className={`px-4 py-2.5 rounded-xl transition cursor-pointer whitespace-nowrap ${
-              activeTab === 'bank' ? 'bg-red-600 text-white shadow-md' : 'bg-white text-black hover:bg-red-50 border border-slate-200'
-            }`}
-          >
-            4. Bank Details & UPI QR
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('about')}
-            className={`px-4 py-2.5 rounded-xl transition cursor-pointer whitespace-nowrap ${
-              activeTab === 'about' ? 'bg-red-600 text-white shadow-md' : 'bg-white text-black hover:bg-red-50 border border-slate-200'
-            }`}
-          >
-            5. About Us & Mission/Vision
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('smtp')}
-            className={`px-4 py-2.5 rounded-xl transition cursor-pointer whitespace-nowrap ${
-              activeTab === 'smtp' ? 'bg-red-600 text-white shadow-md' : 'bg-white text-black hover:bg-red-50 border border-slate-200'
-            }`}
-          >
-            6. SMTP Email Server & Security
-          </button>
+      {saved && (
+        <div className="mx-3 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2">
+          <FiCheckCircle className="w-5 h-5 text-emerald-600 shrink-0" />
+          <span>Settings saved successfully! Changes are immediately live across Navbar, Footer, Receipts, and ID Cards.</span>
         </div>
+      )}
 
-        <form onSubmit={handleSave} className="space-y-8 text-xs">
+      {/* Tab Navigation */}
+      <div className="bg-white mx-3 p-1 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-1.5 overflow-x-auto text-xs font-bold">
+        <button
+          type="button"
+          onClick={() => setActiveTab('branding')}
+          className={`px-3.5 py-1.5 rounded-xl transition cursor-pointer whitespace-nowrap text-xs font-black ${
+            activeTab === 'branding' ? 'bg-red-600 text-white shadow-md shadow-red-600/20' : 'bg-slate-100 text-slate-700 hover:bg-red-50 hover:text-red-600'
+          }`}
+        >
+          1. Logo, Seal &amp; Signature
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('statutory')}
+          className={`px-3.5 py-1.5 rounded-xl transition cursor-pointer whitespace-nowrap text-xs font-black ${
+            activeTab === 'statutory' ? 'bg-red-600 text-white shadow-md shadow-red-600/20' : 'bg-slate-100 text-slate-700 hover:bg-red-50 hover:text-red-600'
+          }`}
+        >
+          2. Statutory 12A / 80G &amp; PAN
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('contact')}
+          className={`px-3.5 py-1.5 rounded-xl transition cursor-pointer whitespace-nowrap text-xs font-black ${
+            activeTab === 'contact' ? 'bg-red-600 text-white shadow-md shadow-red-600/20' : 'bg-slate-100 text-slate-700 hover:bg-red-50 hover:text-red-600'
+          }`}
+        >
+          3. Contact &amp; Head Office
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('bank')}
+          className={`px-3.5 py-1.5 rounded-xl transition cursor-pointer whitespace-nowrap text-xs font-black ${
+            activeTab === 'bank' ? 'bg-red-600 text-white shadow-md shadow-red-600/20' : 'bg-slate-100 text-slate-700 hover:bg-red-50 hover:text-red-600'
+          }`}
+        >
+          4. Bank Details &amp; UPI QR
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('whoWeAre')}
+          className={`px-3.5 py-1.5 rounded-xl transition cursor-pointer whitespace-nowrap text-xs font-black ${
+            activeTab === 'whoWeAre' ? 'bg-red-600 text-white shadow-md shadow-red-600/20' : 'bg-slate-100 text-slate-700 hover:bg-red-50 hover:text-red-600'
+          }`}
+        >
+          5. &quot;Who We Are&quot; Page CMS
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('legalCms')}
+          className={`px-3.5 py-1.5 rounded-xl transition cursor-pointer whitespace-nowrap text-xs font-black ${
+            activeTab === 'legalCms' ? 'bg-red-600 text-white shadow-md shadow-red-600/20' : 'bg-slate-100 text-slate-700 hover:bg-red-50 hover:text-red-600'
+          }`}
+        >
+          6. Privacy &amp; Terms CMS
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('about')}
+          className={`px-3.5 py-1.5 rounded-xl transition cursor-pointer whitespace-nowrap text-xs font-black ${
+            activeTab === 'about' ? 'bg-red-600 text-white shadow-md shadow-red-600/20' : 'bg-slate-100 text-slate-700 hover:bg-red-50 hover:text-red-600'
+          }`}
+        >
+          7. About Us Story
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('smtp')}
+          className={`px-3.5 py-1.5 rounded-xl transition cursor-pointer whitespace-nowrap text-xs font-black ${
+            activeTab === 'smtp' ? 'bg-red-600 text-white shadow-md shadow-red-600/20' : 'bg-slate-100 text-slate-700 hover:bg-red-50 hover:text-red-600'
+          }`}
+        >
+          8. SMTP Email Server &amp; Security
+        </button>
+      </div>
+
+      <form onSubmit={handleSave} className="mx-3 space-y-4 text-xs">
           {/* TAB 1: BRANDING, LOGO, SEAL, SIGNATURE */}
           {activeTab === 'branding' && (
             <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm space-y-6">
@@ -372,6 +478,24 @@ export default function SettingsPage() {
                     </label>
                   </div>
                 </div>
+              </div>
+
+              {/* National President & Signatory Name */}
+              <div className="pt-4 border-t border-slate-200">
+                <label className="font-bold text-black block mb-1">
+                  National President / Authorized Admin Signatory Name *
+                </label>
+                <input
+                  type="text"
+                  name="presidentName"
+                  value={form.presidentName}
+                  onChange={handleChange}
+                  placeholder="Ravi Saini (National President & Trustee)"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-bold text-black"
+                />
+                <span className="text-[10px] text-gray-600 mt-1 block">
+                  This official signatory name dynamically prints beneath the digital signatures and trust seal across all Certificates, ID Cards, and Offer/Appointment Letters.
+                </span>
               </div>
             </div>
           )}
@@ -621,12 +745,301 @@ export default function SettingsPage() {
             </div>
           )}
 
-          {/* TAB 5: DYNAMIC ABOUT US & MISSION/VISION */}
+          {/* TAB 5: "WHO WE ARE" PAGE CMS */}
+          {activeTab === 'whoWeAre' && (
+            <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4">
+                <div>
+                  <h2 className="text-base font-extrabold text-black flex items-center gap-2">
+                    <FiUsers className="text-red-600" />
+                    <span>5. &quot;Who We Are&quot; Dynamic Page Management</span>
+                  </h2>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Live content editor for the dedicated public page (/who-we-are). Changes are reflected instantly.
+                  </p>
+                </div>
+                <Link
+                  href="/who-we-are"
+                  target="_blank"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-red-50 text-red-700 hover:bg-red-100 font-bold text-xs border border-red-200 transition"
+                >
+                  <FiExternalLink className="w-3.5 h-3.5" />
+                  <span>Preview &quot;Who We Are&quot; Page</span>
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="font-bold text-black block mb-1">Page Main Heading *</label>
+                  <input
+                    type="text"
+                    required
+                    name="whoWeAreHeading"
+                    value={form.whoWeAreHeading}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-bold text-black"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-black block mb-1">Page Subtitle / Tagline *</label>
+                  <input
+                    type="text"
+                    required
+                    name="whoWeAreSubtitle"
+                    value={form.whoWeAreSubtitle}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-black"
+                  />
+                </div>
+              </div>
+
+              {/* Banner Image URL & Uploader */}
+              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="font-bold text-black block text-xs">Who We Are Showcase Banner Image</label>
+                  {form.whoWeAreBannerUrl && (
+                    <img src={form.whoWeAreBannerUrl} alt="Banner Preview" className="w-16 h-9 rounded-lg object-cover border" />
+                  )}
+                </div>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="text"
+                    name="whoWeAreBannerUrl"
+                    placeholder="Banner Image URL or upload below"
+                    value={form.whoWeAreBannerUrl}
+                    onChange={handleChange}
+                    className="flex-1 px-3 py-2 rounded-xl border border-slate-300 text-xs text-black"
+                  />
+                  <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs transition shadow-md shadow-red-600/20 whitespace-nowrap">
+                    <FiUploadCloud className="w-3.5 h-3.5" />
+                    <span>{uploadingField === 'whoWeAreBannerUrl' ? 'Uploading...' : 'Upload Image'}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => handleFileUpload('whoWeAreBannerUrl', e)}
+                    />
+                  </label>
+                </div>
+              </div>
+
+              {/* Comprehensive Who We Are Narrative Story */}
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="font-bold text-black block">
+                    Comprehensive Narrative Story &amp; Identity *
+                  </label>
+                  <span className="text-[10px] text-slate-500 font-semibold">
+                    Supports paragraphs, **bold text**, and markdown headings
+                  </span>
+                </div>
+                <textarea
+                  rows={8}
+                  required
+                  name="whoWeAreStory"
+                  value={form.whoWeAreStory}
+                  onChange={handleChange}
+                  placeholder="Enter the complete foundational story..."
+                  className="w-full px-4 py-3 rounded-2xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 leading-relaxed text-black font-normal"
+                />
+              </div>
+
+              {/* Mission & Vision */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="font-bold text-black block mb-1">Who We Are — Mission</label>
+                  <textarea
+                    rows={4}
+                    name="whoWeAreMission"
+                    value={form.whoWeAreMission}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-black leading-relaxed"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-black block mb-1">Who We Are — Vision</label>
+                  <textarea
+                    rows={4}
+                    name="whoWeAreVision"
+                    value={form.whoWeAreVision}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-black leading-relaxed"
+                  />
+                </div>
+              </div>
+
+              {/* Core Values & Ideology */}
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="font-bold text-black block">Core Values &amp; Non-Negotiable Ideology</label>
+                  <span className="text-[10px] text-slate-500">Each point on a new line</span>
+                </div>
+                <textarea
+                  rows={4}
+                  name="whoWeAreValues"
+                  value={form.whoWeAreValues}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-black leading-relaxed font-normal"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* TAB 6: PRIVACY POLICY & TERMS AND CONDITIONS CMS */}
+          {activeTab === 'legalCms' && (
+            <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm space-y-8">
+              <div className="border-b pb-4">
+                <h2 className="text-base font-extrabold text-black flex items-center gap-2">
+                  <FiFileText className="text-red-600" />
+                  <span>6. Dynamic Legal CMS: Privacy Policy &amp; Terms of Service</span>
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Full control over legal clauses, compliance guidelines, 80G tax rules, and donor data protections.
+                </p>
+              </div>
+
+              {/* SECTION A: PRIVACY POLICY CMS */}
+              <div className="p-6 rounded-3xl bg-slate-50/70 border border-slate-200 space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
+                  <div className="flex items-center gap-2">
+                    <FiShield className="text-red-600 w-5 h-5" />
+                    <h3 className="text-sm font-black text-slate-900">Privacy Policy Page Settings (/privacy-policy)</h3>
+                  </div>
+                  <Link
+                    href="/privacy-policy"
+                    target="_blank"
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white text-red-600 hover:text-red-700 font-bold text-xs border border-slate-200 shadow-2xs"
+                  >
+                    <FiExternalLink className="w-3.5 h-3.5" />
+                    <span>View Live Privacy Policy</span>
+                  </Link>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="sm:col-span-2">
+                    <label className="font-bold text-black block mb-1">Privacy Page Title</label>
+                    <input
+                      type="text"
+                      name="privacyPolicyTitle"
+                      value={form.privacyPolicyTitle}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-bold text-black"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-bold text-black block mb-1">Last Updated &amp; Verified Date</label>
+                    <input
+                      type="text"
+                      name="privacyLastUpdated"
+                      value={form.privacyLastUpdated}
+                      onChange={handleChange}
+                      placeholder="e.g. October 2026"
+                      className="w-full px-4 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-mono text-black"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="font-bold text-black block mb-1">Privacy Page Subtitle</label>
+                  <input
+                    type="text"
+                    name="privacyPolicySubtitle"
+                    value={form.privacyPolicySubtitle}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-black"
+                  />
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="font-bold text-black block">Privacy Policy Content Clauses &amp; Sections</label>
+                    <span className="text-[10px] text-slate-500 font-mono">Supports ## Headings, - Bullets, **Bold**</span>
+                  </div>
+                  <textarea
+                    rows={12}
+                    name="privacyPolicyContent"
+                    value={form.privacyPolicyContent}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 rounded-2xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-mono text-xs text-black leading-relaxed"
+                  />
+                </div>
+              </div>
+
+              {/* SECTION B: TERMS AND CONDITIONS CMS */}
+              <div className="p-6 rounded-3xl bg-slate-50/70 border border-slate-200 space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
+                  <div className="flex items-center gap-2">
+                    <FiFileText className="text-red-600 w-5 h-5" />
+                    <h3 className="text-sm font-black text-slate-900">Terms &amp; Conditions Page Settings (/terms)</h3>
+                  </div>
+                  <Link
+                    href="/terms"
+                    target="_blank"
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white text-red-600 hover:text-red-700 font-bold text-xs border border-slate-200 shadow-2xs"
+                  >
+                    <FiExternalLink className="w-3.5 h-3.5" />
+                    <span>View Live Terms &amp; Conditions</span>
+                  </Link>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="sm:col-span-2">
+                    <label className="font-bold text-black block mb-1">Terms Page Title</label>
+                    <input
+                      type="text"
+                      name="termsTitle"
+                      value={form.termsTitle}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-bold text-black"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-bold text-black block mb-1">Effective Date</label>
+                    <input
+                      type="text"
+                      name="termsEffectiveDate"
+                      value={form.termsEffectiveDate}
+                      onChange={handleChange}
+                      placeholder="e.g. October 2026"
+                      className="w-full px-4 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-mono text-black"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="font-bold text-black block mb-1">Terms Page Subtitle</label>
+                  <input
+                    type="text"
+                    name="termsSubtitle"
+                    value={form.termsSubtitle}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-black"
+                  />
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="font-bold text-black block">Terms &amp; Conditions Clauses &amp; Legal Text</label>
+                    <span className="text-[10px] text-slate-500 font-mono">Supports ## Headings, - Bullets, **Bold**</span>
+                  </div>
+                  <textarea
+                    rows={12}
+                    name="termsContent"
+                    value={form.termsContent}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 rounded-2xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-mono text-xs text-black leading-relaxed"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 7: DYNAMIC ABOUT US STORY & MISSION/VISION */}
           {activeTab === 'about' && (
             <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm space-y-4">
               <h2 className="text-base font-extrabold text-black flex items-center gap-2 border-b pb-3">
                 <FiCompass className="text-red-600" />
-                <span>5. Dynamic About Us Story & Mission / Vision Statements</span>
+                <span>7. Dynamic About Us Story &amp; Mission / Vision Statements</span>
               </h2>
 
               <div>
@@ -687,17 +1100,24 @@ export default function SettingsPage() {
             </div>
           )}
 
-          {/* TAB 6: SMTP EMAIL CONFIGURATION & ADMIN SECRET KEY */}
+          {/* TAB 8: SMTP EMAIL CONFIGURATION & ADMIN SECRET KEY */}
           {activeTab === 'smtp' && (
             <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm space-y-6">
               <div className="flex items-center justify-between border-b pb-3">
                 <h2 className="text-base font-extrabold text-black flex items-center gap-2">
                   <FiShield className="text-red-600" />
-                  <span>6. Dynamic SMTP Email Server & Security Settings</span>
+                  <span>8. Dynamic SMTP Email Server &amp; Security Settings</span>
                 </h2>
                 <span className="text-[10px] px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-bold">
                   Statutory Automated Dispatch
                 </span>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 leading-relaxed text-xs flex items-start gap-2.5">
+                <FiShield className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+                <div>
+                  <strong>Protected Security Vault:</strong> Your SMTP App Password and Super Admin Secret Key are securely encrypted and shielded from public API endpoints. To keep your current functioning credentials unchanged, simply leave those fields blank.
+                </div>
               </div>
 
               <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 leading-relaxed text-xs">
@@ -720,41 +1140,165 @@ export default function SettingsPage() {
 
                 <div>
                   <label className="font-bold text-black block mb-1">SMTP Port</label>
-                  <input
-                    type="number"
+                  <select
                     name="smtpPort"
                     value={form.smtpPort}
                     onChange={handleChange}
-                    placeholder="587"
                     className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-black"
-                  />
+                  >
+                    <option value="">Select SMTP Port</option>
+                    <option value="587">587 (SSL/TLS - Recommended)</option>
+                    <option value="465">465 (SSL - Older standard)</option>
+                    <option value="25">25 (Unencrypted - Avoid)</option>
+                  </select>
                   <span className="text-[10px] text-gray-500 mt-1 block">Standard TLS Port: 587 (or 465 for SSL)</span>
                 </div>
 
                 <div>
-                  <label className="font-bold text-black block mb-1">Official SMTP Email Address (Username)</label>
+                  <label className="font-bold text-black block mb-1">Official SMTP Email Address</label>
                   <input
                     type="email"
                     name="smtpUser"
                     value={form.smtpUser}
                     onChange={handleChange}
-                    placeholder="samasyasamadhanparishad@gmail.com"
+                    placeholder="e.g. yourorg@gmail.com (leave blank to keep current)"
                     className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium text-black"
                   />
                 </div>
 
                 <div>
-                  <label className="font-bold text-black block mb-1">SMTP App Password (Gmail 16-character App Password)</label>
-                  <input
-                    type="password"
-                    name="smtpPass"
-                    value={form.smtpPass}
-                    onChange={handleChange}
-                    placeholder="••••••••••••••••"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-mono text-black"
-                  />
-                  <span className="text-[10px] text-gray-500 mt-1 block">Generated from Google Account → Security → App Passwords</span>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="font-bold text-black block text-xs">SMTP App Password</label>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type={showSmtpPass ? 'text' : 'password'}
+                      name="smtpPass"
+                      value={form.smtpPass}
+                      onChange={handleChange}
+                      placeholder="Leave blank to keep existing password"
+                      className="w-full px-4 py-2.5 pr-10 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-mono text-black text-xs"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowSmtpPass(!showSmtpPass)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 cursor-pointer"
+                      title={showSmtpPass ? 'Hide Password' : 'Show Password'}
+                    >
+                      {showSmtpPass ? <FiEyeOff className="w-4 h-4" /> : <FiEye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                  <span className="text-[10px] text-gray-500 mt-1 block">
+                    {form.smtpPass ? (
+                      <span className="text-emerald-700 font-bold">New password entered. Save settings to apply.</span>
+                    ) : (
+                      'Leave blank to keep existing configured App Password. Type new 16-character password to change.'
+                    )}
+                  </span>
                 </div>
+
+                <div className="sm:col-span-2">
+                  <label className="font-bold text-black block mb-1">Email Sender Display Title (From Name)</label>
+                  <input
+                    type="text"
+                    name="smtpFromName"
+                    value={form.smtpFromName}
+                    onChange={handleChange}
+                    placeholder="Indian Youth Foundation"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium text-black"
+                  />
+                  <span className="text-[10px] text-gray-500 mt-1 block">
+                    The organization name displayed in the recipient's inbox (e.g. &quot;Indian Youth Foundation&quot;).
+                  </span>
+                </div>
+              </div>
+
+              {/* ---------------- LIVE SMTP DIAGNOSTIC TESTING DESK ---------------- */}
+              <div className="p-5 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 text-white space-y-4 shadow-xl border border-slate-800/80">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 bg-red-600/20 text-red-400 rounded-xl">
+                      <FiMail className="w-5 h-5 text-red-500" />
+                    </div>
+                    <div>
+                      <h3 className="font-black text-sm text-white flex items-center gap-2">
+                        <span className='text-white'>Live SMTP Connection &amp; Delivery Tester</span>
+                        <span className="text-[9px] px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-500/30">
+                          Real-Time Testing
+                        </span>
+                      </h3>
+                      <p className="text-[11px] text-slate-400">
+                        Test your credentials configured above by immediately dispatching a diagnostic email.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-center gap-3">
+                  <div className="flex-1 w-full">
+                    <label className="text-[11px] font-bold text-slate-300 block mb-1">
+                      Recipient Test Email Address *
+                    </label>
+                    <input
+                      type="email"
+                      value={testReceiverEmail}
+                      onChange={(e) => setTestReceiverEmail(e.target.value)}
+                      placeholder="Enter receiver email address (e.g. yourname@gmail.com)"
+                      className="w-full px-4 py-2.5 rounded-xl bg-slate-800/60 border border-slate-700/60 text-white text-xs placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium"
+                    />
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleTestEmail}
+                    disabled={testingMail || !testReceiverEmail}
+                    className={`w-full sm:w-auto mt-auto sm:self-end px-6 py-2.5 rounded-xl font-black text-xs transition flex items-center justify-center gap-2 shadow-md cursor-pointer ${testingMail || !testReceiverEmail
+                      ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700/50'
+                      : 'bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white shadow-red-950/50'
+                      }`}
+                  >
+                    {testingMail ? (
+                      <>
+                        <FiRefreshCw className="w-4 h-4 animate-spin" />
+                        <span>Verifying &amp; Dispatching...</span>
+                      </>
+                    ) : (
+                      <>
+                        <FiSend className="w-4 h-4" />
+                        <span>Send Test Email</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {/* Diagnostic Results Banner */}
+                {mailTestResult && (
+                  <div
+                    className={`p-4 rounded-xl text-xs font-semibold flex items-start gap-2.5 transition ${mailTestResult.success
+                      ? 'bg-emerald-950/40 border border-emerald-500/30 text-emerald-200'
+                      : 'bg-red-950/40 border border-red-500/30 text-red-200'
+                      }`}
+                  >
+                    {mailTestResult.success ? (
+                      <FiCheckCircle className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+                    ) : (
+                      <FiAlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+                    )}
+                    <div className="space-y-1">
+                      <div className="font-bold text-sm">
+                        {mailTestResult.success ? 'SMTP Verification Succeeded!' : 'SMTP Connection Failed'}
+                      </div>
+                      <p className="text-xs leading-relaxed opacity-95">
+                        {mailTestResult.message}
+                      </p>
+                      {mailTestResult.result?.messageId && (
+                        <div className="font-mono text-[10px] text-emerald-400 opacity-90">
+                          Message-ID: {mailTestResult.result.messageId}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="pt-4 border-t border-slate-200">
@@ -764,10 +1308,11 @@ export default function SettingsPage() {
                   name="adminSecretKey"
                   value={form.adminSecretKey}
                   onChange={handleChange}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-mono bg-slate-50 text-black"
+                  placeholder="Leave blank to keep existing secret key / Type new secret key to change"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-mono bg-slate-50 text-black text-xs"
                 />
                 <span className="text-[10px] text-gray-600 mt-1 block">
-                  Mandatory secret header for privileged administrative operations. Matches X_ADMIN_SECRET_KEY in .env.
+                  Protected master secret key. Leave blank to keep existing key unchanged, or enter a new secret key to update.
                 </span>
               </div>
             </div>
@@ -783,11 +1328,10 @@ export default function SettingsPage() {
               className="flex items-center gap-2 px-8 py-3.5 rounded-2xl bg-red-600 hover:bg-red-700 text-white font-extrabold text-sm shadow-xl shadow-red-600/30 transition cursor-pointer"
             >
               <FiSave className="w-4 h-4" />
-              <span>Save & Publish All Master Settings</span>
+              <span>Save Settings</span>
             </button>
           </div>
         </form>
       </div>
-    </div>
   );
 }

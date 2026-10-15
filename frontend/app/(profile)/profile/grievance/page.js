@@ -18,6 +18,8 @@ export default function ProfileGrievancePage() {
     message: ''
   });
 
+  const isFormValid = (form.subject || '').trim().length > 0 && (form.message || '').trim().length > 0;
+
   useEffect(() => {
     let active = true;
     const loadGrievances = async () => {
@@ -140,11 +142,17 @@ export default function ProfileGrievancePage() {
 
               <button
                 type="submit"
-                disabled={submitting}
-                className="w-full py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold transition flex items-center justify-center gap-2 shadow-md shadow-red-600/20 cursor-pointer disabled:opacity-50"
+                disabled={!isFormValid || submitting}
+                className="w-full py-3 rounded-xl bg-red-600 hover:bg-red-700 disabled:bg-slate-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none text-white font-bold transition flex items-center justify-center gap-2 shadow-md shadow-red-600/20 cursor-pointer"
               >
                 <FiSend className="w-4 h-4" />
-                <span>{submitting ? 'Submitting Ticket...' : 'Submit Grievance'}</span>
+                <span>
+                  {submitting 
+                    ? 'Submitting Ticket...' 
+                    : (!isFormValid 
+                        ? 'Fill Subject & Description to Submit' 
+                        : 'Submit Grievance')}
+                </span>
               </button>
             </form>
           </div>

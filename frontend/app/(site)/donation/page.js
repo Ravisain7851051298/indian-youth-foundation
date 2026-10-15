@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, Suspense } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { 
@@ -14,7 +14,12 @@ import {
   FiUserPlus, 
   FiClock, 
   FiAlertTriangle,
-  FiTrash2
+  FiTrash2,
+  FiTarget,
+  FiHash,
+  FiCopy,
+  FiCheck,
+  FiLayers
 } from 'react-icons/fi';
 import confetti from 'canvas-confetti';
 import { useNGO } from '@/context/NGOContext';
@@ -22,9 +27,10 @@ import { useNGO } from '@/context/NGOContext';
 function DonationContent() {
   const { settings, campaigns, recordDonation, currentUser, login } = useNGO();
   const searchParams = useSearchParams();
-  const campaignQuery = searchParams.get('campaign');
+  const campaignQuery = searchParams.get('campaign') || searchParams.get('campaignId') || searchParams.get('id');
 
   const [selectedCampaign, setSelectedCampaign] = useState(campaignQuery || 'general');
+  const [copiedId, setCopiedId] = useState(false);
   const [amount, setAmount] = useState(1100);
   const [donorName, setDonorName] = useState(() => currentUser?.name || '');
   const [donorPhone, setDonorPhone] = useState(() => currentUser?.phone || '');
@@ -38,6 +44,44 @@ function DonationContent() {
   const [previewUrl, setPreviewUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Synchronize campaign selection with query params (?campaign=..., ?campaignId=..., ?id=...)
+  useEffect(() => {
+    const rawParam = searchParams.get('campaign') || searchParams.get('campaignId') || searchParams.get('id');
+    if (rawParam) {
+      if (campaigns && campaigns.length > 0) {
+        const found = campaigns.find(c => 
+          c._id === rawParam || 
+          c.id === rawParam || 
+          String(c._id) === String(rawParam) || 
+          c.title?.toLowerCase() === rawParam.toLowerCase()
+        );
+        if (found) {
+          setSelectedCampaign(found._id || found.id);
+        } else {
+          setSelectedCampaign(rawParam);
+        }
+      } else {
+        setSelectedCampaign(rawParam);
+      }
+    }
+  }, [searchParams, campaigns]);
+
+  // Resolve currently attached crowdfunding campaign object
+  const currentCampaign = campaigns?.find(c => 
+    c._id === selectedCampaign || 
+    c.id === selectedCampaign || 
+    String(c._id) === String(selectedCampaign)
+  );
+
+  const handleCopyCampaignId = (id) => {
+    if (!id) return;
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(id);
+      setCopiedId(true);
+      setTimeout(() => setCopiedId(false), 2000);
+    }
+  };
 
   // Under-review submitted donation confirmation state
   const [submittedDonation, setSubmittedDonation] = useState(null);
@@ -116,8 +160,9 @@ function DonationContent() {
 
     setLoading(true);
 
-    const campObj = campaigns.find(c => c._id === selectedCampaign || c.id === selectedCampaign);
-    const campaignTitle = campObj ? campObj.title : 'General NGO Social Welfare Fund';
+    const campObj = campaigns.find(c => c._id === selectedCampaign || c.id === selectedCampaign || String(c._id) === String(selectedCampaign));
+    const finalCampaignId = campObj ? (campObj._id || campObj.id) : (selectedCampaign === 'general' ? 'general' : selectedCampaign);
+    const campaignTitle = campObj ? campObj.title : (selectedCampaign === 'general' ? 'General NGO Social Welfare Fund' : 'General Welfare Fund');
 
     const formData = new FormData();
     formData.append('donorName', donorName || currentUser?.name || 'Generous Contributor');
@@ -125,7 +170,7 @@ function DonationContent() {
     formData.append('donorEmail', donorEmail || currentUser?.email || 'donor@byk.org');
     formData.append('panNumber', panNumber ? panNumber.toUpperCase().trim() : '');
     formData.append('amount', String(amount));
-    formData.append('campaignId', selectedCampaign);
+    formData.append('campaignId', finalCampaignId);
     formData.append('campaignTitle', campaignTitle);
     formData.append('transactionId', transactionId.trim());
     formData.append('paymentMethod', paymentMethod);
@@ -142,6 +187,7 @@ function DonationContent() {
         donorName: donorName || currentUser?.name || 'Generous Contributor',
         donorEmail: donorEmail || currentUser?.email || 'donor@byk.org',
         amount: Number(amount),
+        campaignId: finalCampaignId,
         campaignTitle,
         transactionId: transactionId.trim(),
         date: new Date()
@@ -177,8 +223,8 @@ function DonationContent() {
         {submittedDonation ? (
           <div className="bg-white rounded-3xl p-6 sm:p-10 border-2 border-red-500 shadow-xl max-w-3xl mx-auto space-y-6">
             <div className="flex flex-col sm:flex-row items-start gap-4 pb-6 border-b border-slate-100">
-              <div className="w-16 h-16 rounded-2xl bg-red-600 text-white flex items-center justify-center font-bold text-3xl shrink-0 shadow-lg shadow-red-600/25">
-                ⏳
+              <div className="w-16 h-16 rounded-2xl bg-amber-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-amber-600/25">
+                <FiClock className="w-8 h-8" />
               </div>
               <div className="space-y-1">
                 <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-red-100 text-red-900 border border-red-200 inline-block">
@@ -205,6 +251,19 @@ function DonationContent() {
                   <strong className="text-black">{submittedDonation.campaignTitle}</strong>
                 </div>
                 <div>
+                  <span className="text-slate-500 block font-medium">Attached Crowdfunding Campaign ID:</span>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <strong className="font-mono text-slate-800 text-xs bg-slate-200 px-2.5 py-1 rounded-lg inline-block select-all">
+                      {submittedDonation.campaignId && submittedDonation.campaignId !== 'general' ? `#${submittedDonation.campaignId}` : 'General NGO Fund (Unrestricted)'}
+                    </strong>
+                    {submittedDonation.campaignId && submittedDonation.campaignId !== 'general' && (
+                      <span className="text-[10px] text-red-700 font-bold bg-red-100 border border-red-200 px-2 py-0.5 rounded-full">
+                        Attached
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div>
                   <span className="text-slate-500 block font-medium">Registered Contributor Email:</span>
                   <strong className="text-black">{submittedDonation.donorEmail}</strong>
                 </div>
@@ -214,6 +273,23 @@ function DonationContent() {
                 </div>
               </div>
             </div>
+
+            {/* Crowdfunding Real-Time Auto-Credit Notice */}
+            {submittedDonation.campaignId && submittedDonation.campaignId !== 'general' && (
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-red-50 to-rose-50 border border-red-200 text-xs text-slate-800 flex items-start gap-3">
+                <div className="w-8 h-8 rounded-xl bg-red-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                  <FiTarget className="w-4 h-4" />
+                </div>
+                <div className="space-y-1">
+                  <div className="font-extrabold text-red-900 text-xs">
+                    Crowdfunding Database Auto-Update Guarantee
+                  </div>
+                  <p className="text-[11px] text-slate-700 leading-relaxed">
+                    Once the Trustee Verification Desk validates your transfer and mints your 80G tax receipt, this donation of <strong>₹{Number(submittedDonation.amount).toLocaleString('en-IN')}</strong> will automatically be credited to Crowdfunding Campaign <strong className="font-mono text-red-700">#{submittedDonation.campaignId}</strong>, incrementing its raised amount and donor tally live in the database.
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* Statutory Process Explanation */}
             <div className="p-4 sm:p-5 rounded-2xl bg-red-50 border border-red-200 text-xs text-slate-800 space-y-2">
@@ -356,8 +432,8 @@ function DonationContent() {
                   {/* Authenticated Contributor Trust Banner */}
                   <div className="p-3.5 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-xl bg-red-600 text-white flex items-center justify-center font-bold text-xs">
-                        ✓
+                      <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                        <FiCheckCircle className="w-4 h-4" />
                       </div>
                       <div>
                         <div className="font-extrabold text-xs text-black">
@@ -386,21 +462,127 @@ function DonationContent() {
                   </h2>
 
                   <form onSubmit={handleDonate} className="space-y-4 text-xs">
-                    {/* Cause Picker */}
+                    {/* Attached Crowdfunding Campaign Card & Details */}
+                    {currentCampaign ? (
+                      <div className="p-4 rounded-2xl bg-gradient-to-br from-red-50 via-rose-50/40 to-white border-2 border-red-500/50 shadow-sm space-y-3 relative overflow-hidden">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-600 text-white text-[10px] font-black uppercase tracking-wider shadow-xs">
+                            <FiTarget className="w-3.5 h-3.5" />
+                            <span>Crowdfunding Campaign Attached</span>
+                          </div>
+
+                          {/* Attached Campaign ID Badge with One-Click Copy */}
+                          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-900 text-white text-[11px] font-mono shadow-xs">
+                            <FiHash className="w-3 h-3 text-red-400" />
+                            <span className="text-slate-400 font-sans font-medium text-[10px]">ID:</span>
+                            <span className="font-bold text-red-300 select-all">
+                              {currentCampaign._id || currentCampaign.id}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => handleCopyCampaignId(currentCampaign._id || currentCampaign.id)}
+                              className="ml-1 text-slate-300 hover:text-white transition cursor-pointer p-0.5 rounded"
+                              title="Copy Campaign ID"
+                            >
+                              {copiedId ? (
+                                <FiCheck className="w-3.5 h-3.5 text-emerald-400" />
+                              ) : (
+                                <FiCopy className="w-3.5 h-3.5" />
+                              )}
+                            </button>
+                          </div>
+                        </div>
+
+                        <div>
+                          <div className="text-xs font-bold text-red-700 uppercase tracking-wide">
+                            {currentCampaign.category || 'Youth & Education Drive'}
+                          </div>
+                          <h3 className="text-sm sm:text-base font-black text-black mt-0.5">
+                            {currentCampaign.title}
+                          </h3>
+                          {currentCampaign.description && (
+                            <p className="text-xs text-slate-600 line-clamp-2 mt-1 leading-relaxed">
+                              {currentCampaign.description}
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Live Crowdfunding Target & Progress */}
+                        <div className="bg-white/90 backdrop-blur-xs p-3 rounded-xl border border-red-200 space-y-2">
+                          <div className="flex justify-between items-center text-xs font-bold">
+                            <span className="text-black">
+                              ₹{Number(currentCampaign.raisedAmount || 0).toLocaleString('en-IN')}{' '}
+                              <span className="text-slate-500 font-normal text-[11px]">
+                                raised of ₹{Number(currentCampaign.goalAmount || 0).toLocaleString('en-IN')} goal
+                              </span>
+                            </span>
+                            <span className="text-red-600 font-black">
+                              {Math.min(100, Math.round(((Number(currentCampaign.raisedAmount || 0)) / (Number(currentCampaign.goalAmount) || 1)) * 100))}%
+                            </span>
+                          </div>
+
+                          <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                            <div
+                              className="bg-red-600 h-full rounded-full transition-all duration-500"
+                              style={{
+                                width: `${Math.min(100, Math.round(((Number(currentCampaign.raisedAmount || 0)) / (Number(currentCampaign.goalAmount) || 1)) * 100))}%`
+                              }}
+                            />
+                          </div>
+
+                          <div className="flex items-center justify-between text-[11px] text-slate-500">
+                            <span className="flex items-center gap-1 text-emerald-700 font-semibold">
+                              <FiCheckCircle className="w-3 h-3 text-emerald-600" />
+                              Trustee Verified Drive
+                            </span>
+                            <span className="font-bold text-slate-800">
+                              {currentCampaign.donorCount || 0} generous supporters
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-1.5 text-[11px] text-red-900 bg-red-100/70 px-3 py-1.5 rounded-lg border border-red-200">
+                          <FiShield className="w-3.5 h-3.5 text-red-600 shrink-0" />
+                          <span>
+                            Upon Trustee approval of this donation, this campaign's database total will be credited with your <strong>₹{Number(amount || 0).toLocaleString('en-IN')}</strong> contribution.
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
+                      /* General Fund Status Banner */
+                      <div className="p-3.5 rounded-2xl bg-slate-100/80 border border-slate-200 flex items-center justify-between gap-3 text-xs">
+                        <div className="flex items-center gap-2">
+                          <FiShield className="w-4 h-4 text-slate-500 shrink-0" />
+                          <span className="text-slate-700">
+                            Selected Fund: <strong>General NGO Social Welfare Fund</strong> (Unrestricted pool)
+                          </span>
+                        </div>
+                        <span className="text-[10px] bg-white border border-slate-300 font-mono text-slate-600 px-2.5 py-0.5 rounded-full font-bold">
+                          ID: GENERAL
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Cause Picker Dropdown */}
                     <div>
-                      <label className="font-bold text-black block mb-1">Select Cause / Fund</label>
+                      <label className="font-bold text-black block mb-1">
+                        Select Cause / Crowdfunding Campaign
+                      </label>
                       <select
                         value={selectedCampaign}
                         onChange={(e) => setSelectedCampaign(e.target.value)}
                         className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-red-500 font-medium text-black bg-white"
                       >
-                        <option value="general">General NGO Social Welfare Fund</option>
+                        <option value="general">🌐 General NGO Social Welfare Fund (Unrestricted)</option>
                         {campaigns.map((c) => (
                           <option key={c._id || c.id} value={c._id || c.id}>
-                            {c.title}
+                            🎯 [ID: #{(c._id || c.id).slice(-6)}] {c.title}
                           </option>
                         ))}
                       </select>
+                      <span className="text-[10px] text-slate-500 mt-1 block">
+                        Select an urgent crowdfunding drive or leave as general welfare fund. The Campaign ID is attached automatically.
+                      </span>
                     </div>
 
                     {/* Amount Picker */}
@@ -613,6 +795,25 @@ function DonationContent() {
                   <div className="font-mono text-xs font-bold text-red-700 bg-red-50 py-1.5 px-3 rounded-lg border border-red-200 inline-block">
                     {settings?.upiId || 'bharatiyauva@okhdfcbank'}
                   </div>
+                </div>
+
+                {/* Earmarked Allocation Badge */}
+                <div className="mt-4 p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-left text-[11px] space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-500 font-medium">Earmarked Allocation:</span>
+                    <span className="font-mono text-[10px] text-red-600 bg-red-50 px-1.5 py-0.2 rounded border border-red-200 font-bold shrink-0">
+                      {currentCampaign ? `#${(currentCampaign._id || currentCampaign.id).slice(-6)}` : 'GENERAL'}
+                    </span>
+                  </div>
+                  <div className="font-bold text-black truncate">
+                    {currentCampaign ? currentCampaign.title : 'General NGO Social Welfare Fund'}
+                  </div>
+                  {currentCampaign && (
+                    <div className="text-[10px] text-emerald-700 flex items-center gap-1 font-semibold">
+                      <FiCheckCircle className="w-3 h-3 text-emerald-600" />
+                      <span>Campaign ID #{currentCampaign._id || currentCampaign.id} attached</span>
+                    </div>
+                  )}
                 </div>
 
                 <p className="text-[11px] text-slate-600 mt-3 leading-relaxed">

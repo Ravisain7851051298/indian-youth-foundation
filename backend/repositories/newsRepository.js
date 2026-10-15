@@ -15,7 +15,7 @@ class NewsRepository {
   }
 
   async updateById(id, data) {
-    return News.findByIdAndUpdate(id, data, { new: true });
+    return News.findByIdAndUpdate(id, data, { returnDocument: 'after' });
   }
 
   async deleteById(id) {

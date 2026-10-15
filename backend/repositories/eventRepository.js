@@ -15,7 +15,7 @@ class EventRepository {
   }
 
   async updateById(id, data) {
-    return Event.findByIdAndUpdate(id, data, { new: true });
+    return Event.findByIdAndUpdate(id, data, { returnDocument: 'after' });
   }
 
   async deleteById(id) {

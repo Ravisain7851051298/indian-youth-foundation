@@ -15,7 +15,7 @@ class CampaignRepository {
   }
 
   async updateById(id, data) {
-    return Campaign.findByIdAndUpdate(id, data, { new: true });
+    return Campaign.findByIdAndUpdate(id, data, { returnDocument: 'after' });
   }
 
   async deleteById(id) {

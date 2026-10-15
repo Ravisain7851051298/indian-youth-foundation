@@ -127,8 +127,8 @@ function VolunteerContent() {
           <div className="bg-white border-2 border-red-500/30 rounded-3xl p-6 sm:p-10 shadow-md">
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="flex items-start gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-red-600 text-white flex items-center justify-center font-bold text-2xl shrink-0 shadow-md">
-                  ✓
+                <div className="w-14 h-14 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-md">
+                  <FiCheckCircle className="w-8 h-8" />
                 </div>
                 <div className="space-y-1">
                   <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-red-100 text-red-900 inline-block">
@@ -170,8 +170,8 @@ function VolunteerContent() {
         {currentUser && isPending && (
           <div className="bg-white border-2 border-red-200 rounded-3xl p-6 sm:p-10 shadow-sm space-y-4">
             <div className="flex items-start gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-red-600 text-white flex items-center justify-center font-bold text-2xl shrink-0 shadow-md">
-                ⏳
+              <div className="w-14 h-14 rounded-2xl bg-amber-600 text-white flex items-center justify-center shrink-0 shadow-md">
+                <FiClock className="w-8 h-8" />
               </div>
               <div className="space-y-1">
                 <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-red-100 text-red-900 inline-block">

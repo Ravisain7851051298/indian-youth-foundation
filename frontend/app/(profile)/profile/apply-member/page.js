@@ -39,6 +39,7 @@ export default function ApplyMembershipPage() {
 
   const effectivePlanId = selectedPlanId || plans[0]?._id;
   const selectedPlan = plans.find(p => p._id === effectivePlanId) || plans[0];
+  const isFormValid = !!selectedPlan && (!!transactionId.trim() || !!selectedRawFile);
 
   const handleFileSelect = (e) => {
     const file = e.target.files?.[0];
@@ -217,10 +218,17 @@ export default function ApplyMembershipPage() {
                 </div>
 
                 <div className="mt-5 pt-3 border-t border-slate-100">
-                  <div className={`w-full py-2 rounded-xl text-center text-xs font-bold transition ${
+                  <div className={`w-full py-2 rounded-xl text-center text-xs font-bold transition flex items-center justify-center gap-1 ${
                     isSelected ? 'bg-red-600 text-white shadow-xs' : 'bg-slate-100 text-black hover:bg-slate-200'
                   }`}>
-                    {isSelected ? '✓ Selected Plan' : 'Select This Plan'}
+                    {isSelected ? (
+                      <>
+                        <FiCheck className="w-3.5 h-3.5" />
+                        <span>Selected Plan</span>
+                      </>
+                    ) : (
+                      'Select This Plan'
+                    )}
                   </div>
                 </div>
               </div>
@@ -386,8 +394,9 @@ export default function ApplyMembershipPage() {
                       alt="Payment Screenshot Preview"
                       className="w-full max-h-56 object-contain rounded-lg mx-auto"
                     />
-                    <div className="mt-2 text-center text-[11px] font-bold text-emerald-700 bg-emerald-50 py-1 px-2 rounded-lg">
-                      ✓ Screenshot attached and ready to submit
+                    <div className="mt-2 text-center text-[11px] font-bold text-emerald-700 bg-emerald-50 py-1 px-2 rounded-lg flex items-center justify-center gap-1.5">
+                      <FiCheckCircle className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Screenshot attached and ready to submit</span>
                     </div>
                   </div>
                 )}
@@ -414,10 +423,14 @@ export default function ApplyMembershipPage() {
 
             <button
               type="submit"
-              disabled={submitting}
-              className="px-8 py-3 rounded-2xl bg-red-600 hover:bg-red-700 disabled:bg-slate-300 text-white font-bold text-xs shadow-md shadow-red-600/20 transition flex items-center justify-center gap-2 cursor-pointer"
+              disabled={!isFormValid || submitting}
+              className="px-8 py-3 rounded-2xl bg-red-600 hover:bg-red-700 disabled:bg-slate-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none text-white font-bold text-xs shadow-md shadow-red-600/20 transition flex items-center justify-center gap-2 cursor-pointer"
             >
-              {submitting ? 'Submitting Application...' : 'Submit Application for Trustee Verification'}
+              {submitting 
+                ? 'Submitting Application...' 
+                : (!isFormValid 
+                    ? 'Enter UTR or Attach Screenshot to Submit' 
+                    : 'Submit Application for Trustee Verification')}
             </button>
           </div>
         </div>

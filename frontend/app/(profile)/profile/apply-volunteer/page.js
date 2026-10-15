@@ -236,8 +236,9 @@ export default function ApplyVolunteerPage() {
                       alt="ID Proof Preview"
                       className="w-full max-h-56 object-contain rounded-lg mx-auto"
                     />
-                    <div className="mt-2 text-center text-[11px] font-bold text-emerald-700 bg-emerald-50 py-1 px-2 rounded-lg">
-                      ✓ File ready to be submitted with application
+                    <div className="mt-2 text-center text-[11px] font-bold text-emerald-700 bg-emerald-50 py-1 px-2 rounded-lg flex items-center justify-center gap-1.5">
+                      <FiCheckCircle className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>File ready to be submitted with application</span>
                     </div>
                   </div>
                 )}
@@ -251,11 +252,17 @@ export default function ApplyVolunteerPage() {
             </span>
             <button
               type="submit"
-              disabled={loading}
-              className="px-6 py-3 rounded-2xl bg-red-600 hover:bg-red-700 disabled:bg-slate-300 text-white font-black text-xs shadow-md shadow-red-600/25 transition flex items-center gap-2 cursor-pointer"
+              disabled={!selectedFile || loading}
+              className="px-6 py-3 rounded-2xl bg-red-600 hover:bg-red-700 disabled:bg-slate-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none text-white font-black text-xs shadow-md shadow-red-600/25 transition flex items-center gap-2 cursor-pointer"
             >
               <FiUserCheck className="w-4 h-4" />
-              <span>{loading ? 'Submitting Application...' : 'Submit Volunteer Application'}</span>
+              <span>
+                {loading 
+                  ? 'Submitting Application...' 
+                  : (!selectedFile 
+                      ? 'Select ID Proof to Submit' 
+                      : 'Submit Volunteer Application')}
+              </span>
             </button>
           </div>
         </form>

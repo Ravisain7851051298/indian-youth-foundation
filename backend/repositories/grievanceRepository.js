@@ -15,7 +15,7 @@ class GrievanceRepository {
   }
 
   async updateById(id, data) {
-    return Grievance.findByIdAndUpdate(id, data, { new: true });
+    return Grievance.findByIdAndUpdate(id, data, { returnDocument: 'after' });
   }
 
   async count(query = {}) {

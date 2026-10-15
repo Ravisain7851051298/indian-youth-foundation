@@ -202,13 +202,10 @@ export default function DonationManagement() {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Top Header Card */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white p-4 rounded-b-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-red-700 text-xs font-bold mb-2">
-            <span>Finance &amp; 80G Exemptions</span>
-          </div>
           <h1 className="text-2xl font-black text-black tracking-tight">80G Donation Management</h1>
           <p className="text-xs text-slate-700 mt-1">
             Audit contributor payment proofs, verify bank transfers, and issue automated 80G tax receipts.
@@ -243,7 +240,7 @@ export default function DonationManagement() {
       {activeTab === "donations" ? (
         <>
           {/* Search & Status Filters */}
-          <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="bg-white mx-3 p-1 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="relative flex-1 w-full max-w-md">
               <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
               <input
@@ -255,15 +252,15 @@ export default function DonationManagement() {
               />
             </div>
 
-            <div className="flex items-center gap-2 w-full sm:w-auto">
+            <div className="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
               {["All", "Pending", "Approved", "Rejected"].map((st) => (
                 <button
                   key={st}
                   onClick={() => setStatusFilter(st)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap cursor-pointer ${
                     statusFilter === st
-                      ? "bg-black text-white"
-                      : "bg-slate-100 text-slate-700 hover:bg-slate-200 hover:text-black"
+                      ? "bg-red-600 text-white shadow-md shadow-red-600/20"
+                      : "bg-slate-100 text-slate-700 hover:bg-red-50 hover:text-red-600"
                   }`}
                 >
                   {st}
@@ -271,7 +268,7 @@ export default function DonationManagement() {
               ))}
               <button
                 onClick={loadDonations}
-                className="p-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700"
+                className="p-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 cursor-pointer"
                 title="Refresh"
               >
                 <FiRefreshCw className={`w-4 h-4 ${loading ? "animate-spin text-red-600" : ""}`} />
@@ -280,7 +277,7 @@ export default function DonationManagement() {
           </div>
 
           {/* Table */}
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+          <div className="bg-white mx-3 rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
             {loading ? (
               <div className="p-12 text-center text-slate-700 text-xs space-y-2">
                 <FiRefreshCw className="w-6 h-6 animate-spin mx-auto text-red-600" />
@@ -296,13 +293,13 @@ export default function DonationManagement() {
                 <table className="w-full text-left text-xs">
                   <thead className="bg-slate-50 border-b border-slate-200 text-black font-extrabold">
                     <tr>
-                      <th className="py-3 px-4">Contributor</th>
-                      <th className="py-3 px-4">Amount</th>
-                      <th className="py-3 px-4">Transaction / UTR</th>
-                      <th className="py-3 px-4">Payment Proof</th>
-                      <th className="py-3 px-4">Status</th>
-                      <th className="py-3 px-4">Date</th>
-                      <th className="py-3 px-4 text-right">Actions</th>
+                      <th className="py-3 px-3.5">Contributor</th>
+                      <th className="py-3 px-3.5">Amount</th>
+                      <th className="py-3 px-3.5">Transaction / UTR</th>
+                      <th className="py-3 px-3.5">Payment Proof</th>
+                      <th className="py-3 px-3.5">Status</th>
+                      <th className="py-3 px-3.5">Date</th>
+                      <th className="py-3 px-3.5 text-right sticky right-0 bg-slate-50 z-20 shadow-[-6px_0_10px_-2px_rgba(0,0,0,0.06)]">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 text-black">
@@ -311,38 +308,38 @@ export default function DonationManagement() {
                       const screenshot = d.screenshotUrl || d.paymentScreenshot;
                       const status = d.status || "Pending";
                       return (
-                        <tr key={id} className="hover:bg-slate-50/80 transition">
-                          <td className="py-3 px-4">
+                        <tr key={id} className="group hover:bg-slate-50/80 transition">
+                          <td className="py-3 px-3.5">
                             <div className="font-extrabold text-black text-sm">{d.donorName || d.donor?.name || "Anonymous"}</div>
                             <div className="text-[11px] text-slate-600">{d.donorEmail || d.donor?.email} • {d.donorPhone || d.donor?.phone}</div>
                           </td>
-                          <td className="py-3 px-4">
+                          <td className="py-3 px-3.5">
                             <span className="font-black text-sm text-black">₹{Number(d.amount || 0).toLocaleString("en-IN")}</span>
                           </td>
-                          <td className="py-3 px-4 font-mono text-[11px] font-bold text-slate-800">
+                          <td className="py-3 px-3.5 font-mono text-[11px] font-bold text-slate-800">
                             {d.transactionId || d.utrNumber || "-"}
                           </td>
-                          <td className="py-3 px-4">
+                          <td className="py-3 px-3.5 whitespace-nowrap">
                             {screenshot ? (
                               <button
                                 onClick={() => setSelectedScreenshot(getContentImageUrl(screenshot))}
-                                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-50 text-red-700 hover:bg-red-100 font-bold text-[11px] transition cursor-pointer"
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-red-50 text-red-700 hover:bg-red-100 font-bold text-[11px] transition cursor-pointer border border-red-200"
                               >
                                 <FiEye className="w-3.5 h-3.5" />
                                 <span>View Proof</span>
                               </button>
                             ) : (
-                              <span className="text-slate-400 text-[11px]">No Proof</span>
+                              <span className="text-slate-400 text-[11px] italic">No Proof</span>
                             )}
                           </td>
-                          <td className="py-3 px-4">
+                          <td className="py-3 px-3.5 whitespace-nowrap">
                             <span
                               className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase ${
                                 status.toLowerCase() === "approved"
-                                  ? "bg-emerald-100 text-emerald-800"
+                                  ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
                                   : status.toLowerCase() === "rejected"
-                                  ? "bg-rose-100 text-rose-800"
-                                  : "bg-amber-100 text-amber-800"
+                                  ? "bg-rose-100 text-rose-800 border border-rose-200"
+                                  : "bg-amber-100 text-amber-800 border border-amber-200"
                               }`}
                             >
                               {status}
@@ -353,26 +350,28 @@ export default function DonationManagement() {
                               </div>
                             )}
                           </td>
-                          <td className="py-3 px-4 text-slate-700">
+                          <td className="py-3 px-3.5 text-slate-700 whitespace-nowrap font-medium">
                             {d.createdAt ? new Date(d.createdAt).toLocaleDateString("en-IN") : "-"}
                           </td>
-                          <td className="py-3 px-4 text-right">
+                          <td className="py-3 px-3.5 text-right whitespace-nowrap sticky right-0 bg-white group-hover:bg-slate-50 z-10 shadow-[-6px_0_10px_-2px_rgba(0,0,0,0.06)]">
                             <div className="flex items-center justify-end gap-1.5">
                               {status.toLowerCase() === "pending" && (
                                 <>
                                   <button
                                     onClick={() => handleApprove(id)}
                                     disabled={actionLoading}
-                                    className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] transition cursor-pointer disabled:opacity-50"
+                                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] transition cursor-pointer disabled:opacity-50 shadow-xs"
                                   >
-                                    Approve
+                                    <FiCheck className="w-3.5 h-3.5" />
+                                    <span>{actionLoading ? "Approving..." : "Approve"}</span>
                                   </button>
                                   <button
                                     onClick={() => setRejectModalDonation(d)}
                                     disabled={actionLoading}
-                                    className="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-[11px] transition cursor-pointer disabled:opacity-50"
+                                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-[11px] transition cursor-pointer disabled:opacity-50 shadow-xs"
                                   >
-                                    Reject
+                                    <FiX className="w-3.5 h-3.5" />
+                                    <span>Reject</span>
                                   </button>
                                 </>
                               )}
@@ -382,7 +381,7 @@ export default function DonationManagement() {
                                 title="Delete Donation Record"
                                 className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer"
                               >
-                                <FiTrash2 className="w-3.5 h-3.5" />
+                                <FiTrash2 className="w-4 h-4" />
                               </button>
                             </div>
                           </td>
@@ -397,7 +396,7 @@ export default function DonationManagement() {
         </>
       ) : (
         /* Bank & UPI QR Settings Form */
-        <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm max-w-3xl text-black">
+        <div className="bg-white mx-3 p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm max-w-3xl text-black">
           <h2 className="text-xl font-black text-black mb-1">NGO Banking &amp; UPI QR Credentials</h2>
           <p className="text-xs text-slate-600 mb-6">
             Configure the bank account details and UPI QR code shown on public donation pages.

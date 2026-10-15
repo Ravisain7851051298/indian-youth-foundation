@@ -28,20 +28,27 @@ import {
   FiUserPlus,
   FiMessageSquare,
   FiAlertCircle,
-  FiLogOut
+  FiCreditCard,
+  FiGlobe,
 } from 'react-icons/fi';
+import { useSelector } from 'react-redux';
 import { useNGO } from '../context/NGOContext';
+import { getContentImageUrl } from '@/lib/authApi';
 
 export default function Navbar() {
   const pathname = usePathname();
   const { currentUser, logout, settings, lang, toggleLanguage } = useNGO();
+  const reduxUser = useSelector((state) => state.auth?.user);
+  const effectiveUser = reduxUser || currentUser;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [mobileOpenAccordion, setMobileOpenAccordion] = useState(null);
   const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [mounted, setMounted] = useState(false);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
+    setMounted(true);
     const handleBeforeInstallPrompt = (e) => {
       e.preventDefault();
       setDeferredPrompt(e);
@@ -89,6 +96,8 @@ export default function Navbar() {
       id: 'about',
       label: 'About Us',
       links: [
+        { href: '/who-we-are', label: 'Who We Are', desc: 'Our identity, founding journey & grassroots commitment', icon: FiUsers },
+        { href: '/about', label: 'About Foundation', desc: 'Who we are, history, mission & legal standing', icon: FiShield },
         { href: '/mission-vision', label: 'Mission & Vision', desc: 'Our statutory aims, constitution & ideology', icon: FiCompass },
         { href: '/team-members', label: 'Leadership & Board', desc: 'Trustees, directors & advisory council', icon: FiUserCheck },
         { href: '/story', label: 'Impact Stories', desc: 'Grassroots success & beneficiary journeys', icon: FiBookOpen },
@@ -118,7 +127,8 @@ export default function Navbar() {
       id: 'get-involved',
       label: 'Get Involved',
       links: [
-        { href: '/volunteer', label: 'Volunteer / Member Join', desc: 'Official registration with digital ID card', icon: FiUserPlus },
+        { href: '/volunteer', label: 'Apply for Volunteer', desc: 'Join grassroots community & relief drives', icon: FiUserPlus },
+        { href: '/members', label: 'Apply for Membership', desc: 'Official NGO membership & verifiable ID card', icon: FiCreditCard },
         { href: '/feedback', label: 'Reviews & Feedback', desc: 'Supporter testimonials & 5-star ratings', icon: FiMessageSquare },
         { href: '/complaints', label: 'Grievance Redressal', desc: 'Transparent inquiry & complaint resolution', icon: FiAlertCircle },
       ]
@@ -149,40 +159,21 @@ export default function Navbar() {
               <FiShield className="w-3.5 h-3.5" />
               12A & 80G Certified NGO • 50% Income Tax Exemption
             </span>
-            <span className="hidden lg:inline text-red-100 text-[11px]">
+            <span className="hidden lg:inline text-red-100 text-[11px]" suppressHydrationWarning>
               Govt. Reg: {settings?.registrationNo || 'REG/2021/NGO/DEL/8741'} | NITI Aayog: {settings?.nitiAayogDarpanId || 'DL/2021/0284729'}
             </span>
           </div>
 
           {/* Right Helpline & App Install */}
-          <div className="flex items-center gap-4 text-xs">
+          <div className="hidden sm:flex items-center gap-4 text-xs">
             <a
               href={`tel:${settings?.phone || '+91 98765 43210'}`}
               className="hidden sm:flex items-center gap-1 text-white hover:text-red-100 transition"
+              suppressHydrationWarning
             >
               <FiPhone className="w-3.5 h-3.5" />
-              <span className="font-semibold">{settings?.phone || '+91 98765 43210'}</span>
+              <span className="font-semibold" suppressHydrationWarning>{settings?.phone || '+91 98765 43210'}</span>
             </a>
-
-            {/* Language Switcher */}
-            <button
-              onClick={toggleLanguage}
-              className="flex items-center gap-1 bg-white/20 hover:bg-white/30 text-white font-bold px-2.5 py-1 rounded-md text-[11px] backdrop-blur-xs transition cursor-pointer"
-              title="Switch Language (English / हिंदी)"
-            >
-              <span>🌐</span>
-              <span>{lang === 'en' ? 'हिंदी' : 'English'}</span>
-            </button>
-
-            {/* PWA Install Button */}
-            <button
-              onClick={handleInstallApp}
-              className="flex items-center gap-1.5 bg-white text-red-700 hover:bg-red-50 font-bold px-2.5 py-1 rounded-md text-[11px] shadow-xs cursor-pointer transition"
-              title="Install official progressive web app"
-            >
-              <FiDownload className="w-3 h-3" />
-              <span>Install App</span>
-            </button>
           </div>
         </div>
       </div>
@@ -193,20 +184,29 @@ export default function Navbar() {
           <div className="flex items-center justify-between h-20">
             {/* NGO Brand & Logo */}
             <Link href="/" className="flex items-center gap-3 shrink-0 group">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-red-600 to-red-700 flex items-center justify-center text-white font-black text-xl shadow-md shadow-red-600/25 group-hover:scale-105 transition-transform overflow-hidden">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-red-600 to-red-700 flex items-center justify-center text-white font-black text-xl shadow-md shadow-red-600/25 group-hover:scale-105 transition-transform overflow-hidden">
                 {settings?.logoUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={settings.logoUrl} alt="Logo" className="w-full h-full object-cover" />
+                  <img
+                    src={getContentImageUrl(settings.logoUrl)}
+                    alt={settings?.ngoName || 'Logo'}
+                    className="w-full h-full object-cover"
+                    suppressHydrationWarning
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=120&auto=format&fit=crop&q=80';
+                    }}
+                  />
                 ) : (
                   <span>IYF</span>
                 )}
               </div>
               <div className="flex flex-col">
-                <span className="font-black text-lg sm:text-xl text-black leading-tight tracking-tight group-hover:text-red-600 transition-colors">
+                <span className="text-sm sm:text-xl font-black leading-tight tracking-tight bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 bg-clip-text text-transparent group-hover:from-red-700 group-hover:via-rose-700 group-hover:to-amber-700 transition-all drop-shadow-2xs" suppressHydrationWarning>
                   {settings?.ngoName || 'Indian Youth Foundation'}
                 </span>
-                <span className="text-[11px] font-semibold text-black tracking-wider">
-                  {settings?.ngoNameHi || 'Bharatiya Yuva Kranti'}
+                <span className="text-[11px] font-extrabold tracking-wider bg-gradient-to-r from-orange-600 via-red-600 to-rose-600 bg-clip-text text-transparent" suppressHydrationWarning>
+                  {settings?.ngoNameHi || 'भारतीय युवा क्रांति'}
                 </span>
               </div>
             </Link>
@@ -217,8 +217,8 @@ export default function Navbar() {
               <Link
                 href="/"
                 className={`px-3.5 py-2 rounded-xl transition-all ${pathname === '/'
-                    ? 'text-red-600 font-extrabold bg-red-50'
-                    : 'hover:text-red-600 hover:bg-red-50/50'
+                  ? 'text-red-600 font-extrabold bg-red-50'
+                  : 'hover:text-red-600 hover:bg-red-50/50'
                   }`}
               >
                 Home
@@ -235,8 +235,8 @@ export default function Navbar() {
                       onClick={() => toggleDropdown(group.id)}
                       onMouseEnter={() => setActiveDropdown(group.id)}
                       className={`flex items-center gap-1 px-3.5 py-2 rounded-xl transition-all cursor-pointer ${active || isOpen
-                          ? 'text-red-600 font-extrabold bg-red-50/80'
-                          : 'hover:text-red-600 hover:bg-red-50/50'
+                        ? 'text-red-600 font-extrabold bg-red-50/80'
+                        : 'hover:text-red-600 hover:bg-red-50/50'
                         }`}
                       aria-expanded={isOpen}
                     >
@@ -263,8 +263,8 @@ export default function Navbar() {
                                 href={link.href}
                                 onClick={() => setActiveDropdown(null)}
                                 className={`flex items-start gap-3 p-2.5 rounded-xl transition-colors ${isCurrent
-                                    ? 'bg-red-50 text-red-700'
-                                    : 'hover:bg-red-50 text-black hover:text-red-700'
+                                  ? 'bg-red-50 text-red-700'
+                                  : 'hover:bg-red-50 text-black hover:text-red-700'
                                   }`}
                               >
                                 <div className={`p-2 rounded-lg mt-0.5 shrink-0 ${isCurrent ? 'bg-red-600 text-white' : 'bg-slate-100 text-black'}`}>
@@ -286,42 +286,35 @@ export default function Navbar() {
             </div>
 
             {/* Action Buttons: Donate, User Portal & Register */}
-            <div className="hidden sm:flex items-center gap-2.5">
-              {currentUser ? (
+            <div className="hidden lg:flex items-center gap-2.5">
+              {mounted && effectiveUser ? (
                 <div className="flex items-center gap-2">
-                  {currentUser.role === 'Admin' ? (
-                    <>
-                      <Link
-                        href="/dashboard"
-                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold shadow-xs transition bg-black text-white hover:bg-slate-900"
-                        title="Admin Control Panel"
-                      >
-                        <FiGrid className="w-3.5 h-3.5 text-red-500" />
-                        <span>Admin Panel</span>
-                      </Link>
-                      <Link
-                        href="/profile"
-                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition border border-slate-200 text-black hover:text-red-600 hover:border-red-500"
-                        title="View User Portal & Credentials"
-                      >
-                        <FiUser className="w-3.5 h-3.5 text-black" />
-                        <span>User Portal</span>
-                      </Link>
-                    </>
-                  ) : (
+                  {effectiveUser.role === 'Admin' && (
                     <Link
-                      href="/profile"
-                      className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-black text-xs font-bold transition border border-slate-200"
+                      href="/dashboard"
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold shadow-xs transition bg-black text-white hover:bg-slate-900"
+                      title="Admin Control Panel"
                     >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={currentUser.photoUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100'}
-                        alt={currentUser.name}
-                        className="w-5 h-5 rounded-full object-cover border border-red-500"
-                      />
-                      <span className="max-w-[120px] truncate">{currentUser.name}</span>
+                      <FiGrid className="w-3.5 h-3.5 text-red-500" />
                     </Link>
                   )}
+                  <Link
+                    href="/profile"
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-black text-xs font-bold transition border border-slate-200 shadow-2xs"
+                    title="User Portal & Credentials"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={getContentImageUrl(effectiveUser.photoUrl) || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100'}
+                      alt={effectiveUser.name}
+                      className="w-6 h-6 rounded-full object-cover border border-red-500 shrink-0"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100';
+                      }}
+                    />
+                    <span className="max-w-[110px] truncate">{effectiveUser.name}</span>
+                  </Link>
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
@@ -390,7 +383,7 @@ export default function Navbar() {
                   IYF
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-sm text-black truncate">
+                  <h3 className="font-black text-sm bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 bg-clip-text text-transparent truncate" suppressHydrationWarning>
                     {settings?.ngoName || 'Indian Youth Foundation'}
                   </h3>
                   <span className="text-[10px] text-red-600 font-bold block">12A &amp; 80G Certified</span>
@@ -407,19 +400,36 @@ export default function Navbar() {
 
             {/* Drawer User Bar */}
             <div className="p-4 border-b border-slate-100 bg-white">
-              {currentUser ? (
+              {mounted && effectiveUser ? (
                 <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-2.5">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="relative w-11 h-11 rounded-2xl overflow-hidden border-2 border-red-500 shadow-2xs shrink-0 bg-white">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={getContentImageUrl(effectiveUser.photoUrl) || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'}
+                        alt={effectiveUser.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150';
+                        }}
+                      />
+                    </div>
                     <div>
-                      <div className="text-xs font-bold text-black">{currentUser.name}</div>
-                      <span className="inline-block text-[10px] font-bold text-red-700 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full mt-0.5">
-                        {currentUser.role}
-                      </span>
+                      <div className="text-xs font-black text-black">{effectiveUser.name}</div>
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        <span className="inline-block text-[10px] font-bold text-red-700 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full">
+                          {effectiveUser.role}
+                        </span>
+                        <span className="text-[10px] text-slate-500 font-mono">
+                          {effectiveUser.memberId || 'Active'}
+                        </span>
+                      </div>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2 pt-1">
-                    {currentUser.role === 'Admin' ? (
+                    {effectiveUser.role === 'Admin' ? (
                       <>
                         <Link
                           href="/dashboard"
@@ -489,7 +499,7 @@ export default function Navbar() {
               >
                 <span className="flex items-center gap-2">
                   <FiHeart className="w-4 h-4 text-red-600" />
-                  <span>Donations (Instant 80G Receipt)</span>
+                  <span>Donate Now</span>
                 </span>
                 <span className="text-[10px] bg-red-600 text-white px-2 py-0.5 rounded-full font-bold">50% Tax Free</span>
               </Link>
@@ -536,15 +546,7 @@ export default function Navbar() {
 
             {/* Drawer Footer Actions */}
             <div className="p-4 border-t border-slate-200 bg-slate-50 space-y-2">
-              <button
-                onClick={handleInstallApp}
-                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-red-300 text-red-700 bg-red-50 font-bold text-xs"
-              >
-                <FiDownload className="w-3.5 h-3.5" />
-                <span>Install IYF Mobile App</span>
-              </button>
-
-              {currentUser && (
+              {mounted && currentUser && (
                 <button
                   onClick={() => { logout(); setMobileMenuOpen(false); }}
                   className="w-full py-2 text-center text-xs font-bold text-red-600 hover:bg-red-50 rounded-xl"

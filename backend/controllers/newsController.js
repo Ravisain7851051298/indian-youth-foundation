@@ -16,6 +16,12 @@ const createNews = async (req, res) => {
       req.body.image = `/uploads/${category}/${req.file.filename}`;
     } else if (req.body.imageUrl && !req.body.image) {
       req.body.image = req.body.imageUrl;
+    } else if (Array.isArray(req.body.images) && req.body.images.length > 0 && !req.body.image) {
+      req.body.image = req.body.images[0];
+    }
+
+    if (!req.body.content && req.body.description) {
+      req.body.content = req.body.description;
     }
 
     const news = await newsService.createNews(req.body);
@@ -37,6 +43,12 @@ const updateNews = async (req, res) => {
       req.body.image = `/uploads/${category}/${req.file.filename}`;
     } else if (req.body.imageUrl && !req.body.image) {
       req.body.image = req.body.imageUrl;
+    } else if (Array.isArray(req.body.images) && req.body.images.length > 0 && !req.body.image) {
+      req.body.image = req.body.images[0];
+    }
+
+    if (!req.body.content && req.body.description) {
+      req.body.content = req.body.description;
     }
 
     const news = await newsService.updateNews(id, req.body);
