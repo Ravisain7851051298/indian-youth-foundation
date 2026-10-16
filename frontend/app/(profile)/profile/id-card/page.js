@@ -26,9 +26,38 @@ export default function IdCardPage() {
   const cardRef = useRef(null);
 
   // Allow tab query: /profile/id-card?type=volunteer or ?type=member
-  const initialType = searchParams.get('type') === 'volunteer' ? 'volunteer' : 'member';
-  const [activeTab, setActiveTab] = useState(initialType);
+  const paramType = searchParams.get('type');
   const [origin, setOrigin] = useState('');
+
+  // Membership & Volunteer eligibility checks (strictly prevent donor ID BYK-DON- from being treated as member)
+  const isMemberVerified = Boolean(
+    effectiveUser?.role === 'Member' || 
+    effectiveUser?.role === 'Admin' || 
+    (effectiveUser?.isMember && !effectiveUser?.memberId?.startsWith('BYK-DON-')) || 
+    (effectiveUser?.membershipApplication?.status === 'approved') ||
+    (effectiveUser?.memberId && (effectiveUser.memberId.startsWith('BYK-MEM-') || effectiveUser.memberId.startsWith('MEM-')))
+  );
+
+  const isVolunteerVerified = Boolean(
+    effectiveUser?.role === 'Volunteer' || 
+    effectiveUser?.isVolunteer || 
+    effectiveUser?.volunteerApplication?.status === 'approved' ||
+    (effectiveUser?.volunteerId && !effectiveUser?.volunteerId?.startsWith('BYK-DON-'))
+  );
+
+  // Default tab: if user is volunteer and NOT verified member, default directly to volunteer
+  const defaultTab = paramType 
+    ? paramType 
+    : (isVolunteerVerified && !isMemberVerified ? 'volunteer' : 'member');
+  const [activeTab, setActiveTab] = useState(defaultTab);
+
+  useEffect(() => {
+    if (paramType) {
+      setActiveTab(paramType);
+    } else if (isVolunteerVerified && !isMemberVerified) {
+      setActiveTab('volunteer');
+    }
+  }, [paramType, isVolunteerVerified, isMemberVerified]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -37,23 +66,17 @@ export default function IdCardPage() {
     if (refreshUser) refreshUser();
   }, [refreshUser]);
 
-  // Membership & Volunteer eligibility checks
-  const isMemberVerified = (
-    effectiveUser?.role === 'Member' || 
-    effectiveUser?.role === 'Admin' || 
-    effectiveUser?.isMember || 
-    !!effectiveUser?.memberId
-  );
+  const rawMemberId = effectiveUser?.memberId;
+  const memberId = (rawMemberId && !rawMemberId.startsWith('BYK-DON-'))
+    ? rawMemberId
+    : (effectiveUser?.membershipApplication?.assignedMemberId || 'MEM-PENDING');
 
-  const isVolunteerVerified = (
-    effectiveUser?.role === 'Volunteer' || 
-    effectiveUser?.isVolunteer || 
-    effectiveUser?.volunteerApplication?.status === 'approved' ||
-    !!effectiveUser?.volunteerId
-  );
-
-  const memberId = effectiveUser?.memberId || 'MEM-PENDING';
-  const volunteerId = effectiveUser?.volunteerId || effectiveUser?.volunteerApplication?.volunteerId || (effectiveUser?.role === 'Volunteer' ? effectiveUser?.memberId : `VOL-${effectiveUser?.phone ? effectiveUser.phone.slice(-4) : '2026'}`);
+  const rawVolId = effectiveUser?.volunteerId || effectiveUser?.volunteerApplication?.assignedVolunteerId || effectiveUser?.volunteerApplication?.volunteerId;
+  const volunteerId = (rawVolId && !rawVolId.startsWith('BYK-DON-'))
+    ? rawVolId
+    : (effectiveUser?.role === 'Volunteer' && rawMemberId && !rawMemberId.startsWith('BYK-DON-')
+        ? rawMemberId
+        : `BYK-VOL-${effectiveUser?.phone ? effectiveUser.phone.slice(-4) : '2026'}`);
 
   const memberVerificationUrl = `${origin || 'https://indianyouthfoundation.org'}/verify/member/${memberId}`;
   const volunteerVerificationUrl = `${origin || 'https://indianyouthfoundation.org'}/verify/volunteer/${volunteerId}`;

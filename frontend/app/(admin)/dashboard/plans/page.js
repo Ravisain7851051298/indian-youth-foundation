@@ -2,23 +2,23 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { 
-  FiLayers, 
-  FiPlus, 
-  FiEdit2, 
-  FiTrash2, 
-  FiCheck, 
-  FiCheckCircle, 
+import {
+  FiLayers,
+  FiPlus,
+  FiEdit2,
+  FiTrash2,
+  FiCheck,
+  FiCheckCircle,
   FiStar,
   FiShield
 } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
-import { 
-  fetchPlans, 
-  createPlan, 
-  updatePlan, 
+import {
+  fetchPlans,
+  createPlan,
+  updatePlan,
   deletePlan,
-  clearPlanStatus 
+  clearPlanStatus
 } from '@/store/planSlice';
 
 export default function MembershipPlansPage() {
@@ -96,7 +96,7 @@ export default function MembershipPlansPage() {
   return (
     <div className="space-y-4">
       {/* Top Header Card */}
-      <div className="bg-white p-4 rounded-b-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white p-4 rounded-b-2xl border-b border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="text-lg font-black text-slate-900 tracking-tight flex items-center gap-2">
             <FiLayers className="text-red-600 w-5 h-5" />
@@ -129,9 +129,8 @@ export default function MembershipPlansPage() {
         {plans.map((plan) => (
           <div
             key={plan._id}
-            className={`bg-white rounded-3xl p-6 border shadow-2xs flex flex-col justify-between transition relative ${
-              plan.popular ? 'border-red-600 ring-2 ring-red-500/20 shadow-md' : 'border-slate-200 hover:border-red-200'
-            }`}
+            className={`bg-white rounded-3xl p-6 border shadow-2xs flex flex-col justify-between transition relative ${plan.popular ? 'border-red-600 ring-2 ring-red-500/20 shadow-md' : 'border-slate-200 hover:border-red-200'
+              }`}
           >
             {plan.popular && (
               <span className="absolute top-4 right-4 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-red-600 text-white flex items-center gap-1 shadow-xs">

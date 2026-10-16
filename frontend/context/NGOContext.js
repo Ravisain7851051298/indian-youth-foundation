@@ -220,7 +220,7 @@ export function NGOProvider({ children }) {
         })
         .catch(() => {});
 
-      const [setRes, campRes, donRes, memRes, evtRes, newsRes, galRes, certRes, grvRes, fbRes, teamRes] = await Promise.allSettled([
+      const [setRes, campRes, donRes, memRes, evtRes, newsRes, galRes, certRes, grvRes, fbRes, teamRes, srvRes] = await Promise.allSettled([
         fetch('/api/settings', { credentials: 'include' }).then(r => r.json()),
         fetch('/api/campaigns', { credentials: 'include' }).then(r => r.json()),
         fetch('/api/donations', { credentials: 'include' }).then(r => r.json()),
@@ -231,8 +231,16 @@ export function NGOProvider({ children }) {
         fetch('/api/certificates', { credentials: 'include' }).then(r => r.json()),
         fetch('/api/grievances', { credentials: 'include' }).then(r => r.json()),
         fetch('/api/feedback', { credentials: 'include' }).then(r => r.json()),
-        fetch('/api/team-members', { credentials: 'include' }).then(r => r.json())
+        fetch('/api/team-members', { credentials: 'include' }).then(r => r.json()),
+        fetch('/api/services', { credentials: 'include' }).then(r => r.json())
       ]);
+
+      if (srvRes.status === 'fulfilled') {
+        const srvList = srvRes.value?.data || srvRes.value?.items || [];
+        if (Array.isArray(srvList) && srvList.length > 0) {
+          setServices(srvList);
+        }
+      }
 
       if (setRes.status === 'fulfilled' && setRes.value?.settings) {
         setSettings(prev => ({ ...prev, ...setRes.value.settings }));
@@ -583,6 +591,23 @@ export function NGOProvider({ children }) {
         body: JSON.stringify(data)
       });
     } catch (e) {}
+  };
+
+  const fetchServices = async () => {
+    try {
+      const res = await fetch('/api/services', { credentials: 'include' });
+      if (res.ok) {
+        const json = await res.json();
+        const list = json?.data || json?.items || [];
+        if (Array.isArray(list) && list.length > 0) {
+          setServices(list);
+          return list;
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to fetch services:', e);
+    }
+    return services;
   };
 
   const addService = (srv) => setServices(prev => [{ ...srv, id: `srv_${Date.now()}` }, ...prev]);
@@ -1176,6 +1201,7 @@ export function NGOProvider({ children }) {
     updateCampaign,
     deleteCampaign,
     services,
+    fetchServices,
     addService,
     deleteService,
     programs,
@@ -1190,6 +1216,7 @@ export function NGOProvider({ children }) {
     updateFeedbackStatus,
     deleteFeedback,
     events,
+    setEvents,
     addEvent,
     updateEvent,
     deleteEvent,

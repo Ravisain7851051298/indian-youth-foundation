@@ -141,7 +141,6 @@ export default function AdminFeedbackPage() {
         <div className="flex items-center gap-2">
           <Link
             href="/feedback"
-            target="_blank"
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold transition shadow-2xs cursor-pointer"
           >
             <FiEye className="w-3.5 h-3.5 text-red-600" />

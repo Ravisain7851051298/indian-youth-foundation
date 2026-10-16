@@ -189,7 +189,7 @@ export default function Navbar() {
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={getContentImageUrl(settings.logoUrl)}
-                    alt={settings?.ngoName || 'Logo'}
+                    alt={settings?.ngoName ? `${settings.ngoName} Logo` : 'Indian Youth Foundation Logo'}
                     className="w-full h-full object-cover"
                     suppressHydrationWarning
                     onError={(e) => {
@@ -216,9 +216,9 @@ export default function Navbar() {
               {/* Home link */}
               <Link
                 href="/"
-                className={`px-3.5 py-2 rounded-xl transition-all ${pathname === '/'
-                  ? 'text-red-600 font-extrabold bg-red-50'
-                  : 'hover:text-red-600 hover:bg-red-50/50'
+                className={`px-3.5 py-2 rounded-xl border transition-all ${pathname === '/'
+                  ? 'text-red-700 font-black bg-red-100 border-red-300 shadow-2xs'
+                  : 'text-slate-800 border-transparent hover:text-red-700 hover:bg-red-100/90 hover:border-red-300 font-bold'
                   }`}
               >
                 Home
@@ -234,15 +234,15 @@ export default function Navbar() {
                     <button
                       onClick={() => toggleDropdown(group.id)}
                       onMouseEnter={() => setActiveDropdown(group.id)}
-                      className={`flex items-center gap-1 px-3.5 py-2 rounded-xl transition-all cursor-pointer ${active || isOpen
-                        ? 'text-red-600 font-extrabold bg-red-50/80'
-                        : 'hover:text-red-600 hover:bg-red-50/50'
+                      className={`group flex items-center gap-1.5 px-3.5 py-2 rounded-xl border transition-all cursor-pointer ${active || isOpen
+                        ? 'text-red-700 font-black bg-red-100 border-red-300 shadow-2xs'
+                        : 'text-slate-800 border-transparent hover:text-red-700 hover:bg-red-100/90 hover:border-red-300 font-bold'
                         }`}
                       aria-expanded={isOpen}
                     >
                       <span>{group.label}</span>
                       <FiChevronDown
-                        className={`w-3.5 h-3.5 transition-transform duration-200 ${isOpen ? 'rotate-180 text-red-600' : 'text-slate-400'}`}
+                        className={`w-3.5 h-3.5 transition-transform duration-200 ${isOpen ? 'rotate-180 text-red-600' : 'text-slate-500 group-hover:text-red-600'}`}
                       />
                     </button>
 
@@ -250,7 +250,7 @@ export default function Navbar() {
                     {isOpen && (
                       <div
                         onMouseLeave={() => setActiveDropdown(null)}
-                        className="absolute left-0 mt-1 w-72 bg-white rounded-2xl shadow-2xl border border-slate-100 p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150"
+                        className="absolute left-0 mt-1 w-72 bg-white rounded-2xl shadow-2xl border border-red-100 p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150"
                       >
                         <div className="space-y-1">
                           {group.links.map((link) => {
@@ -262,17 +262,17 @@ export default function Navbar() {
                                 key={link.href}
                                 href={link.href}
                                 onClick={() => setActiveDropdown(null)}
-                                className={`flex items-start gap-3 p-2.5 rounded-xl transition-colors ${isCurrent
-                                  ? 'bg-red-50 text-red-700'
-                                  : 'hover:bg-red-50 text-black hover:text-red-700'
+                                className={`flex items-start gap-3 p-2.5 rounded-xl border transition-all group ${isCurrent
+                                  ? 'bg-red-100/90 text-red-700 border-red-300 font-bold'
+                                  : 'border-transparent hover:bg-red-100/80 text-slate-800 hover:text-red-700 hover:border-red-200'
                                   }`}
                               >
-                                <div className={`p-2 rounded-lg mt-0.5 shrink-0 ${isCurrent ? 'bg-red-600 text-white' : 'bg-slate-100 text-black'}`}>
+                                <div className={`p-2 rounded-lg mt-0.5 shrink-0 transition-colors ${isCurrent ? 'bg-red-600 text-white shadow-2xs' : 'bg-red-50 text-red-600 group-hover:bg-red-600 group-hover:text-white shadow-2xs'}`}>
                                   <Icon className="w-4 h-4" />
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                  <div className="font-bold text-xs">{link.label}</div>
-                                  <div className="text-[11px] text-black font-medium truncate mt-0.5">{link.desc}</div>
+                                  <div className="font-bold text-xs group-hover:text-red-700 transition-colors">{link.label}</div>
+                                  <div className="text-[11px] text-slate-500 group-hover:text-red-900 font-medium truncate mt-0.5">{link.desc}</div>
                                 </div>
                               </Link>
                             );

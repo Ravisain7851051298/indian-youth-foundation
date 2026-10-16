@@ -32,21 +32,21 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (req, file, cb) => {
-  // Allowed extensions for NGO operations: images, PDFs, office docs
-  const allowedExts = /\.(jpg|jpeg|png|webp|svg|gif|pdf|doc|docx|xls|xlsx)$/i;
-  const allowedMimes = /^(image\/(jpeg|png|webp|svg\+xml|gif)|application\/(pdf|msword|vnd\.openxmlformats-officedocument\.wordprocessingml\.document|vnd\.ms-excel|vnd\.openxmlformats-officedocument\.spreadsheetml\.sheet))$/i;
+  // Allowed extensions for NGO operations: images, videos, PDFs, office docs
+  const allowedExts = /\.(jpg|jpeg|png|webp|svg|gif|pdf|doc|docx|xls|xlsx|mp4|webm|mov|mkv|avi|3gp)$/i;
+  const allowedMimes = /^(image\/(jpeg|png|webp|svg\+xml|gif)|video\/(mp4|webm|quicktime|x-msvideo|x-matroska|3gpp)|application\/(pdf|msword|vnd\.openxmlformats-officedocument\.wordprocessingml\.document|vnd\.ms-excel|vnd\.openxmlformats-officedocument\.spreadsheetml\.sheet))$/i;
 
   if (file.originalname.match(allowedExts) || file.mimetype.match(allowedMimes)) {
     cb(null, true);
   } else {
-    cb(new Error(`Unsupported file type: ${file.originalname}. Allowed: Images (JPG, PNG, WEBP), PDFs, and Documents.`), false);
+    cb(new Error(`Unsupported file type: ${file.originalname}. Allowed: Images (JPG, PNG, WEBP), Videos (MP4, WEBM, MOV), PDFs, and Documents.`), false);
   }
 };
 
 const upload = multer({
   storage: storage,
   limits: { 
-    fileSize: 15 * 1024 * 1024 // 15MB max file size
+    fileSize: 60 * 1024 * 1024 // 60MB max file size for videos and documents
   },
   fileFilter: fileFilter
 });

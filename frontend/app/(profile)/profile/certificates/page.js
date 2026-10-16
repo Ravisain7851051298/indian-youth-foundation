@@ -493,15 +493,13 @@ export default function ProfileCertificatesPage() {
                     >
                       <FiPrinter className="w-3.5 h-3.5" />
                     </button>
-                    <a
+                    <Link
                       href={`/verify/certificate/${cert.certificateId}`}
-                      target="_blank"
-                      rel="noreferrer"
                       className="p-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-black text-xs font-bold transition flex items-center gap-1"
                       title="Public Verification"
                     >
                       <FiExternalLink className="w-3.5 h-3.5 text-black" />
-                    </a>
+                    </Link>
                   </div>
                 </div>
               </div>

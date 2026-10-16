@@ -13,20 +13,24 @@ import {
   FiEye, 
   FiUploadCloud, 
   FiCalendar, 
-  FiLayers 
+  FiLayers,
+  FiSearch,
+  FiFilter
 } from 'react-icons/fi';
 import { useNGO } from '@/context/NGOContext';
 import { getContentImageUrl } from '@/lib/authApi';
 import api from '@/services/api';
 
 const CATEGORIES = [
-  { id: 'all', label: 'All Media' },
-  { id: 'photo', label: 'Field Photos' },
-  { id: 'video', label: 'Video Archives' },
+  { id: 'all', label: 'All Categories' },
   { id: 'Child Education', label: 'Child Education' },
-  { id: 'Healthcare & Blood Donation', label: 'Health & Blood' },
+  { id: 'Healthcare & Blood Donation', label: 'Health & Blood Camps' },
+  { id: 'Food & Ration Drives', label: 'Food & Ration Drives' },
+  { id: 'Women Empowerment', label: 'Women Empowerment' },
   { id: 'Disaster Relief', label: 'Disaster Relief' },
   { id: 'Youth & Community', label: 'Youth Leadership' },
+  { id: 'Tree Plantation & Green India', label: 'Green India' },
+  { id: 'General', label: 'General' },
 ];
 
 export default function GalleryPage() {
@@ -34,6 +38,8 @@ export default function GalleryPage() {
   const isAdmin = currentUser?.role === 'Admin' || currentUser?.role === 'SuperAdmin';
 
   const [activeTab, setActiveTab] = useState('all');
+  const [mediaFormat, setMediaFormat] = useState('all'); // 'all' | 'photo' | 'video'
+  const [searchQuery, setSearchQuery] = useState('');
   const [lightboxItem, setLightboxItem] = useState(null);
 
   // Form State (Add / Edit)
@@ -43,17 +49,37 @@ export default function GalleryPage() {
   const [deleteModalItem, setDeleteModalItem] = useState(null);
 
   const [title, setTitle] = useState('');
-  const [category, setCategory] = useState('photo');
+  const [category, setCategory] = useState('General');
+  const [mediaType, setMediaType] = useState('photo');
   const [url, setUrl] = useState('');
   const [caption, setCaption] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState('');
 
   const filteredItems = gallery.filter((item) => {
-    if (activeTab === 'all') return true;
-    if (activeTab === 'photo') return item.category === 'photo' || !item.category || item.category === 'General';
-    if (activeTab === 'video') return item.category === 'video' || item.category === 'Video Footage' || Boolean(item.videoUrl);
-    return item.category === activeTab;
+    const isVideo =
+      item.mediaType === 'video' ||
+      item.category === 'video' ||
+      Boolean(item.videoUrl) ||
+      /\.(mp4|webm|mov)(\?.*)?$/i.test(item.url || '');
+
+    if (mediaFormat === 'photo' && isVideo) return false;
+    if (mediaFormat === 'video' && !isVideo) return false;
+
+    if (activeTab !== 'all') {
+      const cat = (item.category || '').toLowerCase();
+      if (cat !== activeTab.toLowerCase()) return false;
+    }
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      const title = (item.title || '').toLowerCase();
+      const caption = (item.caption || item.description || '').toLowerCase();
+      const cat = (item.category || '').toLowerCase();
+      return title.includes(q) || caption.includes(q) || cat.includes(q);
+    }
+
+    return true;
   });
 
   const openAddModal = () => {
@@ -183,8 +209,50 @@ export default function GalleryPage() {
           )}
         </div>
 
+        {/* Search & Media Format Toolbar */}
+        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-2xs">
+          <div className="relative flex-1 max-w-md">
+            <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+            <input
+              type="text"
+              placeholder="Search albums, activities, captions, or locations..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:outline-red-500 font-medium text-black placeholder:text-slate-400"
+            />
+          </div>
+
+          <div className="flex items-center gap-2 self-end sm:self-auto">
+            {/* Format toggle: All | Photos | Videos */}
+            <div className="flex items-center bg-white border border-slate-200 p-0.5 rounded-xl text-xs font-bold shadow-2xs">
+              {[
+                { id: 'all', label: 'All Media' },
+                { id: 'photo', label: 'Photos Only' },
+                { id: 'video', label: 'Videos Only' }
+              ].map((fmt) => (
+                <button
+                  key={fmt.id}
+                  type="button"
+                  onClick={() => setMediaFormat(fmt.id)}
+                  className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${
+                    mediaFormat === fmt.id
+                      ? 'bg-red-600 text-white font-extrabold shadow-xs'
+                      : 'text-slate-600 hover:text-black'
+                  }`}
+                >
+                  {fmt.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="text-xs font-bold text-slate-500 hidden md:block">
+              Showing <span className="text-black font-extrabold">{filteredItems.length}</span> items
+            </div>
+          </div>
+        </div>
+
         {/* Filter Navigation */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-200">
+        <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-200 scrollbar-none">
           {CATEGORIES.map((cat) => {
             const isActive = activeTab === cat.id;
             return (
@@ -400,12 +468,16 @@ export default function GalleryPage() {
                     onChange={(e) => setCategory(e.target.value)}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-red-500 text-black bg-slate-50"
                   >
-                    <option value="photo">Field Photo</option>
-                    <option value="video">YouTube Video</option>
+                    <option value="General">General Drives</option>
                     <option value="Child Education">Child Education</option>
                     <option value="Healthcare & Blood Donation">Healthcare &amp; Blood Donation</option>
+                    <option value="Food & Ration Drives">Food &amp; Ration Drives</option>
+                    <option value="Women Empowerment">Women Empowerment</option>
                     <option value="Disaster Relief">Disaster Relief</option>
                     <option value="Youth & Community">Youth &amp; Community</option>
+                    <option value="Tree Plantation & Green India">Tree Plantation &amp; Green India</option>
+                    <option value="Sports & Cultural">Sports &amp; Cultural</option>
+                    <option value="Video Footage">Video Footage</option>
                   </select>
                 </div>
 

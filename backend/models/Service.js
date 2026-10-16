@@ -7,7 +7,8 @@ const serviceSchema = new mongoose.Schema({
   features: { type: [String], default: [] },
   icon: { type: String, default: 'FiActivity', trim: true },
   image: { type: String, default: '', trim: true },
-  status: { type: String, enum: ['active', 'inactive'], default: 'active' }
+  order: { type: Number, default: 0 },
+  status: { type: String, enum: ['Active', 'Inactive', 'Draft'], default: 'Active' }
 }, {
   timestamps: true
 });

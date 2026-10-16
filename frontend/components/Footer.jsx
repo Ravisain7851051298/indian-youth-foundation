@@ -38,7 +38,7 @@ export default function Footer() {
                   /* eslint-disable-next-line @next/next/no-img-element */
                   <img
                     src={getContentImageUrl(settings.logoUrl)}
-                    alt={settings?.ngoName || 'Logo'}
+                    alt={settings?.ngoName ? `${settings.ngoName} Logo` : 'Indian Youth Foundation Logo'}
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       e.currentTarget.onerror = null;

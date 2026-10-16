@@ -147,7 +147,7 @@ export default function MembershipManagement() {
   return (
     <div className="space-y-4">
       {/* Top Header Card */}
-      <div className="bg-white p-4 rounded-b-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white p-4 rounded-b-2xl border-b border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-black text-black tracking-tight">Membership Management</h1>
           <p className="text-xs text-slate-700 mt-1">
@@ -182,11 +182,10 @@ export default function MembershipManagement() {
             <button
               key={st}
               onClick={() => setActiveTab(st.toLowerCase())}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap cursor-pointer ${
-                activeTab === st.toLowerCase()
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap cursor-pointer ${activeTab === st.toLowerCase()
                   ? "bg-red-600 text-white shadow-md shadow-red-600/20"
                   : "bg-slate-100 text-black hover:bg-red-50 hover:text-red-600"
-              }`}
+                }`}
             >
               {st}
             </button>
@@ -256,13 +255,12 @@ export default function MembershipManagement() {
                       </td>
                       <td className="py-3 px-3.5 whitespace-nowrap">
                         <span
-                          className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase ${
-                            status.toLowerCase() === "approved" || status.toLowerCase() === "active"
+                          className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase ${status.toLowerCase() === "approved" || status.toLowerCase() === "active"
                               ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
                               : status.toLowerCase() === "rejected"
-                              ? "bg-rose-100 text-rose-800 border border-rose-200"
-                              : "bg-amber-100 text-amber-800 border border-amber-200"
-                          }`}
+                                ? "bg-rose-100 text-rose-800 border border-rose-200"
+                                : "bg-amber-100 text-amber-800 border border-amber-200"
+                            }`}
                         >
                           {status}
                         </span>
@@ -435,11 +433,11 @@ export default function MembershipManagement() {
 
       {/* Issue Certificate Modal */}
       {certModalItem && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4"
           onClick={() => setCertModalItem(null)}
         >
-          <div 
+          <div
             className="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full border border-slate-200 shadow-2xl space-y-4 text-black"
             onClick={(e) => e.stopPropagation()}
           >

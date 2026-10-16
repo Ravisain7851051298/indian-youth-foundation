@@ -366,7 +366,7 @@ export default function DashboardPage() {
   const donutCauses = useMemo(() => {
     const validDonations = donations.filter(d => d.status !== 'rejected');
     const colorPalette = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#ec4899'];
-    
+
     const map = {};
     let grandTotal = 0;
 
@@ -450,7 +450,7 @@ export default function DashboardPage() {
   return (
     <div className="space-y-4">
       {/* Top Header Card */}
-      <div className="bg-white p-4 rounded-b-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white p-4 rounded-b-2xl border-b border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
             <span className="p-2 rounded-xl bg-red-50 text-red-600">
@@ -460,9 +460,9 @@ export default function DashboardPage() {
               <h1 className="text-lg font-black text-slate-900 tracking-tight">
                 {isAdmin ? 'Admin Master Control & Analytics Hub' : 'Team Member Operations Hub'}
               </h1>
-              <p className="text-xs text-slate-500">
+              {/* <p className="text-xs text-slate-500">
                 Organization: <strong className="text-slate-800">{settings?.ngoName || 'Indian Youth Foundation'}</strong> • Real-time Financials, Network Analytics &amp; Approvals
-              </p>
+              </p> */}
             </div>
           </div>
         </div>
@@ -471,11 +471,11 @@ export default function DashboardPage() {
         <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={handleRefresh}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold transition cursor-pointer"
+            className="p-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 transition cursor-pointer"
             title="Refresh Metrics"
+            aria-label="Refresh Metrics"
           >
-            <FiRefreshCw className={`w-3.5 h-3.5 text-red-600 ${isRefreshing ? 'animate-spin' : ''}`} />
-            <span>Refresh</span>
+            <FiRefreshCw className={`w-4 h-4 text-red-600 ${isRefreshing ? 'animate-spin' : ''}`} />
           </button>
 
           <a
@@ -495,7 +495,7 @@ export default function DashboardPage() {
             title="Export 80G Donations"
           >
             <FiDownload className="w-3.5 h-3.5 text-blue-600" />
-            <span>80G Donations Excel</span>
+            <span>Donations Excel</span>
           </a>
 
           <Link
@@ -503,7 +503,6 @@ export default function DashboardPage() {
             className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-md shadow-red-600/20 transition cursor-pointer"
           >
             <FiSettings className="w-3.5 h-3.5" />
-            <span>NGO Settings</span>
           </Link>
         </div>
       </div>
@@ -670,17 +669,15 @@ export default function DashboardPage() {
                 <div className="bg-slate-100 p-0.5 rounded-xl flex items-center text-xs font-bold">
                   <button
                     onClick={() => setChartMetric('amount')}
-                    className={`px-2.5 py-1 rounded-lg transition cursor-pointer text-[11px] ${
-                      chartMetric === 'amount' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-800'
-                    }`}
+                    className={`px-2.5 py-1 rounded-lg transition cursor-pointer text-[11px] ${chartMetric === 'amount' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-800'
+                      }`}
                   >
                     ₹ Amount
                   </button>
                   <button
                     onClick={() => setChartMetric('donors')}
-                    className={`px-2.5 py-1 rounded-lg transition cursor-pointer text-[11px] ${
-                      chartMetric === 'donors' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-800'
-                    }`}
+                    className={`px-2.5 py-1 rounded-lg transition cursor-pointer text-[11px] ${chartMetric === 'donors' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-800'
+                      }`}
                   >
                     Donors
                   </button>
@@ -692,9 +689,8 @@ export default function DashboardPage() {
                     <button
                       key={range}
                       onClick={() => setTimeRange(range)}
-                      className={`px-2 py-1 rounded-lg uppercase tracking-wider text-[10px] font-black transition cursor-pointer ${
-                        timeRange === range ? 'bg-red-600 text-white shadow-xs' : 'text-slate-600 hover:text-red-600'
-                      }`}
+                      className={`px-2 py-1 rounded-lg uppercase tracking-wider text-[10px] font-black transition cursor-pointer ${timeRange === range ? 'bg-red-600 text-white shadow-xs' : 'text-slate-600 hover:text-red-600'
+                        }`}
                     >
                       {range}
                     </button>
@@ -726,8 +722,8 @@ export default function DashboardPage() {
                   const y = 200 - 25 - ratio * 150;
                   const labelVal = chartMetric === 'amount'
                     ? (chartMaxVal >= 1000
-                        ? `₹${Math.round((chartMaxVal * ratio) / 1000)}k`
-                        : `₹${Math.round(chartMaxVal * ratio)}`)
+                      ? `₹${Math.round((chartMaxVal * ratio) / 1000)}k`
+                      : `₹${Math.round(chartMaxVal * ratio)}`)
                     : Math.round(chartMaxVal * ratio);
                   return (
                     <g key={ratio}>
@@ -971,11 +967,10 @@ export default function DashboardPage() {
                     key={idx}
                     onMouseEnter={() => setHoveredDonutIdx(idx)}
                     onMouseLeave={() => setHoveredDonutIdx(null)}
-                    className={`p-2 rounded-xl border transition cursor-pointer flex items-center justify-between text-xs ${
-                      isHovered
-                        ? 'bg-slate-50 border-slate-300 shadow-2xs'
-                        : 'border-transparent hover:bg-slate-50/60'
-                    }`}
+                    className={`p-2 rounded-xl border transition cursor-pointer flex items-center justify-between text-xs ${isHovered
+                      ? 'bg-slate-50 border-slate-300 shadow-2xs'
+                      : 'border-transparent hover:bg-slate-50/60'
+                      }`}
                   >
                     <div className="flex items-center gap-2 min-w-0">
                       <span
@@ -1056,18 +1051,16 @@ export default function DashboardPage() {
                         {/* Members Bar */}
                         <div
                           style={{ height: `${memberH}%` }}
-                          className={`w-3.5 sm:w-4 rounded-t-lg bg-red-600 transition-all duration-300 ${
-                            isHovered ? 'brightness-110 shadow-md shadow-red-500/30' : 'opacity-90'
-                          }`}
+                          className={`w-3.5 sm:w-4 rounded-t-lg bg-red-600 transition-all duration-300 ${isHovered ? 'brightness-110 shadow-md shadow-red-500/30' : 'opacity-90'
+                            }`}
                           title={`Members: ${item.members}`}
                         ></div>
 
                         {/* Volunteers Bar */}
                         <div
                           style={{ height: `${volH}%` }}
-                          className={`w-3.5 sm:w-4 rounded-t-lg bg-emerald-500 transition-all duration-300 ${
-                            isHovered ? 'brightness-110 shadow-md shadow-emerald-500/30' : 'opacity-90'
-                          }`}
+                          className={`w-3.5 sm:w-4 rounded-t-lg bg-emerald-500 transition-all duration-300 ${isHovered ? 'brightness-110 shadow-md shadow-emerald-500/30' : 'opacity-90'
+                            }`}
                           title={`Volunteers: ${item.volunteers}`}
                         ></div>
                       </div>
@@ -1114,9 +1107,13 @@ export default function DashboardPage() {
             <div className="space-y-3.5 pt-3">
               {campaigns.length > 0 ? (
                 campaigns.slice(0, 4).map((c, idx) => {
-                  const goalAmt = Number(c.goal || 100000);
-                  const raisedAmt = Number(c.raised || 0);
-                  const pct = Math.min(Math.round((raisedAmt / goalAmt) * 100), 100);
+                  const goalAmt = Number(c.goalAmount ?? c.goal ?? c.targetAmount ?? 100000);
+                  const campaignDonations = donations.filter(d =>
+                    (d.campaignId && (d.campaignId === c._id || d.campaignId === c.id)) ||
+                    (d.campaign && typeof d.campaign === 'string' && d.campaign.toLowerCase() === (c.title || '').toLowerCase())
+                  ).reduce((s, d) => s + Number(d.amount || 0), 0);
+                  const raisedAmt = Number(c.raisedAmount ?? c.raised ?? 0) || campaignDonations;
+                  const pct = goalAmt > 0 ? Math.min(Math.round((raisedAmt / goalAmt) * 100), 100) : 0;
 
                   return (
                     <div key={idx} className="space-y-1.5 p-2 rounded-2xl hover:bg-slate-50 transition border border-transparent hover:border-slate-200">
@@ -1133,9 +1130,8 @@ export default function DashboardPage() {
                       <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
                         <div
                           style={{ width: `${pct}%` }}
-                          className={`h-full rounded-full transition-all duration-500 ${
-                            pct >= 80 ? 'bg-emerald-500' : pct >= 50 ? 'bg-blue-600' : 'bg-red-500'
-                          }`}
+                          className={`h-full rounded-full transition-all duration-500 ${pct >= 80 ? 'bg-emerald-500' : pct >= 50 ? 'bg-blue-600' : 'bg-red-500'
+                            }`}
                         ></div>
                       </div>
 
@@ -1207,11 +1203,10 @@ export default function DashboardPage() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setActiveRecentTab('donations')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
-                activeRecentTab === 'donations'
-                  ? 'bg-red-600 text-white shadow-md shadow-red-600/20'
-                  : 'bg-slate-100 text-slate-700 hover:bg-red-50 hover:text-red-600'
-              }`}
+              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${activeRecentTab === 'donations'
+                ? 'bg-red-600 text-white shadow-md shadow-red-600/20'
+                : 'bg-slate-100 text-slate-700 hover:bg-red-50 hover:text-red-600'
+                }`}
             >
               <FiCreditCard className="w-3.5 h-3.5" />
               <span>Recent 80G Donations ({donations.length})</span>
@@ -1219,11 +1214,10 @@ export default function DashboardPage() {
 
             <button
               onClick={() => setActiveRecentTab('members')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
-                activeRecentTab === 'members'
-                  ? 'bg-red-600 text-white shadow-md shadow-red-600/20'
-                  : 'bg-slate-100 text-slate-700 hover:bg-red-50 hover:text-red-600'
-              }`}
+              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${activeRecentTab === 'members'
+                ? 'bg-red-600 text-white shadow-md shadow-red-600/20'
+                : 'bg-slate-100 text-slate-700 hover:bg-red-50 hover:text-red-600'
+                }`}
             >
               <FiUsers className="w-3.5 h-3.5" />
               <span>Member Enrolments ({members.length})</span>
@@ -1360,9 +1354,8 @@ export default function DashboardPage() {
                           )}
                         </td>
                         <td className="py-3 px-4 whitespace-nowrap">
-                          <span className={`px-2 py-0.5 rounded-full font-bold text-[10px] ${
-                            isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-700'
-                          }`}>
+                          <span className={`px-2 py-0.5 rounded-full font-bold text-[10px] ${isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-700'
+                            }`}>
                             {isActive ? 'Active & Minted' : (member.status || 'Pending')}
                           </span>
                         </td>
@@ -1400,90 +1393,6 @@ export default function DashboardPage() {
             </table>
           </div>
         )}
-      </div>
-
-      {/* ------------------------------------------------------------- */}
-      {/* Admin Training & Compliance Video Hub */}
-      {/* ------------------------------------------------------------- */}
-      <div className="mx-3 bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-3 border-b border-slate-100">
-          <div>
-            <span className="text-[10px] font-black text-red-600 uppercase tracking-widest">
-              Foundation Master Training &amp; Video Hub
-            </span>
-            <h3 className="text-base font-black text-slate-900 mt-0.5">
-              Fundraising, Volunteer Mobilization &amp; 80G Statutory Compliance Guides
-            </h3>
-          </div>
-          <span className="text-xs bg-red-50 text-red-700 border border-red-200 px-3 py-1 rounded-full font-bold self-start sm:self-auto">
-            Video Tutorials
-          </span>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 flex flex-col justify-between hover:border-red-300 hover:bg-red-50/20 transition">
-            <div>
-              <div className="w-9 h-9 rounded-xl bg-red-100 text-red-600 flex items-center justify-center mb-3">
-                <FiPlay className="w-4 h-4" />
-              </div>
-              <h4 className="font-extrabold text-xs text-slate-900">How to Mobilize Members &amp; Promote NGO</h4>
-              <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">
-                Best practices for expanding your social volunteer network using WhatsApp and social media.
-              </p>
-            </div>
-            <a
-              href="https://www.youtube.com"
-              target="_blank"
-              rel="noreferrer"
-              className="mt-3 text-xs font-bold text-red-600 hover:underline flex items-center gap-1"
-            >
-              <span>Watch Tutorial</span>
-              <FiArrowUpRight className="w-3.5 h-3.5" />
-            </a>
-          </div>
-
-          <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 flex flex-col justify-between hover:border-red-300 hover:bg-red-50/20 transition">
-            <div>
-              <div className="w-9 h-9 rounded-xl bg-red-100 text-red-600 flex items-center justify-center mb-3">
-                <FiAward className="w-4 h-4" />
-              </div>
-              <h4 className="font-extrabold text-xs text-slate-900">Attracting Donors &amp; 80G Benefits</h4>
-              <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">
-                Explaining 50% tax deductions to individual donors and securing corporate CSR funds.
-              </p>
-            </div>
-            <a
-              href="https://www.youtube.com"
-              target="_blank"
-              rel="noreferrer"
-              className="mt-3 text-xs font-bold text-red-600 hover:underline flex items-center gap-1"
-            >
-              <span>Watch Tutorial</span>
-              <FiArrowUpRight className="w-3.5 h-3.5" />
-            </a>
-          </div>
-
-          <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 flex flex-col justify-between hover:border-red-300 hover:bg-red-50/20 transition">
-            <div>
-              <div className="w-9 h-9 rounded-xl bg-red-100 text-red-600 flex items-center justify-center mb-3">
-                <FiSettings className="w-4 h-4" />
-              </div>
-              <h4 className="font-extrabold text-xs text-slate-900">Digital ID Card &amp; Letter Generator</h4>
-              <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">
-                How to generate and print verified ID cards and appointment letters with 1-click.
-              </p>
-            </div>
-            <a
-              href="https://www.youtube.com"
-              target="_blank"
-              rel="noreferrer"
-              className="mt-3 text-xs font-bold text-red-600 hover:underline flex items-center gap-1"
-            >
-              <span>Watch Tutorial</span>
-              <FiArrowUpRight className="w-3.5 h-3.5" />
-            </a>
-          </div>
-        </div>
       </div>
     </div>
   );

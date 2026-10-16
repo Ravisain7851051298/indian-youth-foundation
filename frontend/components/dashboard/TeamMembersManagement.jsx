@@ -191,7 +191,7 @@ export default function TeamMembersManagement() {
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="bg-white p-4 rounded-b-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white p-4 rounded-b-2xl border-b border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-black text-black tracking-tight">Team &amp; Board Management</h1>
           <p className="text-xs text-slate-700 mt-1">
@@ -258,68 +258,70 @@ export default function TeamMembersManagement() {
             <p className="font-semibold text-black">No team members found.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-10 sm:gap-x-8 sm:gap-y-12 justify-items-center py-4">
             {filtered.map((m) => {
               const id = m._id || m.id;
               const photo = m.image;
               return (
                 <div
                   key={id}
-                  className="bg-slate-50 rounded-2xl p-5 border border-slate-200 flex flex-col justify-between hover:shadow-md transition text-black"
+                  className="group flex flex-col items-center text-center transition-transform duration-300 w-full max-w-[200px]"
                 >
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-4">
+                  {/* Profile Picture */}
+                  <div className="relative mb-3">
+                    <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden shadow-md border-3 border-white ring-4 ring-red-100 group-hover:ring-red-500 transition-all duration-300 group-hover:scale-105 bg-slate-100">
                       {photo ? (
                         <img
                           src={getContentImageUrl(photo)}
                           alt={m.name}
-                          className="w-14 h-14 object-cover rounded-2xl border-2 border-red-500 shadow-sm shrink-0"
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src =
+                              "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500";
+                          }}
                         />
                       ) : (
-                        <div className="w-14 h-14 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center font-black text-lg border border-red-200 shrink-0">
+                        <div className="w-full h-full bg-red-100 text-red-600 flex items-center justify-center font-black text-2xl">
                           {m.name.charAt(0)}
-                        </div>
-                      )}
-                      <div>
-                        <h3 className="font-extrabold text-sm text-black">{m.name}</h3>
-                        <p className="text-xs font-bold text-red-700">{m.position}</p>
-                        <span className="text-[10px] text-slate-500 font-semibold">{m.department}</span>
-                      </div>
-                    </div>
-
-                    {m.bio && <p className="text-xs text-slate-600 line-clamp-3 leading-relaxed">{m.bio}</p>}
-
-                    <div className="pt-2 border-t border-slate-200/60 space-y-1 text-[11px] text-slate-600">
-                      {m.email && (
-                        <div className="flex items-center gap-1.5 truncate">
-                          <FiMail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                          <span className="truncate">{m.email}</span>
-                        </div>
-                      )}
-                      {m.phone && (
-                        <div className="flex items-center gap-1.5">
-                          <FiPhone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                          <span>{m.phone}</span>
                         </div>
                       )}
                     </div>
                   </div>
 
-                  <div className="mt-4 pt-3 border-t border-slate-200 flex items-center justify-end gap-2">
+                  {/* Name */}
+                  <h3 className="text-sm sm:text-base font-black text-black group-hover:text-red-600 transition-colors tracking-tight leading-snug">
+                    {m.name}
+                  </h3>
+
+                  {/* Position */}
+                  <p className="text-xs font-semibold text-red-600 tracking-normal mt-0.5 leading-snug">
+                    {m.position}
+                  </p>
+
+                  {/* Department */}
+                  {m.department && (
+                    <span className="inline-block mt-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 border border-slate-200/80">
+                      {m.department}
+                    </span>
+                  )}
+
+                  {/* Action Buttons */}
+                  <div className="mt-3 flex items-center justify-center gap-1.5 opacity-90 group-hover:opacity-100 transition">
                     <button
                       onClick={() => openEdit(m)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 hover:text-black hover:border-slate-300 font-bold text-xs shadow-2xs transition cursor-pointer"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-slate-700 hover:text-black hover:border-slate-300 font-bold text-[11px] shadow-2xs transition cursor-pointer"
                       title="Edit Profile"
                     >
-                      <FiEdit2 className="w-3.5 h-3.5" />
+                      <FiEdit2 className="w-3 h-3 text-slate-600" />
                       <span>Edit</span>
                     </button>
                     <button
                       onClick={() => setDeleteModalItem(m)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 hover:bg-rose-100 font-bold text-xs shadow-2xs transition cursor-pointer"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 hover:bg-rose-100 font-bold text-[11px] shadow-2xs transition cursor-pointer"
                       title="Delete Member"
                     >
-                      <FiTrash2 className="w-3.5 h-3.5" />
+                      <FiTrash2 className="w-3 h-3 text-rose-600" />
                       <span>Delete</span>
                     </button>
                   </div>

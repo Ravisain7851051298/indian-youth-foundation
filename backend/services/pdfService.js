@@ -304,7 +304,7 @@ async function generateVolunteerOfferLetterPdf(user = {}) {
       doc.on('data', b => buffers.push(b));
       doc.on('end', () => resolve(Buffer.concat(buffers)));
 
-      const volunteerId = sanitize(user.memberId || 'BYK-VOL-2026-0501');
+      const volunteerId = sanitize(user.volunteerId || (user.memberId && user.memberId.startsWith('BYK-VOL-') ? user.memberId : 'BYK-VOL-2026-0501'));
       const name = sanitize(user.name || 'Dedicated Volunteer');
       const email = sanitize(user.email || 'N/A');
       const phone = sanitize(user.phone || 'N/A');
@@ -571,7 +571,7 @@ async function generateIdCardPdf(user = {}, roleType = 'volunteer') {
       const cardTitle = isVolunteer ? 'VOLUNTEER IDENTITY CARD' : 'EXECUTIVE MEMBER IDENTITY CARD';
       const defaultDesignation = isVolunteer ? 'Active Youth Volunteer' : 'Active Social Worker';
 
-      const id = sanitize(user.memberId || (isVolunteer ? 'BYK-VOL-2026-0501' : 'BYK-MEM-2026-0001'));
+      const id = sanitize(isVolunteer ? (user.volunteerId || (user.memberId && user.memberId.startsWith('BYK-VOL-') ? user.memberId : 'BYK-VOL-2026-0501')) : (user.memberId || 'BYK-MEM-2026-0001'));
       const name = sanitize(user.name || 'Registered Social Worker');
       const designation = sanitize(user.designation || defaultDesignation);
       const bloodGroup = sanitize(user.bloodGroup || 'O+');

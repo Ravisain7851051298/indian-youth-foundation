@@ -2,12 +2,12 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { 
-  FiMail, 
-  FiCheckCircle, 
-  FiClock, 
-  FiRefreshCw, 
-  FiShield, 
+import {
+  FiMail,
+  FiCheckCircle,
+  FiClock,
+  FiRefreshCw,
+  FiShield,
   FiArrowLeft,
   FiSearch
 } from 'react-icons/fi';
@@ -23,7 +23,7 @@ export default function EmailLogsPage() {
     dispatch(fetchEmailLogs());
   }, [dispatch]);
 
-  const filteredLogs = (emailLogs || []).filter(log => 
+  const filteredLogs = (emailLogs || []).filter(log =>
     (log.to && log.to.toLowerCase().includes(searchTerm.toLowerCase())) ||
     (log.subject && log.subject.toLowerCase().includes(searchTerm.toLowerCase()))
   );
@@ -31,7 +31,7 @@ export default function EmailLogsPage() {
   return (
     <div className="space-y-4">
       {/* Top Header Card */}
-      <div className="bg-white p-4 rounded-b-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white p-4 rounded-b-2xl border-b border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="text-lg font-black text-slate-900 tracking-tight flex items-center gap-2">
             <FiMail className="text-red-600 w-5 h-5" />

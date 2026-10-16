@@ -82,12 +82,13 @@ export default function ProfileLayout({ children }) {
   }
 
   const isVerified = effectiveUser.status === 'active';
-  const isMember = effectiveUser.role === 'Member' || effectiveUser.role === 'Admin' || !!effectiveUser.memberId || effectiveUser.isMember;
-  const isVolunteer = effectiveUser.role === 'Volunteer' || effectiveUser.isVolunteer || effectiveUser.volunteerApplication?.status === 'approved' || effectiveUser.volunteerApplication?.status === 'pending';
+  const isMember = effectiveUser.role === 'Member' || effectiveUser.role === 'Admin' || (!!effectiveUser.memberId && !effectiveUser.memberId.startsWith('BYK-DON-')) || effectiveUser.isMember;
+  const isVolunteer = effectiveUser.role === 'Volunteer' || effectiveUser.isVolunteer || effectiveUser.volunteerApplication?.status === 'approved' || effectiveUser.volunteerApplication?.status === 'pending' || (!!effectiveUser.volunteerId && !effectiveUser.volunteerId.startsWith('BYK-DON-'));
 
   const menuItems = [
     { label: 'Overview & Status', href: '/profile', icon: FiUser },
     { label: 'My Certificates', href: '/profile/certificates', icon: FiAward },
+    { label: 'My Awards & Badges', href: '/profile/my-awards', icon: FiAward },
     {
       label: 'Membership Profile',
       href: '/profile/member',
@@ -100,13 +101,13 @@ export default function ProfileLayout({ children }) {
     },
     {
       label: 'Official ID Card',
-      href: '/profile/id-card',
+      href: isVolunteer && !isMember ? '/profile/id-card?type=volunteer' : '/profile/id-card',
       icon: FiShield,
       locked: !isVerified
     },
     {
       label: 'Offer / Appointment Letter',
-      href: '/profile/appointment-letter',
+      href: isVolunteer && !isMember ? '/profile/appointment-letter?type=volunteer' : '/profile/appointment-letter',
       icon: FiFileText,
       locked: !isVerified
     },

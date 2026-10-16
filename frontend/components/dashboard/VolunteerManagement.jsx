@@ -250,7 +250,7 @@ export default function VolunteerManagement() {
   return (
     <div className="space-y-4">
       {/* Top Header Card */}
-      <div className="bg-white p-4 rounded-b-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white p-4 rounded-b-2xl border-b border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-black text-black tracking-tight">Volunteer Applications</h1>
           <p className="text-xs text-slate-700 mt-1">
@@ -453,16 +453,20 @@ export default function VolunteerManagement() {
                             <>
                               <button
                                 onClick={() => handleApprove(id)}
-                                disabled={processingId === id}
-                                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] transition cursor-pointer disabled:opacity-50 shadow-xs"
+                                disabled={!!processingId}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 text-white font-bold text-[11px] transition cursor-pointer disabled:cursor-not-allowed shadow-xs"
                               >
-                                <FiCheck className="w-3.5 h-3.5" />
+                                {processingId === id ? (
+                                  <FiRefreshCw className="w-3.5 h-3.5 animate-spin" />
+                                ) : (
+                                  <FiCheck className="w-3.5 h-3.5" />
+                                )}
                                 <span>{processingId === id ? "Approving..." : "Approve"}</span>
                               </button>
                               <button
                                 onClick={() => setRejectModalItem(v)}
-                                disabled={processingId === id}
-                                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-[11px] transition cursor-pointer disabled:opacity-50 shadow-xs"
+                                disabled={!!processingId}
+                                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white font-bold text-[11px] transition cursor-pointer disabled:cursor-not-allowed shadow-xs"
                               >
                                 <FiX className="w-3.5 h-3.5" />
                                 <span>Reject</span>

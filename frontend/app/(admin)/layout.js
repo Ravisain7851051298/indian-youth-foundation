@@ -23,7 +23,9 @@ import {
   FiImage,
   FiChevronLeft,
   FiChevronRight,
-  FiSidebar
+  FiSidebar,
+  FiAward,
+  FiActivity
 } from 'react-icons/fi';
 import { useNGO } from '@/context/NGOContext';
 import { getContentImageUrl } from '@/lib/authApi';
@@ -67,17 +69,20 @@ export default function AdminLayout({ children }) {
 
   const navItems = [
     { label: 'Control Overview', href: '/dashboard', icon: FiHome },
+    { label: 'User Accounts', href: '/dashboard/users', icon: FiUsers },
+    { label: 'Awards & Honors', href: '/dashboard/awards', icon: FiAward },
     { label: 'Approvals Center', href: '/dashboard/approvals', icon: FiCheckSquare, badge: totalApprovalsPending },
     { label: 'Members Directory', href: '/dashboard/members', icon: FiUsers },
     { label: 'Volunteer Wing', href: '/dashboard/volunteers', icon: FiUserCheck },
     { label: '80G Donations', href: '/dashboard/donations', icon: FiHeart },
     { label: 'Campaigns CMS', href: '/dashboard/campaigns', icon: FiFileText },
+    { label: 'Our Services', href: '/dashboard/services', icon: FiActivity },
     { label: 'Events Management', href: '/dashboard/events', icon: FiCalendar },
     { label: 'News & Press Releases', href: '/dashboard/blogs', icon: FiFileText },
     { label: 'Photo & Video Gallery', href: '/dashboard/gallery', icon: FiImage },
     { label: 'Executive Team', href: '/dashboard/team-members', icon: FiUsers },
-    { label: 'Membership Plans CMS', href: '/dashboard/plans', icon: FiLayers },
-    { label: 'Grievance Redressal', href: '/dashboard/complaints', icon: FiAlertCircle, badge: pendingComplaints },
+    { label: 'Membership Plans', href: '/dashboard/plans', icon: FiLayers },
+    { label: 'Complaints & Enquries', href: '/dashboard/complaints', icon: FiAlertCircle, badge: pendingComplaints },
     { label: 'Review & Feedbacks', href: '/dashboard/feedback', icon: FiAlertCircle },
     { label: 'Email Audit Logs', href: '/dashboard/email-logs', icon: FiMail },
     { label: 'Org Certificates', href: '/dashboard/certificates', icon: FiShield },
@@ -163,7 +168,7 @@ export default function AdminLayout({ children }) {
                     </span>
                   </div>
                 </div>
-
+                {/* 
                 <button
                   type="button"
                   onClick={toggleCollapsed}
@@ -171,7 +176,7 @@ export default function AdminLayout({ children }) {
                   title="Collapse sidebar to icons only"
                 >
                   <FiChevronLeft className="w-4 h-4" />
-                </button>
+                </button> */}
               </>
             ) : (
               <div className="flex flex-col items-center gap-2">
@@ -273,7 +278,7 @@ export default function AdminLayout({ children }) {
           </div>
 
           {/* Bottom Actions */}
-          <div className={`border-t border-slate-200 bg-slate-50/60 transition-all ${collapsed ? 'p-2 space-y-2' : 'p-3 space-y-1'
+          {/* <div className={`border-t border-slate-200 bg-slate-50/60 transition-all ${collapsed ? 'p-2 space-y-2' : 'p-3 space-y-1'
             }`}>
             {collapsed ? (
               <>
@@ -290,7 +295,6 @@ export default function AdminLayout({ children }) {
 
                 <Link
                   href="/"
-                  target="_blank"
                   className="group relative flex items-center justify-center w-11 h-11 mx-auto rounded-xl text-slate-700 hover:text-black hover:bg-white transition"
                 >
                   <FiGlobe className="w-5 h-5 text-slate-600" />
@@ -324,7 +328,6 @@ export default function AdminLayout({ children }) {
 
                 <Link
                   href="/"
-                  target="_blank"
                   className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-black hover:bg-white transition border border-transparent hover:border-slate-200"
                 >
                   <FiGlobe className="w-4 h-4 text-slate-500" />
@@ -341,7 +344,7 @@ export default function AdminLayout({ children }) {
                 </button>
               </>
             )}
-          </div>
+          </div> */}
         </div>
       </aside>
 
@@ -418,7 +421,6 @@ export default function AdminLayout({ children }) {
                 </Link>
                 <Link
                   href="/"
-                  target="_blank"
                   onClick={() => setMobileOpen(false)}
                   className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-black hover:bg-white transition"
                 >
@@ -445,7 +447,7 @@ export default function AdminLayout({ children }) {
           }`}
       >
         {/* DEDICATED TOP HEADER FOR ADMIN DASHBOARD */}
-        <header className="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-slate-200/90 px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-4 shadow-2xs">
+        <header className="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-slate-200/90 px-4 py-3 flex items-center justify-between gap-4 shadow-2xs">
           {/* Left section: Collapse/Expand toggles & Page Breadcrumb */}
           <div className="flex items-center gap-3 min-w-0">
             {/* Desktop Collapse / Expand Toggle Button */}
@@ -490,9 +492,8 @@ export default function AdminLayout({ children }) {
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <Link
               href="/"
-              target="_blank"
               className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-black text-xs font-bold transition shadow-2xs"
-              title="Open Public Website in new tab"
+              title="Navigate to Public Website"
             >
               <FiGlobe className="w-3.5 h-3.5 text-slate-600" />
               <span>Live Site</span>
@@ -507,11 +508,9 @@ export default function AdminLayout({ children }) {
               <span>User Portal</span>
             </Link>
 
-            {/* Admin Profile Pill */}
             <div className="flex items-center gap-2 pl-2 sm:border-l border-slate-200">
               <div className="w-8 h-8 rounded-full bg-red-600 text-white font-extrabold flex items-center justify-center text-xs shadow-xs overflow-hidden">
                 {currentUser?.photoUrl ? (
-                  /* eslint-disable-next-line @next/next/no-img-element */
                   <img
                     src={getContentImageUrl(currentUser.photoUrl)}
                     alt={currentUser.name}
@@ -530,7 +529,7 @@ export default function AdminLayout({ children }) {
               <button
                 type="button"
                 onClick={handleLogout}
-                className="p-1.5 rounded-lg text-slate-500 hover:text-red-600 hover:bg-red-50 transition cursor-pointer"
+                className="p-2 rounded-lg text-slate-500 bg-red-100 border border-red-200 shadow-sm hover:text-red-600 hover:bg-red-200 hover:border-red-600 hover:shadow-md transition cursor-pointer"
                 title="Sign Out Session"
               >
                 <FiLogOut className="w-4 h-4" />

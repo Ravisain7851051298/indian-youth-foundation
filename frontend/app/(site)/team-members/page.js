@@ -389,7 +389,7 @@ export default function TeamMembersPage() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-x-8 gap-y-12 sm:gap-x-12 sm:gap-y-14 justify-items-center">
             {filteredMembers.map((m) => {
               const photoUrl = m.image
                 ? getContentImageUrl(m.image)
@@ -398,100 +398,72 @@ export default function TeamMembersPage() {
               return (
                 <div
                   key={m._id || m.id}
-                  className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 hover:border-red-300 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group relative"
+                  className="group flex flex-col items-center text-center transition-transform duration-300 w-full max-w-[220px]"
                 >
-                  {/* Department Badge */}
-                  <div className="flex items-center justify-between gap-2 mb-4">
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 truncate max-w-[200px]">
-                      {m.department || 'Leadership & Board'}
-                    </span>
-                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600">
-                      <FiCheckCircle className="w-3 h-3" />
-                      <span>Verified</span>
-                    </span>
-                  </div>
-
-                  {/* Member Photo & Basic Details */}
-                  <div className="text-center">
-                    <div className="relative inline-block mx-auto mb-4">
+                  {/* Member Circular Photo */}
+                  <div className="relative mb-3.5">
+                    <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-full overflow-hidden shadow-lg border-4 border-white ring-4 ring-red-100 group-hover:ring-red-500 transition-all duration-300 group-hover:scale-105 bg-slate-100">
                       <img
                         src={photoUrl}
                         alt={m.name}
-                        className="w-28 h-28 rounded-full object-cover border-4 border-red-50 shadow-md group-hover:scale-105 group-hover:border-red-100 transition-all duration-300 bg-slate-100"
+                        className="w-full h-full object-cover"
                         onError={(e) => {
                           e.target.src =
                             'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400';
                         }}
                       />
-                      {isAdmin && (
-                        <button
-                          onClick={() => openEdit(m)}
-                          className="absolute bottom-0 right-0 p-2 rounded-full bg-slate-900 text-white hover:bg-red-600 transition shadow-md cursor-pointer"
-                          title="Change Photo / Edit Member"
-                        >
-                          <FiCamera className="w-3.5 h-3.5" />
-                        </button>
-                      )}
                     </div>
 
-                    <h3 className="text-lg font-black text-slate-900 tracking-tight">{m.name}</h3>
-                    <span className="text-xs font-bold text-red-600 block mt-0.5">
-                      {m.position || m.role}
-                    </span>
-
-                    {m.bio && (
-                      <p className="text-xs text-slate-600 mt-3 leading-relaxed font-normal line-clamp-3">
-                        {m.bio}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Contact Info & Action Buttons Footer */}
-                  <div className="mt-6 pt-4 border-t border-slate-100 space-y-2">
-                    <div className="flex flex-col gap-1 text-xs text-slate-600">
-                      {m.phone && (
-                        <a
-                          href={`tel:${m.phone}`}
-                          className="flex items-center gap-2 hover:text-red-600 transition"
-                        >
-                          <FiPhone className="w-3.5 h-3.5 text-red-600 shrink-0" />
-                          <span className="font-medium truncate">{m.phone}</span>
-                        </a>
-                      )}
-                      {m.email && (
-                        <a
-                          href={`mailto:${m.email}`}
-                          className="flex items-center gap-2 hover:text-red-600 transition"
-                        >
-                          <FiMail className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                          <span className="font-medium truncate">{m.email}</span>
-                        </a>
-                      )}
-                    </div>
-
-                    {/* Admin Edit & Delete Actions */}
                     {isAdmin && (
-                      <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
-                        <button
-                          onClick={() => openEdit(m)}
-                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition cursor-pointer"
-                          title="Edit Member Information & Photo"
-                        >
-                          <FiEdit2 className="w-3.5 h-3.5 text-slate-600" />
-                          <span>Edit</span>
-                        </button>
-
-                        <button
-                          onClick={() => handleDelete(m)}
-                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs transition cursor-pointer"
-                          title="Delete from Database"
-                        >
-                          <FiTrash2 className="w-3.5 h-3.5 text-rose-600" />
-                          <span>Delete</span>
-                        </button>
-                      </div>
+                      <button
+                        onClick={() => openEdit(m)}
+                        className="absolute bottom-1 right-1 p-2 rounded-full bg-slate-900 text-white hover:bg-red-600 transition shadow-md cursor-pointer"
+                        title="Change Photo / Edit Member"
+                      >
+                        <FiCamera className="w-3.5 h-3.5" />
+                      </button>
                     )}
                   </div>
+
+                  {/* Name */}
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 group-hover:text-red-600 transition-colors tracking-tight leading-snug">
+                    {m.name}
+                  </h3>
+
+                  {/* Position */}
+                  <p className="text-xs sm:text-sm font-semibold text-red-600 tracking-normal mt-0.5 leading-snug">
+                    {m.position || m.role || 'Board Member'}
+                  </p>
+
+                  {/* Department */}
+                  {m.department && (
+                    <span className="inline-block mt-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 border border-slate-200/80">
+                      {m.department}
+                    </span>
+                  )}
+
+                  {/* Admin Controls */}
+                  {isAdmin && (
+                    <div className="mt-3 flex items-center justify-center gap-1.5 opacity-90 group-hover:opacity-100 transition">
+                      <button
+                        onClick={() => openEdit(m)}
+                        className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-[11px] transition cursor-pointer"
+                        title="Edit Member"
+                      >
+                        <FiEdit2 className="w-3 h-3 text-slate-600" />
+                        <span>Edit</span>
+                      </button>
+
+                      <button
+                        onClick={() => handleDelete(m)}
+                        className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-[11px] transition cursor-pointer"
+                        title="Delete"
+                      >
+                        <FiTrash2 className="w-3 h-3 text-rose-600" />
+                        <span>Delete</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               );
             })}

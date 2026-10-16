@@ -35,9 +35,9 @@ import { getContentImageUrl } from '@/lib/authApi';
 // Master 18 modules for Admin
 export const ADMIN_NAV_ITEMS = [
   { label: "Dashboard", href: "/dashboard", icon: FiGrid },
-  { label: "Donations", href: "/donation", icon: FiCreditCard },
-  { label: "Our Services", href: "/services", icon: FiActivity },
-  { label: "Volunteer", href: "/volunteer", icon: FiUserPlus },
+  { label: "Donations", href: "/dashboard/donations", icon: FiCreditCard },
+  { label: "Our Services", href: "/dashboard/services", icon: FiActivity },
+  { label: "Volunteer", href: "/dashboard/volunteers", icon: FiUserPlus },
   { label: "Members", href: "/members", icon: FiUsers },
   { label: "Team Members", href: "/team-members", icon: FiUserCheck },
   { label: "Mission & Vision", href: "/mission-vision", icon: FiCompass },

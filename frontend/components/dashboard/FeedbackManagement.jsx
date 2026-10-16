@@ -157,7 +157,7 @@ export default function FeedbackManagement() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white p-6 rounded-3xl border-b border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-red-700 text-xs font-bold mb-2">
             <span>Public Testimonials</span>
@@ -204,11 +204,10 @@ export default function FeedbackManagement() {
             <button
               key={st}
               onClick={() => setActiveTab(st.toLowerCase())}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${
-                activeTab === st.toLowerCase()
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${activeTab === st.toLowerCase()
                   ? "bg-black text-white"
                   : "bg-slate-100 text-slate-700 hover:bg-slate-200 hover:text-black"
-              }`}
+                }`}
             >
               {st}
             </button>
@@ -242,13 +241,12 @@ export default function FeedbackManagement() {
                     <div className="flex items-center justify-between">
                       <StarRating rating={f.rating || 5} />
                       <span
-                        className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${
-                          status.toLowerCase() === "approved"
+                        className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${status.toLowerCase() === "approved"
                             ? "bg-emerald-100 text-emerald-800"
                             : status.toLowerCase() === "rejected"
-                            ? "bg-rose-100 text-rose-800"
-                            : "bg-amber-100 text-amber-800"
-                        }`}
+                              ? "bg-rose-100 text-rose-800"
+                              : "bg-amber-100 text-amber-800"
+                          }`}
                       >
                         {status}
                       </span>

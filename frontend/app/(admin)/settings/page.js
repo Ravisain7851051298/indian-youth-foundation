@@ -111,8 +111,18 @@ export default function SettingsPage() {
     }
   }, [settings]);
 
+  const [initialFormJson, setInitialFormJson] = useState("");
+  const isDirty = initialFormJson ? JSON.stringify(form) !== initialFormJson : false;
+
+  useEffect(() => {
+    if (settings && !initialFormJson) {
+      setInitialFormJson(JSON.stringify(form));
+    }
+  }, [settings, form, initialFormJson]);
+
   const [saved, setSaved] = useState(false);
   const [showSmtpPass, setShowSmtpPass] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -142,21 +152,29 @@ export default function SettingsPage() {
 
   const handleSave = async (e) => {
     e.preventDefault();
-    const res = await updateSettings({
-      ...form,
-      bankDetails: {
-        accountName: form.accountName,
-        accountNumber: form.accountNumber,
-        ifscCode: form.ifscCode,
-        bankName: form.bankName,
-        branch: form.branch
+    try {
+      setIsSaving(true);
+      const res = await updateSettings({
+        ...form,
+        bankDetails: {
+          accountName: form.accountName,
+          accountNumber: form.accountNumber,
+          ifscCode: form.ifscCode,
+          bankName: form.bankName,
+          branch: form.branch
+        }
+      });
+      if (!res.success) {
+        toast.error(res.message || "Failed to save settings!");
+        return;
       }
-    });
-    if (!res.success) {
-      toast.error(res.message || "Failed to save settings!");
-      return;
+      setInitialFormJson(JSON.stringify(form));
+      toast.success(res.message || "Settings saved successfully!");
+    } catch (err) {
+      toast.error(err?.message || "Failed to save settings");
+    } finally {
+      setIsSaving(false);
     }
-    toast.success(res.message || "Settings saved successfully!");
   };
 
   const handleTestEmail = async (e) => {
@@ -233,10 +251,12 @@ export default function SettingsPage() {
           <button
             type="button"
             onClick={handleSave}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-md shadow-red-600/20 transition cursor-pointer"
+            disabled={!isDirty || isSaving}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-md shadow-red-600/20 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            title={!isDirty ? "No modifications to save" : "Save All Settings"}
           >
             <FiSave className="w-3.5 h-3.5" />
-            <span>Save All Settings</span>
+            <span>{isSaving ? "Saving..." : !isDirty ? "No Changes to Save" : "Save All Settings"}</span>
           </button>
           <Link
             href="/dashboard"
@@ -760,7 +780,6 @@ export default function SettingsPage() {
                 </div>
                 <Link
                   href="/who-we-are"
-                  target="_blank"
                   className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-red-50 text-red-700 hover:bg-red-100 font-bold text-xs border border-red-200 transition"
                 >
                   <FiExternalLink className="w-3.5 h-3.5" />
@@ -907,7 +926,6 @@ export default function SettingsPage() {
                   </div>
                   <Link
                     href="/privacy-policy"
-                    target="_blank"
                     className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white text-red-600 hover:text-red-700 font-bold text-xs border border-slate-200 shadow-2xs"
                   >
                     <FiExternalLink className="w-3.5 h-3.5" />
@@ -974,7 +992,6 @@ export default function SettingsPage() {
                   </div>
                   <Link
                     href="/terms"
-                    target="_blank"
                     className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white text-red-600 hover:text-red-700 font-bold text-xs border border-slate-200 shadow-2xs"
                   >
                     <FiExternalLink className="w-3.5 h-3.5" />

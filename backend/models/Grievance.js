@@ -16,11 +16,15 @@ const grievanceSchema = new mongoose.Schema({
   description: { type: String, default: '' },
   attachment: { type: String, default: '' },
   attachments: [{ type: String }],
+  imageUrl: { type: String, default: '' },
+  videoUrl: { type: String, default: '' },
   status: { 
     type: String, 
-    enum: ['pending', 'in_progress', 'resolved'], 
+    enum: ['pending', 'in_progress', 'resolved', 'closed'], 
     default: 'pending' 
   },
+  adminAnswer: { type: String, default: '' },
+  adminAnsweredAt: { type: Date },
   resolutionNotes: { type: String, default: '' },
   resolvedBy: { type: String, default: '' },
   resolvedAt: { type: Date }
@@ -37,6 +41,8 @@ grievanceSchema.pre('save', function () {
   if (this.memberEmail && !this.email) this.email = this.memberEmail;
   if (this.message && !this.description) this.description = this.message;
   if (this.description && !this.message) this.message = this.description;
+  if (this.adminAnswer && !this.resolutionNotes) this.resolutionNotes = this.adminAnswer;
+  if (this.resolutionNotes && !this.adminAnswer) this.adminAnswer = this.resolutionNotes;
 });
 
 grievanceSchema.plugin(fileCleanupPlugin);

@@ -254,8 +254,8 @@ class ApplicationService {
     user.role = 'Volunteer';
     user.isVolunteer = true;
     user.volunteerId = verifiedVolId;
-    if (!user.memberId) {
-      user.memberId = verifiedVolId;
+    if (user.memberId && user.memberId.startsWith('BYK-DON-')) {
+      user.memberId = undefined;
     }
     user.designation = 'Active Volunteer (Youth Wing)';
     user.idCardGenerated = true;

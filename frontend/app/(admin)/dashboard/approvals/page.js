@@ -2,33 +2,34 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { 
-  FiCheckCircle, 
-  FiXCircle, 
-  FiEye, 
-  FiClock, 
-  FiCreditCard, 
-  FiUserCheck, 
-  FiHeart, 
+import {
+  FiCheckCircle,
+  FiXCircle,
+  FiEye,
+  FiClock,
+  FiCreditCard,
+  FiUserCheck,
+  FiHeart,
   FiExternalLink,
   FiAlertCircle,
   FiFileText,
   FiMail,
-  FiShield
+  FiShield,
+  FiRefreshCw
 } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
-import { 
-  fetchMemberApplications, 
-  fetchVolunteerApplications, 
-  approveMembershipApplication, 
+import {
+  fetchMemberApplications,
+  fetchVolunteerApplications,
+  approveMembershipApplication,
   rejectMembershipApplication,
   approveVolunteerApplication,
   rejectVolunteerApplication
 } from '@/store/applicationSlice';
-import { 
-  fetchDonations, 
-  approveDonation, 
-  rejectDonation 
+import {
+  fetchDonations,
+  approveDonation,
+  rejectDonation
 } from '@/store/donationSlice';
 import { fetchCampaigns } from '@/store/ngoSlice';
 
@@ -41,6 +42,7 @@ export default function ApprovalsPage() {
   const [previewImage, setPreviewImage] = useState(null);
   const [rejectModal, setRejectModal] = useState({ open: false, type: '', id: '', reason: '' });
   const [actionNotice, setActionNotice] = useState(null);
+  const [processingId, setProcessingId] = useState(null);
 
   useEffect(() => {
     dispatch(fetchMemberApplications());
@@ -54,28 +56,35 @@ export default function ApprovalsPage() {
 
   const handleApproveMember = async (id) => {
     try {
+      setProcessingId(id);
       const res = await dispatch(approveMembershipApplication(id)).unwrap();
       setActionNotice(res.message || 'Membership approved! Appointment letter and ID card emailed.');
       setTimeout(() => setActionNotice(null), 5000);
       dispatch(fetchMemberApplications());
     } catch (err) {
       alert(err || 'Failed to approve membership');
+    } finally {
+      setProcessingId(null);
     }
   };
 
   const handleApproveVolunteer = async (id) => {
     try {
+      setProcessingId(id);
       const res = await dispatch(approveVolunteerApplication(id)).unwrap();
       setActionNotice(res.message || 'Volunteer approved! Offer letter auto-emailed.');
       setTimeout(() => setActionNotice(null), 5000);
       dispatch(fetchVolunteerApplications());
     } catch (err) {
       alert(err || 'Failed to approve volunteer');
+    } finally {
+      setProcessingId(null);
     }
   };
 
   const handleApproveDonation = async (id) => {
     try {
+      setProcessingId(id);
       const res = await dispatch(approveDonation(id)).unwrap();
       setActionNotice(res.message || 'Donation verified! Official 80G Tax Receipt generated, campaign funding updated, and auto-emailed.');
       setTimeout(() => setActionNotice(null), 5000);
@@ -83,12 +92,15 @@ export default function ApprovalsPage() {
       dispatch(fetchCampaigns());
     } catch (err) {
       alert(err || 'Failed to approve donation');
+    } finally {
+      setProcessingId(null);
     }
   };
 
   const submitReject = async () => {
     const { type, id, reason } = rejectModal;
     try {
+      setProcessingId(id);
       if (type === 'member') {
         await dispatch(rejectMembershipApplication({ id, reason })).unwrap();
         dispatch(fetchMemberApplications());
@@ -105,13 +117,15 @@ export default function ApprovalsPage() {
       setTimeout(() => setActionNotice(null), 4000);
     } catch (err) {
       alert(err || 'Error rejecting');
+    } finally {
+      setProcessingId(null);
     }
   };
 
   return (
     <div className="space-y-4">
       {/* Top Header Card */}
-      <div className="bg-white p-4 rounded-b-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white p-4 rounded-b-2xl border-b border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-black text-black tracking-tight">Trustee Approvals &amp; Verification Center</h1>
           <p className="text-xs text-slate-700 mt-1">
@@ -139,51 +153,45 @@ export default function ApprovalsPage() {
       <div className="bg-white mx-3 p-1 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap items-center gap-1.5">
         <button
           onClick={() => setActiveTab('members')}
-          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
-            activeTab === 'members'
+          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${activeTab === 'members'
               ? 'bg-red-600 text-white shadow-md shadow-red-600/20'
               : 'bg-slate-100 text-slate-700 hover:bg-red-50 hover:text-red-600'
-          }`}
+            }`}
         >
           <FiCreditCard className="w-3.5 h-3.5" />
           <span>Membership Applications</span>
-          <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${
-            activeTab === 'members' ? 'bg-white/20 text-white' : 'bg-slate-200 text-black font-bold'
-          }`}>
+          <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${activeTab === 'members' ? 'bg-white/20 text-white' : 'bg-slate-200 text-black font-bold'
+            }`}>
             {pendingMembers.length}
           </span>
         </button>
 
         <button
           onClick={() => setActiveTab('volunteers')}
-          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
-            activeTab === 'volunteers'
+          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${activeTab === 'volunteers'
               ? 'bg-red-600 text-white shadow-md shadow-red-600/20'
               : 'bg-slate-100 text-slate-700 hover:bg-red-50 hover:text-red-600'
-          }`}
+            }`}
         >
           <FiUserCheck className="w-3.5 h-3.5" />
           <span>Volunteer Applications</span>
-          <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${
-            activeTab === 'volunteers' ? 'bg-white/20 text-white' : 'bg-slate-200 text-black font-bold'
-          }`}>
+          <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${activeTab === 'volunteers' ? 'bg-white/20 text-white' : 'bg-slate-200 text-black font-bold'
+            }`}>
             {pendingVolunteers.length}
           </span>
         </button>
 
         <button
           onClick={() => setActiveTab('donations')}
-          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${
-            activeTab === 'donations'
+          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${activeTab === 'donations'
               ? 'bg-red-600 text-white shadow-md shadow-red-600/20'
               : 'bg-slate-100 text-slate-700 hover:bg-red-50 hover:text-red-600'
-          }`}
+            }`}
         >
           <FiHeart className="w-3.5 h-3.5" />
           <span>80G Donations Pending</span>
-          <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${
-            activeTab === 'donations' ? 'bg-white/20 text-white' : 'bg-slate-200 text-black font-bold'
-          }`}>
+          <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${activeTab === 'donations' ? 'bg-white/20 text-white' : 'bg-slate-200 text-black font-bold'
+            }`}>
             {pendingDonations.length}
           </span>
         </button>
@@ -212,7 +220,7 @@ export default function ApprovalsPage() {
           ) : (
             <div className="grid grid-cols-1 gap-4">
               {pendingMembers.map((app) => (
-                <div 
+                <div
                   key={app._id}
                   className="bg-white rounded-3xl p-5 border border-slate-200 shadow-2xs hover:border-red-300 transition flex flex-col lg:flex-row lg:items-center justify-between gap-6"
                 >
@@ -266,16 +274,27 @@ export default function ApprovalsPage() {
                   <div className="flex lg:flex-col items-center gap-2 shrink-0">
                     <button
                       type="button"
+                      disabled={!!processingId}
                       onClick={() => handleApproveMember(app._id)}
-                      className="w-full px-5 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 transition flex items-center justify-center gap-1.5"
+                      className="w-full px-5 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 disabled:cursor-not-allowed text-white font-bold text-xs shadow-md shadow-emerald-600/20 transition flex items-center justify-center gap-1.5 cursor-pointer"
                     >
-                      <FiCheckCircle className="w-4 h-4" />
-                      <span>Approve & Email Letter</span>
+                      {processingId === app._id ? (
+                        <>
+                          <FiRefreshCw className="w-4 h-4 animate-spin" />
+                          <span>Approving & Emailing...</span>
+                        </>
+                      ) : (
+                        <>
+                          <FiCheckCircle className="w-4 h-4" />
+                          <span>Approve & Email Letter</span>
+                        </>
+                      )}
                     </button>
                     <button
                       type="button"
+                      disabled={!!processingId}
                       onClick={() => setRejectModal({ open: true, type: 'member', id: app._id, reason: '' })}
-                      className="w-full px-5 py-2.5 rounded-2xl bg-slate-100 hover:bg-red-50 text-slate-700 hover:text-red-700 border border-slate-200 hover:border-red-200 font-bold text-xs transition flex items-center justify-center gap-1.5"
+                      className="w-full px-5 py-2.5 rounded-2xl bg-slate-100 hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed text-slate-700 hover:text-red-700 border border-slate-200 hover:border-red-200 font-bold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer"
                     >
                       <FiXCircle className="w-4 h-4" />
                       <span>Reject</span>
@@ -311,7 +330,7 @@ export default function ApprovalsPage() {
           ) : (
             <div className="grid grid-cols-1 gap-4">
               {pendingVolunteers.map((app) => (
-                <div 
+                <div
                   key={app._id}
                   className="bg-white rounded-3xl p-5 border border-slate-200 shadow-2xs hover:border-emerald-300 transition flex flex-col lg:flex-row lg:items-center justify-between gap-6"
                 >
@@ -356,16 +375,27 @@ export default function ApprovalsPage() {
                   <div className="flex lg:flex-col items-center gap-2 shrink-0">
                     <button
                       type="button"
+                      disabled={!!processingId}
                       onClick={() => handleApproveVolunteer(app._id)}
-                      className="w-full px-5 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 transition flex items-center justify-center gap-1.5"
+                      className="w-full px-5 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 disabled:cursor-not-allowed text-white font-bold text-xs shadow-md shadow-emerald-600/20 transition flex items-center justify-center gap-1.5 cursor-pointer"
                     >
-                      <FiCheckCircle className="w-4 h-4" />
-                      <span>Approve & Email Offer</span>
+                      {processingId === app._id ? (
+                        <>
+                          <FiRefreshCw className="w-4 h-4 animate-spin" />
+                          <span>Approving & Issuing...</span>
+                        </>
+                      ) : (
+                        <>
+                          <FiCheckCircle className="w-4 h-4" />
+                          <span>Approve & Email Offer</span>
+                        </>
+                      )}
                     </button>
                     <button
                       type="button"
+                      disabled={!!processingId}
                       onClick={() => setRejectModal({ open: true, type: 'volunteer', id: app._id, reason: '' })}
-                      className="w-full px-5 py-2.5 rounded-2xl bg-slate-100 hover:bg-red-50 text-slate-700 hover:text-red-700 border border-slate-200 hover:border-red-200 font-bold text-xs transition flex items-center justify-center gap-1.5"
+                      className="w-full px-5 py-2.5 rounded-2xl bg-slate-100 hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed text-slate-700 hover:text-red-700 border border-slate-200 hover:border-red-200 font-bold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer"
                     >
                       <FiXCircle className="w-4 h-4" />
                       <span>Reject</span>
@@ -401,7 +431,7 @@ export default function ApprovalsPage() {
           ) : (
             <div className="grid grid-cols-1 gap-4">
               {pendingDonations.map((d) => (
-                <div 
+                <div
                   key={d._id}
                   className="bg-white rounded-3xl p-5 border border-slate-200 shadow-2xs hover:border-blue-300 transition flex flex-col lg:flex-row lg:items-center justify-between gap-6"
                 >
@@ -457,16 +487,27 @@ export default function ApprovalsPage() {
                   <div className="flex lg:flex-col items-center gap-2 shrink-0">
                     <button
                       type="button"
+                      disabled={!!processingId}
                       onClick={() => handleApproveDonation(d._id)}
-                      className="w-full px-5 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md shadow-blue-600/20 transition flex items-center justify-center gap-1.5"
+                      className="w-full px-5 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white font-bold text-xs shadow-md shadow-blue-600/20 transition flex items-center justify-center gap-1.5 cursor-pointer"
                     >
-                      <FiCheckCircle className="w-4 h-4" />
-                      <span>Approve & Issue 80G Receipt</span>
+                      {processingId === d._id ? (
+                        <>
+                          <FiRefreshCw className="w-4 h-4 animate-spin" />
+                          <span>Verifying & Issuing 80G...</span>
+                        </>
+                      ) : (
+                        <>
+                          <FiCheckCircle className="w-4 h-4" />
+                          <span>Approve & Issue 80G Receipt</span>
+                        </>
+                      )}
                     </button>
                     <button
                       type="button"
+                      disabled={!!processingId}
                       onClick={() => setRejectModal({ open: true, type: 'donation', id: d._id, reason: '' })}
-                      className="w-full px-5 py-2.5 rounded-2xl bg-slate-100 hover:bg-red-50 text-slate-700 hover:text-red-700 border border-slate-200 hover:border-red-200 font-bold text-xs transition flex items-center justify-center gap-1.5"
+                      className="w-full px-5 py-2.5 rounded-2xl bg-slate-100 hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed text-slate-700 hover:text-red-700 border border-slate-200 hover:border-red-200 font-bold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer"
                     >
                       <FiXCircle className="w-4 h-4" />
                       <span>Reject</span>
@@ -533,16 +574,19 @@ export default function ApprovalsPage() {
             />
             <div className="flex justify-end gap-2 pt-2">
               <button
+                disabled={!!processingId}
                 onClick={() => setRejectModal({ open: false, type: '', id: '', reason: '' })}
-                className="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs hover:bg-slate-200"
+                className="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 font-bold text-xs hover:bg-slate-200 disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
+                disabled={!!processingId}
                 onClick={submitReject}
-                className="px-4 py-2 rounded-xl bg-red-600 text-white font-bold text-xs hover:bg-red-700"
+                className="px-4 py-2 rounded-xl bg-red-600 disabled:bg-red-400 disabled:cursor-not-allowed text-white font-bold text-xs hover:bg-red-700 flex items-center gap-1.5"
               >
-                Confirm Rejection
+                {processingId ? <FiRefreshCw className="w-3.5 h-3.5 animate-spin" /> : null}
+                <span>{processingId ? 'Rejecting...' : 'Confirm Rejection'}</span>
               </button>
             </div>
           </div>

@@ -416,8 +416,16 @@ class AuthService {
 
       userSafe.membershipApplication = membershipApp ? (membershipApp.toObject ? membershipApp.toObject() : membershipApp) : null;
       userSafe.volunteerApplication = volunteerApp ? (volunteerApp.toObject ? volunteerApp.toObject() : volunteerApp) : null;
-      userSafe.isMember = user.role === 'Member' || user.role === 'Admin' || !!user.memberId;
-      userSafe.isVolunteer = user.role === 'Volunteer' || (volunteerApp && volunteerApp.status === 'approved');
+      userSafe.isMember = user.role === 'Member' || user.role === 'Admin' || (membershipApp && membershipApp.status === 'approved') || (user.memberId && (user.memberId.startsWith('BYK-MEM-') || user.memberId.startsWith('MEM-')));
+      userSafe.isVolunteer = user.role === 'Volunteer' || (volunteerApp && volunteerApp.status === 'approved') || (user.volunteerId && (user.volunteerId.startsWith('BYK-VOL-') || user.volunteerId.startsWith('VOL-')));
+
+      if (!userSafe.isMember && userSafe.memberId && userSafe.memberId.startsWith('BYK-DON-')) {
+        userSafe.donorId = userSafe.memberId;
+        userSafe.memberId = null;
+      }
+      if (userSafe.isVolunteer && (!userSafe.volunteerId || userSafe.volunteerId.startsWith('BYK-DON-'))) {
+        userSafe.volunteerId = volunteerApp?.assignedVolunteerId || volunteerApp?.volunteerId || (user.volunteerId && !user.volunteerId.startsWith('BYK-DON-') ? user.volunteerId : `BYK-VOL-${user.phone ? user.phone.slice(-4) : '2026'}`);
+      }
     } catch (appErr) {
       console.warn('Note querying user applications in getMe:', appErr.message);
     }

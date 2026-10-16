@@ -257,7 +257,7 @@ export default function AdminOrganizationCertificatesPage() {
   return (
     <div className="space-y-4">
       {/* Top Header Card (VolunteerManagement Standard) */}
-      <div className="bg-white p-4 rounded-b-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white p-4 rounded-b-2xl border-b border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-lg font-black text-slate-900 tracking-tight flex items-center gap-2">
             <FiAward className="text-red-600 w-5 h-5" />
@@ -280,7 +280,6 @@ export default function AdminOrganizationCertificatesPage() {
 
           <Link
             href="/certificates"
-            target="_blank"
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold transition shadow-2xs cursor-pointer"
           >
             <FiExternalLink className="w-3.5 h-3.5 text-red-600" />
@@ -332,11 +331,10 @@ export default function AdminOrganizationCertificatesPage() {
             <button
               key={tab.key}
               onClick={() => setActiveCategory(tab.key)}
-              className={`px-3 py-1.5 rounded-xl transition cursor-pointer whitespace-nowrap text-xs font-black ${
-                activeCategory === tab.key
+              className={`px-3 py-1.5 rounded-xl transition cursor-pointer whitespace-nowrap text-xs font-black ${activeCategory === tab.key
                   ? 'bg-red-600 text-white shadow-md shadow-red-600/20'
                   : 'bg-slate-100 text-slate-700 hover:bg-red-50 hover:text-red-600'
-              }`}
+                }`}
             >
               {tab.label}
             </button>
@@ -387,9 +385,8 @@ export default function AdminOrganizationCertificatesPage() {
                       {/* Title & Category */}
                       <td className="py-3 px-3.5">
                         <div className="flex items-center gap-2.5">
-                          <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
-                            isPdf ? 'bg-red-50 text-red-600 border border-red-200' : 'bg-blue-50 text-blue-600 border border-blue-200'
-                          }`}>
+                          <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${isPdf ? 'bg-red-50 text-red-600 border border-red-200' : 'bg-blue-50 text-blue-600 border border-blue-200'
+                            }`}>
                             {isPdf ? <FiFileText className="w-4 h-4" /> : <FiImage className="w-4 h-4" />}
                           </div>
                           <div>
@@ -429,9 +426,8 @@ export default function AdminOrganizationCertificatesPage() {
 
                       {/* File format */}
                       <td className="py-3 px-3.5 whitespace-nowrap">
-                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                          isPdf ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'
-                        }`}>
+                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${isPdf ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'
+                          }`}>
                           {isPdf ? 'PDF Document' : 'Image Scan'}
                         </span>
                         {doc.fileSize && (

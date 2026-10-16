@@ -21,6 +21,8 @@ const verifyRoutes = require('./verifyRoutes');
 const statsRoutes = require('./statsRoutes');
 const feedbackRoutes = require('./feedbackRoutes');
 const orgDocumentRoutes = require('./orgDocumentRoutes');
+const userRoutes = require('./userRoutes');
+const awardRoutes = require('./awardRoutes');
 
 // Health Check
 router.get('/health', (req, res) => {
@@ -36,6 +38,10 @@ router.get('/health', (req, res) => {
 const createResourceRouter = require('./contentResourceRouter');
 
 router.use('/auth', authRoutes);
+router.use('/users', userRoutes);
+router.use('/user', userRoutes); // alias
+router.use('/awards', awardRoutes);
+router.use('/award', awardRoutes); // alias
 router.use('/applications', applicationRoutes);
 router.use('/memberships', applicationRoutes); // alias
 router.use('/membership', applicationRoutes); // alias

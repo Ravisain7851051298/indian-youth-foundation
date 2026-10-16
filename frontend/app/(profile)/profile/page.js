@@ -53,12 +53,24 @@ export default function ProfileOverviewPage() {
   const isVerified = currentUser?.status === 'active';
   const isPending = currentUser?.status === 'pending';
 
-  // Membership status detection
-  const isMember = currentUser?.role === 'Member' || currentUser?.role === 'Admin' || !!currentUser?.memberId || currentUser?.isMember;
+  // Membership status detection (strictly prevent donor ID BYK-DON- from being treated as member)
+  const isMember = Boolean(
+    currentUser?.role === 'Member' || 
+    currentUser?.role === 'Admin' || 
+    (currentUser?.isMember && !currentUser?.memberId?.startsWith('BYK-DON-')) ||
+    (currentUser?.membershipApplication?.status === 'approved') ||
+    (currentUser?.memberId && (currentUser.memberId.startsWith('BYK-MEM-') || currentUser.memberId.startsWith('MEM-')))
+  );
   const memberApp = currentUser?.membershipApplication;
 
   // Volunteer status detection
-  const isVolunteer = currentUser?.role === 'Volunteer' || currentUser?.isVolunteer || currentUser?.volunteerApplication?.status === 'approved' || currentUser?.volunteerApplication?.status === 'pending';
+  const isVolunteer = Boolean(
+    currentUser?.role === 'Volunteer' || 
+    currentUser?.isVolunteer || 
+    currentUser?.volunteerApplication?.status === 'approved' || 
+    currentUser?.volunteerApplication?.status === 'pending' ||
+    (currentUser?.volunteerId && !currentUser?.volunteerId?.startsWith('BYK-DON-'))
+  );
   const volunteerApp = currentUser?.volunteerApplication;
 
   return (
@@ -443,14 +455,6 @@ export default function ProfileOverviewPage() {
               <span>{isVolunteer ? 'Open Volunteer Profile' : 'Explore Volunteer Wing'}</span>
               <FiArrowRight className="w-3.5 h-3.5" />
             </Link>
-            {!isVolunteer && (
-              <Link
-                href="/profile/apply-volunteer"
-                className="py-2.5 px-4 rounded-xl border border-slate-300 hover:border-indigo-400 hover:text-indigo-600 text-black font-bold text-xs transition shrink-0"
-              >
-                Apply
-              </Link>
-            )}
           </div>
         </div>
       </div>
@@ -477,19 +481,39 @@ export default function ProfileOverviewPage() {
             <span className="text-slate-500 font-bold block">Verified Mobile</span>
             <span className="font-bold text-black mt-0.5 block">{currentUser?.phone}</span>
           </div>
-          <div>
-            <span className="text-slate-500 font-bold block">Assigned Member / Reg. ID</span>
-            <span className="font-mono font-bold text-red-600 mt-0.5 block">
-              {currentUser?.memberId || 'Verification Pending'}
-            </span>
-          </div>
+          {isMember && (
+            <div>
+              <span className="text-slate-500 font-bold block">Official Member ID</span>
+              <span className="font-mono font-bold text-red-600 mt-0.5 block">
+                {currentUser?.memberId && !currentUser?.memberId.startsWith('BYK-DON-') ? currentUser.memberId : (currentUser?.membershipApplication?.assignedMemberId || 'BYK-MEM-PENDING')}
+              </span>
+            </div>
+          )}
+          {isVolunteer && (
+            <div>
+              <span className="text-slate-500 font-bold block">Official Volunteer ID</span>
+              <span className="font-mono font-bold text-indigo-700 mt-0.5 block">
+                {currentUser?.volunteerId && !currentUser?.volunteerId.startsWith('BYK-DON-') 
+                  ? currentUser.volunteerId 
+                  : (currentUser?.volunteerApplication?.assignedVolunteerId || `BYK-VOL-${currentUser?.phone ? currentUser.phone.slice(-4) : '2026'}`)}
+              </span>
+            </div>
+          )}
+          {!isMember && !isVolunteer && (
+            <div>
+              <span className="text-slate-500 font-bold block">User Reference ID</span>
+              <span className="font-mono font-bold text-slate-700 mt-0.5 block">
+                {currentUser?.memberId || 'REG-USER'}
+              </span>
+            </div>
+          )}
           <div>
             <span className="text-slate-500 font-bold block">Blood Group</span>
             <span className="font-bold text-black mt-0.5 block">{currentUser?.bloodGroup || 'O+'}</span>
           </div>
           <div>
             <span className="text-slate-500 font-bold block">Designation / Role</span>
-            <span className="font-bold text-black mt-0.5 block">{currentUser?.designation || currentUser?.role}</span>
+            <span className="font-bold text-black mt-0.5 block">{currentUser?.designation || (isVolunteer ? 'Active Volunteer' : currentUser?.role)}</span>
           </div>
           <div>
             <span className="text-slate-500 font-bold block">District / State</span>

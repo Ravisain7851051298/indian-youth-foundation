@@ -2,22 +2,22 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { 
-  FiShield, 
-  FiCompass, 
-  FiTarget, 
-  FiHeart, 
-  FiUsers, 
-  FiAward, 
-  FiBookOpen, 
-  FiActivity, 
-  FiCheckCircle, 
-  FiArrowRight, 
-  FiDownload, 
-  FiMapPin, 
-  FiPhone, 
-  FiMail, 
-  FiFileText, 
+import {
+  FiShield,
+  FiCompass,
+  FiTarget,
+  FiHeart,
+  FiUsers,
+  FiAward,
+  FiBookOpen,
+  FiActivity,
+  FiCheckCircle,
+  FiArrowRight,
+  FiDownload,
+  FiMapPin,
+  FiPhone,
+  FiMail,
+  FiFileText,
   FiCalendar,
   FiExternalLink
 } from 'react-icons/fi';
@@ -123,7 +123,7 @@ export default function AboutPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
-      
+
       {/* ---------------- 1. HERO HEADER ---------------- */}
       <section className="relative overflow-hidden bg-gradient-to-b from-red-50/70 via-white to-slate-50 py-16 sm:py-24 border-b border-red-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -185,7 +185,7 @@ export default function AboutPage() {
       <section className="py-20 bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            
+
             <div className="lg:col-span-6 space-y-6">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-bold">
                 <FiCompass className="w-3.5 h-3.5 text-red-600" />
@@ -281,11 +281,10 @@ export default function AboutPage() {
                 <button
                   key={pillar.id}
                   onClick={() => setActivePillar(pillar.id)}
-                  className={`flex items-center gap-2 px-5 py-3 rounded-2xl text-xs font-black transition cursor-pointer ${
-                    isActive 
-                      ? 'bg-red-600 text-white shadow-lg shadow-red-600/25 scale-102' 
-                      : 'bg-white text-slate-700 hover:bg-red-50 hover:text-red-600 border border-slate-200'
-                  }`}
+                  className={`flex items-center gap-2 px-5 py-3 rounded-2xl text-xs font-black transition cursor-pointer ${isActive
+                    ? 'bg-red-600 text-white shadow-lg shadow-red-600/25 scale-102'
+                    : 'bg-white text-slate-700 hover:bg-red-50 hover:text-red-600 border border-slate-200'
+                    }`}
                 >
                   <Icon className="w-4 h-4" />
                   <span>{pillar.title}</span>
@@ -297,7 +296,7 @@ export default function AboutPage() {
           {/* Active Pillar Interactive Showcase Card */}
           <div className="bg-white rounded-3xl p-6 sm:p-10 border border-slate-200 shadow-xl">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-              
+
               <div className="lg:col-span-7 space-y-4">
                 <div className="flex items-center gap-2">
                   <span className="px-3 py-1 rounded-full bg-red-50 text-red-600 border border-red-200 text-xs font-black">
@@ -468,7 +467,7 @@ export default function AboutPage() {
                 <div className="absolute -left-[17px] top-0 w-8 h-8 rounded-full bg-red-600 border-4 border-white flex items-center justify-center text-white text-[10px] font-bold shadow-md">
                   ✓
                 </div>
-                
+
                 <div className="sm:absolute sm:-left-28 sm:top-0.5 sm:text-right">
                   <span className="font-mono text-xs font-black text-red-600 bg-red-50 border border-red-200 px-2 py-0.5 rounded-md">
                     {item.year}
@@ -518,15 +517,15 @@ export default function AboutPage() {
               { name: 'Amit Sharma', role: 'Chief Trustee & Legal Secretary', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400' },
               { name: 'Neha Gupta', role: 'National Volunteer Coordinator', image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400' }
             ]).map((member, idx) => (
-              <div 
+              <div
                 key={member._id || member.id || idx}
-                className="bg-slate-50 p-4 rounded-3xl border border-slate-200 text-center space-y-3 group hover:border-red-400 hover:shadow-lg transition-all"
+                className="text-center"
               >
-                <div className="w-24 h-24 mx-auto rounded-2xl overflow-hidden shadow-md bg-slate-200 border-2 border-white">
+                <div className="w-24 h-24 mx-auto rounded-full overflow-hidden">
                   <img
                     src={getContentImageUrl(member.image || member.photoUrl)}
                     alt={member.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                    className="w-full h-full object-cover "
                     onError={(e) => {
                       e.currentTarget.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400';
                     }}
@@ -534,7 +533,14 @@ export default function AboutPage() {
                 </div>
                 <div>
                   <h4 className="font-black text-sm text-black">{member.name}</h4>
-                  <p className="text-[11px] text-red-600 font-bold">{member.role}</p>
+                  <p className="text-[11px] text-red-600 font-bold">{member.position}</p>
+
+                  {/* Department */}
+                  {member.department && (
+                    <span className="inline-block mt-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 border border-slate-200/80">
+                      {member.department}
+                    </span>
+                  )}
                 </div>
               </div>
             ))}

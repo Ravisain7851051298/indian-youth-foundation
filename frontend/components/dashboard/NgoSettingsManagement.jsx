@@ -178,7 +178,7 @@ export default function NgoSettingsManagement() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white p-6 rounded-3xl border-b border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-red-700 text-xs font-bold mb-2">
             <span>Global Configuration</span>
@@ -210,11 +210,10 @@ export default function NgoSettingsManagement() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer shrink-0 ${
-              activeTab === tab.id
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer shrink-0 ${activeTab === tab.id
                 ? "bg-red-600 text-white shadow-md shadow-red-600/25"
                 : "text-slate-700 hover:text-black hover:bg-slate-50"
-            }`}
+              }`}
           >
             {tab.label}
           </button>
