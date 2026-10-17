@@ -18,6 +18,12 @@ const settingSchema = new mongoose.Schema({
   email: { type: String, default: 'samasyasamadhanparishad@gmail.com' },
   phone: { type: String, default: '+91 93196 98759' },
   whatsapp: { type: String, default: '+919319698759' },
+  facebook: { type: String, default: 'https://facebook.com' },
+  twitter: { type: String, default: 'https://x.com' },
+  instagram: { type: String, default: 'https://instagram.com' },
+  youtube: { type: String, default: 'https://youtube.com' },
+  linkedin: { type: String, default: 'https://linkedin.com' },
+  telegram: { type: String, default: '' },
   address: { type: String, default: 'Head Office - Krishna Vihar Pala Road Aligarh, Uttar Pradesh' },
   googleMapEmbed: { 
     type: String, 
@@ -93,6 +99,85 @@ const settingSchema = new mongoose.Schema({
 
   // Admin Master Secret Key
   adminSecretKey: { type: String, default: 'iyf_admin_master_secret_2026' },
+
+  // Admin-managed Hero Carousel Slides
+  heroSlides: [
+    {
+      title: { type: String, default: '' },
+      subtitle: { type: String, default: '' },
+      imageUrl: { type: String, default: '' },
+      tag: { type: String, default: '' },
+      ctaPrimaryText: { type: String, default: '' },
+      ctaPrimaryLink: { type: String, default: '' },
+      ctaSecondaryText: { type: String, default: '' },
+      ctaSecondaryLink: { type: String, default: '' },
+      highlight: { type: String, default: '' }
+    }
+  ],
+
+  // Homepage Ticker / Marquee
+  newsTickerText: { 
+    type: String, 
+    default: 'समस्या समाधान परिषद (SSP) में आपका स्वागत है • निःशुल्क सदस्यता एवं समाज सेवा अभियान • हेल्पलाइन: +919319698759' 
+  },
+
+  // Homepage About Us text sections
+  homeAboutTitle: { type: String, default: 'About Us' },
+  homeAboutStory: { 
+    type: String, 
+    default: 'Samasya Samadhan Parishadh (SSP) is a passionate advocate for positive change, dedicated to making a tangible difference in the world. Since our inception [Year], we have been driven by a singular mission: to empower individuals and communities to thrive through sustainable development initiatives, education, healthcare access, and environmental stewardship.' 
+  },
+  homeOurValues: { 
+    type: String, 
+    default: 'At Samasya Samadhan Parishadh (SSP), our core values of compassion, integrity, and inclusivity guide everything we do. We believe in the power of collaboration and collective action to address pressing global challenges and create lasting impact.' 
+  },
+  homeOurImpact: { 
+    type: String, 
+    default: 'Through strategic partnerships, grassroots initiatives, and the dedication of our team, we have achieved significant milestones in [mention specific areas of impact]. Our work has touched the lives of [number] individuals and continues to inspire positive change worldwide.' 
+  },
+  homeJoinUs: { 
+    type: String, 
+    default: 'Join us in our mission to create a brighter, more equitable world for all. Together, we can make a difference.' 
+  },
+
+  // President Message
+  presidentMessageTitle: { type: String, default: 'President Message' },
+  presidentPhotoUrl: { type: String, default: '' },
+  presidentMessageContent: {
+    type: String,
+    default: `Dear Friends,
+
+It is with great pride and humility that I address you as the President of Samasya Samadhan Parishadh (SSP). Since our founding 2022, our organization has been driven by a simple yet profound belief: that every individual, regardless of circumstance, deserves the opportunity to thrive.
+
+At Samasya Samadhan Parishadh (SSP), we are not just dreamers; we are doers. We roll up our sleeves and work tirelessly to turn our vision of a better world into reality. From providing access to education and healthcare to championing environmental sustainability and social justice, our efforts are guided by a deep commitment to making a meaningful difference in the lives of others.
+
+But we cannot do it alone. Our success is built on the support of passionate individuals like you—individuals who share our values and our vision for a brighter future. Together, we can amplify our impact and create lasting change that reverberates far beyond our borders.
+
+As we look to the future, I am filled with hope and optimism. The challenges we face are great, but so too is our resolve to overcome them. With your continued support, I am confident that we can build a world where every person has the opportunity to flourish and thrive.
+
+Thank you for your unwavering commitment to our cause. Together, we are truly making a difference.
+
+Warm regards,
+
+Samasya Samadhan Parishadh (SSP)`
+  },
+
+  // YouTube Videos List
+  youtubeVideos: [
+    {
+      title: { type: String, default: '' },
+      url: { type: String, default: '' }
+    }
+  ],
+
+  // Objectives List
+  objectives: [
+    {
+      title: { type: String, default: '' },
+      imageUrl: { type: String, default: '' },
+      link: { type: String, default: '' }
+    }
+  ],
 
   pageViews: { type: Number, default: 18450 }
 }, {

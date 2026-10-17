@@ -186,8 +186,8 @@ export default function GalleryPage() {
         {/* Header Section */}
         <div className="bg-slate-50/70 border border-slate-200 rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-bold mb-2">
-              <FiImage className="w-3.5 h-3.5 text-red-600" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold mb-2 border border-emerald-200">
+              <FiImage className="w-3.5 h-3.5 text-emerald-700" />
               <span>Official Media &amp; Field Archives</span>
             </div>
             <h1 className="text-3xl sm:text-4xl font-black text-black tracking-tight">
@@ -201,7 +201,7 @@ export default function GalleryPage() {
           {isAdmin && (
             <button
               onClick={openAddModal}
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-md shadow-red-600/20 transition cursor-pointer self-start md:self-auto shrink-0"
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-md shadow-emerald-700/20 transition cursor-pointer self-start md:self-auto shrink-0"
             >
               <FiPlus className="w-4 h-4" />
               <span>Add New Media</span>
@@ -218,7 +218,7 @@ export default function GalleryPage() {
               placeholder="Search albums, activities, captions, or locations..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:outline-red-500 font-medium text-black placeholder:text-slate-400"
+              className="w-full pl-10 pr-4 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:outline-emerald-600 font-medium text-black placeholder:text-slate-400"
             />
           </div>
 
@@ -236,7 +236,7 @@ export default function GalleryPage() {
                   onClick={() => setMediaFormat(fmt.id)}
                   className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${
                     mediaFormat === fmt.id
-                      ? 'bg-red-600 text-white font-extrabold shadow-xs'
+                      ? 'bg-emerald-700 text-white font-extrabold shadow-xs'
                       : 'text-slate-600 hover:text-black'
                   }`}
                 >
@@ -261,7 +261,7 @@ export default function GalleryPage() {
                 onClick={() => setActiveTab(cat.id)}
                 className={`px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap cursor-pointer ${
                   isActive
-                    ? 'bg-red-600 text-white shadow-xs'
+                    ? 'bg-emerald-700 text-white shadow-xs'
                     : 'bg-slate-100 text-slate-800 hover:bg-slate-200'
                 }`}
               >
@@ -309,7 +309,7 @@ export default function GalleryPage() {
                             onClick={() => setLightboxItem(item)}
                             className="w-full h-full flex flex-col items-center justify-center bg-black/90 text-white cursor-pointer group-hover:scale-105 transition duration-500 relative"
                           >
-                            <div className="w-14 h-14 rounded-full bg-red-600 flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition">
+                            <div className="w-14 h-14 rounded-full bg-emerald-700 flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition">
                               <FiPlay className="w-6 h-6 ml-1" />
                             </div>
                             <span className="text-xs font-bold mt-2">Play Video</span>
@@ -330,7 +330,7 @@ export default function GalleryPage() {
                           />
                           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition flex items-center justify-center opacity-0 group-hover:opacity-100">
                             <span className="p-3 rounded-full bg-white text-black shadow-lg">
-                              <FiEye className="w-5 h-5 text-red-600" />
+                              <FiEye className="w-5 h-5 text-emerald-700" />
                             </span>
                           </div>
                         </div>
@@ -422,7 +422,7 @@ export default function GalleryPage() {
               </div>
 
               <div className="p-6 space-y-2">
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-50 text-red-700 text-xs font-bold">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold border border-emerald-200">
                   <span>{lightboxItem.category || 'Archive'}</span>
                 </div>
                 <h3 className="font-black text-lg text-black">{lightboxItem.title}</h3>
@@ -466,7 +466,7 @@ export default function GalleryPage() {
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-red-500 text-black bg-slate-50"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-emerald-600 text-black bg-slate-50"
                   >
                     <option value="General">General Drives</option>
                     <option value="Child Education">Child Education</option>
@@ -489,7 +489,7 @@ export default function GalleryPage() {
                     placeholder="e.g. Free Distribution of Educational Kits to 150 Children"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-red-500 text-black bg-slate-50"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-emerald-600 text-black bg-slate-50"
                   />
                 </div>
 
@@ -503,7 +503,7 @@ export default function GalleryPage() {
                         onChange={handleFileChange}
                         className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                       />
-                      <FiUploadCloud className="w-6 h-6 text-red-600 mx-auto mb-1" />
+                      <FiUploadCloud className="w-6 h-6 text-emerald-700 mx-auto mb-1" />
                       <p className="text-xs font-bold text-black">Click or drag image file here</p>
                       <p className="text-[10px] text-slate-500 mt-0.5">PNG, JPG, WEBP up to 10MB</p>
                     </div>
@@ -529,7 +529,7 @@ export default function GalleryPage() {
                     placeholder={category === 'video' ? 'https://www.youtube.com/embed/...' : 'https://images.unsplash.com/...'}
                     value={url}
                     onChange={(e) => setUrl(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-red-500 text-black bg-slate-50"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-emerald-600 text-black bg-slate-50"
                   />
                 </div>
 
@@ -540,7 +540,7 @@ export default function GalleryPage() {
                     placeholder="e.g. Organized at Govt Sr. Secondary School, Sanganer, Jaipur"
                     value={caption}
                     onChange={(e) => setCaption(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-red-500 text-black bg-slate-50"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-emerald-600 text-black bg-slate-50"
                   />
                 </div>
 
@@ -555,7 +555,7 @@ export default function GalleryPage() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold shadow-md transition cursor-pointer disabled:opacity-50"
+                    className="flex-1 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold shadow-md transition cursor-pointer disabled:opacity-50"
                   >
                     {isSubmitting ? 'Saving...' : editingItem ? 'Save Changes' : 'Upload to Gallery'}
                   </button>

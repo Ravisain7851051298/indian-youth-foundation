@@ -3,10 +3,6 @@ const router = express.Router();
 const authController = require('../controllers/authController');
 const { verifyToken } = require('../middlewares/auth');
 
-// Dynamic Admin Account Creation (Requires X-ADMIN-SECRET-KEY, strictly prohibits default values)
-router.post('/create-admin', authController.createAdmin);
-router.post('/register-admin', authController.createAdmin); // alias
-
 // Public Registration & Authentication
 router.post('/register', authController.register);
 router.post('/login', authController.login);

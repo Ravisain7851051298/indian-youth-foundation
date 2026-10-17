@@ -200,64 +200,6 @@ export default function ServicesPage() {
   return (
     <div className="min-h-screen bg-slate-50 text-black py-10 sm:py-14">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
-
-        {/* Hero Header Section */}
-        <div className="relative rounded-3xl bg-linear-to-br from-red-600 via-red-700 to-rose-900 p-8 sm:p-12 text-white shadow-xl overflow-hidden">
-          <div className="absolute -right-16 -top-16 w-80 h-80 rounded-full bg-white/5 blur-2xl pointer-events-none" />
-          <div className="absolute -left-16 -bottom-16 w-72 h-72 rounded-full bg-black/10 blur-xl pointer-events-none" />
-
-          <div className="relative z-10 max-w-3xl space-y-4">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/15 backdrop-blur-md text-white text-xs font-bold border border-white/20">
-              <FiLayers className="w-4 h-4 text-white" />
-              <span>Dedicated Social Welfare & Grassroots Missions</span>
-            </div>
-
-            <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight">
-              Our Dedicated Social Services
-            </h1>
-
-            <p className="text-sm sm:text-base text-red-50 leading-relaxed font-normal">
-              Empowering marginalized communities across India with free child education, rapid emergency blood coordination, women self-reliance vocational centers, hunger relief, and environmental action.
-            </p>
-
-            {/* Quick Stats Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 pt-4 border-t border-white/15">
-              <div className="bg-white/10 backdrop-blur-xs p-3 rounded-2xl border border-white/10">
-                <div className="text-2xl font-black">{servicesList.length || 6}+</div>
-                <div className="text-[11px] text-red-100 font-medium">Active Programs</div>
-              </div>
-              <div className="bg-white/10 backdrop-blur-xs p-3 rounded-2xl border border-white/10">
-                <div className="text-2xl font-black">50,000+</div>
-                <div className="text-[11px] text-red-100 font-medium">Beneficiaries Reached</div>
-              </div>
-              <div className="bg-white/10 backdrop-blur-xs p-3 rounded-2xl border border-white/10">
-                <div className="text-2xl font-black">100%</div>
-                <div className="text-[11px] text-red-100 font-medium">Free Public Aid</div>
-              </div>
-              <div className="bg-white/10 backdrop-blur-xs p-3 rounded-2xl border border-white/10">
-                <div className="text-2xl font-black">24x7</div>
-                <div className="text-[11px] text-red-100 font-medium">Relief Helpline</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Admin shortcut button */}
-          {isAdmin && (
-            <div className="mt-6 pt-4 border-t border-white/20 flex items-center justify-between">
-              <span className="text-xs font-semibold text-red-100">
-                Administrator mode enabled. You can manage, add, or edit services directly from the CMS.
-              </span>
-              <Link
-                href="/dashboard/services"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white text-red-700 font-extrabold text-xs shadow-md hover:bg-red-50 transition cursor-pointer"
-              >
-                <FiSettings className="w-4 h-4" />
-                <span>Manage Services in Admin Panel</span>
-              </Link>
-            </div>
-          )}
-        </div>
-
         {/* Search & Category Filter Controls */}
         <div className="bg-white p-4 sm:p-5 rounded-3xl border border-slate-200 shadow-sm space-y-4">
           <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
@@ -269,7 +211,7 @@ export default function ServicesPage() {
                 placeholder="Search services by keyword, mission, or category..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-11 pr-4 py-2.5 rounded-2xl border border-slate-200 text-xs font-medium text-black focus:outline-red-500 bg-slate-50"
+                className="w-full pl-11 pr-4 py-2.5 rounded-2xl border border-slate-200 text-xs font-medium text-black focus:outline-emerald-600 bg-slate-50"
               />
               {searchQuery && (
                 <button
@@ -287,7 +229,7 @@ export default function ServicesPage() {
                 title="Refresh Services"
                 className="p-2.5 rounded-xl border border-slate-200 text-slate-600 hover:text-black hover:bg-slate-50 transition cursor-pointer"
               >
-                <FiRefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-red-600' : ''}`} />
+                <FiRefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-emerald-700' : ''}`} />
               </button>
               <span className="text-xs font-bold text-slate-500">
                 Showing <strong className="text-black">{filteredServices.length}</strong> of {servicesList.length} Services
@@ -308,16 +250,14 @@ export default function ServicesPage() {
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${
-                    isSelected
-                      ? 'bg-red-600 text-white shadow-xs'
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer ${isSelected
+                      ? 'bg-emerald-700 text-white shadow-xs'
                       : 'bg-slate-100 text-slate-700 hover:bg-slate-200 hover:text-black'
-                  }`}
+                    }`}
                 >
                   <span>{cat}</span>
-                  <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-                    isSelected ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-600'
-                  }`}>
+                  <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${isSelected ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-600'
+                    }`}>
                     {count}
                   </span>
                 </button>
@@ -329,7 +269,7 @@ export default function ServicesPage() {
         {/* Services Grid */}
         {loading ? (
           <div className="py-20 text-center space-y-3">
-            <FiRefreshCw className="w-8 h-8 animate-spin mx-auto text-red-600" />
+            <FiRefreshCw className="w-8 h-8 animate-spin mx-auto text-emerald-700" />
             <p className="text-xs font-bold text-slate-600">Loading social services...</p>
           </div>
         ) : filteredServices.length === 0 ? (
@@ -344,7 +284,7 @@ export default function ServicesPage() {
                 setSearchQuery('');
                 setSelectedCategory('All');
               }}
-              className="px-4 py-2 rounded-xl bg-red-50 text-red-700 font-bold text-xs hover:bg-red-100 transition cursor-pointer"
+              className="px-4 py-2 rounded-xl bg-emerald-50 text-emerald-800 font-bold text-xs hover:bg-emerald-100 transition cursor-pointer"
             >
               Reset Filters
             </button>
@@ -356,13 +296,13 @@ export default function ServicesPage() {
               const featuresList = Array.isArray(srv.features)
                 ? srv.features
                 : typeof srv.features === 'string' && srv.features
-                ? srv.features.split(/[\n,]+/).map((s) => s.trim()).filter(Boolean)
-                : [];
+                  ? srv.features.split(/[\n,]+/).map((s) => s.trim()).filter(Boolean)
+                  : [];
 
               return (
                 <div
                   key={srv._id || srv.id || index}
-                  className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-xl hover:border-red-300 transition-all flex flex-col justify-between group"
+                  className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-xl hover:border-emerald-300 transition-all flex flex-col justify-between group"
                 >
                   <div>
                     {/* Banner Image */}
@@ -383,7 +323,7 @@ export default function ServicesPage() {
 
                       {/* Category Badge */}
                       <div className="absolute top-3 left-3">
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold bg-white/95 text-red-700 backdrop-blur-md shadow-sm">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold bg-white/95 text-emerald-800 backdrop-blur-md shadow-sm">
                           {getCategoryIcon(srv.category)}
                           <span>{srv.category || 'Social Welfare'}</span>
                         </span>
@@ -406,7 +346,7 @@ export default function ServicesPage() {
                         </span>
                       </div>
 
-                      <h3 className="font-extrabold text-lg text-black leading-snug group-hover:text-red-600 transition-colors">
+                      <h3 className="font-extrabold text-lg text-black leading-snug group-hover:text-emerald-700 transition-colors">
                         {srv.titleEn || srv.title}
                       </h3>
 
@@ -423,12 +363,12 @@ export default function ServicesPage() {
                           <div className="space-y-1">
                             {featuresList.slice(0, 3).map((feat, fIdx) => (
                               <div key={fIdx} className="flex items-start gap-1.5 text-[11px] text-slate-700 font-medium">
-                                <FiCheckCircle className="w-3.5 h-3.5 text-red-500 shrink-0 mt-0.5" />
+                                <FiCheckCircle className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
                                 <span className="line-clamp-1">{feat}</span>
                               </div>
                             ))}
                             {featuresList.length > 3 && (
-                              <span className="text-[10px] font-bold text-red-600 pl-5 block">
+                              <span className="text-[10px] font-bold text-emerald-700 pl-5 block">
                                 +{featuresList.length - 3} more offerings
                               </span>
                             )}
@@ -443,7 +383,7 @@ export default function ServicesPage() {
                     <button
                       type="button"
                       onClick={() => setActiveModalService(srv)}
-                      className="inline-flex items-center gap-1.5 text-xs font-extrabold text-slate-800 hover:text-red-600 transition cursor-pointer"
+                      className="inline-flex items-center gap-1.5 text-xs font-extrabold text-slate-800 hover:text-emerald-700 transition cursor-pointer"
                     >
                       <span>Explore Initiative</span>
                       <FiArrowRight className="w-3.5 h-3.5" />
@@ -451,7 +391,7 @@ export default function ServicesPage() {
 
                     <Link
                       href="/donation"
-                      className="inline-flex items-center gap-1 px-3.5 py-2 rounded-xl bg-red-50 hover:bg-red-600 text-red-700 hover:text-white font-extrabold text-xs transition shadow-2xs cursor-pointer"
+                      className="inline-flex items-center gap-1 px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-700 text-emerald-800 hover:text-white font-extrabold text-xs transition shadow-2xs cursor-pointer border border-emerald-200 hover:border-emerald-700"
                     >
                       <FiHeart className="w-3.5 h-3.5" />
                       <span>Support</span>
@@ -483,10 +423,10 @@ export default function ServicesPage() {
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute top-3 left-3 flex flex-wrap gap-2">
-                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-white/95 text-red-700 backdrop-blur-md shadow-sm">
+                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-white/95 text-emerald-800 backdrop-blur-md shadow-sm">
                       {activeModalService.category || 'Social Service'}
                     </span>
-                    <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500 text-white shadow-sm">
+                    <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-600 text-white shadow-sm">
                       ● Active Initiative
                     </span>
                   </div>
@@ -494,7 +434,7 @@ export default function ServicesPage() {
               )}
 
               <div>
-                <span className="text-xs font-bold text-red-600 uppercase tracking-wider">
+                <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider">
                   Social Welfare Initiative #{activeModalService.order || 1}
                 </span>
                 <h2 className="text-2xl font-black text-black mt-1 leading-snug">
@@ -514,8 +454,8 @@ export default function ServicesPage() {
                 const fList = Array.isArray(activeModalService.features)
                   ? activeModalService.features
                   : typeof activeModalService.features === 'string' && activeModalService.features
-                  ? activeModalService.features.split(/[\n,]+/).map((s) => s.trim()).filter(Boolean)
-                  : [];
+                    ? activeModalService.features.split(/[\n,]+/).map((s) => s.trim()).filter(Boolean)
+                    : [];
 
                 if (fList.length === 0) return null;
 
@@ -526,7 +466,7 @@ export default function ServicesPage() {
                     </h4>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                       {fList.map((feat, idx) => (
-                        <div key={idx} className="flex items-start gap-2.5 p-3 rounded-2xl bg-red-50/60 border border-red-100 text-xs text-slate-800">
+                        <div key={idx} className="flex items-start gap-2.5 p-3 rounded-2xl bg-emerald-50/60 border border-emerald-100 text-xs text-slate-800">
                           <FiCheckCircle className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                           <span className="font-semibold">{feat}</span>
                         </div>
@@ -538,14 +478,14 @@ export default function ServicesPage() {
 
               <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div className="flex items-center gap-2 text-xs text-slate-500">
-                  <FiUsers className="w-4 h-4 text-red-500" />
+                  <FiUsers className="w-4 h-4 text-emerald-700" />
                   <span>Serving communities with zero user fee</span>
                 </div>
 
                 <div className="flex items-center gap-3 w-full sm:w-auto">
                   <Link
                     href="/donation"
-                    className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-extrabold text-xs shadow-md transition text-center cursor-pointer"
+                    className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs shadow-md transition text-center cursor-pointer"
                   >
                     Support / Sponsor Cause
                   </Link>
@@ -581,7 +521,7 @@ export default function ServicesPage() {
             </Link>
             <Link
               href="/contact"
-              className="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-extrabold text-xs shadow-md transition"
+              className="px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs shadow-md transition"
             >
               Contact Welfare Desk
             </Link>

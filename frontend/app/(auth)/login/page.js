@@ -56,24 +56,24 @@ function LoginForm() {
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center p-4 sm:p-6 bg-slate-50 text-black">
-      <div className="max-w-md w-full bg-white rounded-3xl p-6 sm:p-8 border border-gray-200 shadow-xl relative overflow-hidden">
+    <div className="min-h-[85vh] flex items-center justify-center p-4 sm:p-6 bg-slate-50 text-slate-900">
+      <div className="max-w-md w-full bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xl relative overflow-hidden">
         
         {/* Decorative Top Accent Glow */}
-        <div className="absolute -top-24 -right-24 w-48 h-48 bg-red-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#0b8026]/10 rounded-full blur-3xl pointer-events-none"></div>
 
         {/* Brand Banner */}
         <div className="text-center mb-6">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-red-600 to-rose-600 text-white font-black text-xl flex items-center justify-center mx-auto mb-3 shadow-lg shadow-red-500/20">
-            IYF
+          <div className="w-14 h-14 rounded-2xl bg-[#0b8026] text-white font-black text-xl flex items-center justify-center mx-auto mb-3 shadow-lg shadow-[#0b8026]/20">
+            SSP
           </div>
-          <h1 className="text-2xl font-black text-black">Sign In to Portal</h1>
-          <p className="text-xs text-black/70 mt-1">
-            {settings?.ngoName || 'Indian Youth Foundation'} — Official Central Gateway
+          <h1 className="text-2xl font-black text-slate-900">Sign In to Portal</h1>
+          <p className="text-xs text-slate-600 mt-1">
+            {settings?.ngoName || 'Samasya Samadhan Parishad (SSP)'} — Official Central Gateway
           </p>
-          <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 border border-red-200 text-[10px] text-red-700 font-semibold">
-            <span className="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse"></span>
-            Unified Member &amp; Trustee Secure Gateway
+          <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[10px] text-[#0b8026] font-semibold">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#0b8026] animate-pulse"></span>
+            Unified Member &amp; Officer Secure Gateway
           </div>
         </div>
 
@@ -95,38 +95,38 @@ function LoginForm() {
         {/* UNIFIED LOGIN FORM FOR USERS & ADMINS */}
         <form onSubmit={handleLogin} className="space-y-4 text-xs">
           <div>
-            <label className="font-bold text-black block mb-1.5">
+            <label className="font-bold text-slate-800 block mb-1.5">
               Registered Email or Mobile Number
             </label>
             <div className="relative">
-              <FiUser className="absolute left-3.5 top-3.5 text-gray-400 w-4 h-4" />
+              <FiUser className="absolute left-3.5 top-3.5 text-slate-400 w-4 h-4" />
               <input
                 type="text"
                 required
                 placeholder="name@domain.org or 98XXXXXXXX"
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white border border-gray-300 text-black placeholder-gray-400 focus:outline-none focus:border-red-500 text-xs font-medium transition"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0b8026] focus:ring-1 focus:ring-[#0b8026] text-xs font-medium transition"
               />
             </div>
           </div>
 
           <div>
-            <label className="font-bold text-black block mb-1.5">Password</label>
+            <label className="font-bold text-slate-800 block mb-1.5">Password</label>
             <div className="relative">
-              <FiLock className="absolute left-3.5 top-3.5 text-gray-400 w-4 h-4" />
+              <FiLock className="absolute left-3.5 top-3.5 text-slate-400 w-4 h-4" />
               <input
                 type={showPassword ? 'text' : 'password'}
                 required
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-white border border-gray-300 text-black placeholder-gray-400 focus:outline-none focus:border-red-500 text-xs font-medium transition"
+                className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0b8026] focus:ring-1 focus:ring-[#0b8026] text-xs font-medium transition"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3.5 top-3 text-gray-400 hover:text-black"
+                className="absolute right-3.5 top-3 text-slate-400 hover:text-slate-700"
               >
                 {showPassword ? <FiEyeOff className="w-4 h-4" /> : <FiEye className="w-4 h-4" />}
               </button>
@@ -134,8 +134,8 @@ function LoginForm() {
           </div>
 
           <div className="flex items-center justify-between text-xs pt-1">
-            <span className="text-gray-500">Can&apos;t remember?</span>
-            <Link href="/forgot-password" className="text-red-600 hover:text-red-700 font-bold hover:underline">
+            <span className="text-slate-500">Can&apos;t remember?</span>
+            <Link href="/forgot-password" className="text-[#0b8026] hover:text-[#09661f] font-bold hover:underline">
               Forgot password?
             </Link>
           </div>
@@ -143,7 +143,7 @@ function LoginForm() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-lg shadow-red-600/20 transition cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+            className="w-full py-3.5 rounded-xl bg-[#0b8026] hover:bg-[#09661f] text-white font-bold text-xs shadow-lg shadow-[#0b8026]/20 transition cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {loading ? (
               <span>Verifying credentials...</span>
@@ -155,26 +155,15 @@ function LoginForm() {
             )}
           </button>
 
-          {/* Navigation to User Register & Admin Creation */}
-          <div className="mt-6 text-center text-xs text-black/70 border-t border-gray-200 pt-4 space-y-2.5">
+          {/* Navigation to User Register */}
+          <div className="mt-6 text-center text-xs text-slate-600 border-t border-slate-200 pt-4">
             <div>
               Don&apos;t have an account yet?{' '}
               <Link 
                 href={`/register${redirectTarget ? `?redirect=${encodeURIComponent(redirectTarget)}` : ''}`} 
-                className="text-red-600 font-bold hover:underline"
+                className="text-[#0b8026] font-bold hover:underline"
               >
                 Create User Account →
-              </Link>
-            </div>
-
-            <div className="pt-1.5 border-t border-gray-100">
-              <span className="text-gray-500 text-[11px]">Trust Executive or Official? </span>
-              <Link 
-                href="/admin-register" 
-                className="text-red-600 hover:text-red-700 font-bold hover:underline inline-flex items-center gap-1 text-[11px]"
-              >
-                <FiKey className="w-3 h-3" />
-                Create Admin Account (Secret Key Required) →
               </Link>
             </div>
           </div>

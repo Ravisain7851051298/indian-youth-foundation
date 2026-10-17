@@ -25,7 +25,9 @@ import {
   FiChevronRight,
   FiSidebar,
   FiAward,
-  FiActivity
+  FiActivity,
+  FiPlay,
+  FiBookOpen
 } from 'react-icons/fi';
 import { useNGO } from '@/context/NGOContext';
 import { getContentImageUrl } from '@/lib/authApi';
@@ -69,6 +71,9 @@ export default function AdminLayout({ children }) {
 
   const navItems = [
     { label: 'Control Overview', href: '/dashboard', icon: FiHome },
+    { label: 'President Message', href: '/dashboard/president-message', icon: FiUserCheck },
+    { label: 'YouTube Videos', href: '/dashboard/youtube-videos', icon: FiPlay },
+    { label: 'Manage Content', href: '/dashboard/managecontent', icon: FiBookOpen },
     { label: 'User Accounts', href: '/dashboard/users', icon: FiUsers },
     { label: 'Awards & Honors', href: '/dashboard/awards', icon: FiAward },
     { label: 'Approvals Center', href: '/dashboard/approvals', icon: FiCheckSquare, badge: totalApprovalsPending },

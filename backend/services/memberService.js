@@ -17,6 +17,33 @@ class MemberService {
     return userRepository.find(query);
   }
 
+  async getPublicMembers(limit = 20) {
+    const User = require('../models/User');
+    // Query verified active members and return safe public fields only
+    const members = await User.find({
+      $or: [
+        { isMember: true },
+        { role: 'Member' },
+        { memberId: { $exists: true, $ne: '' } }
+      ],
+      status: 'active'
+    })
+      .select('name memberId designation role state district photoUrl bloodGroup verifiedAt createdAt')
+      .sort({ createdAt: -1 })
+      .limit(Number(limit) || 20);
+
+    const totalCount = await User.countDocuments({
+      $or: [
+        { isMember: true },
+        { role: 'Member' },
+        { memberId: { $exists: true, $ne: '' } }
+      ],
+      status: 'active'
+    });
+
+    return { members, total: totalCount };
+  }
+
   async updateMemberStatus(id, status) {
     const user = await userRepository.updateById(id, { status });
     if (!user) throw new Error('Member not found');

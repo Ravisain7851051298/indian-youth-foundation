@@ -18,9 +18,6 @@ body {
 }
 
 /* Ensure crisp high-contrast black text */
-h1, h2, h3, h4, h5, h6 {
-  color: #000000;
-}
 
 /* Ensure inputs and selects have crisp pitch black text and clean styling */
 input,
@@ -39,15 +36,18 @@ textarea::placeholder {
   width: 8px;
   height: 8px;
 }
+
 ::-webkit-scrollbar-track {
   background: #f8fafc;
 }
+
 ::-webkit-scrollbar-thumb {
-  background: #fca5a5;
+  background: #82f872;
   border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
-  background: #ef4444;
+  background: #04a835;
 }
 
 /* Print Styles for ID Card, 80G Receipt & Appointment Letter */
@@ -56,15 +56,50 @@ textarea::placeholder {
     background: white !important;
     color: black !important;
   }
+
   .no-print {
     display: none !important;
   }
+
   .print-only {
     display: block !important;
   }
+
   .print-card-container {
     box-shadow: none !important;
     border: 1px solid #ccc !important;
     page-break-inside: avoid;
   }
+}
+
+/* Google Translate Global Fixes */
+.goog-te-banner-frame.skiptranslate,
+.goog-te-banner-frame,
+iframe.goog-te-banner-frame {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+}
+
+body {
+  top: 0px !important;
+  position: static !important;
+}
+
+#goog-gt-tt,
+.goog-te-balloon-frame {
+  display: none !important;
+}
+
+.goog-text-highlight {
+  background: none !important;
+  box-shadow: none !important;
+}
+
+.goog-logo-link {
+  display: none !important;
+}
+
+.goog-te-gadget span {
+  display: none !important;
 }

@@ -291,8 +291,8 @@ export default function CampaignsPage() {
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-200">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-red-700 text-xs font-bold border border-red-200 mb-2">
-              <FiTarget className="w-3.5 h-3.5 text-red-600" />
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-200 mb-2">
+              <FiTarget className="w-3.5 h-3.5 text-emerald-700" />
               <span>Crowdfunding & Welfare Drives</span>
             </div>
             <h1 className="text-3xl sm:text-4xl font-black text-black tracking-tight">
@@ -307,7 +307,7 @@ export default function CampaignsPage() {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setShowAddModal(true)}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-md shadow-red-600/20 transition cursor-pointer"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-md shadow-emerald-700/20 transition cursor-pointer"
               >
                 <FiPlus className="w-4 h-4" />
                 <span>Launch New Campaign</span>
@@ -319,7 +319,7 @@ export default function CampaignsPage() {
         {/* Category Filter Pills */}
         <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-8 no-scrollbar">
           <div className="flex items-center gap-1.5 text-xs font-bold text-slate-700 mr-2 flex-shrink-0">
-            <FiFilter className="w-3.5 h-3.5 text-red-600" />
+            <FiFilter className="w-3.5 h-3.5 text-emerald-700" />
             <span>Filter:</span>
           </div>
           {CATEGORIES.map((cat) => {
@@ -330,8 +330,8 @@ export default function CampaignsPage() {
                 onClick={() => setSelectedCategory(cat)}
                 className={`px-4 py-2 rounded-xl text-xs font-bold transition flex-shrink-0 cursor-pointer ${
                   isSelected
-                    ? 'bg-red-600 text-white shadow-sm'
-                    : 'bg-white text-black border border-slate-200 hover:bg-red-50 hover:text-red-700'
+                    ? 'bg-emerald-700 text-white shadow-sm'
+                    : 'bg-white text-black border border-slate-200 hover:bg-emerald-50 hover:text-emerald-800'
                 }`}
               >
                 {cat}
@@ -342,8 +342,8 @@ export default function CampaignsPage() {
             onClick={() => setSelectedCategory('Urgent')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition flex-shrink-0 cursor-pointer ${
               selectedCategory === 'Urgent'
-                ? 'bg-red-600 text-white shadow-sm'
-                : 'bg-white text-black border border-slate-200 hover:bg-red-50 hover:text-red-700'
+                ? 'bg-emerald-700 text-white shadow-sm'
+                : 'bg-white text-black border border-slate-200 hover:bg-emerald-50 hover:text-emerald-800'
             }`}
           >
             🔥 Urgent Only
@@ -361,7 +361,7 @@ export default function CampaignsPage() {
             {isAdmin && (
               <button
                 onClick={() => setShowAddModal(true)}
-                className="px-4 py-2 rounded-xl bg-red-600 text-white font-bold text-xs hover:bg-red-700 transition"
+                className="px-4 py-2 rounded-xl bg-emerald-700 text-white font-bold text-xs hover:bg-emerald-800 transition"
               >
                 Launch First Campaign
               </button>
@@ -396,13 +396,13 @@ export default function CampaignsPage() {
                       />
                       
                       {/* Category Badge */}
-                      <span className="absolute bottom-3 left-3 bg-white/95 backdrop-blur-xs text-red-700 text-[11px] font-bold px-3 py-1 rounded-full border border-red-200 shadow-sm">
+                      <span className="absolute bottom-3 left-3 bg-white/95 backdrop-blur-xs text-emerald-800 text-[11px] font-bold px-3 py-1 rounded-full border border-emerald-200 shadow-sm">
                         {camp.category || 'General Drive'}
                       </span>
 
                       {/* Urgent Badge */}
                       {camp.urgent && (
-                        <span className="absolute top-3 left-3 bg-red-600 text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-md animate-pulse">
+                        <span className="absolute top-3 left-3 bg-rose-600 text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-md animate-pulse">
                           Urgent Cause
                         </span>
                       )}
@@ -419,7 +419,7 @@ export default function CampaignsPage() {
                           </button>
                           <button
                             onClick={() => setDeletingCampaign(camp)}
-                            className="p-2 rounded-xl bg-white/90 hover:bg-red-50 text-red-600 border border-red-200 shadow-md backdrop-blur-xs transition cursor-pointer"
+                            className="p-2 rounded-xl bg-white/90 hover:bg-rose-50 text-rose-600 border border-rose-200 shadow-md backdrop-blur-xs transition cursor-pointer"
                             title="Delete Campaign"
                           >
                             <FiTrash2 className="w-3.5 h-3.5" />
@@ -441,7 +441,7 @@ export default function CampaignsPage() {
                       <div className="mt-6 bg-slate-50 p-4 rounded-2xl border border-slate-100">
                         <div className="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
                           <div
-                            className="bg-gradient-to-r from-red-600 to-rose-600 h-full rounded-full transition-all duration-500"
+                            className="bg-gradient-to-r from-emerald-600 to-teal-500 h-full rounded-full transition-all duration-500"
                             style={{ width: `${percent}%` }}
                           />
                         </div>
@@ -451,7 +451,7 @@ export default function CampaignsPage() {
                             ₹{raised.toLocaleString('en-IN')}{' '}
                             <span className="text-[11px] font-normal text-slate-600">raised</span>
                           </span>
-                          <span className="font-bold text-red-600">{percent}%</span>
+                          <span className="font-bold text-emerald-700">{percent}%</span>
                         </div>
                         <div className="text-[11px] text-slate-600 mt-1.5 flex items-center justify-between">
                           <span>Target: ₹{goal.toLocaleString('en-IN')}</span>
@@ -468,7 +468,7 @@ export default function CampaignsPage() {
                   <div className="p-6 pt-0 space-y-2">
                     <Link
                       href={`/donation?campaign=${id}`}
-                      className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-md shadow-red-600/20 transition cursor-pointer"
+                      className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-md shadow-emerald-700/20 transition cursor-pointer"
                     >
                       <FiHeart className="w-4 h-4 fill-white" />
                       <span>Donate to This Campaign (80G)</span>
@@ -485,9 +485,9 @@ export default function CampaignsPage() {
                         </button>
                         <button
                           onClick={() => setDeletingCampaign(camp)}
-                          className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 font-bold text-[11px] transition cursor-pointer"
+                          className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-[11px] transition cursor-pointer"
                         >
-                          <FiTrash2 className="w-3.5 h-3.5 text-red-600" />
+                          <FiTrash2 className="w-3.5 h-3.5 text-rose-600" />
                           <span>Delete</span>
                         </button>
                       </div>
@@ -514,7 +514,7 @@ export default function CampaignsPage() {
               </button>
 
               <div className="flex items-center gap-2 mb-2">
-                <span className="p-2 rounded-xl bg-red-100 text-red-600">
+                <span className="p-2 rounded-xl bg-emerald-100 text-emerald-700">
                   <FiTarget className="w-5 h-5" />
                 </span>
                 <div>
@@ -532,7 +532,7 @@ export default function CampaignsPage() {
                     placeholder="e.g. Free School Bags & Study Kits for 500 Slum Children"
                     value={addTitle}
                     onChange={(e) => setAddTitle(e.target.value)}
-                    className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-red-500 font-medium text-black bg-white"
+                    className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-emerald-600 font-medium text-black bg-white"
                   />
                 </div>
 
@@ -543,7 +543,7 @@ export default function CampaignsPage() {
                     placeholder="e.g. 500 जरूरतमंद बच्चों के लिए मुफ्त स्कूल बैग और अध्ययन सामग्री"
                     value={addTitleHi}
                     onChange={(e) => setAddTitleHi(e.target.value)}
-                    className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-red-500 font-medium text-black bg-white"
+                    className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-emerald-600 font-medium text-black bg-white"
                   />
                 </div>
 
@@ -553,7 +553,7 @@ export default function CampaignsPage() {
                     <select
                       value={addCategory}
                       onChange={(e) => setAddCategory(e.target.value)}
-                      className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-red-500 font-bold text-black bg-white"
+                      className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-emerald-600 font-bold text-black bg-white"
                     >
                       <option value="Child Education">Child Education</option>
                       <option value="Emergency Healthcare">Emergency Healthcare</option>
@@ -572,7 +572,7 @@ export default function CampaignsPage() {
                       min={100}
                       value={addGoalAmount}
                       onChange={(e) => setAddGoalAmount(e.target.value)}
-                      className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-red-500 font-bold text-black bg-white"
+                      className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-emerald-600 font-bold text-black bg-white"
                     />
                   </div>
                 </div>
@@ -581,7 +581,7 @@ export default function CampaignsPage() {
                 <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
                   <div className="flex items-center justify-between">
                     <label className="font-bold text-black flex items-center gap-1.5">
-                      <FiImage className="w-4 h-4 text-red-600" />
+                      <FiImage className="w-4 h-4 text-emerald-700" />
                       <span>Campaign Banner Image</span>
                     </label>
                     <span className="text-[10px] text-slate-500">Upload file or enter URL</span>
@@ -599,9 +599,9 @@ export default function CampaignsPage() {
                     />
                     <label
                       htmlFor="addCampaignFileInput"
-                      className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-slate-300 hover:border-red-500 text-black font-bold cursor-pointer transition shadow-xs text-xs"
+                      className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-slate-300 hover:border-emerald-600 text-black font-bold cursor-pointer transition shadow-xs text-xs"
                     >
-                      <FiUploadCloud className="w-4 h-4 text-red-600" />
+                      <FiUploadCloud className="w-4 h-4 text-emerald-700" />
                       <span>{addImageFile ? 'Change Image File' : 'Upload Image from Device'}</span>
                     </label>
 
@@ -643,7 +643,7 @@ export default function CampaignsPage() {
                       setAddBannerUrl(e.target.value);
                       if (!addImageFile) setAddImagePreview(e.target.value);
                     }}
-                    className="w-full px-3.5 py-2 border rounded-xl border-slate-300 focus:outline-red-500 font-medium text-black bg-white"
+                    className="w-full px-3.5 py-2 border rounded-xl border-slate-300 focus:outline-emerald-600 font-medium text-black bg-white"
                   />
                 </div>
 
@@ -655,16 +655,16 @@ export default function CampaignsPage() {
                     placeholder="Describe the background, urgency, direct beneficiaries, and how the donations will be used..."
                     value={addDescription}
                     onChange={(e) => setAddDescription(e.target.value)}
-                    className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-red-500 font-medium text-black bg-white"
+                    className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-emerald-600 font-medium text-black bg-white"
                   />
                 </div>
 
-                <label className="flex items-center gap-2 font-bold text-black cursor-pointer bg-red-50/60 p-3 rounded-xl border border-red-100">
+                <label className="flex items-center gap-2 font-bold text-black cursor-pointer bg-rose-50/60 p-3 rounded-xl border border-rose-100">
                   <input
                     type="checkbox"
                     checked={addUrgent}
                     onChange={(e) => setAddUrgent(e.target.checked)}
-                    className="rounded text-red-600 focus:ring-red-500 w-4 h-4 cursor-pointer"
+                    className="rounded text-rose-600 focus:ring-rose-500 w-4 h-4 cursor-pointer"
                   />
                   <span>Mark as High-Priority Urgent Relief (Displays warning banner)</span>
                 </label>
@@ -683,7 +683,7 @@ export default function CampaignsPage() {
                   <button
                     type="submit"
                     disabled={addingSubmitting}
-                    className="flex items-center gap-2 px-6 py-2.5 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-bold rounded-xl shadow-md transition cursor-pointer"
+                    className="flex items-center gap-2 px-6 py-2.5 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-bold rounded-xl shadow-md transition cursor-pointer"
                   >
                     {addingSubmitting ? (
                       <>
@@ -715,7 +715,7 @@ export default function CampaignsPage() {
               </button>
 
               <div className="flex items-center gap-2 mb-2">
-                <span className="p-2 rounded-xl bg-red-100 text-red-600">
+                <span className="p-2 rounded-xl bg-emerald-100 text-emerald-700">
                   <FiEdit2 className="w-5 h-5" />
                 </span>
                 <div>
@@ -732,7 +732,7 @@ export default function CampaignsPage() {
                     required
                     value={editTitle}
                     onChange={(e) => setEditTitle(e.target.value)}
-                    className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-red-500 font-medium text-black bg-white"
+                    className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-emerald-600 font-medium text-black bg-white"
                   />
                 </div>
 
@@ -742,7 +742,7 @@ export default function CampaignsPage() {
                     type="text"
                     value={editTitleHi}
                     onChange={(e) => setEditTitleHi(e.target.value)}
-                    className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-red-500 font-medium text-black bg-white"
+                    className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-emerald-600 font-medium text-black bg-white"
                   />
                 </div>
 
@@ -752,7 +752,7 @@ export default function CampaignsPage() {
                     <select
                       value={editCategory}
                       onChange={(e) => setEditCategory(e.target.value)}
-                      className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-red-500 font-bold text-black bg-white"
+                      className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-emerald-600 font-bold text-black bg-white"
                     >
                       <option value="Child Education">Child Education</option>
                       <option value="Emergency Healthcare">Emergency Healthcare</option>
@@ -771,7 +771,7 @@ export default function CampaignsPage() {
                       min={100}
                       value={editGoalAmount}
                       onChange={(e) => setEditGoalAmount(e.target.value)}
-                      className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-red-500 font-bold text-black bg-white"
+                      className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-emerald-600 font-bold text-black bg-white"
                     />
                   </div>
                   <div>
@@ -781,7 +781,7 @@ export default function CampaignsPage() {
                       min={0}
                       value={editRaisedAmount}
                       onChange={(e) => setEditRaisedAmount(e.target.value)}
-                      className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-red-500 font-bold text-black bg-white"
+                      className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-emerald-600 font-bold text-black bg-white"
                     />
                   </div>
                 </div>
@@ -790,7 +790,7 @@ export default function CampaignsPage() {
                 <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
                   <div className="flex items-center justify-between">
                     <label className="font-bold text-black flex items-center gap-1.5">
-                      <FiImage className="w-4 h-4 text-red-600" />
+                      <FiImage className="w-4 h-4 text-emerald-700" />
                       <span>Update Banner Image</span>
                     </label>
                     <span className="text-[10px] text-slate-500">Pick from device or change link</span>
@@ -808,9 +808,9 @@ export default function CampaignsPage() {
                     />
                     <label
                       htmlFor="editCampaignFileInput"
-                      className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-slate-300 hover:border-red-500 text-black font-bold cursor-pointer transition shadow-xs text-xs"
+                      className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-slate-300 hover:border-emerald-600 text-black font-bold cursor-pointer transition shadow-xs text-xs"
                     >
-                      <FiUploadCloud className="w-4 h-4 text-red-600" />
+                      <FiUploadCloud className="w-4 h-4 text-emerald-700" />
                       <span>{editImageFile ? 'Select Different Image' : 'Upload New Photo'}</span>
                     </label>
 
@@ -852,7 +852,7 @@ export default function CampaignsPage() {
                         setEditBannerUrl(e.target.value);
                         if (!editImageFile) setEditImagePreview(e.target.value);
                       }}
-                      className="w-full px-3.5 py-2 border rounded-xl border-slate-300 focus:outline-red-500 font-medium text-black bg-white"
+                      className="w-full px-3.5 py-2 border rounded-xl border-slate-300 focus:outline-emerald-600 font-medium text-black bg-white"
                     />
                   </div>
                 </div>
@@ -864,16 +864,16 @@ export default function CampaignsPage() {
                     required
                     value={editDescription}
                     onChange={(e) => setEditDescription(e.target.value)}
-                    className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-red-500 font-medium text-black bg-white"
+                    className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-emerald-600 font-medium text-black bg-white"
                   />
                 </div>
 
-                <label className="flex items-center gap-2 font-bold text-black cursor-pointer bg-red-50/60 p-3 rounded-xl border border-red-100">
+                <label className="flex items-center gap-2 font-bold text-black cursor-pointer bg-rose-50/60 p-3 rounded-xl border border-rose-100">
                   <input
                     type="checkbox"
                     checked={editUrgent}
                     onChange={(e) => setEditUrgent(e.target.checked)}
-                    className="rounded text-red-600 focus:ring-red-500 w-4 h-4 cursor-pointer"
+                    className="rounded text-rose-600 focus:ring-rose-500 w-4 h-4 cursor-pointer"
                   />
                   <span>Mark as High-Priority Urgent Relief</span>
                 </label>
@@ -889,7 +889,7 @@ export default function CampaignsPage() {
                   <button
                     type="submit"
                     disabled={editingSubmitting}
-                    className="flex items-center gap-2 px-6 py-2.5 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-bold rounded-xl shadow-md transition cursor-pointer"
+                    className="flex items-center gap-2 px-6 py-2.5 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-bold rounded-xl shadow-md transition cursor-pointer"
                   >
                     {editingSubmitting ? (
                       <>

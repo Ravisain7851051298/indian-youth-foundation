@@ -59,10 +59,10 @@ export default function VerificationPage() {
     if (found) {
       verified = true;
       details = (
-        <div className="space-y-3 text-xs text-left bg-red-50/60 p-5 rounded-2xl border border-red-200">
-          <div className="font-mono text-red-600 font-bold">{found.certificateNo}</div>
+        <div className="space-y-3 text-xs text-left bg-emerald-50/60 p-5 rounded-2xl border border-emerald-200">
+          <div className="font-mono text-emerald-700 font-bold">{found.certificateNo}</div>
           <h4 className="font-extrabold text-base text-black">{found.recipientName}</h4>
-          <div className="text-red-900 font-bold">{found.awardTitle}</div>
+          <div className="text-emerald-900 font-bold">{found.awardTitle}</div>
           <p className="text-slate-700 leading-relaxed">{found.description}</p>
           <div className="text-[11px] text-slate-500 font-medium">Issue Date: {found.issueDate}</div>
         </div>

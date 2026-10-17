@@ -133,7 +133,10 @@ const replyFeedback = async (req, res) => {
 const updateFeedbackStatus = async (req, res) => {
   try {
     const { id } = req.params;
-    const { status } = req.body;
+    let { status } = req.body;
+    if (status) {
+      status = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+    }
 
     if (!['Approved', 'Pending', 'Rejected'].includes(status)) {
       return res.status(400).json({

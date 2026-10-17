@@ -36,13 +36,13 @@ Donors and registered members maintain the right to review their records, reques
   const activeContent = settings?.privacyPolicyContent || defaultPolicyContent;
 
   return (
-    <div className="min-h-screen bg-slate-50 py-16 selection:bg-red-600 selection:text-white">
+    <div className="min-h-screen bg-slate-50 py-16 selection:bg-emerald-600 selection:text-white">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-red-100 text-red-700 font-extrabold text-xs mb-3 border border-red-200">
-            <FiShield className="w-4 h-4 text-red-600" />
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100 text-emerald-800 font-extrabold text-xs mb-3 border border-emerald-200">
+            <FiShield className="w-4 h-4 text-emerald-700" />
             <span>Statutory Compliance &amp; Data Protection</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-black text-black tracking-tight">
@@ -67,15 +67,15 @@ Donors and registered members maintain the right to review their records, reques
             </h3>
             <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-2.5 font-medium text-xs">
               <div className="flex items-center gap-2 text-slate-800">
-                <FiMail className="w-4 h-4 text-red-600 shrink-0" />
-                <span>Grievance Email: <a href={`mailto:${settings?.email || 'samasyasamadhanparishad@gmail.com'}`} className="text-red-600 font-bold underline">{settings?.email || 'samasyasamadhanparishad@gmail.com'}</a></span>
+                <FiMail className="w-4 h-4 text-emerald-700 shrink-0" />
+                <span>Grievance Email: <a href={`mailto:${settings?.email || 'samasyasamadhanparishad@gmail.com'}`} className="text-emerald-700 font-bold underline">{settings?.email || 'samasyasamadhanparishad@gmail.com'}</a></span>
               </div>
               <div className="flex items-center gap-2 text-slate-800">
-                <FiPhone className="w-4 h-4 text-red-600 shrink-0" />
+                <FiPhone className="w-4 h-4 text-emerald-700 shrink-0" />
                 <span>Helpline: <a href={`tel:${settings?.phone || '+91 93196 98759'}`} className="text-black font-bold">{settings?.phone || '+91 93196 98759'}</a></span>
               </div>
               <div className="flex items-start gap-2 text-slate-800">
-                <FiMapPin className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+                <FiMapPin className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
                 <span>Head Office: {settings?.address || 'Head Office - Krishna Vihar Pala Road Aligarh, Uttar Pradesh'}</span>
               </div>
             </div>
@@ -86,7 +86,7 @@ Donors and registered members maintain the right to review their records, reques
         <div className="mt-8 text-center">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-md shadow-red-600/20 transition"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-md shadow-emerald-700/20 transition"
           >
             ← Back to Homepage
           </Link>

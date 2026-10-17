@@ -265,8 +265,8 @@ export default function TeamMembersPage() {
         {/* Top Header Card */}
         <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-red-50 text-red-700 text-xs font-bold border border-red-200 shadow-2xs">
-              <FiUserCheck className="w-3.5 h-3.5 text-red-600" />
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-200 shadow-2xs">
+              <FiUserCheck className="w-3.5 h-3.5 text-emerald-700" />
               <span>Leadership, Trustees &amp; Executive Governance</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
@@ -283,14 +283,14 @@ export default function TeamMembersPage() {
               className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold transition cursor-pointer"
               title="Refresh from Database"
             >
-              <FiRefreshCw className={`w-3.5 h-3.5 text-red-600 ${loading ? 'animate-spin' : ''}`} />
+              <FiRefreshCw className={`w-3.5 h-3.5 text-emerald-700 ${loading ? 'animate-spin' : ''}`} />
               <span>Sync</span>
             </button>
 
             {isAdmin && (
               <button
                 onClick={openAdd}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-md shadow-red-600/20 transition cursor-pointer"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-md shadow-emerald-700/20 transition cursor-pointer"
               >
                 <FiPlus className="w-4 h-4" />
                 <span>Add Team Member</span>
@@ -320,7 +320,7 @@ export default function TeamMembersPage() {
                 placeholder="Search by name, position, or bio..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-red-500 font-medium text-slate-900"
+                className="w-full pl-9 pr-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-emerald-600 font-medium text-slate-900"
               />
             </div>
 
@@ -341,7 +341,7 @@ export default function TeamMembersPage() {
                   onClick={() => setSelectedDept(dept)}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer ${
                     active
-                      ? 'bg-red-600 text-white shadow-xs'
+                      ? 'bg-emerald-700 text-white shadow-xs'
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                   }`}
                 >
@@ -369,7 +369,7 @@ export default function TeamMembersPage() {
           </div>
         ) : filteredMembers.length === 0 ? (
           <div className="bg-white rounded-3xl p-12 border border-slate-200 text-center max-w-md mx-auto shadow-sm">
-            <div className="w-16 h-16 rounded-full bg-red-50 text-red-600 flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+            <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
               <FiUserCheck className="w-8 h-8" />
             </div>
             <h3 className="text-base font-bold text-slate-900">No Team Members Found</h3>
@@ -381,7 +381,7 @@ export default function TeamMembersPage() {
             {isAdmin && (
               <button
                 onClick={openAdd}
-                className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-md transition cursor-pointer"
+                className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-md transition cursor-pointer"
               >
                 <FiPlus className="w-4 h-4" />
                 <span>Add First Member</span>
@@ -402,7 +402,7 @@ export default function TeamMembersPage() {
                 >
                   {/* Member Circular Photo */}
                   <div className="relative mb-3.5">
-                    <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-full overflow-hidden shadow-lg border-4 border-white ring-4 ring-red-100 group-hover:ring-red-500 transition-all duration-300 group-hover:scale-105 bg-slate-100">
+                    <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-full overflow-hidden shadow-lg border-4 border-white ring-4 ring-emerald-100 group-hover:ring-emerald-600 transition-all duration-300 group-hover:scale-105 bg-slate-100">
                       <img
                         src={photoUrl}
                         alt={m.name}
@@ -417,7 +417,7 @@ export default function TeamMembersPage() {
                     {isAdmin && (
                       <button
                         onClick={() => openEdit(m)}
-                        className="absolute bottom-1 right-1 p-2 rounded-full bg-slate-900 text-white hover:bg-red-600 transition shadow-md cursor-pointer"
+                        className="absolute bottom-1 right-1 p-2 rounded-full bg-slate-900 text-white hover:bg-emerald-700 transition shadow-md cursor-pointer"
                         title="Change Photo / Edit Member"
                       >
                         <FiCamera className="w-3.5 h-3.5" />
@@ -426,12 +426,12 @@ export default function TeamMembersPage() {
                   </div>
 
                   {/* Name */}
-                  <h3 className="text-base sm:text-lg font-black text-slate-900 group-hover:text-red-600 transition-colors tracking-tight leading-snug">
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 group-hover:text-emerald-700 transition-colors tracking-tight leading-snug">
                     {m.name}
                   </h3>
 
                   {/* Position */}
-                  <p className="text-xs sm:text-sm font-semibold text-red-600 tracking-normal mt-0.5 leading-snug">
+                  <p className="text-xs sm:text-sm font-semibold text-emerald-700 tracking-normal mt-0.5 leading-snug">
                     {m.position || m.role || 'Board Member'}
                   </p>
 
@@ -482,7 +482,7 @@ export default function TeamMembersPage() {
               </button>
 
               <div className="flex items-center gap-2.5 mb-5">
-                <div className="p-2.5 rounded-2xl bg-red-50 text-red-600">
+                <div className="p-2.5 rounded-2xl bg-emerald-50 text-emerald-700">
                   <FiUserCheck className="w-5 h-5" />
                 </div>
                 <div>
@@ -514,7 +514,7 @@ export default function TeamMembersPage() {
                     Member Photo / Portrait *
                   </label>
 
-                  <div className="flex flex-col sm:flex-row items-center gap-4 p-4 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/80 hover:border-red-300 transition">
+                  <div className="flex flex-col sm:flex-row items-center gap-4 p-4 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/80 hover:border-emerald-300 transition">
                     {/* Thumbnail Preview */}
                     <div className="relative w-20 h-20 rounded-2xl bg-white border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center shadow-xs">
                       {photoPreview ? (
@@ -536,7 +536,7 @@ export default function TeamMembersPage() {
                     {/* Upload Buttons */}
                     <div className="flex-1 space-y-2 text-center sm:text-left">
                       <div className="flex flex-wrap items-center gap-2 justify-center sm:justify-start">
-                        <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-xs transition cursor-pointer">
+                        <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-xs transition cursor-pointer">
                           <FiUploadCloud className="w-3.5 h-3.5" />
                           <span>{isUploading ? 'Uploading...' : 'Upload Image'}</span>
                           <input
@@ -574,7 +574,7 @@ export default function TeamMembersPage() {
                         setForm((prev) => ({ ...prev, image: e.target.value }));
                         setPhotoPreview(e.target.value);
                       }}
-                      className="w-full px-3 py-2 border rounded-xl border-slate-200 focus:outline-none focus:border-red-500 text-xs text-slate-800"
+                      className="w-full px-3 py-2 border rounded-xl border-slate-200 focus:outline-none focus:border-emerald-600 text-xs text-slate-800"
                     />
                   </div>
                 </div>
@@ -589,7 +589,7 @@ export default function TeamMembersPage() {
                       placeholder="e.g. Dr. Vikram Sharma"
                       value={form.name}
                       onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
-                      className="w-full px-3 py-2.5 border rounded-xl border-slate-200 focus:outline-none focus:border-red-500 font-medium text-slate-900"
+                      className="w-full px-3 py-2.5 border rounded-xl border-slate-200 focus:outline-none focus:border-emerald-600 font-medium text-slate-900"
                     />
                   </div>
 
@@ -603,7 +603,7 @@ export default function TeamMembersPage() {
                       placeholder="e.g. Founder & National President"
                       value={form.position}
                       onChange={(e) => setForm((prev) => ({ ...prev, position: e.target.value }))}
-                      className="w-full px-3 py-2.5 border rounded-xl border-slate-200 focus:outline-none focus:border-red-500 font-medium text-slate-900"
+                      className="w-full px-3 py-2.5 border rounded-xl border-slate-200 focus:outline-none focus:border-emerald-600 font-medium text-slate-900"
                     />
                   </div>
                 </div>
@@ -614,7 +614,7 @@ export default function TeamMembersPage() {
                   <select
                     value={form.department}
                     onChange={(e) => setForm((prev) => ({ ...prev, department: e.target.value }))}
-                    className="w-full px-3 py-2.5 border rounded-xl border-slate-200 focus:outline-none focus:border-red-500 font-medium text-slate-900 bg-white"
+                    className="w-full px-3 py-2.5 border rounded-xl border-slate-200 focus:outline-none focus:border-emerald-600 font-medium text-slate-900 bg-white"
                   >
                     {DEPARTMENTS.filter((d) => d !== 'All').map((d) => (
                       <option key={d} value={d}>
@@ -633,7 +633,7 @@ export default function TeamMembersPage() {
                       placeholder="+91 98765 43210"
                       value={form.phone}
                       onChange={(e) => setForm((prev) => ({ ...prev, phone: e.target.value }))}
-                      className="w-full px-3 py-2.5 border rounded-xl border-slate-200 focus:outline-none focus:border-red-500 font-medium text-slate-900"
+                      className="w-full px-3 py-2.5 border rounded-xl border-slate-200 focus:outline-none focus:border-emerald-600 font-medium text-slate-900"
                     />
                   </div>
                   <div>
@@ -643,7 +643,7 @@ export default function TeamMembersPage() {
                       placeholder="team@bharatiyayuvakranti.org"
                       value={form.email}
                       onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
-                      className="w-full px-3 py-2.5 border rounded-xl border-slate-200 focus:outline-none focus:border-red-500 font-medium text-slate-900"
+                      className="w-full px-3 py-2.5 border rounded-xl border-slate-200 focus:outline-none focus:border-emerald-600 font-medium text-slate-900"
                     />
                   </div>
                 </div>
@@ -656,7 +656,7 @@ export default function TeamMembersPage() {
                     placeholder="Brief overview of background, social initiatives, and constitutional responsibilities..."
                     value={form.bio}
                     onChange={(e) => setForm((prev) => ({ ...prev, bio: e.target.value }))}
-                    className="w-full px-3 py-2.5 border rounded-xl border-slate-200 focus:outline-none focus:border-red-500 font-medium text-slate-900"
+                    className="w-full px-3 py-2.5 border rounded-xl border-slate-200 focus:outline-none focus:border-emerald-600 font-medium text-slate-900"
                   />
                 </div>
 
@@ -672,7 +672,7 @@ export default function TeamMembersPage() {
                   <button
                     type="submit"
                     disabled={submitting || isUploading}
-                    className="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl shadow-md transition cursor-pointer disabled:opacity-60 flex items-center gap-1.5"
+                    className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl shadow-md transition cursor-pointer disabled:opacity-60 flex items-center gap-1.5"
                   >
                     {submitting ? (
                       <>

@@ -207,8 +207,8 @@ function DonationContent() {
         
         {/* Top Header */}
         <div className="text-center max-w-2xl mx-auto mb-10">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-100 text-red-800 text-xs font-bold mb-2">
-            <FiShield className="w-3.5 h-3.5 text-red-600" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold mb-2 border border-emerald-200">
+            <FiShield className="w-3.5 h-3.5 text-emerald-700" />
             <span>Section 80G Certified Non-Profit • 50% Income Tax Exemption</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-black text-black tracking-tight">
@@ -221,13 +221,13 @@ function DonationContent() {
 
         {/* ---------------- 1. SUBMITTED CONFIRMATION SCREEN (UNDER REVIEW) ---------------- */}
         {submittedDonation ? (
-          <div className="bg-white rounded-3xl p-6 sm:p-10 border-2 border-red-500 shadow-xl max-w-3xl mx-auto space-y-6">
+          <div className="bg-white rounded-3xl p-6 sm:p-10 border-2 border-emerald-600 shadow-xl max-w-3xl mx-auto space-y-6">
             <div className="flex flex-col sm:flex-row items-start gap-4 pb-6 border-b border-slate-100">
               <div className="w-16 h-16 rounded-2xl bg-amber-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-amber-600/25">
                 <FiClock className="w-8 h-8" />
               </div>
               <div className="space-y-1">
-                <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-red-100 text-red-900 border border-red-200 inline-block">
+                <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-900 border border-emerald-200 inline-block">
                   Application Under Review
                 </span>
                 <h2 className="text-xl sm:text-2xl font-black text-black">
@@ -244,7 +244,7 @@ function DonationContent() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <span className="text-slate-500 block font-medium">Bank UTR / Transaction ID:</span>
-                  <strong className="font-mono text-red-600 font-black text-sm">{submittedDonation.transactionId}</strong>
+                  <strong className="font-mono text-emerald-700 font-black text-sm">{submittedDonation.transactionId}</strong>
                 </div>
                 <div>
                   <span className="text-slate-500 block font-medium">Cause Earmarked:</span>
@@ -257,7 +257,7 @@ function DonationContent() {
                       {submittedDonation.campaignId && submittedDonation.campaignId !== 'general' ? `#${submittedDonation.campaignId}` : 'General NGO Fund (Unrestricted)'}
                     </strong>
                     {submittedDonation.campaignId && submittedDonation.campaignId !== 'general' && (
-                      <span className="text-[10px] text-red-700 font-bold bg-red-100 border border-red-200 px-2 py-0.5 rounded-full">
+                      <span className="text-[10px] text-emerald-800 font-bold bg-emerald-100 border border-emerald-200 px-2 py-0.5 rounded-full">
                         Attached
                       </span>
                     )}
@@ -276,25 +276,25 @@ function DonationContent() {
 
             {/* Crowdfunding Real-Time Auto-Credit Notice */}
             {submittedDonation.campaignId && submittedDonation.campaignId !== 'general' && (
-              <div className="p-4 rounded-2xl bg-gradient-to-r from-red-50 to-rose-50 border border-red-200 text-xs text-slate-800 flex items-start gap-3">
-                <div className="w-8 h-8 rounded-xl bg-red-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 text-xs text-slate-800 flex items-start gap-3">
+                <div className="w-8 h-8 rounded-xl bg-emerald-700 text-white flex items-center justify-center shrink-0 shadow-xs">
                   <FiTarget className="w-4 h-4" />
                 </div>
                 <div className="space-y-1">
-                  <div className="font-extrabold text-red-900 text-xs">
+                  <div className="font-extrabold text-emerald-950 text-xs">
                     Crowdfunding Database Auto-Update Guarantee
                   </div>
                   <p className="text-[11px] text-slate-700 leading-relaxed">
-                    Once the Trustee Verification Desk validates your transfer and mints your 80G tax receipt, this donation of <strong>₹{Number(submittedDonation.amount).toLocaleString('en-IN')}</strong> will automatically be credited to Crowdfunding Campaign <strong className="font-mono text-red-700">#{submittedDonation.campaignId}</strong>, incrementing its raised amount and donor tally live in the database.
+                    Once the Trustee Verification Desk validates your transfer and mints your 80G tax receipt, this donation of <strong>₹{Number(submittedDonation.amount).toLocaleString('en-IN')}</strong> will automatically be credited to Crowdfunding Campaign <strong className="font-mono text-emerald-800">#{submittedDonation.campaignId}</strong>, incrementing its raised amount and donor tally live in the database.
                   </p>
                 </div>
               </div>
             )}
 
             {/* Statutory Process Explanation */}
-            <div className="p-4 sm:p-5 rounded-2xl bg-red-50 border border-red-200 text-xs text-slate-800 space-y-2">
-              <div className="font-black flex items-center gap-1.5 text-red-900">
-                <FiClock className="w-4 h-4 text-red-600" />
+            <div className="p-4 sm:p-5 rounded-2xl bg-emerald-50/60 border border-emerald-200 text-xs text-slate-800 space-y-2">
+              <div className="font-black flex items-center gap-1.5 text-emerald-950">
+                <FiClock className="w-4 h-4 text-emerald-700" />
                 <span>Statutory 80G Receipt Issuance Workflow:</span>
               </div>
               <p className="text-slate-700 leading-relaxed text-[11px]">
@@ -303,15 +303,15 @@ function DonationContent() {
               </p>
               <div className="pt-1 space-y-1 text-[11px] text-slate-700 font-medium">
                 <div className="flex items-center gap-1.5">
-                  <FiCheckCircle className="w-3.5 h-3.5 text-red-600" />
+                  <FiCheckCircle className="w-3.5 h-3.5 text-emerald-700" />
                   <span><strong>Audit Reconciliation:</strong> Your payment UTR is cross-verified with bank account statements.</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <FiCheckCircle className="w-3.5 h-3.5 text-red-600" />
+                  <FiCheckCircle className="w-3.5 h-3.5 text-emerald-700" />
                   <span><strong>Email Dispatch:</strong> Upon approval, your digitally stamped 80G Tax Receipt is automatically emailed to <strong>{submittedDonation.donorEmail}</strong>.</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <FiCheckCircle className="w-3.5 h-3.5 text-red-600" />
+                  <FiCheckCircle className="w-3.5 h-3.5 text-emerald-700" />
                   <span><strong>Profile Download:</strong> You can download or print your official receipt anytime from your <strong>Profile Receipts Tab</strong>.</span>
                 </div>
               </div>
@@ -321,7 +321,7 @@ function DonationContent() {
             <div className="pt-2 flex flex-col sm:flex-row items-center gap-3">
               <Link
                 href="/profile/donations"
-                className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-md shadow-red-600/20 text-center transition flex items-center justify-center gap-2"
+                className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-md shadow-emerald-700/20 text-center transition flex items-center justify-center gap-2"
               >
                 <FiFileText className="w-4 h-4" />
                 <span>View Receipts in My Profile →</span>
@@ -351,10 +351,10 @@ function DonationContent() {
               
               {/* UNAUTHENTICATED STATE: LEAST ACTION AUTH GATE */}
               {!currentUser ? (
-                <div className="bg-white p-6 sm:p-8 rounded-3xl border-2 border-red-200 shadow-md space-y-6">
+                <div className="bg-white p-6 sm:p-8 rounded-3xl border-2 border-emerald-200 shadow-md space-y-6">
                   
                   <div className="flex items-start gap-3.5 pb-4 border-b border-slate-100">
-                    <div className="w-12 h-12 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center text-xl shrink-0">
+                    <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center text-xl shrink-0">
                       <FiLock className="w-6 h-6" />
                     </div>
                     <div>
@@ -387,7 +387,7 @@ function DonationContent() {
                         placeholder="name@domain.com or 98XXXXXXXX"
                         value={quickIdentifier}
                         onChange={(e) => setQuickIdentifier(e.target.value)}
-                        className="w-full p-2.5 bg-white border border-slate-300 rounded-xl focus:outline-red-500 font-medium text-black"
+                        className="w-full p-2.5 bg-white border border-slate-300 rounded-xl focus:outline-emerald-600 font-medium text-black"
                       />
                     </div>
 
@@ -399,14 +399,14 @@ function DonationContent() {
                         placeholder="••••••••"
                         value={quickPassword}
                         onChange={(e) => setQuickPassword(e.target.value)}
-                        className="w-full p-2.5 bg-white border border-slate-300 rounded-xl focus:outline-red-500 font-medium text-black"
+                        className="w-full p-2.5 bg-white border border-slate-300 rounded-xl focus:outline-emerald-600 font-medium text-black"
                       />
                     </div>
 
                     <button
                       type="submit"
                       disabled={quickLoginLoading}
-                      className="w-full py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
+                      className="w-full py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <FiLogIn className="w-3.5 h-3.5" />
                       <span>{quickLoginLoading ? 'Verifying...' : 'Sign In & Unlock Donation'}</span>
@@ -418,7 +418,7 @@ function DonationContent() {
                     <span className="text-slate-600">First-time donor?</span>
                     <Link
                       href="/register?redirect=/donation"
-                      className="font-bold text-red-600 hover:text-red-700 hover:underline flex items-center gap-1"
+                      className="font-bold text-emerald-700 hover:text-emerald-800 hover:underline flex items-center gap-1"
                     >
                       <FiUserPlus className="w-3.5 h-3.5" />
                       <span>Create User Account (Instant 80G Access) →</span>
@@ -430,21 +430,21 @@ function DonationContent() {
                 <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm space-y-5">
                   
                   {/* Authenticated Contributor Trust Banner */}
-                  <div className="p-3.5 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-between">
+                  <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                      <div className="w-8 h-8 rounded-xl bg-emerald-700 text-white flex items-center justify-center shrink-0 shadow-xs">
                         <FiCheckCircle className="w-4 h-4" />
                       </div>
                       <div>
                         <div className="font-extrabold text-xs text-black">
                           {currentUser.name}
                         </div>
-                        <div className="text-[11px] text-red-800">
+                        <div className="text-[11px] text-emerald-800">
                           {currentUser.email} • Authenticated 80G Contributor
                         </div>
                       </div>
                     </div>
-                    <span className="text-[10px] bg-red-100 text-red-900 font-bold px-2 py-0.5 rounded-full">
+                    <span className="text-[10px] bg-emerald-100 text-emerald-900 font-bold px-2 py-0.5 rounded-full">
                       Active Session
                     </span>
                   </div>
@@ -457,25 +457,25 @@ function DonationContent() {
                   )}
 
                   <h2 className="text-lg font-extrabold text-black flex items-center gap-2">
-                    <FiHeart className="text-red-600" />
+                    <FiHeart className="text-emerald-700" />
                     <span>Submit Donation Details &amp; Payment Proof</span>
                   </h2>
 
                   <form onSubmit={handleDonate} className="space-y-4 text-xs">
                     {/* Attached Crowdfunding Campaign Card & Details */}
                     {currentCampaign ? (
-                      <div className="p-4 rounded-2xl bg-gradient-to-br from-red-50 via-rose-50/40 to-white border-2 border-red-500/50 shadow-sm space-y-3 relative overflow-hidden">
+                      <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-50/70 via-teal-50/40 to-white border-2 border-emerald-500/50 shadow-sm space-y-3 relative overflow-hidden">
                         <div className="flex flex-wrap items-center justify-between gap-2">
-                          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-600 text-white text-[10px] font-black uppercase tracking-wider shadow-xs">
+                          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-700 text-white text-[10px] font-black uppercase tracking-wider shadow-xs">
                             <FiTarget className="w-3.5 h-3.5" />
                             <span>Crowdfunding Campaign Attached</span>
                           </div>
 
                           {/* Attached Campaign ID Badge with One-Click Copy */}
                           <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-900 text-white text-[11px] font-mono shadow-xs">
-                            <FiHash className="w-3 h-3 text-red-400" />
+                            <FiHash className="w-3 h-3 text-emerald-400" />
                             <span className="text-slate-400 font-sans font-medium text-[10px]">ID:</span>
-                            <span className="font-bold text-red-300 select-all">
+                            <span className="font-bold text-emerald-300 select-all">
                               {currentCampaign._id || currentCampaign.id}
                             </span>
                             <button
@@ -494,7 +494,7 @@ function DonationContent() {
                         </div>
 
                         <div>
-                          <div className="text-xs font-bold text-red-700 uppercase tracking-wide">
+                          <div className="text-xs font-bold text-emerald-800 uppercase tracking-wide">
                             {currentCampaign.category || 'Youth & Education Drive'}
                           </div>
                           <h3 className="text-sm sm:text-base font-black text-black mt-0.5">
@@ -508,7 +508,7 @@ function DonationContent() {
                         </div>
 
                         {/* Live Crowdfunding Target & Progress */}
-                        <div className="bg-white/90 backdrop-blur-xs p-3 rounded-xl border border-red-200 space-y-2">
+                        <div className="bg-white/90 backdrop-blur-xs p-3 rounded-xl border border-emerald-200 space-y-2">
                           <div className="flex justify-between items-center text-xs font-bold">
                             <span className="text-black">
                               ₹{Number(currentCampaign.raisedAmount || 0).toLocaleString('en-IN')}{' '}
@@ -516,14 +516,14 @@ function DonationContent() {
                                 raised of ₹{Number(currentCampaign.goalAmount || 0).toLocaleString('en-IN')} goal
                               </span>
                             </span>
-                            <span className="text-red-600 font-black">
+                            <span className="text-emerald-700 font-black">
                               {Math.min(100, Math.round(((Number(currentCampaign.raisedAmount || 0)) / (Number(currentCampaign.goalAmount) || 1)) * 100))}%
                             </span>
                           </div>
 
                           <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
                             <div
-                              className="bg-red-600 h-full rounded-full transition-all duration-500"
+                              className="bg-emerald-700 h-full rounded-full transition-all duration-500"
                               style={{
                                 width: `${Math.min(100, Math.round(((Number(currentCampaign.raisedAmount || 0)) / (Number(currentCampaign.goalAmount) || 1)) * 100))}%`
                               }}
@@ -541,8 +541,8 @@ function DonationContent() {
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-1.5 text-[11px] text-red-900 bg-red-100/70 px-3 py-1.5 rounded-lg border border-red-200">
-                          <FiShield className="w-3.5 h-3.5 text-red-600 shrink-0" />
+                        <div className="flex items-center gap-1.5 text-[11px] text-emerald-950 bg-emerald-100/70 px-3 py-1.5 rounded-lg border border-emerald-200">
+                          <FiShield className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
                           <span>
                             Upon Trustee approval of this donation, this campaign's database total will be credited with your <strong>₹{Number(amount || 0).toLocaleString('en-IN')}</strong> contribution.
                           </span>
@@ -571,7 +571,7 @@ function DonationContent() {
                       <select
                         value={selectedCampaign}
                         onChange={(e) => setSelectedCampaign(e.target.value)}
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-red-500 font-medium text-black bg-white"
+                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-emerald-600 font-medium text-black bg-white"
                       >
                         <option value="general">🌐 General NGO Social Welfare Fund (Unrestricted)</option>
                         {campaigns.map((c) => (
@@ -596,7 +596,7 @@ function DonationContent() {
                             onClick={() => setAmount(amt)}
                             className={`py-2 rounded-xl font-bold text-xs transition cursor-pointer ${
                               amount === amt 
-                                ? 'bg-red-600 text-white shadow-xs' 
+                                ? 'bg-emerald-700 text-white shadow-xs' 
                                 : 'bg-slate-100 text-black hover:bg-slate-200'
                             }`}
                           >
@@ -611,7 +611,7 @@ function DonationContent() {
                         placeholder="Or enter custom amount in INR"
                         value={amount}
                         onChange={(e) => setAmount(e.target.value)}
-                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-red-500 text-sm font-bold text-black bg-white"
+                        className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-emerald-600 text-sm font-bold text-black bg-white"
                       />
                     </div>
 
@@ -625,7 +625,7 @@ function DonationContent() {
                           placeholder="e.g. Rahul Sharma"
                           value={donorName}
                           onChange={(e) => setDonorName(e.target.value)}
-                          className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-red-500 font-medium text-black bg-white"
+                          className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-emerald-600 font-medium text-black bg-white"
                         />
                       </div>
                       <div>
@@ -636,7 +636,7 @@ function DonationContent() {
                           placeholder="9876543210"
                           value={donorPhone}
                           onChange={(e) => setDonorPhone(e.target.value)}
-                          className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-red-500 font-medium text-black bg-white"
+                          className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-emerald-600 font-medium text-black bg-white"
                         />
                       </div>
                     </div>
@@ -653,7 +653,7 @@ function DonationContent() {
                           placeholder="ABCDE1234F"
                           value={panNumber}
                           onChange={(e) => setPanNumber(e.target.value.toUpperCase())}
-                          className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-red-500 uppercase font-mono font-bold text-black bg-white"
+                          className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-emerald-600 uppercase font-mono font-bold text-black bg-white"
                         />
                       </div>
                       <div>
@@ -664,13 +664,13 @@ function DonationContent() {
                           placeholder="donor@example.com"
                           value={donorEmail}
                           onChange={(e) => setDonorEmail(e.target.value)}
-                          className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-red-500 font-medium text-black bg-white"
+                          className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-emerald-600 font-medium text-black bg-white"
                         />
                       </div>
                     </div>
 
                     {/* Step 2: Bank UTR & Screenshot Upload */}
-                    <div className="p-4 rounded-2xl bg-red-50/60 border border-red-200 space-y-3.5">
+                    <div className="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200 space-y-3.5">
                       <span className="font-bold text-black text-xs block">
                         Payment Proof &amp; Verification Details
                       </span>
@@ -685,7 +685,7 @@ function DonationContent() {
                           placeholder="e.g. 429188291039 or UPI/429188..."
                           value={transactionId}
                           onChange={(e) => setTransactionId(e.target.value)}
-                          className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-red-500 font-mono text-xs bg-white text-black font-bold"
+                          className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-emerald-600 font-mono text-xs bg-white text-black font-bold"
                         />
                         <span className="text-[10px] text-slate-500 mt-0.5 block">
                           Found on GooglePay, PhonePe, Paytm, or your bank debit confirmation screen.
@@ -697,7 +697,7 @@ function DonationContent() {
                         <label className="block font-bold text-black mb-1">
                           Upload Payment Transfer Screenshot (PNG / JPG) *
                         </label>
-                        <div className="border-2 border-dashed border-slate-300 hover:border-red-500 rounded-xl p-4 text-center transition bg-white">
+                        <div className="border-2 border-dashed border-slate-300 hover:border-emerald-600 rounded-xl p-4 text-center transition bg-white">
                           <input
                             type="file"
                             accept="image/*"
@@ -707,10 +707,10 @@ function DonationContent() {
                           />
                           {!previewUrl ? (
                             <label htmlFor="donationScreenshotInput" className="cursor-pointer space-y-1 block">
-                              <div className="w-10 h-10 rounded-full bg-red-50 text-red-600 flex items-center justify-center mx-auto text-xl">
+                              <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center mx-auto text-xl">
                                 <FiUploadCloud />
                               </div>
-                              <span className="text-xs font-bold text-red-600 hover:underline block">
+                              <span className="text-xs font-bold text-emerald-700 hover:underline block">
                                 Click to select payment screenshot
                               </span>
                               <span className="text-[10px] text-slate-500 block">
@@ -753,7 +753,7 @@ function DonationContent() {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="w-full py-3.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-sm shadow-lg shadow-red-600/25 transition cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+                      className="w-full py-3.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-sm shadow-lg shadow-emerald-700/25 transition cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
                     >
                       {loading ? (
                         <span>Submitting for verification...</span>
@@ -776,7 +776,7 @@ function DonationContent() {
             {/* Direct Bank & UPI Card (5 cols) */}
             <div className="lg:col-span-5 space-y-6">
               <div className="bg-white text-black p-6 rounded-3xl border-2 border-slate-200 shadow-xl text-center">
-                <span className="text-xs font-bold text-red-600 uppercase tracking-wider">
+                <span className="text-xs font-bold text-emerald-700 uppercase tracking-wider">
                   Step 1: Scan &amp; Pay via UPI
                 </span>
                 <h3 className="text-base font-extrabold text-black mt-1">
@@ -792,7 +792,7 @@ function DonationContent() {
                 </div>
 
                 <div>
-                  <div className="font-mono text-xs font-bold text-red-700 bg-red-50 py-1.5 px-3 rounded-lg border border-red-200 inline-block">
+                  <div className="font-mono text-xs font-bold text-emerald-800 bg-emerald-50 py-1.5 px-3 rounded-lg border border-emerald-200 inline-block">
                     {settings?.upiId || 'bharatiyauva@okhdfcbank'}
                   </div>
                 </div>
@@ -801,7 +801,7 @@ function DonationContent() {
                 <div className="mt-4 p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-left text-[11px] space-y-1">
                   <div className="flex items-center justify-between">
                     <span className="text-slate-500 font-medium">Earmarked Allocation:</span>
-                    <span className="font-mono text-[10px] text-red-600 bg-red-50 px-1.5 py-0.2 rounded border border-red-200 font-bold shrink-0">
+                    <span className="font-mono text-[10px] text-emerald-800 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200 font-bold shrink-0">
                       {currentCampaign ? `#${(currentCampaign._id || currentCampaign.id).slice(-6)}` : 'GENERAL'}
                     </span>
                   </div>

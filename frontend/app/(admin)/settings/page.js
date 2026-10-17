@@ -21,7 +21,9 @@ import {
   FiEyeOff,
   FiUsers,
   FiFileText,
-  FiExternalLink
+  FiExternalLink,
+  FiTrash2,
+  FiPlus
 } from 'react-icons/fi';
 import { useNGO } from '@/context/NGOContext';
 import toast from "react-hot-toast";
@@ -53,7 +55,14 @@ export default function SettingsPage() {
     exemption80G: settings?.exemption80G || 'CIT(EXEMP)/80G/2021-22/G-881',
     phone: settings?.phone || '+91 93196 98759',
     whatsapp: settings?.whatsapp || '+919319698759',
+    facebook: settings?.facebook || 'https://facebook.com',
+    twitter: settings?.twitter || 'https://x.com',
+    instagram: settings?.instagram || 'https://instagram.com',
+    youtube: settings?.youtube || 'https://youtube.com',
+    linkedin: settings?.linkedin || 'https://linkedin.com',
+    telegram: settings?.telegram || '',
     email: settings?.email || 'samasyasamadhanparishad@gmail.com',
+    newsTickerText: settings?.newsTickerText || 'समस्या समाधान परिषद (SSP) में आपका स्वागत है • निःशुल्क सदस्यता एवं समाज सेवा अभियान • हेल्पलाइन: +919319698759',
     address: settings?.address || 'Head Office - Krishna Vihar Pala Road Aligarh, Uttar Pradesh',
     googleMapEmbed: settings?.googleMapEmbed || '',
     accountName: settings?.bankDetails?.accountName || 'INDIAN YOUTH FOUNDATION SANSTHA',
@@ -91,7 +100,8 @@ export default function SettingsPage() {
     smtpUser: settings?.smtpUser || '',
     smtpPass: '',
     smtpFromName: settings?.smtpFromName || 'Indian Youth Foundation',
-    adminSecretKey: ''
+    adminSecretKey: '',
+    heroSlides: settings?.heroSlides || []
   });
 
   // Keep form in sync when settings are loaded from server
@@ -107,6 +117,7 @@ export default function SettingsPage() {
         ifscCode: settings.bankDetails?.ifscCode ?? prev.ifscCode,
         bankName: settings.bankDetails?.bankName ?? prev.bankName,
         branch: settings.bankDetails?.branch ?? prev.branch,
+        heroSlides: settings?.heroSlides || prev.heroSlides || [],
       }));
     }
   }, [settings]);
@@ -341,12 +352,21 @@ export default function SettingsPage() {
         </button>
         <button
           type="button"
+          onClick={() => setActiveTab('carousel')}
+          className={`px-3.5 py-1.5 rounded-xl transition cursor-pointer whitespace-nowrap text-xs font-black ${
+            activeTab === 'carousel' ? 'bg-red-600 text-white shadow-md shadow-red-600/20' : 'bg-slate-100 text-slate-700 hover:bg-red-50 hover:text-red-600'
+          }`}
+        >
+          8. Hero Carousel Slides
+        </button>
+        <button
+          type="button"
           onClick={() => setActiveTab('smtp')}
           className={`px-3.5 py-1.5 rounded-xl transition cursor-pointer whitespace-nowrap text-xs font-black ${
             activeTab === 'smtp' ? 'bg-red-600 text-white shadow-md shadow-red-600/20' : 'bg-slate-100 text-slate-700 hover:bg-red-50 hover:text-red-600'
           }`}
         >
-          8. SMTP Email Server &amp; Security
+          9. SMTP Email Server &amp; Security
         </button>
       </div>
 
@@ -637,6 +657,126 @@ export default function SettingsPage() {
                     className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-bold text-black"
                   />
                 </div>
+              </div>
+
+              {/* Dedicated Social Media Accounts Link Section */}
+              <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+                  <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
+                    <FiSend className="w-4 h-4 text-red-600" />
+                    <span>Official Social Media Accounts Links</span>
+                  </h3>
+                  <span className="text-[10px] font-bold text-slate-500 bg-white px-2.5 py-0.5 rounded-full border border-slate-200 shadow-2xs">
+                    Live on Top Header &amp; Footer
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-600 leading-relaxed">
+                  Enter your NGO’s official social profile URLs. These links will automatically connect to all social buttons across the header top bar, footer, and contact sections.
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {/* Facebook */}
+                  <div>
+                    <label className="font-bold text-slate-800 block mb-1">Facebook Page URL</label>
+                    <input
+                      type="url"
+                      name="facebook"
+                      value={form.facebook || ''}
+                      onChange={handleChange}
+                      placeholder="https://facebook.com/your-ngo-page"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-xs font-medium text-slate-900 bg-white"
+                    />
+                  </div>
+
+                  {/* Instagram */}
+                  <div>
+                    <label className="font-bold text-slate-800 block mb-1">Instagram Profile URL</label>
+                    <input
+                      type="url"
+                      name="instagram"
+                      value={form.instagram || ''}
+                      onChange={handleChange}
+                      placeholder="https://instagram.com/your-ngo-handle"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-xs font-medium text-slate-900 bg-white"
+                    />
+                  </div>
+
+                  {/* YouTube */}
+                  <div>
+                    <label className="font-bold text-slate-800 block mb-1">YouTube Channel URL</label>
+                    <input
+                      type="url"
+                      name="youtube"
+                      value={form.youtube || ''}
+                      onChange={handleChange}
+                      placeholder="https://youtube.com/@yourchannel"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-xs font-medium text-slate-900 bg-white"
+                    />
+                  </div>
+
+                  {/* X (Twitter) */}
+                  <div>
+                    <label className="font-bold text-slate-800 block mb-1">X (Twitter) Profile URL</label>
+                    <input
+                      type="url"
+                      name="twitter"
+                      value={form.twitter || ''}
+                      onChange={handleChange}
+                      placeholder="https://x.com/yourhandle"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-xs font-medium text-slate-900 bg-white"
+                    />
+                  </div>
+
+                  {/* LinkedIn */}
+                  <div>
+                    <label className="font-bold text-slate-800 block mb-1">LinkedIn Page URL</label>
+                    <input
+                      type="url"
+                      name="linkedin"
+                      value={form.linkedin || ''}
+                      onChange={handleChange}
+                      placeholder="https://linkedin.com/company/your-ngo"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-xs font-medium text-slate-900 bg-white"
+                    />
+                  </div>
+
+                  {/* Telegram / Channel */}
+                  <div>
+                    <label className="font-bold text-slate-800 block mb-1">Telegram Channel / Group URL</label>
+                    <input
+                      type="url"
+                      name="telegram"
+                      value={form.telegram || ''}
+                      onChange={handleChange}
+                      placeholder="https://t.me/yourchannel"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-xs font-medium text-slate-900 bg-white"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Header Top Announcement Ticker Message */}
+              <div className="bg-emerald-50/70 p-4 rounded-2xl border border-emerald-200 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="font-black text-xs text-[#0b8026] flex items-center gap-1.5">
+                    <FiSend className="w-3.5 h-3.5" />
+                    <span>Header Top Message / News &amp; Updates Marquee Ticker</span>
+                  </label>
+                  <span className="text-[10px] font-bold text-emerald-700 bg-white px-2 py-0.5 rounded-full border border-emerald-200">
+                    Live on Website Top Header
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-600">
+                  This text runs continuously in the top green banner next to &quot;News &amp; Updates&quot;. You can update announcements, helplines, or breaking news directly from here.
+                </p>
+                <textarea
+                  rows={2}
+                  name="newsTickerText"
+                  value={form.newsTickerText || ''}
+                  onChange={handleChange}
+                  placeholder="Welcome to Samasya Samadhan Parishad (SSP) • Free Membership & Social Welfare Mission • Helpline: +919319698759"
+                  className="w-full px-4 py-2.5 rounded-xl border border-emerald-300 focus:outline-none focus:ring-2 focus:ring-[#0b8026] text-xs font-semibold text-slate-900 bg-white shadow-2xs"
+                />
               </div>
 
               <div>
@@ -1117,7 +1257,346 @@ export default function SettingsPage() {
             </div>
           )}
 
-          {/* TAB 8: SMTP EMAIL CONFIGURATION & ADMIN SECRET KEY */}
+          {/* TAB 8: HERO CAROUSEL SLIDES MANAGEMENT */}
+          {activeTab === 'carousel' && (
+            <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-3">
+                <div>
+                  <h2 className="text-base font-extrabold text-black flex items-center gap-2">
+                    <FiImage className="text-red-600" />
+                    <span>8. Home Hero Carousel Slides &amp; Banners</span>
+                  </h2>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Upload, preview, update, reorder or delete slides on the homepage hero carousel.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const newSlide = {
+                      title: 'Empowering Communities Across India',
+                      subtitle: 'Transforming lives through grassroots education, healthcare, and social support.',
+                      imageUrl: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=1920&auto=format&fit=crop&q=80',
+                      tag: 'Social Impact Movement',
+                      ctaPrimaryText: 'Donate Now',
+                      ctaPrimaryLink: '/donation',
+                      ctaSecondaryText: 'Join as Member',
+                      ctaSecondaryLink: '/members',
+                      highlight: 'Dedicated To Youth Empowerment & Social Welfare'
+                    };
+                    setForm(prev => ({
+                      ...prev,
+                      heroSlides: [...(prev.heroSlides || []), newSlide]
+                    }));
+                  }}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-md transition cursor-pointer self-start sm:self-auto"
+                >
+                  <FiPlus className="w-4 h-4" />
+                  <span>Add New Slide</span>
+                </button>
+              </div>
+
+              {(!form.heroSlides || form.heroSlides.length === 0) ? (
+                <div className="p-8 text-center bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl space-y-3">
+                  <FiImage className="w-10 h-10 text-slate-400 mx-auto" />
+                  <p className="text-xs text-slate-600 font-semibold">No custom carousel slides added yet. The default foundation slides are currently displayed.</p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setForm(prev => ({
+                        ...prev,
+                        heroSlides: [
+                          {
+                            title: 'Empowering Youth, Transforming Society, Nation First',
+                            subtitle: 'Indian Youth Foundation (भारतीय युवा क्रांति) is a premier 12A & 80G certified NGO mobilizing young leaders for free child literacy, emergency healthcare, and rural empowerment.',
+                            imageUrl: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1920&auto=format&fit=crop&q=80',
+                            tag: 'National Youth Movement',
+                            ctaPrimaryText: 'Donate Online (Instant 80G)',
+                            ctaPrimaryLink: '/donation',
+                            ctaSecondaryText: 'Join as Member (Get ID Card)',
+                            ctaSecondaryLink: '/members',
+                            highlight: 'Over 25,000+ Underprivileged Beneficiaries Across India',
+                          },
+                          {
+                            title: '100% Transparent Giving with Section 80G Tax Exemption',
+                            subtitle: 'Your contribution funds school books, student scholarships, emergency blood delivery, and women vocational centers. Claim 50% tax deduction with instant receipts.',
+                            imageUrl: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=1920&auto=format&fit=crop&q=80',
+                            tag: '50% Income Tax Exemption',
+                            ctaPrimaryText: 'Contribute to a Campaign',
+                            ctaPrimaryLink: '/campaigns',
+                            ctaSecondaryText: 'Inspect Legal Certificates',
+                            ctaSecondaryLink: '/certificates',
+                            highlight: 'Instant 80G Form 10BD Eligible Receipts Generated',
+                          },
+                          {
+                            title: '24/7 Voluntary Blood Network & Emergency Relief Helpline',
+                            subtitle: 'Connecting critical hospital patients with verified voluntary donors across districts in real time. Over 1,800 emergency units arranged with zero donor charges.',
+                            imageUrl: 'https://images.unsplash.com/photo-1579154204601-01588f351e67?w=1920&auto=format&fit=crop&q=80',
+                            tag: 'Emergency Relief Care',
+                            ctaPrimaryText: 'Emergency Blood Support',
+                            ctaPrimaryLink: '/complaints',
+                            ctaSecondaryText: 'Apply as Volunteer',
+                            ctaSecondaryLink: '/volunteer',
+                            highlight: 'Zero Administrative Fee Deductions • Real Ground Relief',
+                          }
+                        ]
+                      }));
+                    }}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-red-200 text-red-600 font-bold text-xs rounded-xl hover:bg-red-50 transition cursor-pointer shadow-xs"
+                  >
+                    <span>Load Default 3 Slides to Edit</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {form.heroSlides.map((slide, sIdx) => (
+                    <div key={sIdx} className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-4 shadow-xs relative">
+                      <div className="flex items-center justify-between border-b border-slate-200 pb-2.5">
+                        <span className="font-extrabold text-sm text-slate-800 flex items-center gap-2">
+                          <span className="w-6 h-6 rounded-lg bg-red-600 text-white flex items-center justify-center text-xs">
+                            {sIdx + 1}
+                          </span>
+                          Slide #{sIdx + 1} {slide.title ? `– ${slide.title.slice(0, 30)}...` : ''}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (confirm(`Are you sure you want to remove Slide #${sIdx + 1}?`)) {
+                              setForm(prev => ({
+                                ...prev,
+                                heroSlides: prev.heroSlides.filter((_, i) => i !== sIdx)
+                              }));
+                            }
+                          }}
+                          className="flex items-center gap-1 text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer"
+                        >
+                          <FiTrash2 className="w-3.5 h-3.5" />
+                          <span>Delete Slide</span>
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-start">
+                        {/* Slide Image Preview & Upload */}
+                        <div className="md:col-span-4 space-y-2">
+                          <label className="font-bold text-slate-800 block text-xs">Slide Image / Banner *</label>
+                          <div className="relative rounded-2xl overflow-hidden border border-slate-200 aspect-16/10 bg-slate-200 flex items-center justify-center group shadow-xs">
+                            {slide.imageUrl ? (
+                              <img
+                                src={slide.imageUrl}
+                                alt={`Slide ${sIdx + 1}`}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  e.currentTarget.src = 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600';
+                                }}
+                              />
+                            ) : (
+                              <FiImage className="w-8 h-8 text-slate-400" />
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-2 pt-1">
+                            <label className="flex-1 cursor-pointer">
+                              <span className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-white border border-slate-300 hover:border-red-400 text-slate-700 hover:text-red-600 font-bold text-xs rounded-xl shadow-xs transition">
+                                <FiUploadCloud className="w-4 h-4 text-red-600" />
+                                <span>{uploadingField === `slide_${sIdx}` ? 'Uploading...' : 'Upload Image'}</span>
+                              </span>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={async (e) => {
+                                  const file = e.target.files?.[0];
+                                  if (!file) return;
+                                  setUploadingField(`slide_${sIdx}`);
+                                  try {
+                                    const res = await uploadFile(file);
+                                    if (res.success && res.url) {
+                                      setForm(prev => {
+                                        const updated = [...prev.heroSlides];
+                                        updated[sIdx] = { ...updated[sIdx], imageUrl: res.url };
+                                        return { ...prev, heroSlides: updated };
+                                      });
+                                      toast.success('Slide image uploaded successfully!');
+                                    } else {
+                                      toast.error(res.message || 'Upload failed');
+                                    }
+                                  } catch (err) {
+                                    toast.error('Upload error');
+                                  } finally {
+                                    setUploadingField(null);
+                                  }
+                                }}
+                              />
+                            </label>
+                          </div>
+
+                          <input
+                            type="text"
+                            placeholder="Or paste image URL"
+                            value={slide.imageUrl || ''}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setForm(prev => {
+                                const updated = [...prev.heroSlides];
+                                updated[sIdx] = { ...updated[sIdx], imageUrl: val };
+                                return { ...prev, heroSlides: updated };
+                              });
+                            }}
+                            className="w-full px-3 py-1.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-1 focus:ring-red-500 text-[11px] text-slate-800 bg-white"
+                          />
+                        </div>
+
+                        {/* Slide Details */}
+                        <div className="md:col-span-8 space-y-3">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                              <label className="font-bold text-slate-700 block text-[11px] mb-1">Slide Tag / Category</label>
+                              <input
+                                type="text"
+                                placeholder="e.g. National Youth Movement"
+                                value={slide.tag || ''}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  setForm(prev => {
+                                    const updated = [...prev.heroSlides];
+                                    updated[sIdx] = { ...updated[sIdx], tag: val };
+                                    return { ...prev, heroSlides: updated };
+                                  });
+                                }}
+                                className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-xs bg-white text-slate-900"
+                              />
+                            </div>
+                            <div>
+                              <label className="font-bold text-slate-700 block text-[11px] mb-1">Bottom Highlight Pill</label>
+                              <input
+                                type="text"
+                                placeholder="e.g. Over 25,000+ Underprivileged Beneficiaries"
+                                value={slide.highlight || ''}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  setForm(prev => {
+                                    const updated = [...prev.heroSlides];
+                                    updated[sIdx] = { ...updated[sIdx], highlight: val };
+                                    return { ...prev, heroSlides: updated };
+                                  });
+                                }}
+                                className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-xs bg-white text-slate-900"
+                              />
+                            </div>
+                          </div>
+
+                          <div>
+                            <label className="font-bold text-slate-700 block text-[11px] mb-1">Main Slide Heading / Title *</label>
+                            <input
+                              type="text"
+                              required
+                              placeholder="e.g. Empowering Youth, Transforming Society, Nation First"
+                              value={slide.title || ''}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                setForm(prev => {
+                                  const updated = [...prev.heroSlides];
+                                  updated[sIdx] = { ...updated[sIdx], title: val };
+                                  return { ...prev, heroSlides: updated };
+                                });
+                              }}
+                              className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-xs font-bold bg-white text-slate-900"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="font-bold text-slate-700 block text-[11px] mb-1">Slide Subtitle / Description</label>
+                            <textarea
+                              rows={2}
+                              placeholder="e.g. Indian Youth Foundation is a premier 12A & 80G certified NGO mobilizing young leaders..."
+                              value={slide.subtitle || ''}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                setForm(prev => {
+                                  const updated = [...prev.heroSlides];
+                                  updated[sIdx] = { ...updated[sIdx], subtitle: val };
+                                  return { ...prev, heroSlides: updated };
+                                });
+                              }}
+                              className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-xs bg-white text-slate-900"
+                            />
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                            <div className="p-3 bg-white rounded-xl border border-slate-200 space-y-2">
+                              <span className="font-bold text-[11px] text-red-600 block">Primary Action Button</span>
+                              <input
+                                type="text"
+                                placeholder="Button Text (e.g. Donate Online)"
+                                value={slide.ctaPrimaryText || ''}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  setForm(prev => {
+                                    const updated = [...prev.heroSlides];
+                                    updated[sIdx] = { ...updated[sIdx], ctaPrimaryText: val };
+                                    return { ...prev, heroSlides: updated };
+                                  });
+                                }}
+                                className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-[11px] text-slate-900"
+                              />
+                              <input
+                                type="text"
+                                placeholder="Button Link (e.g. /donation)"
+                                value={slide.ctaPrimaryLink || ''}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  setForm(prev => {
+                                    const updated = [...prev.heroSlides];
+                                    updated[sIdx] = { ...updated[sIdx], ctaPrimaryLink: val };
+                                    return { ...prev, heroSlides: updated };
+                                  });
+                                }}
+                                className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-[11px] text-slate-900"
+                              />
+                            </div>
+
+                            <div className="p-3 bg-white rounded-xl border border-slate-200 space-y-2">
+                              <span className="font-bold text-[11px] text-slate-700 block">Secondary Action Button</span>
+                              <input
+                                type="text"
+                                placeholder="Button Text (e.g. Join as Member)"
+                                value={slide.ctaSecondaryText || ''}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  setForm(prev => {
+                                    const updated = [...prev.heroSlides];
+                                    updated[sIdx] = { ...updated[sIdx], ctaSecondaryText: val };
+                                    return { ...prev, heroSlides: updated };
+                                  });
+                                }}
+                                className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-[11px] text-slate-900"
+                              />
+                              <input
+                                type="text"
+                                placeholder="Button Link (e.g. /members)"
+                                value={slide.ctaSecondaryLink || ''}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  setForm(prev => {
+                                    const updated = [...prev.heroSlides];
+                                    updated[sIdx] = { ...updated[sIdx], ctaSecondaryLink: val };
+                                    return { ...prev, heroSlides: updated };
+                                  });
+                                }}
+                                className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-[11px] text-slate-900"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB 9: SMTP EMAIL CONFIGURATION & ADMIN SECRET KEY */}
           {activeTab === 'smtp' && (
             <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm space-y-6">
               <div className="flex items-center justify-between border-b pb-3">

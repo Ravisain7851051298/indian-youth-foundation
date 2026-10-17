@@ -47,14 +47,14 @@ Empathy in Action: Rapid, unconditional grassroots aid for every vulnerable citi
     : 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1200&auto=format&fit=crop&q=80';
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 selection:bg-red-600 selection:text-white">
+    <div className="min-h-screen bg-slate-50 text-slate-900 selection:bg-emerald-600 selection:text-white">
       
       {/* ---------------- 1. HERO SECTION ---------------- */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-red-50/70 via-white to-slate-50 py-16 sm:py-24 border-b border-red-100">
+      <section className="relative overflow-hidden bg-gradient-to-b from-emerald-50/70 via-white to-slate-50 py-16 sm:py-24 border-b border-emerald-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto space-y-4">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-red-100 border border-red-200 text-red-700 text-xs font-black shadow-xs">
-              <FiUsers className="w-4 h-4 text-red-600" />
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100 border border-emerald-200 text-emerald-800 text-xs font-black shadow-xs">
+              <FiUsers className="w-4 h-4 text-emerald-700" />
               <span>Who We Are • {settings?.ngoNameHi || 'भारतीय युवा क्रांति'}</span>
             </div>
 
@@ -69,7 +69,7 @@ Empathy in Action: Rapid, unconditional grassroots aid for every vulnerable citi
             <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
               <Link
                 href="/donation"
-                className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-red-600 hover:bg-red-700 text-white font-black text-xs shadow-lg shadow-red-600/25 hover:scale-102 transition"
+                className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs shadow-lg shadow-emerald-700/25 hover:scale-102 transition"
               >
                 <FiHeart className="w-4 h-4 fill-white" />
                 <span>Support Our Cause (80G Tax-Deductible)</span>
@@ -78,7 +78,7 @@ Empathy in Action: Rapid, unconditional grassroots aid for every vulnerable citi
                 href="/volunteer"
                 className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-white hover:bg-slate-50 text-black border-2 border-slate-200 font-bold text-xs shadow-xs hover:scale-102 transition"
               >
-                <FiUsers className="w-4 h-4 text-red-600" />
+                <FiUsers className="w-4 h-4 text-emerald-700" />
                 <span>Join as Volunteer</span>
               </Link>
               <Link
@@ -100,8 +100,8 @@ Empathy in Action: Rapid, unconditional grassroots aid for every vulnerable citi
             
             {/* Left: Dynamic Story */}
             <div className="lg:col-span-7 space-y-6">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-50 text-red-700 text-xs font-bold border border-red-200">
-                <FiCompass className="w-3.5 h-3.5 text-red-600" />
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-200">
+                <FiCompass className="w-3.5 h-3.5 text-emerald-700" />
                 <span>Our Identity &amp; Living Journey</span>
               </div>
 
@@ -130,7 +130,7 @@ Empathy in Action: Rapid, unconditional grassroots aid for every vulnerable citi
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-5">
                   <div className="text-white space-y-1">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-red-400 bg-black/60 px-2 py-0.5 rounded-md">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-emerald-300 bg-black/60 px-2 py-0.5 rounded-md">
                       Ground Social Action
                     </span>
                     <h3 className="text-sm font-black text-white">
@@ -146,7 +146,7 @@ Empathy in Action: Rapid, unconditional grassroots aid for every vulnerable citi
               {/* Statutory Trust Card */}
               <div className="bg-slate-50 p-6 rounded-3xl border border-slate-200 space-y-3.5 shadow-xs">
                 <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                  <FiShield className="text-red-600 w-4 h-4" />
+                  <FiShield className="text-emerald-700 w-4 h-4" />
                   <span>Statutory Certifications</span>
                 </h4>
                 <div className="grid grid-cols-2 gap-2.5 text-xs">
@@ -158,7 +158,7 @@ Empathy in Action: Rapid, unconditional grassroots aid for every vulnerable citi
                   </div>
                   <div className="p-3 rounded-2xl bg-white border border-slate-200">
                     <span className="text-[10px] text-slate-500 block font-semibold">80G Tax Exemption</span>
-                    <span className="font-mono font-bold text-red-600 truncate block text-[11px] mt-0.5">
+                    <span className="font-mono font-bold text-emerald-700 truncate block text-[11px] mt-0.5">
                       {settings?.exemption80G || 'CIT(EXEMP)/80G/2021-22/G-881'}
                     </span>
                   </div>
@@ -186,7 +186,7 @@ Empathy in Action: Rapid, unconditional grassroots aid for every vulnerable citi
       <section className="py-16 sm:py-20 bg-slate-50 border-b border-slate-200">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-12 space-y-2">
-            <span className="text-xs font-black uppercase tracking-wider text-red-600 bg-red-100 px-3 py-1 rounded-full">
+            <span className="text-xs font-black uppercase tracking-wider text-emerald-800 bg-emerald-100 px-3 py-1 rounded-full">
               Our Compass
             </span>
             <h2 className="text-2xl sm:text-3xl font-black text-slate-900">
@@ -199,30 +199,30 @@ Empathy in Action: Rapid, unconditional grassroots aid for every vulnerable citi
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
             {/* Mission Card */}
-            <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm space-y-4 hover:border-red-300 transition group">
-              <div className="w-12 h-12 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center text-xl font-bold group-hover:scale-105 transition-transform">
+            <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm space-y-4 hover:border-emerald-300 transition group">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-xl font-bold group-hover:scale-105 transition-transform">
                 <FiTarget className="w-6 h-6" />
               </div>
               <h3 className="text-xl font-black text-slate-900">Our Mission</h3>
               <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-normal">
                 {missionContent}
               </p>
-              <div className="pt-2 flex items-center gap-2 text-xs font-bold text-red-600">
+              <div className="pt-2 flex items-center gap-2 text-xs font-bold text-emerald-700">
                 <FiCheckCircle className="w-4 h-4" />
                 <span>Measurable Grassroots Impact</span>
               </div>
             </div>
 
             {/* Vision Card */}
-            <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm space-y-4 hover:border-red-300 transition group">
-              <div className="w-12 h-12 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center text-xl font-bold group-hover:scale-105 transition-transform">
+            <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm space-y-4 hover:border-emerald-300 transition group">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-xl font-bold group-hover:scale-105 transition-transform">
                 <FiCompass className="w-6 h-6" />
               </div>
               <h3 className="text-xl font-black text-slate-900">Our Vision</h3>
               <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-normal">
                 {visionContent}
               </p>
-              <div className="pt-2 flex items-center gap-2 text-xs font-bold text-red-600">
+              <div className="pt-2 flex items-center gap-2 text-xs font-bold text-emerald-700">
                 <FiCheckCircle className="w-4 h-4" />
                 <span>Self-Reliant &amp; United Nation</span>
               </div>
@@ -237,7 +237,7 @@ Empathy in Action: Rapid, unconditional grassroots aid for every vulnerable citi
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             
             <div className="lg:col-span-5 space-y-4">
-              <span className="text-xs font-black uppercase tracking-wider text-red-600 bg-red-100 px-3 py-1 rounded-full">
+              <span className="text-xs font-black uppercase tracking-wider text-emerald-800 bg-emerald-100 px-3 py-1 rounded-full">
                 Core Philosophy
               </span>
               <h2 className="text-2xl sm:text-3xl font-black text-slate-900 leading-tight">
@@ -247,9 +247,9 @@ Empathy in Action: Rapid, unconditional grassroots aid for every vulnerable citi
                 We believe that good intentions without disciplined execution and high ethics achieve little. Every volunteer and leader adheres to our transparent principles.
               </p>
 
-              <div className="p-4 rounded-2xl bg-red-50 border border-red-200 space-y-2">
-                <div className="flex items-center gap-2 text-red-700 font-bold text-xs">
-                  <FiAward className="w-4 h-4" />
+              <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 space-y-2">
+                <div className="flex items-center gap-2 text-emerald-800 font-bold text-xs">
+                  <FiAward className="w-4 h-4 text-emerald-700" />
                   <span>National President Signatory</span>
                 </div>
                 <p className="text-xs font-semibold text-slate-800">
@@ -286,12 +286,12 @@ Empathy in Action: Rapid, unconditional grassroots aid for every vulnerable citi
                 href={`tel:${settings?.phone || '+91 93196 98759'}`}
                 className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition"
               >
-                <FiPhone className="w-3.5 h-3.5 text-red-400" />
+                <FiPhone className="w-3.5 h-3.5 text-emerald-400" />
                 <span>{settings?.phone || '+91 93196 98759'}</span>
               </a>
               <a
                 href={`mailto:${settings?.email || 'samasyasamadhanparishad@gmail.com'}`}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs transition shadow-md shadow-red-600/20"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs transition shadow-md shadow-emerald-700/20"
               >
                 <FiMail className="w-3.5 h-3.5" />
                 <span>Email Administration</span>

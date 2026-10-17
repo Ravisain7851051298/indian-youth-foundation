@@ -26,7 +26,8 @@ import {
   FiExternalLink,
   FiShield,
   FiMenu,
-  FiX
+  FiX,
+  FiPlay,
 } from 'react-icons/fi';
 import { useSelector } from 'react-redux';
 import { useNGO } from '../context/NGOContext';
@@ -49,7 +50,9 @@ export const ADMIN_NAV_ITEMS = [
   { label: "Complaints & Inquiries", href: "/complaints", icon: FiAlertCircle },
   { label: "Event", href: "/event", icon: FiCalendar },
   { label: "Gallery", href: "/gallery", icon: FiImage },
-  { label: "Story", href: "/story", icon: FiBookOpen },
+  { label: "President Message", href: "/dashboard/president-message", icon: FiUserCheck },
+  { label: "YouTube Videos", href: "/dashboard/youtube-videos", icon: FiPlay },
+  { label: "Manage Home Content", href: "/dashboard/managecontent", icon: FiLayers },
   { label: "Contact & NGO Settings", href: "/settings", icon: FiSettings },
   { label: "Profile", href: "/profile", icon: FiUser }
 ];
@@ -203,8 +206,8 @@ export default function AdminSidebar({ activeRole = null }) {
                 href={item.href}
                 onClick={() => setMobileSidebarOpen(false)}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all ${isActive
-                    ? 'bg-red-600 text-white shadow-md shadow-red-600/20'
-                    : 'text-slate-700 hover:bg-red-50 hover:text-red-700'
+                  ? 'bg-red-600 text-white shadow-md shadow-red-600/20'
+                  : 'text-slate-700 hover:bg-red-50 hover:text-red-700'
                   }`}
               >
                 <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-slate-500'}`} />

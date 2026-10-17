@@ -42,7 +42,88 @@ const INITIAL_SETTINGS = {
   membershipFee: 250,
   pageViews: 18450,
   footerDescription: 'Indian Youth Foundation (Bharatiya Yuva Kranti) is a non-profit, government-registered social welfare organization certified under Section 12A & 80G of the Income Tax Act. Dedicated to quality education, youth livelihood, healthcare, emergency blood donation, and nation building.',
-  footerCopyright: '© 2026 Indian Youth Foundation. All rights reserved.'
+  footerCopyright: '© 2026 Indian Youth Foundation. All rights reserved.',
+  heroSlides: [
+    {
+      title: 'Empowering Youth, Transforming Society, Nation First',
+      subtitle: 'Indian Youth Foundation (भारतीय युवा क्रांति) is a premier 12A & 80G certified NGO mobilizing young leaders for free child literacy, emergency healthcare, and rural empowerment.',
+      imageUrl: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1920&auto=format&fit=crop&q=80',
+      tag: 'National Youth Movement',
+      ctaPrimaryText: 'Donate Online (Instant 80G)',
+      ctaPrimaryLink: '/donation',
+      ctaSecondaryText: 'Join as Member (Get ID Card)',
+      ctaSecondaryLink: '/members',
+      highlight: 'Over 25,000+ Underprivileged Beneficiaries Across India',
+    },
+    {
+      title: '100% Transparent Giving with Section 80G Tax Exemption',
+      subtitle: 'Your contribution funds school books, student scholarships, emergency blood delivery, and women vocational centers. Claim 50% tax deduction with instant receipts.',
+      imageUrl: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=1920&auto=format&fit=crop&q=80',
+      tag: '50% Income Tax Exemption',
+      ctaPrimaryText: 'Contribute to a Campaign',
+      ctaPrimaryLink: '/campaigns',
+      ctaSecondaryText: 'Inspect Legal Certificates',
+      ctaSecondaryLink: '/certificates',
+      highlight: 'Instant 80G Form 10BD Eligible Receipts Generated',
+    },
+    {
+      title: '24/7 Voluntary Blood Network & Emergency Relief Helpline',
+      subtitle: 'Connecting critical hospital patients with verified voluntary donors across districts in real time. Over 1,800 emergency units arranged with zero donor charges.',
+      imageUrl: 'https://images.unsplash.com/photo-1579154204601-01588f351e67?w=1920&auto=format&fit=crop&q=80',
+      tag: 'Emergency Relief Care',
+      ctaPrimaryText: 'Emergency Blood Support',
+      ctaPrimaryLink: '/complaints',
+      ctaSecondaryText: 'Apply as Volunteer',
+      ctaSecondaryLink: '/volunteer',
+      highlight: 'Zero Administrative Fee Deductions • Real Ground Relief',
+    },
+  ],
+  newsTickerText: 'समस्या समाधान परिषद (SSP) में आपका स्वागत है • निःशुल्क सदस्यता एवं समाज सेवा अभियान • हेल्पलाइन: +919319698759',
+  homeAboutTitle: 'About Us',
+  homeAboutStory: 'Samasya Samadhan Parishadh (SSP) is a passionate advocate for positive change, dedicated to making a tangible difference in the world. Since our inception [Year], we have been driven by a singular mission: to empower individuals and communities to thrive through sustainable development initiatives, education, healthcare access, and environmental stewardship.',
+  homeOurValues: 'At Samasya Samadhan Parishadh (SSP), our core values of compassion, integrity, and inclusivity guide everything we do. We believe in the power of collaboration and collective action to address pressing global challenges and create lasting impact.',
+  homeOurImpact: 'Through strategic partnerships, grassroots initiatives, and the dedication of our team, we have achieved significant milestones in [mention specific areas of impact]. Our work has touched the lives of [number] individuals and continues to inspire positive change worldwide.',
+  homeJoinUs: 'Join us in our mission to create a brighter, more equitable world for all. Together, we can make a difference.',
+  presidentMessageTitle: 'President Message',
+  presidentPhotoUrl: '',
+  presidentMessageContent: `Dear Friends,\n\nIt is with great pride and humility that I address you as the President of Samasya Samadhan Parishadh (SSP). Since our founding 2022, our organization has been driven by a simple yet profound belief: that every individual, regardless of circumstance, deserves the opportunity to thrive.\n\nAt Samasya Samadhan Parishadh (SSP), we are not just dreamers; we are doers. We roll up our sleeves and work tirelessly to turn our vision of a better world into reality. From providing access to education and healthcare to championing environmental sustainability and social justice, our efforts are guided by a deep commitment to making a meaningful difference in the lives of others.\n\nBut we cannot do it alone. Our success is built on the support of passionate individuals like you—individuals who share our values and our vision for a brighter future. Together, we can amplify our impact and create lasting change that reverberates far beyond our borders.\n\nAs we look to the future, I am filled with hope and optimism. The challenges we face are great, but so too is our resolve to overcome them. With your continued support, I am confident that we can build a world where every person has the opportunity to flourish and thrive.\n\nThank you for your unwavering commitment to our cause. Together, we are truly making a difference.\n\nWarm regards,\n\nSamasya Samadhan Parishadh (SSP)`,
+  youtubeVideos: [
+    {
+      title: 'समस्या समाधान परिषद (SSP) के राष्ट्रीय अध्यक्ष श्री...',
+      url: 'https://www.youtube.com/embed/dQw4w9WgXcQ'
+    },
+    {
+      title: 'समस्या समाधान परिषद (SSP) के सामाजिक कार्य...',
+      url: 'https://www.youtube.com/embed/dQw4w9WgXcQ'
+    }
+  ],
+  objectives: [
+    {
+      title: 'SOCIAL WELFARE',
+      imageUrl: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600',
+      link: '/services'
+    },
+    {
+      title: 'HEALTH & RESEARCH',
+      imageUrl: 'https://images.unsplash.com/photo-1579154204601-01588f351e67?w=600',
+      link: '/services'
+    },
+    {
+      title: 'EDUCATION & TRAINING',
+      imageUrl: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600',
+      link: '/services'
+    },
+    {
+      title: 'HUMAN RIGHTS',
+      imageUrl: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600',
+      link: '/who-we-are'
+    },
+    {
+      title: 'ANTI CRIME',
+      imageUrl: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600',
+      link: '/complaints'
+    }
+  ]
 };
 
 const INITIAL_SERVICES = [
@@ -224,7 +305,9 @@ export function NGOProvider({ children }) {
         fetch('/api/settings', { credentials: 'include' }).then(r => r.json()),
         fetch('/api/campaigns', { credentials: 'include' }).then(r => r.json()),
         fetch('/api/donations', { credentials: 'include' }).then(r => r.json()),
-        fetch('/api/members', { credentials: 'include' }).then(r => r.json()),
+        fetch('/api/members/public', { credentials: 'include' })
+          .then(r => r.json())
+          .catch(() => ({ members: [] })),
         fetch('/api/events', { credentials: 'include' }).then(r => r.json()),
         fetch('/api/news', { credentials: 'include' }).then(r => r.json()),
         fetch('/api/gallery', { credentials: 'include' }).then(r => r.json()),
@@ -1239,6 +1322,8 @@ export function NGOProvider({ children }) {
     addTeamMember,
     updateTeamMember,
     deleteTeamMember,
+    members,
+    setMembers,
     loading
   };
 

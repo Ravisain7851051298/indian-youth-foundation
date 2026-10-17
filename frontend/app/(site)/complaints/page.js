@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { 
   FiAlertCircle, 
@@ -45,6 +45,22 @@ export default function ComplaintsPage() {
   // Admin resolution state
   const [resolvingId, setResolvingId] = useState(null);
   const [resNote, setResNote] = useState('');
+
+  // Fetch grievances directly from API on mount
+  useEffect(() => {
+    const fetchComplaints = async () => {
+      try {
+        const res = await api.get('/complaints');
+        const list = res.data?.grievances || res.data?.data || [];
+        if (Array.isArray(list) && setComplaints) {
+          setComplaints(list);
+        }
+      } catch (err) {
+        console.warn('Grievances fetch note:', err?.message);
+      }
+    };
+    fetchComplaints();
+  }, [setComplaints]);
 
   const handleImageChange = (e) => {
     const file = e.target.files?.[0];
@@ -194,8 +210,8 @@ export default function ComplaintsPage() {
         
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-10">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-bold mb-2 border border-red-200">
-            <FiAlertCircle className="w-3.5 h-3.5 text-red-600" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold mb-2 border border-emerald-200">
+            <FiAlertCircle className="w-3.5 h-3.5 text-emerald-700" />
             <span>Public Grievance &amp; Redressal Help Desk</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-black text-black tracking-tight">
@@ -220,7 +236,7 @@ export default function ComplaintsPage() {
               </p>
               <button
                 onClick={() => setSubmitted(false)}
-                className="mt-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition cursor-pointer"
+                className="mt-2 px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition cursor-pointer"
               >
                 Submit Another Inquiry / Grievance
               </button>
@@ -236,7 +252,7 @@ export default function ComplaintsPage() {
                     placeholder="e.g. Ramesh Kumar"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-red-500 font-medium text-black bg-slate-50"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-emerald-600 font-medium text-black bg-slate-50"
                   />
                 </div>
                 <div>
@@ -247,7 +263,7 @@ export default function ComplaintsPage() {
                     placeholder="+91 98765 43210"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-red-500 font-medium text-black bg-slate-50"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-emerald-600 font-medium text-black bg-slate-50"
                   />
                 </div>
               </div>
@@ -260,7 +276,7 @@ export default function ComplaintsPage() {
                     placeholder="user@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-red-500 font-medium text-black bg-slate-50"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-emerald-600 font-medium text-black bg-slate-50"
                   />
                 </div>
                 <div>
@@ -270,7 +286,7 @@ export default function ComplaintsPage() {
                     placeholder="e.g. BYK-MEM-101"
                     value={memberId}
                     onChange={(e) => setMemberId(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-red-500 font-medium text-black bg-slate-50"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-emerald-600 font-medium text-black bg-slate-50"
                   />
                 </div>
               </div>
@@ -283,7 +299,7 @@ export default function ComplaintsPage() {
                   placeholder="e.g. Urgent requirement for free medical checkup / Slum school kits"
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-red-500 font-medium text-black bg-slate-50"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-emerald-600 font-medium text-black bg-slate-50"
                 />
               </div>
 
@@ -295,7 +311,7 @@ export default function ComplaintsPage() {
                   placeholder="Please describe the exact ground location, urgency, and background details..."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-red-500 font-medium text-black bg-slate-50"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-emerald-600 font-medium text-black bg-slate-50"
                 />
               </div>
 
@@ -306,7 +322,7 @@ export default function ComplaintsPage() {
                 <div className="p-4 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/70 text-center space-y-2">
                   <div className="flex items-center justify-between text-xs font-bold text-slate-700">
                     <span className="flex items-center gap-1.5 text-black">
-                      <FiImage className="w-4 h-4 text-red-600" />
+                      <FiImage className="w-4 h-4 text-emerald-700" />
                       <span>Attach Photo Proof (Optional)</span>
                     </span>
                     {imageFile && (
@@ -332,7 +348,7 @@ export default function ComplaintsPage() {
                         onChange={handleImageChange}
                         className="hidden"
                       />
-                      <FiUploadCloud className="w-5 h-5 text-red-600 mx-auto mb-1" />
+                      <FiUploadCloud className="w-5 h-5 text-emerald-700 mx-auto mb-1" />
                       <span className="text-[11px] font-bold text-slate-800 block">Click to select photo</span>
                       <span className="text-[10px] text-slate-400">JPG, PNG, WEBP (Max 20MB)</span>
                     </label>
@@ -343,7 +359,7 @@ export default function ComplaintsPage() {
                 <div className="p-4 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/70 text-center space-y-2">
                   <div className="flex items-center justify-between text-xs font-bold text-slate-700">
                     <span className="flex items-center gap-1.5 text-black">
-                      <FiVideo className="w-4 h-4 text-red-600" />
+                      <FiVideo className="w-4 h-4 text-emerald-700" />
                       <span>Attach Video Proof (Optional)</span>
                     </span>
                     {videoFile && (
@@ -369,7 +385,7 @@ export default function ComplaintsPage() {
                         onChange={handleVideoChange}
                         className="hidden"
                       />
-                      <FiUploadCloud className="w-5 h-5 text-red-600 mx-auto mb-1" />
+                      <FiUploadCloud className="w-5 h-5 text-emerald-700 mx-auto mb-1" />
                       <span className="text-[11px] font-bold text-slate-800 block">Click to select video</span>
                       <span className="text-[10px] text-slate-400">MP4, WEBM, MOV (Max 60MB)</span>
                     </label>
@@ -381,7 +397,7 @@ export default function ComplaintsPage() {
               <button
                 type="submit"
                 disabled={isUploading}
-                className="w-full py-3.5 bg-red-600 hover:bg-red-700 text-white font-black text-xs rounded-xl shadow-md shadow-red-600/20 transition cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
+                className="w-full py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs rounded-xl shadow-md shadow-emerald-700/20 transition cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 <FiSend className="w-4 h-4" />
                 <span>{isUploading ? 'Uploading Media & Submitting...' : 'Submit Grievance / Inquiry'}</span>
@@ -394,7 +410,7 @@ export default function ComplaintsPage() {
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-black text-black flex items-center gap-2">
-              <FiClock className="text-red-600" />
+              <FiClock className="text-emerald-700" />
               <span>Recently Tracked Inquiries &amp; Official Answers</span>
             </h2>
             <span className="text-xs font-bold text-slate-500">
@@ -422,12 +438,12 @@ export default function ComplaintsPage() {
                 return (
                   <div
                     key={id}
-                    className="bg-white rounded-3xl p-6 border border-slate-200 hover:border-red-300 shadow-sm transition space-y-4 text-xs"
+                    className="bg-white rounded-3xl p-6 border border-slate-200 hover:border-emerald-300 shadow-sm transition space-y-4 text-xs"
                   >
                     {/* Top Row: Ticket & Status */}
                     <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
                       <div>
-                        <span className="font-mono text-[11px] font-bold text-red-600 bg-red-50 border border-red-200 px-2.5 py-0.5 rounded-full inline-block mr-2">
+                        <span className="font-mono text-[11px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full inline-block mr-2">
                           #{c.ticketNumber || (id ? id.slice(-6).toUpperCase() : 'GRV')}
                         </span>
                         <h3 className="font-black text-sm text-black inline-block">{c.subject}</h3>
@@ -450,7 +466,18 @@ export default function ComplaintsPage() {
                     <div className="space-y-2">
                       <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-slate-500 text-[11px]">
                         <span>Complainant: <strong className="text-black">{c.name || c.memberName}</strong></span>
-                        {c.phone && <span>Phone: <strong className="text-black">{c.phone}</strong></span>}
+                        {c.phone && (
+                          <span>
+                            Phone:{' '}
+                            <strong className="text-black">
+                              {isAdmin
+                                ? c.phone
+                                : c.phone.length > 5
+                                ? `${c.phone.slice(0, 3)}****${c.phone.slice(-3)}`
+                                : '******'}
+                            </strong>
+                          </span>
+                        )}
                         {c.createdAt && <span>Date: {new Date(c.createdAt).toLocaleDateString('en-IN')}</span>}
                       </div>
 
@@ -465,7 +492,7 @@ export default function ComplaintsPage() {
                         {photoProof && (
                           <div className="space-y-1">
                             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
-                              <FiImage className="w-3 h-3 text-red-600" />
+                              <FiImage className="w-3 h-3 text-emerald-700" />
                               <span>Attached Photo Proof</span>
                             </span>
                             <a
@@ -489,7 +516,7 @@ export default function ComplaintsPage() {
                         {videoProof && (
                           <div className="space-y-1">
                             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
-                              <FiVideo className="w-3 h-3 text-red-600" />
+                              <FiVideo className="w-3 h-3 text-emerald-700" />
                               <span>Attached Video Evidence</span>
                             </span>
                             <div className="h-36 rounded-xl overflow-hidden border border-slate-200 bg-black">
@@ -538,7 +565,7 @@ export default function ComplaintsPage() {
                               placeholder="Type administrative action taken, contact made, or resolution..."
                               value={resNote}
                               onChange={(e) => setResNote(e.target.value)}
-                              className="w-full p-2.5 rounded-xl border border-slate-200 text-xs text-black bg-white focus:outline-red-500 font-medium"
+                              className="w-full p-2.5 rounded-xl border border-slate-200 text-xs text-black bg-white focus:outline-emerald-600 font-medium"
                             />
                             <div className="flex justify-end gap-2">
                               <button
@@ -551,7 +578,7 @@ export default function ComplaintsPage() {
                               <button
                                 type="button"
                                 onClick={() => handleResolve(id)}
-                                className="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-xs"
+                                className="px-4 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-bold shadow-xs"
                               >
                                 Post Answer &amp; Mark Resolved
                               </button>
@@ -564,7 +591,7 @@ export default function ComplaintsPage() {
                               setResolvingId(id);
                               setResNote(c.adminAnswer || c.resolutionNotes || '');
                             }}
-                            className="inline-flex items-center gap-1.5 text-xs font-bold text-red-600 hover:text-red-700 cursor-pointer"
+                            className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 hover:text-emerald-800 cursor-pointer"
                           >
                             <FiMessageSquare className="w-3.5 h-3.5" />
                             <span>{c.adminAnswer ? 'Update Official Answer' : 'Post Official Answer'}</span>

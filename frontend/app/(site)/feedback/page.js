@@ -26,6 +26,7 @@ import {
   FiSettings
 } from 'react-icons/fi';
 import { useNGO } from '@/context/NGOContext';
+import { getContentImageUrl } from '@/lib/authApi';
 
 // High quality initial seed feedbacks with admin replies and timestamps
 const DEFAULT_FEEDBACKS = [
@@ -35,6 +36,7 @@ const DEFAULT_FEEDBACKS = [
     email: 'dr.manish.sharma@healthplus.org',
     role: 'Regular 80G Donor',
     rating: 5,
+    profilePicture: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
     comment: 'The transparency and ground dedication of Indian Youth Foundation is commendable. The 80G tax receipt was generated instantly and every rupee was accounted for in their child education drive.',
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString(), // 3 hours ago
     adminReply: 'Thank you Dr. Manish! Your generous contributions support 45 slum children with school kits and nutrition packets. We deeply value your ongoing trust.',
@@ -47,6 +49,7 @@ const DEFAULT_FEEDBACKS = [
     email: 'suman.lata2026@gmail.com',
     role: 'Active Volunteer',
     rating: 5,
+    profilePicture: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&auto=format&fit=crop&q=80',
     comment: 'Volunteering with this foundation gave me a meaningful platform to teach underprivileged children. The organization channels youth energy in the right nation-building direction.',
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 26).toISOString(), // 1 day ago
     adminReply: 'Suman ji, our education wing is stronger because of dedicated teachers like you. Thank you for empowering our youth cadre!',
@@ -59,6 +62,7 @@ const DEFAULT_FEEDBACKS = [
     email: 'rajeev.khandelwal@khandelwalenterprises.in',
     role: 'CSR Partner & Trustee',
     rating: 5,
+    profilePicture: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80',
     comment: 'All statutory compliances (12A, 80G, NITI Aayog Darpan) are well maintained. Our corporate CSR contribution delivered great ground-level results in rural solar water projects.',
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 72).toISOString(), // 3 days ago
     adminReply: 'We appreciate Khandelwal Enterprises for sponsoring the Aligarh and Hathras solar water purifiers. The statutory audit report is published in the dashboard.',
@@ -71,6 +75,7 @@ const DEFAULT_FEEDBACKS = [
     email: 'pooja.verma@techcorp.in',
     role: 'Blood Helpline Volunteer',
     rating: 5,
+    profilePicture: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&auto=format&fit=crop&q=80',
     comment: 'Joined the emergency 24x7 blood donation drive in Aligarh. Extremely organized team, prompt verified digital certificates, and heartfelt commitment to human life.',
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 120).toISOString() // 5 days ago
   },
@@ -80,6 +85,7 @@ const DEFAULT_FEEDBACKS = [
     email: 'rathore.vikram@gmail.com',
     role: 'Youth Supporter',
     rating: 5,
+    profilePicture: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&auto=format&fit=crop&q=80',
     comment: 'The tree plantation campaign with community geotagging was an innovative initiative. Proud to be associated with Bharatiya Yuva Kranti youth leadership movement.',
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 180).toISOString() // 7 days ago
   },
@@ -89,6 +95,7 @@ const DEFAULT_FEEDBACKS = [
     email: 'ananya.m@delhiuni.ac.in',
     role: 'Student Volunteer',
     rating: 5,
+    profilePicture: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200&auto=format&fit=crop&q=80',
     comment: 'The free book distribution and educational remedial classes transformed dozens of lives in local settlements. Genuine, transparent, and inspiring NGO leadership.',
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 240).toISOString() // 10 days ago
   }
@@ -97,6 +104,7 @@ const DEFAULT_FEEDBACKS = [
 export default function FeedbackPage() {
   const {
     feedbacks = [],
+    settings,
     addFeedback,
     replyFeedback,
     deleteFeedback,
@@ -150,6 +158,7 @@ export default function FeedbackPage() {
         email: fb.email || fallbackSeed.email,
         role: fb.role || fb.userRole || 'Community Supporter',
         rating: Number(fb.rating) || 5,
+        profilePicture: fb.profilePicture || fb.photoUrl || fb.userId?.photoUrl || fallbackSeed.profilePicture || '',
         comment: fb.comment || '',
         createdAt: fb.createdAt || fb.date || fallbackSeed.createdAt,
         adminReply: fb.adminReply || '',
@@ -295,8 +304,8 @@ export default function FeedbackPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         {/* Top Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3">
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-red-50 text-red-700 text-xs font-bold border border-red-200 shadow-2xs">
-            <FiMessageSquare className="w-3.5 h-3.5 text-red-600" />
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-200 shadow-2xs">
+            <FiMessageSquare className="w-3.5 h-3.5 text-emerald-700" />
             <span>Community Voice &amp; Verified Trust</span>
           </div>
 
@@ -327,9 +336,9 @@ export default function FeedbackPage() {
             {isAdmin && (
               <Link
                 href="/dashboard/feedback"
-                className="flex items-center gap-1.5 bg-red-50 text-red-700 hover:bg-red-100 px-3.5 py-1.5 rounded-full border border-red-200 font-bold transition shadow-2xs"
+                className="flex items-center gap-1.5 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 px-3.5 py-1.5 rounded-full border border-emerald-200 font-bold transition shadow-2xs"
               >
-                <FiSettings className="w-3.5 h-3.5" />
+                <FiSettings className="w-3.5 h-3.5 text-emerald-700" />
                 <span>Admin Feedback Panel →</span>
               </Link>
             )}
@@ -345,7 +354,7 @@ export default function FeedbackPage() {
             <div>
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span className="text-[11px] font-black uppercase tracking-wider text-red-600">
+                <span className="text-[11px] font-black uppercase tracking-wider text-emerald-700">
                   Latest Feedbacks (Live Stream)
                 </span>
               </div>
@@ -366,14 +375,14 @@ export default function FeedbackPage() {
               <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-2xl">
                 <button
                   onClick={handlePrev}
-                  className="p-2 rounded-xl bg-white text-slate-700 hover:text-red-600 hover:bg-red-50 border border-slate-200 shadow-2xs transition cursor-pointer"
+                  className="p-2 rounded-xl bg-white text-slate-700 hover:text-emerald-700 hover:bg-emerald-50 border border-slate-200 shadow-2xs transition cursor-pointer"
                   title="Previous Reviews"
                 >
                   <FiChevronLeft className="w-4 h-4" />
                 </button>
                 <button
                   onClick={handleNext}
-                  className="p-2 rounded-xl bg-white text-slate-700 hover:text-red-600 hover:bg-red-50 border border-slate-200 shadow-2xs transition cursor-pointer"
+                  className="p-2 rounded-xl bg-white text-slate-700 hover:text-emerald-700 hover:bg-emerald-50 border border-slate-200 shadow-2xs transition cursor-pointer"
                   title="Next Reviews"
                 >
                   <FiChevronRight className="w-4 h-4" />
@@ -400,7 +409,7 @@ export default function FeedbackPage() {
                     key={fbId || idx}
                     className="w-full sm:w-1/2 lg:w-1/3 shrink-0 p-2 sm:p-2.5"
                   >
-                    <div className="bg-slate-50/70 hover:bg-white rounded-3xl p-5 border border-slate-200 hover:border-red-300 hover:shadow-md transition-all duration-300 h-full flex flex-col justify-between relative group">
+                    <div className="bg-slate-50/70 hover:bg-white rounded-3xl p-5 border border-slate-200 hover:border-emerald-300 hover:shadow-md transition-all duration-300 h-full flex flex-col justify-between relative group">
                       {isNewest && (
                         <span className="absolute top-4 right-4 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200 shadow-2xs">
                           Latest Review
@@ -433,21 +442,37 @@ export default function FeedbackPage() {
                           &ldquo;{fb.comment}&rdquo;
                         </p>
 
-                        {/* Official Admin Reply Banner (if available) */}
+                        {/* Official Admin Reply Banner with Admin/President Photo */}
                         {fb.adminReply && (
-                          <div className="mt-3 bg-gradient-to-br from-red-50/80 to-slate-50 p-3 rounded-2xl border border-red-200/90 space-y-1 shadow-2xs">
-                            <div className="flex items-center justify-between text-[11px] font-extrabold text-slate-900">
-                              <span className="flex items-center gap-1 text-red-600">
-                                <FiShield className="w-3.5 h-3.5" />
-                                <span>Official Reply from {fb.repliedBy || 'Management'}</span>
-                              </span>
+                          <div className="mt-3 bg-gradient-to-br from-emerald-50/90 to-slate-50 p-3.5 rounded-2xl border border-emerald-200/90 space-y-2 shadow-2xs">
+                            <div className="flex items-center justify-between text-[11px] font-extrabold text-slate-900 border-b border-emerald-100 pb-1.5">
+                              <div className="flex items-center gap-2">
+                                <div className="w-6 h-6 rounded-full overflow-hidden border border-emerald-300 bg-white shrink-0">
+                                  <img
+                                    src={getContentImageUrl(settings?.presidentPhotoUrl || settings?.logoUrl || '/logo.jpeg')}
+                                    alt={fb.repliedBy || 'Admin Official'}
+                                    className="w-full h-full object-cover"
+                                    onError={(e) => {
+                                      e.currentTarget.onerror = null;
+                                      e.currentTarget.src = '/logo.jpeg';
+                                    }}
+                                  />
+                                </div>
+                                <span className="flex items-center gap-1 text-emerald-800 font-bold">
+                                  <FiShield className="w-3.5 h-3.5 text-emerald-700" />
+                                  <span>Official Reply from {fb.repliedBy || 'Management'}</span>
+                                </span>
+                              </div>
                               <span className="text-[9px] text-slate-400 font-mono">
                                 {formatDateTime(fb.adminRepliedAt).dateStr}
                               </span>
                             </div>
-                            <p className="text-[11px] text-slate-700 leading-relaxed font-medium">
-                              {fb.adminReply}
-                            </p>
+                            <div className="flex items-start gap-2 pl-0.5">
+                              <FiCornerDownRight className="w-3.5 h-3.5 text-emerald-700 shrink-0 mt-0.5" />
+                              <p className="text-[11px] text-slate-700 leading-relaxed font-medium">
+                                {fb.adminReply}
+                              </p>
+                            </div>
                           </div>
                         )}
                       </div>
@@ -457,8 +482,20 @@ export default function FeedbackPage() {
                         {/* User Name & Admin actions */}
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <div className="w-7 h-7 rounded-full bg-red-100 text-red-600 font-black text-xs flex items-center justify-center shrink-0">
-                              {fb.name?.charAt(0) || 'U'}
+                            <div className="w-8 h-8 rounded-full overflow-hidden border border-emerald-200 bg-emerald-100 text-emerald-800 font-black text-xs flex items-center justify-center shrink-0">
+                              {fb.profilePicture || fb.photoUrl ? (
+                                <img
+                                  src={getContentImageUrl(fb.profilePicture || fb.photoUrl)}
+                                  alt={fb.name}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    e.currentTarget.onerror = null;
+                                    e.currentTarget.src = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100';
+                                  }}
+                                />
+                              ) : (
+                                <span>{fb.name?.charAt(0) || 'U'}</span>
+                              )}
                             </div>
                             <div>
                               <h4 className="font-extrabold text-xs text-slate-900 truncate max-w-[150px]" title={fb.name}>
@@ -476,7 +513,7 @@ export default function FeedbackPage() {
                                   setReplyingFeedbackId(replyingFeedbackId === fbId ? null : fbId);
                                   setInlineReplyText(fb.adminReply || '');
                                 }}
-                                className="text-red-600 hover:text-red-700 text-[10px] font-bold px-2 py-0.5 rounded-lg bg-red-50 hover:bg-red-100 border border-red-200 cursor-pointer"
+                                className="text-emerald-700 hover:text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 cursor-pointer"
                               >
                                 {fb.adminReply ? 'Edit Reply' : 'Reply'}
                               </button>
@@ -496,7 +533,7 @@ export default function FeedbackPage() {
                         {isAdmin && replyingFeedbackId === fbId && (
                           <form
                             onSubmit={(e) => handleInlineReply(e, fbId)}
-                            className="p-2.5 rounded-xl bg-white border border-red-300 shadow-sm space-y-2 mt-2"
+                            className="p-2.5 rounded-xl bg-white border border-emerald-300 shadow-sm space-y-2 mt-2"
                           >
                             <label className="text-[10px] font-bold text-slate-700 block">
                               Write Official Admin Reply:
@@ -507,7 +544,7 @@ export default function FeedbackPage() {
                               value={inlineReplyText}
                               onChange={(e) => setInlineReplyText(e.target.value)}
                               placeholder="Write your response as NGO Administrator..."
-                              className="w-full text-xs p-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-red-500 text-slate-900"
+                              className="w-full text-xs p-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-600 text-slate-900"
                             />
                             <div className="flex justify-end gap-1.5">
                               <button
@@ -520,7 +557,7 @@ export default function FeedbackPage() {
                               <button
                                 type="submit"
                                 disabled={isSubmittingInlineReply}
-                                className="px-3 py-1 rounded-lg text-[10px] font-bold bg-red-600 text-white cursor-pointer hover:bg-red-700 disabled:opacity-50"
+                                className="px-3 py-1 rounded-lg text-[10px] font-bold bg-emerald-700 text-white cursor-pointer hover:bg-emerald-800 disabled:opacity-50"
                               >
                                 {isSubmittingInlineReply ? 'Saving...' : 'Post Reply'}
                               </button>
@@ -528,13 +565,17 @@ export default function FeedbackPage() {
                           </form>
                         )}
 
-                        {/* User Email with Mail Icon */}
-                        <div className="flex items-center gap-1.5 text-[11px] text-slate-600 truncate font-mono">
-                          <FiMail className="w-3 h-3 text-red-500 shrink-0" />
-                          <span className="truncate" title={fb.email}>
-                            {fb.email || 'user@community.org'}
-                          </span>
-                        </div>
+                        {/* User Email with Mail Icon (Masked for privacy unless admin) */}
+                        {fb.email && (
+                          <div className="flex items-center gap-1.5 text-[11px] text-slate-600 truncate font-mono">
+                            <FiMail className="w-3 h-3 text-emerald-600 shrink-0" />
+                            <span className="truncate" title={isAdmin ? fb.email : ''}>
+                              {isAdmin
+                                ? fb.email
+                                : fb.email.replace(/(.{2})(.*)(?=@)/, (_m, a, b) => a + '*'.repeat(Math.max(3, b.length)))}
+                            </span>
+                          </div>
+                        )}
 
                         {/* Time & Date Stamps */}
                         <div className="flex items-center justify-between text-[10px] text-slate-500 pt-0.5 font-semibold">
@@ -569,7 +610,7 @@ export default function FeedbackPage() {
                     setCurrentIndex(i);
                   }}
                   className={`h-2 rounded-full transition-all cursor-pointer ${
-                    currentIndex === i ? 'w-6 bg-red-600' : 'w-2 bg-slate-200 hover:bg-slate-300'
+                    currentIndex === i ? 'w-6 bg-emerald-700' : 'w-2 bg-slate-200 hover:bg-slate-300'
                   }`}
                   aria-label={`Slide ${i + 1}`}
                 />
@@ -581,15 +622,15 @@ export default function FeedbackPage() {
               <button
                 type="button"
                 onClick={() => setShowAllFeedbacks((prev) => !prev)}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 hover:bg-red-50 hover:text-red-600 text-slate-800 text-xs font-bold border border-slate-200 shadow-2xs transition cursor-pointer"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 hover:bg-emerald-50 hover:text-emerald-800 text-slate-800 text-xs font-bold border border-slate-200 shadow-2xs transition cursor-pointer"
               >
-                <FiGrid className="w-3.5 h-3.5 text-red-600" />
+                <FiGrid className="w-3.5 h-3.5 text-emerald-700" />
                 <span>{showAllFeedbacks ? 'Collapse Feedback Directory' : `Display All Feedbacks (${latestFeedbacks.length})`}</span>
               </button>
 
               <a
                 href="#feedback-form"
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-md shadow-red-600/20 transition cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow-md shadow-emerald-700/20 transition cursor-pointer"
               >
                 <FiPlus className="w-3.5 h-3.5" />
                 <span>Write Feedback</span>
@@ -627,7 +668,7 @@ export default function FeedbackPage() {
                     onClick={() => setSelectedFilter(tab.key)}
                     className={`px-3 py-1.5 rounded-xl transition cursor-pointer whitespace-nowrap text-xs font-bold ${
                       selectedFilter === tab.key
-                        ? 'bg-red-600 text-white shadow-xs'
+                        ? 'bg-emerald-700 text-white shadow-xs'
                         : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                     }`}
                   >
@@ -646,7 +687,7 @@ export default function FeedbackPage() {
                 return (
                   <div
                     key={fbId || idx}
-                    className="bg-slate-50/70 hover:bg-white rounded-3xl p-5 border border-slate-200 hover:border-red-300 hover:shadow-md transition-all duration-300 flex flex-col justify-between"
+                    className="bg-slate-50/70 hover:bg-white rounded-3xl p-5 border border-slate-200 hover:border-emerald-300 hover:shadow-md transition-all duration-300 flex flex-col justify-between"
                   >
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
@@ -671,30 +712,63 @@ export default function FeedbackPage() {
                         &ldquo;{fb.comment}&rdquo;
                       </p>
 
-                      {/* Official Admin Reply in Grid */}
+                      {/* Official Admin Reply in Grid with Admin/President Photo */}
                       {fb.adminReply && (
-                        <div className="mt-3 bg-gradient-to-br from-red-50/80 to-slate-50 p-3 rounded-2xl border border-red-200/90 space-y-1 shadow-2xs">
-                          <div className="flex items-center justify-between text-[11px] font-extrabold text-slate-900">
-                            <span className="flex items-center gap-1 text-red-600">
-                              <FiShield className="w-3.5 h-3.5" />
-                              <span>Official Reply from {fb.repliedBy || 'Management'}</span>
-                            </span>
+                        <div className="mt-3 bg-gradient-to-br from-emerald-50/90 to-slate-50 p-3.5 rounded-2xl border border-emerald-200/90 space-y-2 shadow-2xs">
+                          <div className="flex items-center justify-between text-[11px] font-extrabold text-slate-900 border-b border-emerald-100 pb-1.5">
+                            <div className="flex items-center gap-2">
+                              <div className="w-6 h-6 rounded-full overflow-hidden border border-emerald-300 bg-white shrink-0">
+                                <img
+                                  src={getContentImageUrl(settings?.presidentPhotoUrl || settings?.logoUrl || '/logo.jpeg')}
+                                  alt={fb.repliedBy || 'Admin Official'}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    e.currentTarget.onerror = null;
+                                    e.currentTarget.src = '/logo.jpeg';
+                                  }}
+                                />
+                              </div>
+                              <span className="flex items-center gap-1 text-emerald-800 font-bold">
+                                <FiShield className="w-3.5 h-3.5 text-emerald-700" />
+                                <span>Official Reply from {fb.repliedBy || 'Management'}</span>
+                              </span>
+                            </div>
                             <span className="text-[9px] text-slate-400 font-mono">
                               {formatDateTime(fb.adminRepliedAt).dateStr}
                             </span>
                           </div>
-                          <p className="text-[11px] text-slate-700 leading-relaxed font-medium">
-                            {fb.adminReply}
-                          </p>
+                          <div className="flex items-start gap-2 pl-0.5">
+                            <FiCornerDownRight className="w-3.5 h-3.5 text-emerald-700 shrink-0 mt-0.5" />
+                            <p className="text-[11px] text-slate-700 leading-relaxed font-medium">
+                              {fb.adminReply}
+                            </p>
+                          </div>
                         </div>
                       )}
                     </div>
 
                     <div className="mt-4 pt-3.5 border-t border-slate-200/80 space-y-2">
                       <div className="flex items-center justify-between">
-                        <h4 className="font-extrabold text-xs text-slate-900 truncate">
-                          {fb.name}
-                        </h4>
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-full overflow-hidden border border-emerald-200 bg-emerald-100 text-emerald-800 font-black text-xs flex items-center justify-center shrink-0">
+                            {fb.profilePicture || fb.photoUrl ? (
+                              <img
+                                src={getContentImageUrl(fb.profilePicture || fb.photoUrl)}
+                                alt={fb.name}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  e.currentTarget.onerror = null;
+                                  e.currentTarget.src = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100';
+                                }}
+                              />
+                            ) : (
+                              <span>{fb.name?.charAt(0) || 'U'}</span>
+                            )}
+                          </div>
+                          <h4 className="font-extrabold text-xs text-slate-900 truncate max-w-[150px]" title={fb.name}>
+                            {fb.name}
+                          </h4>
+                        </div>
                         {isAdmin && (
                           <div className="flex items-center gap-1">
                             <button
@@ -703,7 +777,7 @@ export default function FeedbackPage() {
                                 setReplyingFeedbackId(replyingFeedbackId === fbId ? null : fbId);
                                 setInlineReplyText(fb.adminReply || '');
                               }}
-                              className="text-red-600 hover:text-red-700 text-[10px] font-bold px-2 py-0.5 rounded-lg bg-red-50 hover:bg-red-100 border border-red-200 cursor-pointer"
+                              className="text-emerald-700 hover:text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 cursor-pointer"
                             >
                               {fb.adminReply ? 'Edit Reply' : 'Reply'}
                             </button>
@@ -718,11 +792,17 @@ export default function FeedbackPage() {
                         )}
                       </div>
 
-                      {/* User Email */}
-                      <div className="flex items-center gap-1.5 text-[11px] text-slate-600 font-mono truncate">
-                        <FiMail className="w-3 h-3 text-red-500 shrink-0" />
-                        <span className="truncate">{fb.email || 'user@community.org'}</span>
-                      </div>
+                      {/* User Email (Masked for privacy unless admin) */}
+                      {fb.email && (
+                        <div className="flex items-center gap-1.5 text-[11px] text-slate-600 font-mono truncate">
+                          <FiMail className="w-3 h-3 text-emerald-600 shrink-0" />
+                          <span className="truncate">
+                            {isAdmin
+                              ? fb.email
+                              : fb.email.replace(/(.{2})(.*)(?=@)/, (_m, a, b) => a + '*'.repeat(Math.max(3, b.length)))}
+                          </span>
+                        </div>
+                      )}
 
                       {/* Date & Time */}
                       <div className="flex items-center justify-between text-[10px] text-slate-500 pt-0.5 font-semibold">
@@ -749,7 +829,7 @@ export default function FeedbackPage() {
                 <button
                   type="button"
                   onClick={() => setDisplayCount((prev) => prev + 6)}
-                  className="px-6 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-md shadow-red-600/20 transition cursor-pointer"
+                  className="px-6 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-md shadow-emerald-700/20 transition cursor-pointer"
                 >
                   Load More Feedbacks ({filteredFeedbacks.length - displayCount} remaining)
                 </button>
@@ -801,7 +881,7 @@ export default function FeedbackPage() {
               </div>
               <Link
                 href="/login?redirect=/feedback"
-                className="inline-flex items-center gap-1 text-red-600 font-bold hover:underline whitespace-nowrap"
+                className="inline-flex items-center gap-1 text-emerald-700 font-bold hover:underline whitespace-nowrap"
               >
                 <FiLogIn className="w-3.5 h-3.5" />
                 <span>Log in to Verify Review</span>
@@ -820,7 +900,7 @@ export default function FeedbackPage() {
               </p>
               <button
                 onClick={() => setSubmitted(false)}
-                className="mt-3 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold transition cursor-pointer"
+                className="mt-3 px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl font-bold transition cursor-pointer"
               >
                 Submit Another Review
               </button>
@@ -841,7 +921,7 @@ export default function FeedbackPage() {
                       placeholder="e.g. Dr. Manish Sharma"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full pl-10 pr-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 font-medium text-slate-900 text-xs"
+                      className="w-full pl-10 pr-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600 font-medium text-slate-900 text-xs"
                     />
                   </div>
                 </div>
@@ -859,7 +939,7 @@ export default function FeedbackPage() {
                       placeholder="e.g. manish.sharma@example.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full pl-10 pr-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 font-medium text-slate-900 text-xs"
+                      className="w-full pl-10 pr-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600 font-medium text-slate-900 text-xs"
                     />
                   </div>
                 </div>
@@ -873,7 +953,7 @@ export default function FeedbackPage() {
                 <select
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 font-medium text-slate-900 text-xs cursor-pointer"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600 font-medium text-slate-900 text-xs cursor-pointer"
                 >
                   <option value="Regular 80G Donor">Regular 80G Donor</option>
                   <option value="Active Youth Volunteer">Active Youth Volunteer</option>
@@ -923,7 +1003,7 @@ export default function FeedbackPage() {
                   placeholder="Share your thoughts on transparency, volunteering experience, tax deduction receipts, or social impact..."
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
-                  className="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 font-medium text-slate-900 text-xs"
+                  className="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600 font-medium text-slate-900 text-xs"
                 />
               </div>
 
@@ -931,7 +1011,7 @@ export default function FeedbackPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-black text-xs rounded-xl shadow-md shadow-red-600/20 transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                className="w-full py-3 bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs rounded-xl shadow-md shadow-emerald-700/20 transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
               >
                 <FiSend className="w-3.5 h-3.5" />
                 <span>{isSubmitting ? 'Posting Review...' : 'Publish Testimonial (Live Stream)'}</span>

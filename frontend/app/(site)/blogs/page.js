@@ -137,8 +137,8 @@ export default function BlogsPage() {
         {/* Header Section */}
         <div className="bg-slate-50/70 border border-slate-200 rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-bold mb-2">
-              <FiFileText className="w-3.5 h-3.5 text-red-600" />
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold mb-2 border border-emerald-200">
+              <FiFileText className="w-3.5 h-3.5 text-emerald-700" />
               <span>Press Releases &amp; Official Dispatches</span>
             </div>
             <h1 className="text-3xl sm:text-4xl font-black text-black tracking-tight">
@@ -152,7 +152,7 @@ export default function BlogsPage() {
           {isAdmin && (
             <button
               onClick={openCreateModal}
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-md shadow-red-600/20 transition cursor-pointer self-start md:self-auto shrink-0"
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-md shadow-emerald-700/20 transition cursor-pointer self-start md:self-auto shrink-0"
             >
               <FiPlus className="w-4 h-4" />
               <span>Publish New Article</span>
@@ -178,7 +178,7 @@ export default function BlogsPage() {
               return (
                 <div
                   key={id}
-                  className="bg-white rounded-3xl overflow-hidden border border-slate-200 hover:border-red-500 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
+                  className="bg-white rounded-3xl overflow-hidden border border-slate-200 hover:border-emerald-400 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
                 >
                   <div>
                     <div className="relative h-52 overflow-hidden bg-slate-100">
@@ -191,7 +191,7 @@ export default function BlogsPage() {
                         }}
                       />
                       <span className="absolute bottom-3 left-3 bg-black/80 backdrop-blur-xs text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1.5">
-                        <FiCalendar className="w-3 h-3 text-red-400" />
+                        <FiCalendar className="w-3 h-3 text-emerald-400" />
                         <span>{b.date || 'Field Report'}</span>
                       </span>
                     </div>
@@ -303,7 +303,7 @@ export default function BlogsPage() {
                       onChange={handleFileChange}
                       className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                     />
-                    <FiUploadCloud className="w-6 h-6 text-red-600 mx-auto mb-1" />
+                    <FiUploadCloud className="w-6 h-6 text-emerald-700 mx-auto mb-1" />
                     <p className="text-xs font-bold text-black">Click to upload photo file</p>
                     <p className="text-[10px] text-slate-500 mt-0.5">PNG, JPG, WEBP</p>
                   </div>
@@ -326,7 +326,7 @@ export default function BlogsPage() {
                     placeholder="https://images.unsplash.com/photo-..."
                     value={image}
                     onChange={(e) => setImage(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-red-500 text-black bg-slate-50"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-emerald-600 text-black bg-slate-50"
                   />
                 </div>
 
@@ -338,7 +338,7 @@ export default function BlogsPage() {
                     placeholder="Provide full press release description, ground details, and coordinator statements..."
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-red-500 text-black bg-slate-50"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-emerald-600 text-black bg-slate-50"
                   />
                 </div>
 
@@ -353,7 +353,7 @@ export default function BlogsPage() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold shadow-md transition cursor-pointer disabled:opacity-50"
+                    className="flex-1 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold shadow-md transition cursor-pointer disabled:opacity-50"
                   >
                     {isSubmitting ? 'Saving...' : editingItem ? 'Save Changes' : 'Publish Article'}
                   </button>

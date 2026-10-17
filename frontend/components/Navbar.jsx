@@ -4,58 +4,44 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  FiHeart,
   FiPhone,
-  FiUser,
   FiMenu,
   FiX,
-  FiShield,
-  FiDownload,
   FiChevronDown,
+  FiHome,
   FiChevronRight,
-  FiGrid,
-  FiCompass,
-  FiUsers,
-  FiUserCheck,
-  FiBookOpen,
-  FiActivity,
-  FiLayers,
-  FiTarget,
-  FiCalendar,
-  FiFileText,
-  FiImage,
-  FiAward,
-  FiUserPlus,
-  FiMessageSquare,
-  FiAlertCircle,
+  FiHeart,
+  FiUser,
   FiCreditCard,
-  FiGlobe,
+  FiAward,
+  FiFileText,
+  FiShield,
+  FiSettings,
+  FiActivity,
+  FiUsers,
+  FiBookOpen,
+  FiImage,
+  FiLogIn,
+  FiUserPlus,
+  FiMail,
+  FiLayers
 } from 'react-icons/fi';
-import { useSelector } from 'react-redux';
+import {
+  FaFacebookF,
+  FaInstagram,
+  FaYoutube,
+  FaXTwitter
+} from 'react-icons/fa6';
 import { useNGO } from '../context/NGOContext';
 import { getContentImageUrl } from '@/lib/authApi';
+import GoogleTranslate from '@/components/common/GoogleTranslate';
 
 export default function Navbar() {
   const pathname = usePathname();
-  const { currentUser, logout, settings, lang, toggleLanguage } = useNGO();
-  const reduxUser = useSelector((state) => state.auth?.user);
-  const effectiveUser = reduxUser || currentUser;
+  const { settings, currentUser, logout } = useNGO();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
-  const [mobileOpenAccordion, setMobileOpenAccordion] = useState(null);
-  const [deferredPrompt, setDeferredPrompt] = useState(null);
-  const [mounted, setMounted] = useState(false);
   const dropdownRef = useRef(null);
-
-  useEffect(() => {
-    setMounted(true);
-    const handleBeforeInstallPrompt = (e) => {
-      e.preventDefault();
-      setDeferredPrompt(e);
-    };
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-  }, []);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -69,495 +55,453 @@ export default function Navbar() {
   }, []);
 
   // Close mobile drawer when route changes
-  const prevPathRef = useRef(pathname);
   useEffect(() => {
-    if (prevPathRef.current !== pathname) {
-      prevPathRef.current = pathname;
-      const timer = setTimeout(() => {
-        setMobileMenuOpen(false);
-        setActiveDropdown(null);
-      }, 0);
-      return () => clearTimeout(timer);
-    }
+    setMobileMenuOpen(false);
+    setActiveDropdown(null);
   }, [pathname]);
-
-  const handleInstallApp = async () => {
-    if (!deferredPrompt) {
-      alert('PWA App: You can install this website as a native application by clicking "Add to Home Screen" or the Install icon in your browser address bar.');
-      return;
-    }
-    deferredPrompt.prompt();
-    await deferredPrompt.userChoice;
-  };
-
-  // Structured navigation groups with descriptions & icons
-  const navGroups = [
-    {
-      id: 'about',
-      label: 'About Us',
-      links: [
-        { href: '/who-we-are', label: 'Who We Are', desc: 'Our identity, founding journey & grassroots commitment', icon: FiUsers },
-        { href: '/about', label: 'About Foundation', desc: 'Who we are, history, mission & legal standing', icon: FiShield },
-        { href: '/mission-vision', label: 'Mission & Vision', desc: 'Our statutory aims, constitution & ideology', icon: FiCompass },
-        { href: '/team-members', label: 'Leadership & Board', desc: 'Trustees, directors & advisory council', icon: FiUserCheck },
-        { href: '/story', label: 'Impact Stories', desc: 'Grassroots success & beneficiary journeys', icon: FiBookOpen },
-        { href: '/members', label: 'Members Directory', desc: 'Verified social change-makers nationwide', icon: FiUsers },
-      ]
-    },
-    {
-      id: 'what-we-do',
-      label: 'What We Do',
-      links: [
-        { href: '/services', label: 'Our Services', desc: 'Free education, medical aid & relief care', icon: FiActivity },
-        { href: '/programs', label: 'Flagship Programs', desc: 'Structured ongoing social transformation drives', icon: FiLayers },
-        { href: '/campaigns', label: 'Crowdfunding Drives', desc: 'Urgent causes requiring public donation', icon: FiTarget },
-        { href: '/event', label: 'Events & Summits', desc: 'Upcoming rallies, blood camps & conferences', icon: FiCalendar },
-      ]
-    },
-    {
-      id: 'media',
-      label: 'Media & Recognition',
-      links: [
-        { href: '/blogs', label: 'News & Press Releases', desc: 'Official updates, coverage & articles', icon: FiFileText },
-        { href: '/gallery', label: 'Photo & Video Gallery', desc: 'Field activities & documentary glimpses', icon: FiImage },
-        { href: '/certificates', label: 'Certificates of Honor', desc: 'Verified recognition & volunteer awards', icon: FiAward },
-      ]
-    },
-    {
-      id: 'get-involved',
-      label: 'Get Involved',
-      links: [
-        { href: '/volunteer', label: 'Apply for Volunteer', desc: 'Join grassroots community & relief drives', icon: FiUserPlus },
-        { href: '/members', label: 'Apply for Membership', desc: 'Official NGO membership & verifiable ID card', icon: FiCreditCard },
-        { href: '/feedback', label: 'Reviews & Feedback', desc: 'Supporter testimonials & 5-star ratings', icon: FiMessageSquare },
-        { href: '/complaints', label: 'Grievance Redressal', desc: 'Transparent inquiry & complaint resolution', icon: FiAlertCircle },
-      ]
-    }
-  ];
 
   const toggleDropdown = (id) => {
     setActiveDropdown((prev) => (prev === id ? null : id));
   };
 
-  const toggleMobileAccordion = (id) => {
-    setMobileOpenAccordion((prev) => (prev === id ? null : id));
-  };
+  const isMember = Boolean(
+    currentUser?.role === 'Member' ||
+    currentUser?.role === 'Admin' ||
+    (currentUser?.isMember && !currentUser?.memberId?.startsWith('BYK-DON-')) ||
+    (currentUser?.membershipApplication?.status === 'approved') ||
+    (currentUser?.memberId && (currentUser.memberId.startsWith('BYK-MEM-') || currentUser.memberId.startsWith('MEM-')))
+  );
 
-  // Helper to determine active state of a dropdown
-  const isGroupActive = (group) => {
-    return group.links.some(l => pathname === l.href);
-  };
+  const isVolunteer = Boolean(
+    currentUser?.role === 'Volunteer' ||
+    currentUser?.isVolunteer ||
+    currentUser?.volunteerApplication?.status === 'approved' ||
+    currentUser?.volunteerApplication?.status === 'pending' ||
+    (currentUser?.volunteerId && !currentUser?.volunteerId?.startsWith('BYK-DON-'))
+  );
+
+  const isAdmin = Boolean(
+    currentUser?.role === 'Admin' ||
+    currentUser?.role === 'admin'
+  );
+
+  const navMenuItems = [
+    {
+      label: 'About Us',
+      id: 'about',
+      hasDropdown: true,
+      links: [
+        { label: 'President Message', href: '/#president-message', icon: FiUser },
+        { label: 'Who We Are', href: '/who-we-are', icon: FiBookOpen },
+        { label: 'About Foundation', href: '/about', icon: FiBookOpen },
+        { label: 'Mission & Vision', href: '/mission-vision', icon: FiActivity },
+        { label: 'Story', href: '/story', icon: FiFileText },
+      ]
+    },
+    { label: 'Services', href: '/services' },
+    { label: 'Campaigns', href: '/campaigns' },
+    { label: 'Events', href: '/event' },
+    { label: 'Certifications', href: '/certificates' },
+    { label: 'Team', href: '/team-members' },
+    {
+      label: isMember ? 'Member Profile' : 'Apply Member',
+      href: isMember ? '/profile/member' : '/apply-member'
+    },
+    {
+      label: isVolunteer ? 'Volunteer Profile' : 'Volunteer Apply',
+      href: isVolunteer ? '/profile/volunteer' : '/apply-volunteer'
+    },
+    {
+      label: 'Media',
+      id: 'media',
+      hasDropdown: true,
+      links: [
+        { label: 'Blogs', href: '/blogs', icon: FiFileText },
+        { label: 'YouTube Videos', href: '/#youtube-videos', icon: FaYoutube },
+        { label: 'Photo Gallery', href: '/gallery', icon: FiImage },
+      ]
+    },
+    { label: 'Complains & Enquries', href: '/complaints' },
+    { label: 'Feedback', href: '/feedback' },
+    ...(isAdmin ? [{ label: 'Admin Panel', href: '/dashboard' }] : []),
+    currentUser ? {
+      label: currentUser.name ? `${currentUser.name.split(' ')[0]}` : 'My Profile',
+      id: 'user_profile',
+      hasDropdown: true,
+      links: [
+        { label: 'Profile Overview', href: '/profile', icon: FiUser },
+        { label: isMember ? 'Member Profile' : 'Apply for Membership', href: isMember ? '/profile/member' : '/apply-member', icon: FiCreditCard },
+        { label: isVolunteer ? 'Volunteer Profile' : 'Apply as Volunteer', href: isVolunteer ? '/profile/volunteer' : '/apply-volunteer', icon: FiUsers },
+        { label: 'Official ID Card', href: '/profile/id-card', icon: FiShield },
+        { label: 'Appointment Letter', href: '/profile/appointment-letter', icon: FiFileText },
+        { label: 'My Certificates', href: '/profile/certificates', icon: FiAward },
+        ...(currentUser.role === 'Admin' ? [{ label: 'Admin Dashboard', href: '/dashboard', icon: FiLayers }] : []),
+        { label: 'Account Settings', href: '/profile/settings', icon: FiSettings },
+      ]
+    } : {
+      label: 'Login',
+      id: 'login',
+      hasDropdown: true,
+      links: [
+        { label: 'Member / Volunteer Login', href: '/login', icon: FiLogIn },
+        { label: 'Apply for Membership', href: '/apply-member', icon: FiUserPlus },
+        { label: 'Apply as Volunteer', href: '/apply-volunteer', icon: FiUserPlus },
+      ]
+    }
+  ];
 
   return (
-    <header className="sticky top-0 z-50 shadow-xs bg-white">
-      {/* 1. TOP ANNOUNCEMENT BAR */}
-      <div className="bg-gradient-to-r from-red-600 via-red-600 to-red-700 text-white text-xs py-2 px-4 sm:px-8">
+    <header className="sticky top-0 z-50 shadow-md font-sans bg-white">
+      {/* ---------------- 1. TOP GREEN BAR ---------------- */}
+      <div className="bg-[#0b8026] text-white py-2 px-2 sm:px-4">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
-          {/* Statutory 12A & 80G notice */}
-          <div className="flex items-center gap-3">
-            <span className="flex items-center gap-1.5 bg-white/20 px-2.5 py-0.5 rounded-full font-bold backdrop-blur-xs text-[11px]">
-              <FiShield className="w-3.5 h-3.5" />
-              12A & 80G Certified NGO • 50% Income Tax Exemption
-            </span>
-            <span className="hidden lg:inline text-red-100 text-[11px]" suppressHydrationWarning>
-              Govt. Reg: {settings?.registrationNo || 'REG/2021/NGO/DEL/8741'} | NITI Aayog: {settings?.nitiAayogDarpanId || 'DL/2021/0284729'}
-            </span>
-          </div>
 
-          {/* Right Helpline & App Install */}
-          <div className="hidden sm:flex items-center gap-4 text-xs">
+          {/* Left Social Icons (Hidden on small mobile devices to give space to ticker and helpline, always visible on tablet & desktop) */}
+          <div className="hidden md:flex items-center gap-2 shrink-0">
             <a
-              href={`tel:${settings?.phone || '+91 98765 43210'}`}
-              className="hidden sm:flex items-center gap-1 text-white hover:text-red-100 transition"
-              suppressHydrationWarning
+              href={settings?.facebook || 'https://facebook.com'}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-7 h-7 rounded-full bg-white text-[#0b8026] flex items-center justify-center hover:scale-110 transition shadow-2xs hover:bg-emerald-50 shrink-0"
+              aria-label="Facebook"
+              title="Facebook"
             >
-              <FiPhone className="w-3.5 h-3.5" />
-              <span className="font-semibold" suppressHydrationWarning>{settings?.phone || '+91 98765 43210'}</span>
+              <FaFacebookF className="w-3.5 h-3.5" />
+            </a>
+
+            <a
+              href={settings?.instagram || 'https://instagram.com'}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-7 h-7 rounded-full bg-white text-[#0b8026] flex items-center justify-center hover:scale-110 transition shadow-2xs hover:bg-emerald-50 shrink-0"
+              aria-label="Instagram"
+              title="Instagram"
+            >
+              <FaInstagram className="w-3.5 h-3.5" />
+            </a>
+
+            <a
+              href={settings?.youtube || 'https://youtube.com'}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-7 h-7 rounded-full bg-white text-[#0b8026] flex items-center justify-center hover:scale-110 transition shadow-2xs hover:bg-emerald-50 shrink-0"
+              aria-label="YouTube"
+              title="YouTube"
+            >
+              <FaYoutube className="w-3.5 h-3.5" />
+            </a>
+
+            <a
+              href={settings?.twitter || 'https://x.com'}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-7 h-7 rounded-full bg-white text-[#0b8026] flex items-center justify-center hover:scale-110 transition shadow-2xs hover:bg-emerald-50 shrink-0"
+              aria-label="X (Twitter)"
+              title="X (Twitter)"
+            >
+              <FaXTwitter className="w-3.5 h-3.5" />
             </a>
           </div>
+
+          {/* Middle: News & Updates Red Button + White Ticker Bar */}
+          <div className="flex-1 flex items-center min-w-50 max-w-xl lg:max-w-3xl mx-2 sm:mx-3 overflow-hidden">
+            <div className="hidden sm:flex bg-[#d50000] text-white px-3 py-1.5 rounded-l-md font-black text-xs whitespace-nowrap items-center gap-1 shadow-sm shrink-0">
+              <FiActivity className="w-3.5 h-3.5" />
+              <span>News &amp; Updates</span>
+            </div>
+            <div className="flex-1 bg-white h-7 flex items-center px-3 rounded-md sm:rounded-l-none sm:rounded-r-md overflow-hidden">
+              <div className="whitespace-nowrap animate-marquee text-xs font-semibold text-slate-800">
+                {settings?.newsTickerText || 'Welcome to Samasya Samadhan Parishad (SSP) • Free Membership & Social Welfare Mission • Helpline: +919319698759'}
+              </div>
+            </div>
+          </div>
+
+          {/* Right: Phone Helpline */}
+          <div className="hidden md:flex items-center gap-1.5 text-xs font-bold shrink-0 border border-white rounded-full p-2">
+            <FiPhone className="w-3.5 h-3.5" />
+            <a
+              href={`tel:${settings?.phone}`}
+              className="hover:underline"
+            >
+              {settings?.phone}
+            </a>
+          </div>
+
         </div>
       </div>
 
-      {/* 2. MAIN HEADER NAVIGATION BAR */}
-      <nav className="bg-white/95 backdrop-blur-md border-b border-slate-200" ref={dropdownRef}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            {/* NGO Brand & Logo */}
-            <Link href="/" className="flex items-center gap-3 shrink-0 group">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-red-600 to-red-700 flex items-center justify-center text-white font-black text-xl shadow-md shadow-red-600/25 group-hover:scale-105 transition-transform overflow-hidden">
-                {settings?.logoUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={getContentImageUrl(settings.logoUrl)}
-                    alt={settings?.ngoName ? `${settings.ngoName} Logo` : 'Indian Youth Foundation Logo'}
-                    className="w-full h-full object-cover"
-                    suppressHydrationWarning
-                    onError={(e) => {
-                      e.currentTarget.onerror = null;
-                      e.currentTarget.src = 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=120&auto=format&fit=crop&q=80';
-                    }}
-                  />
-                ) : (
-                  <span>IYF</span>
-                )}
-              </div>
-              <div className="flex flex-col">
-                <span className="text-sm sm:text-xl font-black leading-tight tracking-tight bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 bg-clip-text text-transparent group-hover:from-red-700 group-hover:via-rose-700 group-hover:to-amber-700 transition-all drop-shadow-2xs" suppressHydrationWarning>
-                  {settings?.ngoName || 'Indian Youth Foundation'}
-                </span>
-                <span className="text-[11px] font-extrabold tracking-wider bg-gradient-to-r from-orange-600 via-red-600 to-rose-600 bg-clip-text text-transparent" suppressHydrationWarning>
-                  {settings?.ngoNameHi || 'भारतीय युवा क्रांति'}
-                </span>
-              </div>
+      {/* ---------------- 2. MIDDLE WHITE BRANDING ROW ---------------- */}
+      <div className="bg-white py-0 px-4 sm:px-8 border-b border-slate-100">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+
+          {/* Logo & Big Bold English Name (Hindi name removed for cleaner layout) */}
+          <Link href="/" className="flex items-center gap-3 sm:gap-4 group">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full border border-slate-200 p-0 flex items-center justify-center bg-white shrink-0 overflow-hidden shadow-sm">
+              <img
+                src={getContentImageUrl(settings?.logoUrl) || '/logo.jpeg'}
+                alt={settings?.ngoName}
+                className="w-full h-full object-contain"
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = '/logo.jpeg';
+                }}
+              />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-[#d50000] tracking-tight leading-tight uppercase">
+                {settings?.ngoName || 'YUVA KRANTI DAL'}
+              </span>
+            </div>
+          </Link>
+
+          {/* Right: Red Donate Us Button with Bouncing Heart + Google Translate */}
+          <div className="flex items-center gap-3">
+            <Link
+              href="/donation"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#d50000] hover:bg-red-700 text-white font-extrabold text-xs sm:text-sm shadow-md transition transform hover:scale-105 animate-bounce"
+            >
+              <FiHeart className="w-4 h-4 text-white fill-white shrink-0" />
+              <span>Donate Us</span>
             </Link>
 
-            {/* Desktop Navigation Links with Dropdowns */}
-            <div className="hidden lg:flex items-center space-x-1 font-semibold text-xs text-black">
-              {/* Home link */}
+            <div className="hidden sm:block">
+              <GoogleTranslate />
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      {/* ---------------- 3. GREEN MAIN NAVIGATION BAR ---------------- */}
+      <nav className="bg-[#0b8026] text-white border-t border-[#09661f]" ref={dropdownRef}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-11">
+
+            {/* Desktop Navigation Links */}
+            <div className="hidden lg:flex items-center space-x-0.5 font-bold text-xs h-full">
+              {/* Home Icon button */}
               <Link
                 href="/"
-                className={`px-3.5 py-2 rounded-xl border transition-all ${pathname === '/'
-                  ? 'text-red-700 font-black bg-red-100 border-red-300 shadow-2xs'
-                  : 'text-slate-800 border-transparent hover:text-red-700 hover:bg-red-100/90 hover:border-red-300 font-bold'
+                className={`flex items-center justify-center w-11 h-11 transition ${pathname === '/'
+                  ? 'bg-[#d50000] text-white shadow-inner font-black'
+                  : 'bg-[#09661f] text-white hover:bg-[#075018]'
                   }`}
+                title="Home"
               >
-                Home
+                <FiHome className="w-5 h-5" />
               </Link>
 
-              {/* Dropdown Groups */}
-              {navGroups.map((group) => {
-                const isOpen = activeDropdown === group.id;
-                const active = isGroupActive(group);
+              {navMenuItems.map((item) => {
+                if (item.hasDropdown) {
+                  const isOpen = activeDropdown === item.id;
+                  const isDropdownActive = item.links?.some((l) => {
+                    const cleanHref = l.href.split('#')[0];
+                    return cleanHref && cleanHref !== '/' ? pathname.startsWith(cleanHref) : false;
+                  });
 
-                return (
-                  <div key={group.id} className="relative">
-                    <button
-                      onClick={() => toggleDropdown(group.id)}
-                      onMouseEnter={() => setActiveDropdown(group.id)}
-                      className={`group flex items-center gap-1.5 px-3.5 py-2 rounded-xl border transition-all cursor-pointer ${active || isOpen
-                        ? 'text-red-700 font-black bg-red-100 border-red-300 shadow-2xs'
-                        : 'text-slate-800 border-transparent hover:text-red-700 hover:bg-red-100/90 hover:border-red-300 font-bold'
-                        }`}
-                      aria-expanded={isOpen}
-                    >
-                      <span>{group.label}</span>
-                      <FiChevronDown
-                        className={`w-3.5 h-3.5 transition-transform duration-200 ${isOpen ? 'rotate-180 text-red-600' : 'text-slate-500 group-hover:text-red-600'}`}
-                      />
-                    </button>
-
-                    {/* Popover Dropdown Card */}
-                    {isOpen && (
-                      <div
-                        onMouseLeave={() => setActiveDropdown(null)}
-                        className="absolute left-0 mt-1 w-72 bg-white rounded-2xl shadow-2xl border border-red-100 p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150"
+                  return (
+                    <div key={item.id} className="relative h-full flex items-center">
+                      <button
+                        onClick={() => toggleDropdown(item.id)}
+                        className={`flex items-center gap-1 px-3 py-2.5 transition cursor-pointer rounded-sm ${isDropdownActive
+                          ? 'bg-[#d50000] text-white font-black shadow-inner'
+                          : 'hover:bg-[#09661f] text-white'
+                          }`}
                       >
-                        <div className="space-y-1">
-                          {group.links.map((link) => {
-                            const Icon = link.icon;
-                            const isCurrent = pathname === link.href;
+                        <span>{item.label}</span>
+                        <FiChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+                      </button>
+
+                      {isOpen && (
+                        <div
+                          onMouseLeave={() => setActiveDropdown(null)}
+                          className="absolute left-0 top-full mt-0 w-52 bg-white text-slate-800 rounded-b-xl shadow-xl border border-slate-100 py-1.5 z-50 animate-in fade-in slide-in-from-top-1 duration-150"
+                        >
+                          {item.links.map((link) => {
+                            const IconComponent = link.icon;
+                            const cleanHref = link.href.split('#')[0];
+                            const isSubActive = cleanHref && cleanHref !== '/' ? pathname === cleanHref : false;
 
                             return (
                               <Link
-                                key={link.href}
+                                key={link.href + link.label}
                                 href={link.href}
                                 onClick={() => setActiveDropdown(null)}
-                                className={`flex items-start gap-3 p-2.5 rounded-xl border transition-all group ${isCurrent
-                                  ? 'bg-red-100/90 text-red-700 border-red-300 font-bold'
-                                  : 'border-transparent hover:bg-red-100/80 text-slate-800 hover:text-red-700 hover:border-red-200'
+                                className={`flex items-center gap-2 px-4 py-2 text-xs font-semibold transition ${isSubActive
+                                  ? 'bg-red-50 text-[#d50000] font-black'
+                                  : 'hover:bg-green-50 hover:text-[#0b8026] text-slate-700'
                                   }`}
                               >
-                                <div className={`p-2 rounded-lg mt-0.5 shrink-0 transition-colors ${isCurrent ? 'bg-red-600 text-white shadow-2xs' : 'bg-red-50 text-red-600 group-hover:bg-red-600 group-hover:text-white shadow-2xs'}`}>
-                                  <Icon className="w-4 h-4" />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <div className="font-bold text-xs group-hover:text-red-700 transition-colors">{link.label}</div>
-                                  <div className="text-[11px] text-slate-500 group-hover:text-red-900 font-medium truncate mt-0.5">{link.desc}</div>
-                                </div>
+                                {IconComponent && <IconComponent className={`w-3.5 h-3.5 shrink-0 ${isSubActive ? 'text-[#d50000]' : 'text-[#0b8026]'}`} />}
+                                <span>{link.label}</span>
                               </Link>
                             );
                           })}
+                          {item.id === 'user_profile' && (
+                            <div className="pt-1 mt-1 border-t border-slate-100">
+                              <button
+                                type="button"
+                                onClick={async () => {
+                                  setActiveDropdown(null);
+                                  await logout();
+                                }}
+                                className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
+                              >
+                                <FiX className="w-3.5 h-3.5" />
+                                <span>Sign Out</span>
+                              </button>
+                            </div>
+                          )}
                         </div>
-                      </div>
-                    )}
-                  </div>
+                      )}
+                    </div>
+                  );
+                }
+
+                const isActive = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
+
+                return (
+                  <Link
+                    key={item.href + item.label}
+                    href={item.href}
+                    className={`px-3 py-2.5 transition rounded-sm whitespace-nowrap ${isActive
+                      ? 'bg-[#d50000] text-white font-black shadow-inner'
+                      : 'hover:bg-[#09661f] text-white'
+                      }`}
+                  >
+                    {item.label}
+                  </Link>
                 );
               })}
             </div>
 
-            {/* Action Buttons: Donate, User Portal & Register */}
-            <div className="hidden lg:flex items-center gap-2.5">
-              {mounted && effectiveUser ? (
-                <div className="flex items-center gap-2">
-                  {effectiveUser.role === 'Admin' && (
-                    <Link
-                      href="/dashboard"
-                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold shadow-xs transition bg-black text-white hover:bg-slate-900"
-                      title="Admin Control Panel"
-                    >
-                      <FiGrid className="w-3.5 h-3.5 text-red-500" />
-                    </Link>
-                  )}
-                  <Link
-                    href="/profile"
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-black text-xs font-bold transition border border-slate-200 shadow-2xs"
-                    title="User Portal & Credentials"
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={getContentImageUrl(effectiveUser.photoUrl) || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100'}
-                      alt={effectiveUser.name}
-                      className="w-6 h-6 rounded-full object-cover border border-red-500 shrink-0"
-                      onError={(e) => {
-                        e.currentTarget.onerror = null;
-                        e.currentTarget.src = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100';
-                      }}
-                    />
-                    <span className="max-w-[110px] truncate">{effectiveUser.name}</span>
-                  </Link>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <Link
-                    href="/login"
-                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-200 text-black hover:border-red-500 hover:text-red-600 text-xs font-bold transition"
-                  >
-                    <FiUser className="w-3.5 h-3.5" />
-                    <span>Login</span>
-                  </Link>
-                  <Link
-                    href="/register"
-                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 text-xs font-bold transition border border-red-200"
-                  >
-                    <FiUserPlus className="w-3.5 h-3.5 text-red-600" />
-                    <span>Register</span>
-                  </Link>
-                </div>
-              )}
-
-              {/* Direct Donate Button */}
+            {/* Mobile View Toggle */}
+            <div className="flex lg:hidden items-center justify-between w-full">
               <Link
-                href="/donation"
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white text-xs font-extrabold shadow-md shadow-red-600/25 hover:shadow-red-600/40 transform hover:-translate-y-0.5 transition"
+                href="/"
+                className={`flex items-center gap-1 font-bold text-xs py-1.5 px-2.5 rounded-md transition ${pathname === '/' ? 'bg-[#d50000] text-white' : 'hover:bg-[#09661f]'
+                  }`}
               >
-                <FiHeart className="w-4 h-4 fill-white" />
-                <span>Donate (80G)</span>
+                <FiHome className="w-4 h-4" />
+                <span>Home</span>
               </Link>
-            </div>
 
-            {/* Mobile Hamburger & Donate Button */}
-            <div className="flex lg:hidden items-center gap-2">
-              <Link
-                href="/donation"
-                className="px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs font-bold"
-              >
-                Donate
-              </Link>
               <button
-                onClick={() => setMobileMenuOpen(true)}
-                className="p-2 rounded-lg text-black hover:text-black hover:bg-slate-100 cursor-pointer"
-                aria-label="Open navigation menu"
+                type="button"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="p-1.5 text-white hover:bg-[#09661f] rounded-lg cursor-pointer"
+                aria-label="Toggle Menu"
               >
-                <FiMenu className="w-6 h-6" />
+                {mobileMenuOpen ? <FiX className="w-6 h-6" /> : <FiMenu className="w-6 h-6" />}
               </button>
             </div>
+
           </div>
         </div>
       </nav>
 
-      {/* 3. MOBILE SLIDE-OVER SIDEBAR DRAWER */}
+      {/* ---------------- MOBILE DRAWER ---------------- */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          {/* Backdrop overlay */}
-          <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
-            onClick={() => setMobileMenuOpen(false)}
-          />
+        <div className="lg:hidden bg-white text-slate-900 border-b-2 border-[#0b8026] py-3 px-4 shadow-xl max-h-[80vh] overflow-y-auto">
+          <div className="space-y-1 text-xs font-bold">
+            <Link
+              href="/"
+              onClick={() => setMobileMenuOpen(false)}
+              className={`flex items-center gap-2 py-2 px-3 rounded-lg transition ${pathname === '/'
+                ? 'bg-red-50 text-[#d50000] font-black'
+                : 'hover:bg-green-50 text-slate-800 hover:text-[#0b8026]'
+                }`}
+            >
+              <FiHome className={`w-4 h-4 ${pathname === '/' ? 'text-[#d50000]' : 'text-[#0b8026]'}`} />
+              <span>Home</span>
+            </Link>
+            {navMenuItems.map((item) => {
+              const isDirectActive = item.href && (item.href === '/' ? pathname === '/' : pathname.startsWith(item.href));
+              const isChildActive = item.links?.some((l) => {
+                const cleanHref = l.href.split('#')[0];
+                return cleanHref && cleanHref !== '/' ? pathname.startsWith(cleanHref) : false;
+              });
 
-          {/* Drawer Panel */}
-          <div className="fixed inset-y-0 right-0 max-w-xs w-full bg-white shadow-2xl flex flex-col z-50">
-            {/* Drawer Header */}
-            <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-red-600 flex items-center justify-center text-white font-bold text-sm shadow-md">
-                  IYF
-                </div>
-                <div>
-                  <h3 className="font-black text-sm bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 bg-clip-text text-transparent truncate" suppressHydrationWarning>
-                    {settings?.ngoName || 'Indian Youth Foundation'}
-                  </h3>
-                  <span className="text-[10px] text-red-600 font-bold block">12A &amp; 80G Certified</span>
-                </div>
-              </div>
-              <button
-                onClick={() => setMobileMenuOpen(false)}
-                className="p-2 rounded-xl text-black hover:bg-slate-200 cursor-pointer"
-                aria-label="Close menu"
-              >
-                <FiX className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Drawer User Bar */}
-            <div className="p-4 border-b border-slate-100 bg-white">
-              {mounted && effectiveUser ? (
-                <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-2.5">
-                  <div className="flex items-center gap-3">
-                    <div className="relative w-11 h-11 rounded-2xl overflow-hidden border-2 border-red-500 shadow-2xs shrink-0 bg-white">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={getContentImageUrl(effectiveUser.photoUrl) || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'}
-                        alt={effectiveUser.name}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.currentTarget.onerror = null;
-                          e.currentTarget.src = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150';
-                        }}
-                      />
-                    </div>
-                    <div>
-                      <div className="text-xs font-black text-black">{effectiveUser.name}</div>
-                      <div className="flex items-center gap-1.5 mt-0.5">
-                        <span className="inline-block text-[10px] font-bold text-red-700 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full">
-                          {effectiveUser.role}
-                        </span>
-                        <span className="text-[10px] text-slate-500 font-mono">
-                          {effectiveUser.memberId || 'Active'}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2 pt-1">
-                    {effectiveUser.role === 'Admin' ? (
-                      <>
-                        <Link
-                          href="/dashboard"
-                          onClick={() => setMobileMenuOpen(false)}
-                          className="flex-1 py-2 text-center rounded-xl bg-black text-white text-[11px] font-bold"
-                        >
-                          Admin Panel
-                        </Link>
-                        <Link
-                          href="/profile"
-                          onClick={() => setMobileMenuOpen(false)}
-                          className="flex-1 py-2 text-center rounded-xl border border-slate-200 text-black text-[11px] font-bold"
-                        >
-                          User Portal
-                        </Link>
-                      </>
-                    ) : (
-                      <Link
-                        href="/profile"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="w-full py-2 text-center rounded-xl bg-red-600 text-white text-[11px] font-bold"
-                      >
-                        Open My Portal &amp; ID Card →
-                      </Link>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 gap-2">
-                  <Link
-                    href="/login"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-slate-200 text-black font-bold text-xs"
-                  >
-                    <FiUser className="w-3.5 h-3.5" />
-                    <span>Login</span>
-                  </Link>
-                  <Link
-                    href="/register"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-red-600 text-white font-bold text-xs"
-                  >
-                    <FiUserPlus className="w-3.5 h-3.5" />
-                    <span>Register</span>
-                  </Link>
-                </div>
-              )}
-            </div>
-
-            {/* Drawer Nav Accordion List */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-2 text-xs">
-              {/* Home */}
-              <Link
-                href="/"
-                onClick={() => setMobileMenuOpen(false)}
-                className={`block px-3 py-2.5 rounded-xl font-bold transition ${pathname === '/' ? 'bg-red-50 text-red-600' : 'text-black hover:bg-slate-50'
-                  }`}
-              >
-                Home
-              </Link>
-
-              {/* Direct Donate */}
-              <Link
-                href="/donation"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center justify-between px-3 py-2.5 rounded-xl font-bold bg-red-50 text-red-700 border border-red-200"
-              >
-                <span className="flex items-center gap-2">
-                  <FiHeart className="w-4 h-4 text-red-600" />
-                  <span>Donate Now</span>
-                </span>
-                <span className="text-[10px] bg-red-600 text-white px-2 py-0.5 rounded-full font-bold">50% Tax Free</span>
-              </Link>
-
-              {/* Nav Groups Accordion */}
-              {navGroups.map((group) => {
-                const isOpen = mobileOpenAccordion === group.id;
-
-                return (
-                  <div key={group.id} className="border border-slate-100 rounded-2xl overflow-hidden bg-slate-50/50">
-                    <button
-                      onClick={() => toggleMobileAccordion(group.id)}
-                      className="w-full flex items-center justify-between px-3 py-2.5 font-bold text-black hover:text-red-600 transition"
+              return (
+                <div key={item.label} className="border-b border-slate-100 last:border-none pb-1">
+                  {item.href ? (
+                    <Link
+                      href={item.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`block py-2 px-3 rounded-lg transition ${isDirectActive || isChildActive
+                        ? 'bg-red-50 text-[#d50000] font-black'
+                        : 'hover:bg-green-50 text-slate-800 hover:text-[#0b8026]'
+                        }`}
                     >
-                      <span>{group.label}</span>
-                      <FiChevronRight className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-90 text-red-600' : 'text-slate-400'}`} />
-                    </button>
+                      {item.label}
+                    </Link>
+                  ) : (
+                    <div className="py-2 px-3 text-slate-900 font-extrabold flex items-center justify-between">
+                      <span>{item.label}</span>
+                    </div>
+                  )}
 
-                    {isOpen && (
-                      <div className="px-2 pb-2 space-y-1 bg-white border-t border-slate-100">
-                        {group.links.map((link) => {
-                          const Icon = link.icon;
-                          const isActive = pathname === link.href;
+                  {item.links && (
+                    <div className="pl-4 space-y-1 pt-0.5">
+                      {item.links.map((sub) => {
+                        const SubIcon = sub.icon;
+                        const cleanHref = sub.href.split('#')[0];
+                        const isSubActive = cleanHref && cleanHref !== '/' ? pathname === cleanHref : false;
 
-                          return (
-                            <Link
-                              key={link.href}
-                              href={link.href}
-                              onClick={() => setMobileMenuOpen(false)}
-                              className={`flex items-center gap-2.5 px-3 py-2 rounded-xl transition ${isActive ? 'bg-red-50 text-red-600 font-bold' : 'text-black hover:bg-slate-50'
-                                }`}
-                            >
-                              <Icon className="w-3.5 h-3.5 text-black" />
-                              <span>{link.label}</span>
-                            </Link>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Drawer Footer Actions */}
-            <div className="p-4 border-t border-slate-200 bg-slate-50 space-y-2">
-              {mounted && currentUser && (
+                        return (
+                          <Link
+                            key={sub.href + sub.label}
+                            href={sub.href}
+                            onClick={() => setMobileMenuOpen(false)}
+                            className={`flex items-center gap-2 py-1.5 px-2 rounded-md text-[11px] transition ${isSubActive
+                              ? 'bg-red-50 text-[#d50000] font-black'
+                              : 'text-slate-600 hover:text-[#0b8026] hover:bg-slate-50'
+                              }`}
+                          >
+                            {SubIcon ? (
+                              <SubIcon className={`w-3.5 h-3.5 ${isSubActive ? 'text-[#d50000]' : 'text-[#0b8026]'}`} />
+                            ) : (
+                              <span>•</span>
+                            )}
+                            <span>{sub.label}</span>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+            {currentUser && (
+              <div className="pt-2 border-t border-slate-100">
                 <button
-                  onClick={() => { logout(); setMobileMenuOpen(false); }}
-                  className="w-full py-2 text-center text-xs font-bold text-red-600 hover:bg-red-50 rounded-xl"
+                  type="button"
+                  onClick={async () => {
+                    setMobileMenuOpen(false);
+                    await logout();
+                  }}
+                  className="w-full text-left py-2 px-3 rounded-lg text-red-600 hover:bg-red-50 text-xs font-bold transition flex items-center gap-1.5"
                 >
-                  Logout from Account
+                  <FiX className="w-4 h-4" />
+                  <span>Sign Out ({currentUser.name})</span>
                 </button>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       )}
+
+      {/* Keyframe animation for marquee */}
+      <style jsx>{`
+        @keyframes marquee {
+          0% { transform: translateX(100%); }
+          100% { transform: translateX(-100%); }
+        }
+        .animate-marquee {
+          display: inline-block;
+          animation: marquee 25s linear infinite;
+        }
+      `}</style>
     </header>
   );
 }

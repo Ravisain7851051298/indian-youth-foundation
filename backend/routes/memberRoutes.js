@@ -9,7 +9,10 @@ const { handleOptionalFileUpload } = require('../middlewares/upload');
 router.post('/apply', verifyToken, handleOptionalFileUpload, applicationController.applyMembership);
 router.post('/', verifyToken, handleOptionalFileUpload, applicationController.applyMembership);
 
-// Member directory & management
+// Public Member Directory (sanitized, non-sensitive)
+router.get('/public', memberController.getPublicMembers);
+
+// Member directory & management (Admin/Coordinator with full details)
 router.get('/', verifyToken, requireRole(['admin', 'manager', 'coordinator']), memberController.getMembers);
 router.put('/:id/status', verifyToken, requireRole(['admin']), memberController.updateMemberStatus);
 router.put('/:id/verify', verifyToken, requireRole(['admin', 'manager']), memberController.verifyMember);

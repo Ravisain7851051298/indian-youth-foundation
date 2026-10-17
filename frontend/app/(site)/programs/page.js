@@ -38,8 +38,8 @@ export default function ProgramsPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10 pb-6 border-b border-gray-200">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-red-700 text-xs font-bold mb-1 border border-red-200">
-              <FiLayers className="w-3.5 h-3.5 text-red-600" />
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-bold mb-1 border border-emerald-200">
+              <FiLayers className="w-3.5 h-3.5 text-emerald-700" />
               <span>Sustainable Impact Drives</span>
             </div>
             <h1 className="text-3xl font-extrabold text-black tracking-tight">
@@ -53,7 +53,7 @@ export default function ProgramsPage() {
           {isAdmin && (
             <button
               onClick={() => setShowAdd(true)}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-md transition cursor-pointer"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-md shadow-emerald-700/20 transition cursor-pointer"
             >
               <FiPlus className="w-4 h-4" />
               <span>Add New Program</span>
@@ -81,7 +81,7 @@ export default function ProgramsPage() {
                     placeholder="e.g. Green Mission - 10,000 Trees"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="w-full px-3.5 py-2.5 border rounded-xl border-gray-300 focus:outline-red-500 font-medium text-black"
+                    className="w-full px-3.5 py-2.5 border rounded-xl border-gray-300 focus:outline-emerald-600 font-medium text-black"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
@@ -92,7 +92,7 @@ export default function ProgramsPage() {
                       placeholder="e.g. Active Project"
                       value={badge}
                       onChange={(e) => setBadge(e.target.value)}
-                      className="w-full px-3.5 py-2.5 border rounded-xl border-gray-300 focus:outline-red-500 font-medium text-black"
+                      className="w-full px-3.5 py-2.5 border rounded-xl border-gray-300 focus:outline-emerald-600 font-medium text-black"
                     />
                   </div>
                   <div>
@@ -102,7 +102,7 @@ export default function ProgramsPage() {
                       placeholder="e.g. 1,000+ Students"
                       value={beneficiaries}
                       onChange={(e) => setBeneficiaries(e.target.value)}
-                      className="w-full px-3.5 py-2.5 border rounded-xl border-gray-300 focus:outline-red-500 font-medium text-black"
+                      className="w-full px-3.5 py-2.5 border rounded-xl border-gray-300 focus:outline-emerald-600 font-medium text-black"
                     />
                   </div>
                 </div>
@@ -113,7 +113,7 @@ export default function ProgramsPage() {
                     placeholder="https://images.unsplash.com/photo-..."
                     value={image}
                     onChange={(e) => setImage(e.target.value)}
-                    className="w-full px-3.5 py-2.5 border rounded-xl border-gray-300 focus:outline-red-500 font-medium text-black"
+                    className="w-full px-3.5 py-2.5 border rounded-xl border-gray-300 focus:outline-emerald-600 font-medium text-black"
                   />
                 </div>
                 <div>
@@ -124,7 +124,7 @@ export default function ProgramsPage() {
                     placeholder="Key highlights and scope of the program..."
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className="w-full px-3.5 py-2.5 border rounded-xl border-gray-300 focus:outline-red-500 font-medium text-black"
+                    className="w-full px-3.5 py-2.5 border rounded-xl border-gray-300 focus:outline-emerald-600 font-medium text-black"
                   />
                 </div>
                 <div className="flex justify-end gap-3 pt-2">
@@ -137,7 +137,7 @@ export default function ProgramsPage() {
                   </button>
                   <button
                     type="submit"
-                    className="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl shadow-md transition cursor-pointer"
+                    className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl shadow-md transition cursor-pointer"
                   >
                     Save Program
                   </button>
@@ -152,7 +152,7 @@ export default function ProgramsPage() {
           {programs.map((p) => (
             <div
               key={p.id}
-              className="bg-white rounded-3xl overflow-hidden border border-gray-200 hover:border-red-300 hover:shadow-xl transition-all flex flex-col justify-between group"
+              className="bg-white rounded-3xl overflow-hidden border border-gray-200 hover:border-emerald-300 hover:shadow-xl transition-all flex flex-col justify-between group"
             >
               <div>
                 <div className="relative h-48 overflow-hidden">
@@ -175,11 +175,11 @@ export default function ProgramsPage() {
               <div className="p-6 pt-0">
                 <div className="pt-4 border-t border-gray-100 flex items-center justify-between text-xs">
                   <span className="flex items-center gap-1.5 text-black font-semibold">
-                    <FiUsers className="w-3.5 h-3.5 text-red-600" />
+                    <FiUsers className="w-3.5 h-3.5 text-emerald-700" />
                     <span>{p.beneficiaries}</span>
                   </span>
                   <div className="flex items-center gap-3">
-                    <Link href="/donation" className="text-red-600 font-bold hover:text-red-700 transition">
+                    <Link href="/donation" className="text-emerald-700 font-bold hover:text-emerald-800 transition">
                       Support →
                     </Link>
                     {isAdmin && (

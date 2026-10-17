@@ -38,8 +38,8 @@ export default function StoryPage() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10 pb-6 border-b border-slate-200">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-bold mb-1">
-              <FiBookOpen className="w-3.5 h-3.5 text-red-600" />
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold mb-1">
+              <FiBookOpen className="w-3.5 h-3.5 text-emerald-700" />
               <span>Real Transformations</span>
             </div>
             <h1 className="text-3xl font-extrabold text-black tracking-tight">
@@ -53,7 +53,7 @@ export default function StoryPage() {
           {isAdmin && (
             <button
               onClick={() => setShowAdd(true)}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-md transition cursor-pointer"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-md transition cursor-pointer"
             >
               <FiPlus className="w-4 h-4" />
               <span>Add New Story</span>
@@ -81,7 +81,7 @@ export default function StoryPage() {
                     placeholder="e.g. From Traffic Signals to Board Examination Topper"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-red-500 font-medium text-black bg-white"
+                    className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-emerald-600 font-medium text-black bg-white"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
@@ -92,7 +92,7 @@ export default function StoryPage() {
                       placeholder="e.g. Rahul Kumar (Age 16)"
                       value={beneficiary}
                       onChange={(e) => setBeneficiary(e.target.value)}
-                      className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-red-500 font-medium text-black bg-white"
+                      className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-emerald-600 font-medium text-black bg-white"
                     />
                   </div>
                   <div>
@@ -102,7 +102,7 @@ export default function StoryPage() {
                       placeholder="e.g. Education Impact"
                       value={category}
                       onChange={(e) => setCategory(e.target.value)}
-                      className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-red-500 font-medium text-black bg-white"
+                      className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-emerald-600 font-medium text-black bg-white"
                     />
                   </div>
                 </div>
@@ -113,7 +113,7 @@ export default function StoryPage() {
                     placeholder="https://images.unsplash.com/photo-..."
                     value={image}
                     onChange={(e) => setImage(e.target.value)}
-                    className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-red-500 font-medium text-black bg-white"
+                    className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-emerald-600 font-medium text-black bg-white"
                   />
                 </div>
                 <div>
@@ -124,7 +124,7 @@ export default function StoryPage() {
                     placeholder="Describe their journey, challenges overcome, and the role of Indian Youth Foundation..."
                     value={summary}
                     onChange={(e) => setSummary(e.target.value)}
-                    className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-red-500 font-medium text-black bg-white"
+                    className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-emerald-600 font-medium text-black bg-white"
                   />
                 </div>
                 <div className="flex justify-end gap-3 pt-2">
@@ -137,7 +137,7 @@ export default function StoryPage() {
                   </button>
                   <button
                     type="submit"
-                    className="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl shadow-md transition cursor-pointer"
+                    className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl shadow-md transition cursor-pointer"
                   >
                     Save Story
                   </button>
@@ -160,7 +160,7 @@ export default function StoryPage() {
                   alt={s.title}
                   className="w-full h-full object-cover"
                 />
-                <span className="absolute top-4 left-4 bg-red-600 text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-md">
+                <span className="absolute top-4 left-4 bg-emerald-700 text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-md">
                   {s.category}
                 </span>
               </div>
@@ -181,7 +181,7 @@ export default function StoryPage() {
                 <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
                   <Link
                     href="/donation"
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-sm transition"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-sm transition"
                   >
                     <FiHeart className="w-3.5 h-3.5 fill-white" />
                     <span>Support Similar Causes</span>

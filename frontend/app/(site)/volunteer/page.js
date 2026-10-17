@@ -3,12 +3,12 @@
 import React, { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { 
-  FiUserPlus, 
-  FiCheckCircle, 
-  FiShield, 
-  FiHeart, 
-  FiUser, 
+import {
+  FiUserPlus,
+  FiCheckCircle,
+  FiShield,
+  FiHeart,
+  FiUser,
   FiLock,
   FiClock,
   FiFileText,
@@ -31,11 +31,11 @@ function VolunteerContent() {
   return (
     <div className="min-h-screen bg-slate-50 py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* Top Header */}
         <div className="text-center max-w-2xl mx-auto mb-10">
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-red-100 text-red-800 text-xs font-bold mb-3 shadow-xs">
-            <FiShield className="w-3.5 h-3.5 text-red-600" />
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold mb-3 shadow-xs border border-emerald-200">
+            <FiShield className="w-3.5 h-3.5 text-emerald-700" />
             <span>12A &amp; 80G Certified Non-Profit Organization</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-black text-black tracking-tight">
@@ -49,8 +49,8 @@ function VolunteerContent() {
         {/* 3-Step Process Infographic Banner */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
           <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-xs relative overflow-hidden">
-            <span className="text-2xl font-black text-red-500/20 absolute -top-1 -right-1 p-2">01</span>
-            <div className="w-9 h-9 rounded-xl bg-red-100 text-red-600 flex items-center justify-center font-bold text-sm mb-3">
+            <span className="text-2xl font-black text-emerald-500/20 absolute -top-1 -right-1 p-2">01</span>
+            <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-sm mb-3">
               1
             </div>
             <h4 className="font-extrabold text-black text-sm">Account Login / Register</h4>
@@ -60,8 +60,8 @@ function VolunteerContent() {
           </div>
 
           <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-xs relative overflow-hidden">
-            <span className="text-2xl font-black text-red-500/20 absolute -top-1 -right-1 p-2">02</span>
-            <div className="w-9 h-9 rounded-xl bg-red-100 text-red-600 flex items-center justify-center font-bold text-sm mb-3">
+            <span className="text-2xl font-black text-emerald-500/20 absolute -top-1 -right-1 p-2">02</span>
+            <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-sm mb-3">
               2
             </div>
             <h4 className="font-extrabold text-black text-sm">Submit Application</h4>
@@ -71,8 +71,8 @@ function VolunteerContent() {
           </div>
 
           <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-xs relative overflow-hidden">
-            <span className="text-2xl font-black text-red-500/20 absolute -top-1 -right-1 p-2">03</span>
-            <div className="w-9 h-9 rounded-xl bg-red-100 text-red-600 flex items-center justify-center font-bold text-sm mb-3">
+            <span className="text-2xl font-black text-emerald-500/20 absolute -top-1 -right-1 p-2">03</span>
+            <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-sm mb-3">
               3
             </div>
             <h4 className="font-extrabold text-black text-sm">Admin Approval &amp; ID Card</h4>
@@ -85,7 +85,7 @@ function VolunteerContent() {
         {/* ---------------- STATE 1: USER IS NOT LOGGED IN ---------------- */}
         {!currentUser && (
           <div className="bg-white rounded-3xl p-6 sm:p-10 border border-slate-200 shadow-xl text-center space-y-6">
-            <div className="w-16 h-16 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center mx-auto text-2xl shadow-md border border-red-200">
+            <div className="w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center mx-auto text-2xl shadow-md border border-emerald-200">
               <FiLock className="w-8 h-8" />
             </div>
 
@@ -102,7 +102,7 @@ function VolunteerContent() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
               <Link
                 href="/login?redirect=/volunteer"
-                className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-lg shadow-red-600/25 transition flex items-center justify-center gap-2"
+                className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-lg shadow-emerald-700/25 transition flex items-center justify-center gap-2"
               >
                 <FiLogIn className="w-4 h-4" />
                 <span>Sign In to Apply</span>
@@ -124,14 +124,14 @@ function VolunteerContent() {
 
         {/* ---------------- STATE 2: USER IS LOGGED IN & APPROVED ---------------- */}
         {currentUser && isApproved && (
-          <div className="bg-white border-2 border-red-500/30 rounded-3xl p-6 sm:p-10 shadow-md">
+          <div className="bg-white border-2 border-emerald-500/30 rounded-3xl p-6 sm:p-10 shadow-md">
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="flex items-start gap-4">
                 <div className="w-14 h-14 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-md">
                   <FiCheckCircle className="w-8 h-8" />
                 </div>
                 <div className="space-y-1">
-                  <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-red-100 text-red-900 inline-block">
+                  <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-900 inline-block">
                     Verified {currentUser.role}
                   </span>
                   <h2 className="text-xl font-black text-black">
@@ -140,7 +140,7 @@ function VolunteerContent() {
                   <p className="text-xs text-slate-700 leading-relaxed max-w-xl">
                     Your appointment has been approved by the National Executive Council. Your official Dual-Sided ID Card and Letter of Appointment are active and ready.
                   </p>
-                  <p className="text-xs font-mono font-bold text-red-600 pt-1">
+                  <p className="text-xs font-mono font-bold text-emerald-700 pt-1">
                     Official Member ID: {currentUser.memberId}
                   </p>
                 </div>
@@ -149,7 +149,7 @@ function VolunteerContent() {
               <div className="flex flex-col sm:flex-row md:flex-col gap-2 shrink-0 w-full md:w-auto">
                 <Link
                   href="/profile/id-card"
-                  className="px-5 py-3 rounded-2xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-md text-center transition flex items-center justify-center gap-2"
+                  className="px-5 py-3 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-md text-center transition flex items-center justify-center gap-2"
                 >
                   <FiShield className="w-4 h-4" />
                   <span>Open Digital ID Card</span>
@@ -168,13 +168,13 @@ function VolunteerContent() {
 
         {/* ---------------- STATE 3: USER IS LOGGED IN & PENDING APPROVAL ---------------- */}
         {currentUser && isPending && (
-          <div className="bg-white border-2 border-red-200 rounded-3xl p-6 sm:p-10 shadow-sm space-y-4">
+          <div className="bg-white border-2 border-emerald-200 rounded-3xl p-6 sm:p-10 shadow-sm space-y-4">
             <div className="flex items-start gap-4">
               <div className="w-14 h-14 rounded-2xl bg-amber-600 text-white flex items-center justify-center shrink-0 shadow-md">
                 <FiClock className="w-8 h-8" />
               </div>
               <div className="space-y-1">
-                <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-red-100 text-red-900 inline-block">
+                <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-900 inline-block">
                   Trustee Verification in Progress
                 </span>
                 <h2 className="text-xl font-black text-black">
@@ -190,12 +190,12 @@ function VolunteerContent() {
             <div className="pt-2 flex items-center gap-3">
               <Link
                 href="/profile"
-                className="px-5 py-2.5 rounded-xl bg-red-600 text-white font-bold text-xs hover:bg-red-700 transition"
+                className="px-5 py-2.5 rounded-xl bg-emerald-700 text-white font-bold text-xs hover:bg-emerald-800 transition"
               >
                 Go to Profile Overview →
               </Link>
               <Link
-                href="/profile/apply-member"
+                href="/apply-member"
                 className="px-5 py-2.5 rounded-xl bg-white border border-slate-300 text-black font-bold text-xs hover:bg-slate-50 transition"
               >
                 Update Payment Proof
@@ -210,7 +210,7 @@ function VolunteerContent() {
             {/* Authenticated User Status Bar */}
             <div className="bg-white border-2 border-slate-200 text-black p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-md">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-red-600 flex items-center justify-center font-bold text-white text-base">
+                <div className="w-10 h-10 rounded-xl bg-emerald-700 flex items-center justify-center font-bold text-white text-base">
                   <FiUser className="w-5 h-5" />
                 </div>
                 <div>
@@ -218,7 +218,7 @@ function VolunteerContent() {
                   <div className="text-[11px] text-slate-600">{currentUser.email} • Authenticated User</div>
                 </div>
               </div>
-              <span className="text-[11px] px-3 py-1 rounded-full bg-red-100 text-red-700 font-bold border border-red-200">
+              <span className="text-[11px] px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 font-bold border border-emerald-200">
                 Ready to Apply
               </span>
             </div>
@@ -226,30 +226,30 @@ function VolunteerContent() {
             {/* Application Options Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Option 1: Volunteer Service */}
-              <div className="bg-white rounded-3xl p-6 sm:p-8 border-2 border-slate-200 hover:border-red-500 shadow-md flex flex-col justify-between transition">
+              <div className="bg-white rounded-3xl p-6 sm:p-8 border-2 border-slate-200 hover:border-emerald-600 shadow-md flex flex-col justify-between transition">
                 <div>
-                  <div className="w-12 h-12 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center text-xl mb-4">
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center text-xl mb-4">
                     <FiHeart className="w-6 h-6" />
                   </div>
-                  <span className="text-[10px] font-black uppercase tracking-wider text-red-700 bg-red-50 px-2.5 py-0.5 rounded-full inline-block mb-2">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full inline-block mb-2">
                     Grassroots Social Service
                   </span>
                   <h3 className="text-xl font-black text-black">Volunteer Enrolment</h3>
                   <p className="text-xs text-slate-700 mt-2 leading-relaxed">
                     Participate actively in community drives, free slum education, 24x7 blood helplines, environmental campaigns, and emergency disaster relief.
                   </p>
-                  
+
                   <div className="mt-4 space-y-2 border-t border-slate-100 pt-3 text-xs text-black">
                     <div className="flex items-center gap-2">
-                      <FiCheck className="w-4 h-4 text-red-600 shrink-0" />
+                      <FiCheck className="w-4 h-4 text-emerald-700 shrink-0" />
                       <span>Free enrolment for active social workers</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <FiCheck className="w-4 h-4 text-red-600 shrink-0" />
+                      <FiCheck className="w-4 h-4 text-emerald-700 shrink-0" />
                       <span>Volunteer Service Offer Letter upon approval</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <FiCheck className="w-4 h-4 text-red-600 shrink-0" />
+                      <FiCheck className="w-4 h-4 text-emerald-700 shrink-0" />
                       <span>Certificates of Appreciation for drives</span>
                     </div>
                   </div>
@@ -257,8 +257,8 @@ function VolunteerContent() {
 
                 <div className="mt-6 pt-4 border-t border-slate-100">
                   <Link
-                    href="/profile/apply-volunteer"
-                    className="w-full py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-md shadow-red-600/20 text-center transition flex items-center justify-center gap-2"
+                    href="/apply-volunteer"
+                    className="w-full py-3 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-md shadow-emerald-700/20 text-center transition flex items-center justify-center gap-2"
                   >
                     <span>Apply for Volunteer Service</span>
                     <FiArrowRight className="w-4 h-4" />
@@ -267,12 +267,12 @@ function VolunteerContent() {
               </div>
 
               {/* Option 2: Verified Member */}
-              <div className="bg-white rounded-3xl p-6 sm:p-8 border-2 border-slate-200 hover:border-red-500 shadow-md flex flex-col justify-between transition">
+              <div className="bg-white rounded-3xl p-6 sm:p-8 border-2 border-slate-200 hover:border-emerald-600 shadow-md flex flex-col justify-between transition">
                 <div>
-                  <div className="w-12 h-12 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center text-xl mb-4">
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center text-xl mb-4">
                     <FiCreditCard className="w-6 h-6" />
                   </div>
-                  <span className="text-[10px] font-black uppercase tracking-wider text-red-700 bg-red-50 px-2.5 py-0.5 rounded-full inline-block mb-2">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full inline-block mb-2">
                     Official Trust Membership
                   </span>
                   <h3 className="text-xl font-black text-black">Verified Member Enrolment</h3>
@@ -282,15 +282,15 @@ function VolunteerContent() {
 
                   <div className="mt-4 space-y-2 border-t border-slate-100 pt-3 text-xs text-black">
                     <div className="flex items-center gap-2">
-                      <FiCheck className="w-4 h-4 text-red-600 shrink-0" />
+                      <FiCheck className="w-4 h-4 text-emerald-700 shrink-0" />
                       <span>Official Digital ID Card with QR Verification</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <FiCheck className="w-4 h-4 text-red-600 shrink-0" />
+                      <FiCheck className="w-4 h-4 text-emerald-700 shrink-0" />
                       <span>Executive Appointment Letter signed by Trustees</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <FiCheck className="w-4 h-4 text-red-600 shrink-0" />
+                      <FiCheck className="w-4 h-4 text-emerald-700 shrink-0" />
                       <span>Membership plans starting at ₹250 / year</span>
                     </div>
                   </div>
@@ -298,7 +298,7 @@ function VolunteerContent() {
 
                 <div className="mt-6 pt-4 border-t border-slate-100">
                   <Link
-                    href="/profile/apply-member"
+                    href="/apply-member"
                     className="w-full py-3 rounded-xl bg-black hover:bg-slate-900 text-white font-bold text-xs shadow-md text-center transition flex items-center justify-center gap-2"
                   >
                     <span>Choose Plan &amp; Apply for Membership</span>

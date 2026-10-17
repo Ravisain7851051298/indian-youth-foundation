@@ -8,6 +8,8 @@ import {
   FiHeart,
   FiActivity,
   FiAward,
+  FiChevronLeft,
+  FiChevronRight,
 } from 'react-icons/fi';
 import { useNGO } from '@/context/NGOContext';
 import { getContentImageUrl } from '@/lib/authApi';
@@ -107,9 +109,9 @@ export default function Hero() {
       onMouseLeave={() => setIsPaused(false)}
       aria-label="Hero Section"
     >
-      {/* ---------------- 3 BACKGROUND IMAGES WITH SMOOTH ANIMATION ---------------- */}
+      {/* ---------------- BACKGROUND IMAGES WITH SMOOTH ANIMATION ---------------- */}
       <div className="absolute inset-0 -z-30 overflow-hidden">
-        {slides.slice(0, 3).map((slide, idx) => {
+        {slides.map((slide, idx) => {
           const bgImg = slide.imageUrl || DEFAULT_CAROUSEL_IMAGES[idx % DEFAULT_CAROUSEL_IMAGES.length];
           const isActive = activeSlide === idx;
 
@@ -140,6 +142,25 @@ export default function Hero() {
       {/* Ambient Red Glow Highlights */}
       <div className="absolute -top-24 left-1/4 -z-10 w-96 h-96 bg-red-500/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute -bottom-24 right-1/4 -z-10 w-96 h-96 bg-rose-500/10 rounded-full blur-3xl pointer-events-none" />
+
+      {/* Navigation Arrows for Carousel */}
+      <button
+        type="button"
+        onClick={() => setActiveSlide((prev) => (prev - 1 + slides.length) % slides.length)}
+        className="absolute left-3 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-black/30 hover:bg-black/60 text-white flex items-center justify-center transition backdrop-blur-xs border border-white/20 shadow-lg cursor-pointer"
+        aria-label="Previous Slide"
+      >
+        <FiChevronLeft className="w-6 h-6" />
+      </button>
+
+      <button
+        type="button"
+        onClick={() => setActiveSlide((prev) => (prev + 1) % slides.length)}
+        className="absolute right-3 top-1/2 -translate-y-1/2 z-30 w-11 h-11 rounded-full bg-black/30 hover:bg-black/60 text-white flex items-center justify-center transition backdrop-blur-xs border border-white/20 shadow-lg cursor-pointer"
+        aria-label="Next Slide"
+      >
+        <FiChevronRight className="w-6 h-6" />
+      </button>
 
       {/* ---------------- FOREGROUND CONTENT (ALL CHANGE AT THE SAME TIME) ---------------- */}
       <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

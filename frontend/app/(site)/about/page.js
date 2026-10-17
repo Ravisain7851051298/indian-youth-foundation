@@ -125,35 +125,35 @@ export default function AboutPage() {
     <div className="min-h-screen bg-slate-50 text-slate-900">
 
       {/* ---------------- 1. HERO HEADER ---------------- */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-red-50/70 via-white to-slate-50 py-16 sm:py-24 border-b border-red-100">
+      <section className="relative overflow-hidden bg-gradient-to-b from-[#eef8f0] via-white to-slate-50 py-16 sm:py-24 border-b border-emerald-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto space-y-4">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-red-100 border border-red-200 text-red-700 text-xs font-black shadow-xs">
-              <FiShield className="w-4 h-4 text-red-600" />
-              <span>National Youth Movement • Section 80G &amp; 12A Certified NGO</span>
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100 border border-emerald-200 text-[#0b8026] text-xs font-black shadow-xs">
+              <FiShield className="w-4 h-4 text-[#0b8026]" />
+              <span>National Social Welfare Movement • Registered Non-Profit Organization</span>
             </div>
 
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-black tracking-tight leading-tight">
-              About <span className="bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 bg-clip-text text-transparent">Indian Youth Foundation</span>
+              About <span className="text-[#0b8026]">{settings?.ngoName || 'Samasya Samadhan Parishad (SSP)'}</span>
             </h1>
 
             <p className="text-base sm:text-lg text-slate-700 leading-relaxed font-medium">
-              Known natively as <strong>भारतीय युवा क्रांति</strong>, we are a nationwide non-profit coalition of young leaders, social workers, and change-makers mobilizing grassroots impact for child literacy, emergency healthcare, and rural empowerment.
+              Known natively as <strong>{settings?.ngoNameHi || 'समस्या समाधान परिषद् (रजि.) भारत'}</strong>, we are a passionate advocate for positive change, dedicated to making a tangible difference in the world through sustainable development, education, and healthcare access.
             </p>
 
             <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
               <Link
                 href="/donation"
-                className="flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-red-600 hover:bg-red-700 text-white font-black text-xs shadow-lg shadow-red-600/25 hover:scale-102 transition cursor-pointer"
+                className="flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-[#0b8026] hover:bg-[#09661f] text-white font-black text-xs shadow-lg shadow-emerald-700/25 hover:scale-102 transition cursor-pointer"
               >
                 <FiHeart className="w-4 h-4 fill-white" />
                 <span>Support Our Mission (80G Tax Exemption)</span>
               </Link>
               <Link
                 href="/certificates"
-                className="flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-white hover:bg-slate-50 text-black border-2 border-slate-200 font-bold text-xs shadow-xs hover:scale-102 transition cursor-pointer"
+                className="flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-white hover:bg-slate-50 text-slate-900 border-2 border-slate-200 hover:border-[#0b8026] font-bold text-xs shadow-xs hover:scale-102 transition cursor-pointer"
               >
-                <FiFileText className="w-4 h-4 text-red-600" />
+                <FiFileText className="w-4 h-4 text-[#0b8026]" />
                 <span>View Legal Certificates</span>
               </Link>
             </div>
@@ -161,19 +161,19 @@ export default function AboutPage() {
 
           {/* Quick Metrics Counter Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mt-14">
-            <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm text-center">
-              <div className="text-2xl sm:text-4xl font-black text-red-600">25,000+</div>
+            <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm text-center hover:border-emerald-300 transition">
+              <div className="text-2xl sm:text-4xl font-black text-[#0b8026]">25,000+</div>
               <div className="text-xs font-bold text-slate-700 mt-1">Beneficiary Lives Touched</div>
             </div>
-            <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm text-center">
+            <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm text-center hover:border-emerald-300 transition">
               <div className="text-2xl sm:text-4xl font-black text-slate-900">3,500+</div>
               <div className="text-xs font-bold text-slate-700 mt-1">Volunteers with ID Cards</div>
             </div>
-            <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm text-center">
-              <div className="text-2xl sm:text-4xl font-black text-red-600">1,800+</div>
+            <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm text-center hover:border-emerald-300 transition">
+              <div className="text-2xl sm:text-4xl font-black text-[#0b8026]">1,800+</div>
               <div className="text-xs font-bold text-slate-700 mt-1">Emergency Blood Units Arranged</div>
             </div>
-            <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm text-center">
+            <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm text-center hover:border-emerald-300 transition">
               <div className="text-2xl sm:text-4xl font-black text-emerald-600">100%</div>
               <div className="text-xs font-bold text-slate-700 mt-1">CBDT 80G Tax-Deductible</div>
             </div>
@@ -187,8 +187,8 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
 
             <div className="lg:col-span-6 space-y-6">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-bold">
-                <FiCompass className="w-3.5 h-3.5 text-red-600" />
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-[#0b8026] text-xs font-bold">
+                <FiCompass className="w-3.5 h-3.5 text-[#0b8026]" />
                 <span>Our Heritage &amp; Genesis</span>
               </div>
 
@@ -206,9 +206,9 @@ export default function AboutPage() {
 
               {/* Core Philosophy Callouts */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                <div className="p-4 rounded-2xl bg-red-50/60 border border-red-200 space-y-1">
+                <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-1">
                   <div className="font-bold text-black text-xs flex items-center gap-1.5">
-                    <FiCheckCircle className="w-4 h-4 text-red-600" />
+                    <FiCheckCircle className="w-4 h-4 text-[#0b8026]" />
                     <span>Nation First Ideology</span>
                   </div>
                   <p className="text-[11px] text-slate-600 leading-relaxed">
@@ -237,7 +237,7 @@ export default function AboutPage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent flex items-end p-6">
                   <div className="text-white space-y-1">
-                    <span className="text-[11px] font-black uppercase tracking-wider text-red-400 bg-black/40 px-2 py-0.5 rounded-md">
+                    <span className="text-[11px] font-black uppercase tracking-wider text-emerald-300 bg-black/40 px-2 py-0.5 rounded-md">
                       Ground Volunteer Action
                     </span>
                     <h3 className="text-lg font-black leading-snug">
@@ -259,8 +259,8 @@ export default function AboutPage() {
       <section className="py-20 bg-slate-50 border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-12">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-bold mb-2">
-              <FiTarget className="w-3.5 h-3.5 text-red-600" />
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-[#0b8026] text-xs font-bold mb-2">
+              <FiTarget className="w-3.5 h-3.5 text-[#0b8026]" />
               <span>Core Welfare Pillars</span>
             </div>
             <h2 className="text-2xl sm:text-4xl font-black text-black tracking-tight">
@@ -282,8 +282,8 @@ export default function AboutPage() {
                   key={pillar.id}
                   onClick={() => setActivePillar(pillar.id)}
                   className={`flex items-center gap-2 px-5 py-3 rounded-2xl text-xs font-black transition cursor-pointer ${isActive
-                    ? 'bg-red-600 text-white shadow-lg shadow-red-600/25 scale-102'
-                    : 'bg-white text-slate-700 hover:bg-red-50 hover:text-red-600 border border-slate-200'
+                    ? 'bg-[#0b8026] text-white shadow-lg shadow-emerald-700/25 scale-102'
+                    : 'bg-white text-slate-700 hover:bg-emerald-50 hover:text-[#0b8026] border border-slate-200'
                     }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -299,7 +299,7 @@ export default function AboutPage() {
 
               <div className="lg:col-span-7 space-y-4">
                 <div className="flex items-center gap-2">
-                  <span className="px-3 py-1 rounded-full bg-red-50 text-red-600 border border-red-200 text-xs font-black">
+                  <span className="px-3 py-1 rounded-full bg-emerald-50 text-[#0b8026] border border-emerald-200 text-xs font-black">
                     {currentPillar.metrics}
                   </span>
                 </div>
@@ -308,7 +308,7 @@ export default function AboutPage() {
                   {currentPillar.title}
                 </h3>
 
-                <p className="text-xs sm:text-sm font-bold text-red-600">
+                <p className="text-xs sm:text-sm font-bold text-[#0b8026]">
                   {currentPillar.tagline}
                 </p>
 
@@ -323,7 +323,7 @@ export default function AboutPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-700 font-medium">
                     {currentPillar.initiatives.map((item, idx) => (
                       <div key={idx} className="flex items-start gap-2 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
-                        <FiCheckCircle className="w-3.5 h-3.5 text-red-600 shrink-0 mt-0.5" />
+                        <FiCheckCircle className="w-3.5 h-3.5 text-[#0b8026] shrink-0 mt-0.5" />
                         <span>{item}</span>
                       </div>
                     ))}
@@ -333,7 +333,7 @@ export default function AboutPage() {
                 <div className="pt-4 flex gap-3">
                   <Link
                     href="/donation"
-                    className="px-5 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-md transition"
+                    className="px-5 py-3 rounded-xl bg-[#0b8026] hover:bg-[#09661f] text-white font-bold text-xs shadow-md transition"
                   >
                     Contribute to this Pillar →
                   </Link>
@@ -365,8 +365,8 @@ export default function AboutPage() {
       <section className="py-20 bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-12">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-red-700 text-xs font-bold mb-2 border border-red-200">
-              <FiShield className="w-3.5 h-3.5 text-red-600" />
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-[#0b8026] text-xs font-bold mb-2 border border-emerald-200">
+              <FiShield className="w-3.5 h-3.5 text-[#0b8026]" />
               <span>Government Transparency</span>
             </div>
             <h2 className="text-2xl sm:text-4xl font-black text-black tracking-tight">
@@ -379,22 +379,22 @@ export default function AboutPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* 80G Exemption */}
-            <div className="bg-slate-50 p-6 rounded-3xl border border-slate-200 space-y-2 hover:border-red-400 transition-all">
-              <div className="w-10 h-10 rounded-xl bg-red-100 text-red-600 flex items-center justify-center font-bold text-lg mb-3">
+            <div className="bg-slate-50 p-6 rounded-3xl border border-slate-200 space-y-2 hover:border-[#0b8026] transition-all">
+              <div className="w-10 h-10 rounded-xl bg-emerald-100 text-[#0b8026] flex items-center justify-center font-bold text-lg mb-3">
                 80G
               </div>
               <h4 className="font-black text-sm text-black">Section 80G Approval</h4>
               <p className="text-xs text-slate-600 leading-relaxed font-medium">
                 Donors are entitled to 50% income tax exemption under Section 80G of the Income Tax Act 1961.
               </p>
-              <div className="pt-2 font-mono text-[11px] font-bold text-red-600 bg-white px-2.5 py-1 rounded-lg border border-slate-200 inline-block">
+              <div className="pt-2 font-mono text-[11px] font-bold text-[#0b8026] bg-white px-2.5 py-1 rounded-lg border border-slate-200 inline-block">
                 {settings?.exemption80G || '80G-TAX-EXEMPT-CBDT'}
               </div>
             </div>
 
             {/* 12A Registration */}
-            <div className="bg-slate-50 p-6 rounded-3xl border border-slate-200 space-y-2 hover:border-red-400 transition-all">
-              <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-lg mb-3">
+            <div className="bg-slate-50 p-6 rounded-3xl border border-slate-200 space-y-2 hover:border-[#0b8026] transition-all">
+              <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-lg mb-3">
                 12A
               </div>
               <h4 className="font-black text-sm text-black">Section 12A Registration</h4>
@@ -407,7 +407,7 @@ export default function AboutPage() {
             </div>
 
             {/* NITI Aayog Darpan */}
-            <div className="bg-slate-50 p-6 rounded-3xl border border-slate-200 space-y-2 hover:border-red-400 transition-all">
+            <div className="bg-slate-50 p-6 rounded-3xl border border-slate-200 space-y-2 hover:border-[#0b8026] transition-all">
               <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-lg mb-3">
                 NITI
               </div>
@@ -421,7 +421,7 @@ export default function AboutPage() {
             </div>
 
             {/* Societies Registration */}
-            <div className="bg-slate-50 p-6 rounded-3xl border border-slate-200 space-y-2 hover:border-red-400 transition-all">
+            <div className="bg-slate-50 p-6 rounded-3xl border border-slate-200 space-y-2 hover:border-[#0b8026] transition-all">
               <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-lg mb-3">
                 REG
               </div>
@@ -438,9 +438,9 @@ export default function AboutPage() {
           <div className="text-center mt-10">
             <Link
               href="/certificates"
-              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-black hover:bg-slate-900 text-white font-bold text-xs shadow-md transition"
+              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-[#0b8026] hover:bg-[#09661f] text-white font-bold text-xs shadow-md transition"
             >
-              <FiDownload className="w-4 h-4 text-red-400" />
+              <FiDownload className="w-4 h-4 text-emerald-200" />
               <span>Inspect &amp; Download Verified NGO Certificates →</span>
             </Link>
           </div>
@@ -451,8 +451,8 @@ export default function AboutPage() {
       <section className="py-20 bg-slate-50 border-b border-slate-200">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-xl mx-auto mb-14">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-bold mb-2">
-              <FiCalendar className="w-3.5 h-3.5 text-red-600" />
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-[#0b8026] text-xs font-bold mb-2">
+              <FiCalendar className="w-3.5 h-3.5 text-[#0b8026]" />
               <span>Milestones &amp; Evolution</span>
             </div>
             <h2 className="text-2xl sm:text-4xl font-black text-black tracking-tight">
@@ -460,21 +460,21 @@ export default function AboutPage() {
             </h2>
           </div>
 
-          <div className="relative border-l-2 border-red-200 ml-4 sm:ml-32 space-y-10">
+          <div className="relative border-l-2 border-emerald-300 ml-4 sm:ml-32 space-y-10">
             {timelineMilestones.map((item, index) => (
               <div key={index} className="relative pl-6 sm:pl-8 group">
                 {/* Year Marker Badge */}
-                <div className="absolute -left-[17px] top-0 w-8 h-8 rounded-full bg-red-600 border-4 border-white flex items-center justify-center text-white text-[10px] font-bold shadow-md">
+                <div className="absolute -left-[17px] top-0 w-8 h-8 rounded-full bg-[#0b8026] border-4 border-white flex items-center justify-center text-white text-[10px] font-bold shadow-md">
                   ✓
                 </div>
 
                 <div className="sm:absolute sm:-left-28 sm:top-0.5 sm:text-right">
-                  <span className="font-mono text-xs font-black text-red-600 bg-red-50 border border-red-200 px-2 py-0.5 rounded-md">
+                  <span className="font-mono text-xs font-black text-[#0b8026] bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">
                     {item.year}
                   </span>
                 </div>
 
-                <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs hover:border-red-300 transition-all">
+                <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs hover:border-emerald-300 transition-all">
                   <h4 className="text-base font-black text-black">
                     {item.title}
                   </h4>
@@ -493,8 +493,8 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
             <div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-bold mb-2">
-                <FiUsers className="w-3.5 h-3.5 text-red-600" />
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-[#0b8026] text-xs font-bold mb-2">
+                <FiUsers className="w-3.5 h-3.5 text-[#0b8026]" />
                 <span>Executive Council</span>
               </div>
               <h2 className="text-2xl sm:text-4xl font-black text-black tracking-tight">
@@ -503,7 +503,7 @@ export default function AboutPage() {
             </div>
             <Link
               href="/team-members"
-              className="inline-flex items-center gap-1 text-xs font-bold text-red-600 hover:text-red-700"
+              className="inline-flex items-center gap-1 text-xs font-bold text-[#0b8026] hover:text-[#09661f]"
             >
               <span>View Full Governing Body</span>
               <FiArrowRight className="w-4 h-4" />
@@ -519,13 +519,13 @@ export default function AboutPage() {
             ]).map((member, idx) => (
               <div
                 key={member._id || member.id || idx}
-                className="text-center"
+                className="text-center p-4 rounded-3xl bg-slate-50 border border-slate-200 hover:border-emerald-300 transition"
               >
-                <div className="w-24 h-24 mx-auto rounded-full overflow-hidden">
+                <div className="w-24 h-24 mx-auto rounded-full overflow-hidden border-2 border-[#0b8026] shadow-sm mb-3">
                   <img
                     src={getContentImageUrl(member.image || member.photoUrl)}
                     alt={member.name}
-                    className="w-full h-full object-cover "
+                    className="w-full h-full object-cover"
                     onError={(e) => {
                       e.currentTarget.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400';
                     }}
@@ -533,11 +533,11 @@ export default function AboutPage() {
                 </div>
                 <div>
                   <h4 className="font-black text-sm text-black">{member.name}</h4>
-                  <p className="text-[11px] text-red-600 font-bold">{member.position}</p>
+                  <p className="text-[11px] text-[#0b8026] font-bold mt-0.5">{member.position || member.role}</p>
 
                   {/* Department */}
                   {member.department && (
-                    <span className="inline-block mt-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider text-slate-500 bg-slate-100 border border-slate-200/80">
+                    <span className="inline-block mt-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 border border-emerald-200">
                       {member.department}
                     </span>
                   )}
@@ -549,7 +549,7 @@ export default function AboutPage() {
       </section>
 
       {/* ---------------- 7. CALL TO ACTION ---------------- */}
-      <section className="py-20 bg-gradient-to-r from-red-600 via-rose-600 to-red-700 text-white shadow-xl">
+      <section className="py-20 bg-gradient-to-r from-[#0b8026] via-emerald-700 to-[#09661f] text-white shadow-xl">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 text-white text-xs font-bold backdrop-blur-sm">
             <FiHeart className="w-3.5 h-3.5" />
@@ -567,13 +567,13 @@ export default function AboutPage() {
           <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
             <Link
               href="/volunteer"
-              className="px-6 py-3.5 rounded-2xl bg-white hover:bg-slate-100 text-red-700 font-black text-xs shadow-xl transition cursor-pointer"
+              className="px-6 py-3.5 rounded-2xl bg-white hover:bg-slate-100 text-[#0b8026] font-black text-xs shadow-xl transition cursor-pointer"
             >
               Apply as Volunteer (Offer Letter &amp; ID Card)
             </Link>
             <Link
               href="/donation"
-              className="px-6 py-3.5 rounded-2xl bg-red-950/40 hover:bg-red-950/60 text-white font-bold text-xs border border-white/30 backdrop-blur-sm transition cursor-pointer"
+              className="px-6 py-3.5 rounded-2xl bg-black/30 hover:bg-black/50 text-white font-bold text-xs border border-white/30 backdrop-blur-sm transition cursor-pointer"
             >
               Make an 80G Tax-Deductible Donation
             </Link>

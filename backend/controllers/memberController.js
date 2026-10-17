@@ -9,6 +9,16 @@ const getMembers = async (req, res) => {
   }
 };
 
+const getPublicMembers = async (req, res) => {
+  try {
+    const { limit } = req.query;
+    const result = await memberService.getPublicMembers(limit);
+    return res.json({ success: true, ...result });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 const updateMemberStatus = async (req, res) => {
   try {
     const { id } = req.params;
@@ -93,6 +103,7 @@ const deleteMember = async (req, res) => {
 
 module.exports = {
   getMembers,
+  getPublicMembers,
   updateMemberStatus,
   verifyMember,
   exportMembersExcel,

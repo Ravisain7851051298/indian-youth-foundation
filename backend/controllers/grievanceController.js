@@ -50,7 +50,10 @@ const getGrievances = async (req, res) => {
     const query = {};
     if (status) query.status = status;
 
-    if (req.user?.role !== 'Admin' && req.user?.role !== 'Manager') {
+    const userRole = (req.user?.role || '').toLowerCase();
+    const isAdmin = userRole === 'admin' || userRole === 'manager' || userRole === 'superadmin';
+
+    if (!isAdmin) {
       const userEmail = (req.user?.email || email || '').trim().toLowerCase();
       const userPhone = (req.user?.phone || phone || '').trim();
       const userId = req.user?.id || req.user?._id;

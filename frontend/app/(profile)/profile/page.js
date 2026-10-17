@@ -108,20 +108,20 @@ export default function ProfileOverviewPage() {
           </div>
         </div>
       ) : (
-        <div className="bg-white border-2 border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xs">
+        <div className="bg-white border-2 border-[#0b8026]/30 rounded-3xl p-6 sm:p-8 shadow-xs">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="flex items-start gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-red-600 text-white flex items-center justify-center font-bold text-2xl shrink-0 shadow-md">
+              <div className="w-14 h-14 rounded-2xl bg-[#0b8026] text-white flex items-center justify-center font-bold text-2xl shrink-0 shadow-md">
                 <FiCheckCircle className="w-7 h-7" />
               </div>
               <div className="space-y-1">
-                <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-red-100 text-red-800 border border-red-200 inline-block">
+                <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200 inline-block">
                   Verified Active Credentials
                 </span>
                 <h2 className="text-lg sm:text-xl font-black text-black">
                   Welcome, {currentUser?.name}!
                 </h2>
-                <p className="text-xs text-black leading-relaxed max-w-2xl font-medium">
+                <p className="text-xs text-slate-700 leading-relaxed max-w-2xl font-medium">
                   Your appointment as <strong>{currentUser?.designation || 'Active Social Worker'}</strong> has been officially approved by the National Executive Council.
                   Your digital ID card, appointment letter, and awarded certificates are active and verified.
                 </p>
@@ -131,14 +131,14 @@ export default function ProfileOverviewPage() {
             <div className="flex flex-col sm:flex-row md:flex-col gap-2 shrink-0">
               <Link
                 href="/profile/id-card"
-                className="px-5 py-2.5 rounded-2xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-md shadow-red-600/20 text-center transition flex items-center justify-center gap-1.5 cursor-pointer"
+                className="px-5 py-2.5 rounded-2xl bg-[#d50000] hover:bg-red-700 text-white font-bold text-xs shadow-md shadow-red-600/20 text-center transition flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <FiShield className="w-4 h-4" />
                 <span>Open Digital ID Card</span>
               </Link>
               <Link
                 href="/profile/certificates"
-                className="px-5 py-2.5 rounded-2xl bg-black hover:bg-slate-900 text-white font-bold text-xs text-center transition flex items-center justify-center gap-1.5 cursor-pointer"
+                className="px-5 py-2.5 rounded-2xl bg-[#0b8026] hover:bg-green-800 text-white font-bold text-xs text-center transition flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <FiAward className="w-4 h-4" />
                 <span>My Certificates ({certificates.length})</span>
