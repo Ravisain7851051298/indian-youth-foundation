@@ -4,6 +4,7 @@ const cookieParser = require('cookie-parser');
 const apiRoutes = require('./routes/apiRoutes');
 
 const app = express();
+app.set('trust proxy', 1);
 
 // Ensure uploads folder and category directories exist
 const { uploadDir, ensureAllCategoryDirs } = require('./utils/fileCleaner');
