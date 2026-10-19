@@ -14,18 +14,19 @@ ensureAllCategoryDirs();
 const allowedOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:3000',
-  'http://localhost:5000',
+  'https://yuvakrantidal.com',
+  'https://www.yuvakrantidal.com',
   process.env.FRONTEND_URL
 ].filter(Boolean);
 
 // CORS Middleware with credentials enabled (Required for HTTP-Only Cookie auth)
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow non-browser requests (Postman, curl, server-to-server) or matched origins
-    if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV !== 'production') {
+    if (!origin || allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
-    return callback(null, true);
+
+    return callback(new Error('Origin not allowed by CORS'));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
