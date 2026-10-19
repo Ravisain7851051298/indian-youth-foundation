@@ -12,9 +12,9 @@ router.post('/', optionalAuth, feedbackController.createFeedback);
 router.post('/create', optionalAuth, feedbackController.createFeedback);
 
 // Admin Moderation & Replies
-router.post('/:id/reply', verifyToken, requireRole(['Admin', 'admin', 'manager']), feedbackController.replyFeedback);
-router.put('/:id/reply', verifyToken, requireRole(['Admin', 'admin', 'manager']), feedbackController.replyFeedback);
-router.put('/:id/status', verifyToken, requireRole(['Admin', 'admin', 'manager']), feedbackController.updateFeedbackStatus);
-router.delete('/:id', verifyToken, requireRole(['Admin', 'admin', 'manager']), feedbackController.deleteFeedback);
+router.post('/:id/reply', verifyToken, requireRole(['admin']), feedbackController.replyFeedback);
+router.put('/:id/reply', verifyToken, requireRole(['admin']), feedbackController.replyFeedback);
+router.put('/:id/status', verifyToken, requireRole(['admin']), feedbackController.updateFeedbackStatus);
+router.delete('/:id', verifyToken, requireRole(['admin']), feedbackController.deleteFeedback);
 
 module.exports = router;

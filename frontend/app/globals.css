@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  --primary: #dc2626;
-  --primary-dark: #b91c1c;
-  --secondary: #991b1b;
-  --accent: #ef4444;
+  --primary: #0b8026;
+  --primary-dark: #075018;
+  --secondary: #166534;
+  --accent: #22c55e;
   --bg-light: #ffffff;
   --text-dark: #000000;
 }
@@ -33,8 +33,8 @@ textarea::placeholder {
 
 /* Custom scrollbars with white & red accent */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 4px;
+  height: 4px;
 }
 
 ::-webkit-scrollbar-track {
@@ -42,12 +42,12 @@ textarea::placeholder {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #82f872;
+  background: #d0f7cb;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #04a835;
+  background: #0b8026;
 }
 
 /* Print Styles for ID Card, 80G Receipt & Appointment Letter */
@@ -102,4 +102,32 @@ body {
 
 .goog-te-gadget span {
   display: none !important;
+}
+
+/* Gemini Style Rotating Animated Single Border */
+@property --border-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes spin-border-angle {
+  to {
+    --border-angle: 360deg;
+  }
+}
+
+.gemini-animated-border {
+  --border-angle: 0deg;
+  animation: spin-border-angle 3.5s linear infinite;
+  background:
+    linear-gradient(#ffffff, #ffffff) padding-box,
+    conic-gradient(from var(--border-angle), #9bc5ff 0%, #2b7fff 25%, #a855f7 50%, #f97316 75%, #10b981 90%, #9bc5ff 100%) border-box;
+  border: 2px solid transparent;
+}
+
+.gemini-animated-border:hover {
+  background:
+    linear-gradient(#f0fdf4, #f0fdf4) padding-box,
+    conic-gradient(from var(--border-angle), #9bc5ff 0%, #2b7fff 25%, #a855f7 50%, #f97316 75%, #10b981 90%, #9bc5ff 100%) border-box;
 }

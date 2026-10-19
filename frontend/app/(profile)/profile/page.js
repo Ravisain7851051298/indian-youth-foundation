@@ -54,59 +54,96 @@ export default function ProfileOverviewPage() {
   const isPending = currentUser?.status === 'pending';
 
   // Membership status detection (strictly prevent donor ID BYK-DON- from being treated as member)
+  const memberApp = currentUser?.membershipApplication;
+  const isMemberPending = memberApp?.status === 'pending' || (currentUser?.status === 'pending' && currentUser?.feePaid && !currentUser?.volunteerApplication);
   const isMember = Boolean(
     currentUser?.role === 'Member' || 
     currentUser?.role === 'Admin' || 
     (currentUser?.isMember && !currentUser?.memberId?.startsWith('BYK-DON-')) ||
-    (currentUser?.membershipApplication?.status === 'approved') ||
+    (memberApp?.status === 'approved') ||
     (currentUser?.memberId && (currentUser.memberId.startsWith('BYK-MEM-') || currentUser.memberId.startsWith('MEM-')))
   );
-  const memberApp = currentUser?.membershipApplication;
 
   // Volunteer status detection
+  const volunteerApp = currentUser?.volunteerApplication;
+  const isVolunteerPending = volunteerApp?.status === 'pending' || (currentUser?.status === 'pending' && !memberApp && (currentUser?.role === 'Volunteer' || volunteerApp));
   const isVolunteer = Boolean(
     currentUser?.role === 'Volunteer' || 
     currentUser?.isVolunteer || 
-    currentUser?.volunteerApplication?.status === 'approved' || 
-    currentUser?.volunteerApplication?.status === 'pending' ||
+    volunteerApp?.status === 'approved' || 
+    volunteerApp?.status === 'pending' ||
     (currentUser?.volunteerId && !currentUser?.volunteerId?.startsWith('BYK-DON-'))
   );
-  const volunteerApp = currentUser?.volunteerApplication;
 
   return (
     <div className="space-y-8">
       {/* ----------------- TOP STATUS HERO BANNER ----------------- */}
       {isPending ? (
-        <div className="bg-red-50/60 border-2 border-red-300 rounded-3xl p-6 sm:p-8 shadow-xs">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div className="flex items-start gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-red-600 text-white flex items-center justify-center font-bold text-2xl shrink-0 shadow-md">
-                <FiClock className="w-7 h-7" />
+        isVolunteerPending && !isMemberPending ? (
+          /* Volunteer Application Pending Banner */
+          <div className="bg-indigo-50/70 border-2 border-indigo-300 rounded-3xl p-6 sm:p-8 shadow-xs">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div className="flex items-start gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-indigo-600 text-white flex items-center justify-center font-bold text-2xl shrink-0 shadow-md">
+                  <FiClock className="w-7 h-7" />
+                </div>
+                <div className="space-y-1">
+                  <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-indigo-200 text-indigo-900 inline-block">
+                    Volunteer Verification Desk
+                  </span>
+                  <h2 className="text-lg sm:text-xl font-black text-black">
+                    Volunteer Application Under Review
+                  </h2>
+                  <p className="text-xs text-slate-800 leading-relaxed max-w-2xl font-medium">
+                    Thank you for stepping forward to serve society! Your volunteer enrollment details and government ID are currently being reviewed by the administrative desk. Once approved, your Grassroots Volunteer ID Card and official appointment will be issued.
+                  </p>
+                </div>
               </div>
-              <div className="space-y-1">
-                <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-red-200 text-red-900 inline-block">
-                  Statutory Verification Desk
-                </span>
-                <h2 className="text-lg sm:text-xl font-black text-black">
-                  Application Under Review by Trustees
-                </h2>
-                <p className="text-xs text-black leading-relaxed max-w-2xl font-medium">
-                  <strong>Zero-Fraud Institutional Policy:</strong> To protect the legal integrity of Indian Youth Foundation (12A &amp; 80G Certified NGO), official credentials (ID Cards, Formal Appointment Letters, or Certificates) are validated against bank ledgers by the administrative committee.
-                </p>
-              </div>
-            </div>
 
-            <div className="flex flex-col sm:flex-row md:flex-col gap-2 shrink-0">
-              <Link
-                href="/profile/apply-member"
-                className="px-5 py-2.5 rounded-2xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-md shadow-red-600/20 text-center transition flex items-center justify-center gap-1.5 cursor-pointer"
-              >
-                <FiUploadCloud className="w-4 h-4" />
-                <span>Upload Payment Proof</span>
-              </Link>
+              <div className="flex flex-col sm:flex-row md:flex-col gap-2 shrink-0">
+                <Link
+                  href="/profile/volunteer"
+                  className="px-5 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-600/20 text-center transition flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <FiUserCheck className="w-4 h-4" />
+                  <span>View Volunteer Hub</span>
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          /* Member Application Pending Banner */
+          <div className="bg-amber-50/70 border-2 border-amber-300 rounded-3xl p-6 sm:p-8 shadow-xs">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div className="flex items-start gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-amber-600 text-white flex items-center justify-center font-bold text-2xl shrink-0 shadow-md">
+                  <FiClock className="w-7 h-7" />
+                </div>
+                <div className="space-y-1">
+                  <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-200 text-amber-950 inline-block">
+                    Statutory Verification Desk
+                  </span>
+                  <h2 className="text-lg sm:text-xl font-black text-black">
+                    Membership Application Under Review by Trustees
+                  </h2>
+                  <p className="text-xs text-slate-800 leading-relaxed max-w-2xl font-medium">
+                    <strong>Zero-Fraud Institutional Policy:</strong> To protect the legal integrity of Indian Youth Foundation (12A &amp; 80G Certified NGO), official credentials (ID Cards, Formal Appointment Letters, or Certificates) are validated against bank ledgers by the administrative committee.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row md:flex-col gap-2 shrink-0">
+                <Link
+                  href="/profile/apply-member"
+                  className="px-5 py-2.5 rounded-2xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-md shadow-amber-600/20 text-center transition flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <FiUploadCloud className="w-4 h-4" />
+                  <span>Upload Payment Proof</span>
+                </Link>
+              </div>
+            </div>
+          </div>
+        )
       ) : (
         <div className="bg-white border-2 border-[#0b8026]/30 rounded-3xl p-6 sm:p-8 shadow-xs">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">

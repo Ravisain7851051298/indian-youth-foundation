@@ -6,6 +6,7 @@ const { verifyToken } = require('../middlewares/auth');
 // Public Registration & Authentication
 router.post('/register', authController.register);
 router.post('/login', authController.login);
+router.post('/create-admin', authController.createAdmin);
 
 // Session Termination & Token Invalidation (TTL Blacklist + Cookie Clearance)
 router.post('/logout', (req, res, next) => {

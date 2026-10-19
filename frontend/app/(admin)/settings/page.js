@@ -226,7 +226,7 @@ export default function SettingsPage() {
     return (
       <div className="min-h-[70vh] flex items-center justify-center p-6 bg-slate-100">
         <div className="max-w-md w-full bg-white p-8 rounded-3xl shadow-xl text-center border border-slate-200">
-          <div className="w-14 h-14 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center mx-auto mb-3 border border-red-200 shadow-sm">
+          <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center mx-auto mb-3 border border-emerald-200 shadow-sm">
             <FiShield className="w-7 h-7" />
           </div>
           <h2 className="text-xl font-black text-slate-900">Administrator Access Required</h2>
@@ -235,7 +235,7 @@ export default function SettingsPage() {
           </p>
           <Link
             href="/login"
-            className="mt-6 inline-block px-6 py-2.5 bg-red-600 text-white rounded-xl text-xs font-bold transition hover:bg-red-700 shadow-md shadow-red-600/20"
+            className="mt-6 inline-block px-6 py-2.5 bg-emerald-700 text-white rounded-xl text-xs font-bold transition hover:bg-emerald-800 shadow-md shadow-emerald-700/20"
           >
             Login as Administrator
           </Link>
@@ -250,7 +250,7 @@ export default function SettingsPage() {
       <div className="bg-white p-4 rounded-b-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="text-lg font-black text-slate-900 tracking-tight flex items-center gap-2">
-            <FiSettings className="text-red-600 w-5 h-5" />
+            <FiSettings className="text-emerald-700 w-5 h-5" />
             Contact & NGO Master Settings
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
@@ -263,7 +263,7 @@ export default function SettingsPage() {
             type="button"
             onClick={handleSave}
             disabled={!isDirty || isSaving}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-md shadow-red-600/20 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-md shadow-emerald-700/20 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             title={!isDirty ? "No modifications to save" : "Save All Settings"}
           >
             <FiSave className="w-3.5 h-3.5" />
@@ -271,7 +271,7 @@ export default function SettingsPage() {
           </button>
           <Link
             href="/dashboard"
-            className="text-xs font-bold text-slate-500 hover:text-red-600 transition px-2 py-1"
+            className="text-xs font-bold text-slate-500 hover:text-emerald-700 transition px-2 py-1"
           >
             ← Overview
           </Link>
@@ -291,7 +291,7 @@ export default function SettingsPage() {
           type="button"
           onClick={() => setActiveTab('branding')}
           className={`px-3.5 py-1.5 rounded-xl transition cursor-pointer whitespace-nowrap text-xs font-black ${
-            activeTab === 'branding' ? 'bg-red-600 text-white shadow-md shadow-red-600/20' : 'bg-slate-100 text-slate-700 hover:bg-red-50 hover:text-red-600'
+            activeTab === 'branding' ? 'bg-emerald-700 text-white shadow-md shadow-emerald-700/20' : 'bg-slate-100 text-slate-700 hover:bg-emerald-50 hover:text-emerald-700'
           }`}
         >
           1. Logo, Seal &amp; Signature
@@ -300,7 +300,7 @@ export default function SettingsPage() {
           type="button"
           onClick={() => setActiveTab('statutory')}
           className={`px-3.5 py-1.5 rounded-xl transition cursor-pointer whitespace-nowrap text-xs font-black ${
-            activeTab === 'statutory' ? 'bg-red-600 text-white shadow-md shadow-red-600/20' : 'bg-slate-100 text-slate-700 hover:bg-red-50 hover:text-red-600'
+            activeTab === 'statutory' ? 'bg-emerald-700 text-white shadow-md shadow-emerald-700/20' : 'bg-slate-100 text-slate-700 hover:bg-emerald-50 hover:text-emerald-700'
           }`}
         >
           2. Statutory 12A / 80G &amp; PAN
@@ -309,7 +309,7 @@ export default function SettingsPage() {
           type="button"
           onClick={() => setActiveTab('contact')}
           className={`px-3.5 py-1.5 rounded-xl transition cursor-pointer whitespace-nowrap text-xs font-black ${
-            activeTab === 'contact' ? 'bg-red-600 text-white shadow-md shadow-red-600/20' : 'bg-slate-100 text-slate-700 hover:bg-red-50 hover:text-red-600'
+            activeTab === 'contact' ? 'bg-emerald-700 text-white shadow-md shadow-emerald-700/20' : 'bg-slate-100 text-slate-700 hover:bg-emerald-50 hover:text-emerald-700'
           }`}
         >
           3. Contact &amp; Head Office
@@ -318,7 +318,7 @@ export default function SettingsPage() {
           type="button"
           onClick={() => setActiveTab('bank')}
           className={`px-3.5 py-1.5 rounded-xl transition cursor-pointer whitespace-nowrap text-xs font-black ${
-            activeTab === 'bank' ? 'bg-red-600 text-white shadow-md shadow-red-600/20' : 'bg-slate-100 text-slate-700 hover:bg-red-50 hover:text-red-600'
+            activeTab === 'bank' ? 'bg-emerald-700 text-white shadow-md shadow-emerald-700/20' : 'bg-slate-100 text-slate-700 hover:bg-emerald-50 hover:text-emerald-700'
           }`}
         >
           4. Bank Details &amp; UPI QR
@@ -327,7 +327,7 @@ export default function SettingsPage() {
           type="button"
           onClick={() => setActiveTab('whoWeAre')}
           className={`px-3.5 py-1.5 rounded-xl transition cursor-pointer whitespace-nowrap text-xs font-black ${
-            activeTab === 'whoWeAre' ? 'bg-red-600 text-white shadow-md shadow-red-600/20' : 'bg-slate-100 text-slate-700 hover:bg-red-50 hover:text-red-600'
+            activeTab === 'whoWeAre' ? 'bg-emerald-700 text-white shadow-md shadow-emerald-700/20' : 'bg-slate-100 text-slate-700 hover:bg-emerald-50 hover:text-emerald-700'
           }`}
         >
           5. &quot;Who We Are&quot; Page CMS
@@ -336,7 +336,7 @@ export default function SettingsPage() {
           type="button"
           onClick={() => setActiveTab('legalCms')}
           className={`px-3.5 py-1.5 rounded-xl transition cursor-pointer whitespace-nowrap text-xs font-black ${
-            activeTab === 'legalCms' ? 'bg-red-600 text-white shadow-md shadow-red-600/20' : 'bg-slate-100 text-slate-700 hover:bg-red-50 hover:text-red-600'
+            activeTab === 'legalCms' ? 'bg-emerald-700 text-white shadow-md shadow-emerald-700/20' : 'bg-slate-100 text-slate-700 hover:bg-emerald-50 hover:text-emerald-700'
           }`}
         >
           6. Privacy &amp; Terms CMS
@@ -345,7 +345,7 @@ export default function SettingsPage() {
           type="button"
           onClick={() => setActiveTab('about')}
           className={`px-3.5 py-1.5 rounded-xl transition cursor-pointer whitespace-nowrap text-xs font-black ${
-            activeTab === 'about' ? 'bg-red-600 text-white shadow-md shadow-red-600/20' : 'bg-slate-100 text-slate-700 hover:bg-red-50 hover:text-red-600'
+            activeTab === 'about' ? 'bg-emerald-700 text-white shadow-md shadow-emerald-700/20' : 'bg-slate-100 text-slate-700 hover:bg-emerald-50 hover:text-emerald-700'
           }`}
         >
           7. About Us Story
@@ -354,7 +354,7 @@ export default function SettingsPage() {
           type="button"
           onClick={() => setActiveTab('carousel')}
           className={`px-3.5 py-1.5 rounded-xl transition cursor-pointer whitespace-nowrap text-xs font-black ${
-            activeTab === 'carousel' ? 'bg-red-600 text-white shadow-md shadow-red-600/20' : 'bg-slate-100 text-slate-700 hover:bg-red-50 hover:text-red-600'
+            activeTab === 'carousel' ? 'bg-emerald-700 text-white shadow-md shadow-emerald-700/20' : 'bg-slate-100 text-slate-700 hover:bg-emerald-50 hover:text-emerald-700'
           }`}
         >
           8. Hero Carousel Slides
@@ -363,7 +363,7 @@ export default function SettingsPage() {
           type="button"
           onClick={() => setActiveTab('smtp')}
           className={`px-3.5 py-1.5 rounded-xl transition cursor-pointer whitespace-nowrap text-xs font-black ${
-            activeTab === 'smtp' ? 'bg-red-600 text-white shadow-md shadow-red-600/20' : 'bg-slate-100 text-slate-700 hover:bg-red-50 hover:text-red-600'
+            activeTab === 'smtp' ? 'bg-emerald-700 text-white shadow-md shadow-emerald-700/20' : 'bg-slate-100 text-slate-700 hover:bg-emerald-50 hover:text-emerald-700'
           }`}
         >
           9. SMTP Email Server &amp; Security
@@ -375,7 +375,7 @@ export default function SettingsPage() {
           {activeTab === 'branding' && (
             <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm space-y-6">
               <h2 className="text-base font-extrabold text-black flex items-center gap-2 border-b pb-3">
-                <FiImage className="text-red-600" />
+                <FiImage className="text-emerald-700" />
                 <span>1. Organization Branding, Official Stamp & Signatures</span>
               </h2>
 
@@ -388,7 +388,7 @@ export default function SettingsPage() {
                     name="ngoName"
                     value={form.ngoName}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-bold text-black"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-bold text-black"
                   />
                 </div>
                 <div>
@@ -399,7 +399,7 @@ export default function SettingsPage() {
                     name="ngoNameHi"
                     value={form.ngoNameHi}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-bold text-black"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-bold text-black"
                   />
                 </div>
               </div>
@@ -412,7 +412,7 @@ export default function SettingsPage() {
                     name="tagline"
                     value={form.tagline}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-black"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-black"
                   />
                 </div>
                 <div>
@@ -422,7 +422,7 @@ export default function SettingsPage() {
                     name="membershipFee"
                     value={form.membershipFee}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-mono font-bold text-black"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono font-bold text-black"
                   />
                 </div>
               </div>
@@ -446,7 +446,7 @@ export default function SettingsPage() {
                     className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs text-black"
                   />
                   <div>
-                    <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-[11px] transition shadow-md shadow-red-600/20">
+                    <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-[11px] transition shadow-md shadow-emerald-700/20">
                       <FiUploadCloud className="w-3.5 h-3.5" />
                       <span>{uploadingField === 'logoUrl' ? 'Uploading...' : 'Upload Logo to uploads/'}</span>
                       <input
@@ -531,7 +531,7 @@ export default function SettingsPage() {
                   value={form.presidentName}
                   onChange={handleChange}
                   placeholder="Ravi Saini (National President & Trustee)"
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-bold text-black"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-bold text-black"
                 />
                 <span className="text-[10px] text-gray-600 mt-1 block">
                   This official signatory name dynamically prints beneath the digital signatures and trust seal across all Certificates, ID Cards, and Offer/Appointment Letters.
@@ -544,7 +544,7 @@ export default function SettingsPage() {
           {activeTab === 'statutory' && (
             <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm space-y-4">
               <h2 className="text-base font-extrabold text-black flex items-center gap-2 border-b pb-3">
-                <FiShield className="text-red-600" />
+                <FiShield className="text-emerald-700" />
                 <span>2. Statutory Registrations & Tax Exemption Numbers</span>
               </h2>
 
@@ -599,7 +599,7 @@ export default function SettingsPage() {
                     name="exemption80G"
                     value={form.exemption80G}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 font-mono font-bold text-red-600"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 font-mono font-bold text-emerald-700"
                   />
                 </div>
                 <div>
@@ -620,7 +620,7 @@ export default function SettingsPage() {
           {activeTab === 'contact' && (
             <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm space-y-4">
               <h2 className="text-base font-extrabold text-black flex items-center gap-2 border-b pb-3">
-                <FiPhone className="text-red-600" />
+                <FiPhone className="text-emerald-700" />
                 <span>3. Contact Numbers, Email & Head Office Location</span>
               </h2>
 
@@ -633,7 +633,7 @@ export default function SettingsPage() {
                     name="phone"
                     value={form.phone}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-bold text-black"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-bold text-black"
                   />
                 </div>
                 <div>
@@ -643,7 +643,7 @@ export default function SettingsPage() {
                     name="whatsapp"
                     value={form.whatsapp}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-bold text-black"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-bold text-black"
                   />
                 </div>
                 <div>
@@ -654,7 +654,7 @@ export default function SettingsPage() {
                     name="email"
                     value={form.email}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-bold text-black"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-bold text-black"
                   />
                 </div>
               </div>
@@ -663,7 +663,7 @@ export default function SettingsPage() {
               <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
                 <div className="flex items-center justify-between border-b border-slate-200 pb-2">
                   <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
-                    <FiSend className="w-4 h-4 text-red-600" />
+                    <FiSend className="w-4 h-4 text-emerald-700" />
                     <span>Official Social Media Accounts Links</span>
                   </h3>
                   <span className="text-[10px] font-bold text-slate-500 bg-white px-2.5 py-0.5 rounded-full border border-slate-200 shadow-2xs">
@@ -684,7 +684,7 @@ export default function SettingsPage() {
                       value={form.facebook || ''}
                       onChange={handleChange}
                       placeholder="https://facebook.com/your-ngo-page"
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-xs font-medium text-slate-900 bg-white"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-xs font-medium text-slate-900 bg-white"
                     />
                   </div>
 
@@ -697,7 +697,7 @@ export default function SettingsPage() {
                       value={form.instagram || ''}
                       onChange={handleChange}
                       placeholder="https://instagram.com/your-ngo-handle"
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-xs font-medium text-slate-900 bg-white"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-xs font-medium text-slate-900 bg-white"
                     />
                   </div>
 
@@ -710,7 +710,7 @@ export default function SettingsPage() {
                       value={form.youtube || ''}
                       onChange={handleChange}
                       placeholder="https://youtube.com/@yourchannel"
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-xs font-medium text-slate-900 bg-white"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-xs font-medium text-slate-900 bg-white"
                     />
                   </div>
 
@@ -723,7 +723,7 @@ export default function SettingsPage() {
                       value={form.twitter || ''}
                       onChange={handleChange}
                       placeholder="https://x.com/yourhandle"
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-xs font-medium text-slate-900 bg-white"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-xs font-medium text-slate-900 bg-white"
                     />
                   </div>
 
@@ -736,7 +736,7 @@ export default function SettingsPage() {
                       value={form.linkedin || ''}
                       onChange={handleChange}
                       placeholder="https://linkedin.com/company/your-ngo"
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-xs font-medium text-slate-900 bg-white"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-xs font-medium text-slate-900 bg-white"
                     />
                   </div>
 
@@ -749,7 +749,7 @@ export default function SettingsPage() {
                       value={form.telegram || ''}
                       onChange={handleChange}
                       placeholder="https://t.me/yourchannel"
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-xs font-medium text-slate-900 bg-white"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-xs font-medium text-slate-900 bg-white"
                     />
                   </div>
                 </div>
@@ -787,7 +787,7 @@ export default function SettingsPage() {
                   name="address"
                   value={form.address}
                   onChange={handleChange}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium text-black"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium text-black"
                 />
               </div>
 
@@ -798,7 +798,7 @@ export default function SettingsPage() {
                   name="googleMapEmbed"
                   value={form.googleMapEmbed}
                   onChange={handleChange}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-mono text-[11px] text-black"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono text-[11px] text-black"
                 />
               </div>
             </div>
@@ -808,7 +808,7 @@ export default function SettingsPage() {
           {activeTab === 'bank' && (
             <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm space-y-4">
               <h2 className="text-base font-extrabold text-black flex items-center gap-2 border-b pb-3">
-                <FiCreditCard className="text-red-600" />
+                <FiCreditCard className="text-emerald-700" />
                 <span>4. Bank Account Details & UPI Donation QR Code</span>
               </h2>
 
@@ -820,7 +820,7 @@ export default function SettingsPage() {
                     name="accountName"
                     value={form.accountName}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-bold text-black"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-bold text-black"
                   />
                 </div>
                 <div>
@@ -830,7 +830,7 @@ export default function SettingsPage() {
                     name="accountNumber"
                     value={form.accountNumber}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-mono font-bold text-black"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono font-bold text-black"
                   />
                 </div>
               </div>
@@ -843,7 +843,7 @@ export default function SettingsPage() {
                     name="ifscCode"
                     value={form.ifscCode}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-mono uppercase text-black"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono uppercase text-black"
                   />
                 </div>
                 <div>
@@ -853,7 +853,7 @@ export default function SettingsPage() {
                     name="bankName"
                     value={form.bankName}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-black"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-black"
                   />
                 </div>
                 <div>
@@ -863,7 +863,7 @@ export default function SettingsPage() {
                     name="branch"
                     value={form.branch}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-black"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-black"
                   />
                 </div>
               </div>
@@ -876,7 +876,7 @@ export default function SettingsPage() {
                     name="upiId"
                     value={form.upiId}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-mono font-bold text-red-600"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono font-bold text-emerald-700"
                   />
                 </div>
                 <div className="space-y-2">
@@ -890,7 +890,7 @@ export default function SettingsPage() {
                       onChange={handleChange}
                       className="flex-1 px-3 py-2 rounded-xl border border-slate-300 text-xs font-mono text-black"
                     />
-                    <label className="cursor-pointer px-3 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs whitespace-nowrap shadow-md shadow-red-600/20">
+                    <label className="cursor-pointer px-3 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs whitespace-nowrap shadow-md shadow-emerald-700/20">
                       <span>{uploadingField === 'upiQrImage' ? 'Uploading...' : 'Upload QR'}</span>
                       <input
                         type="file"
@@ -911,7 +911,7 @@ export default function SettingsPage() {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4">
                 <div>
                   <h2 className="text-base font-extrabold text-black flex items-center gap-2">
-                    <FiUsers className="text-red-600" />
+                    <FiUsers className="text-emerald-700" />
                     <span>5. &quot;Who We Are&quot; Dynamic Page Management</span>
                   </h2>
                   <p className="text-xs text-slate-500 mt-0.5">
@@ -920,7 +920,7 @@ export default function SettingsPage() {
                 </div>
                 <Link
                   href="/who-we-are"
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-red-50 text-red-700 hover:bg-red-100 font-bold text-xs border border-red-200 transition"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 hover:bg-emerald-100 font-bold text-xs border border-emerald-200 transition"
                 >
                   <FiExternalLink className="w-3.5 h-3.5" />
                   <span>Preview &quot;Who We Are&quot; Page</span>
@@ -936,7 +936,7 @@ export default function SettingsPage() {
                     name="whoWeAreHeading"
                     value={form.whoWeAreHeading}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-bold text-black"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-bold text-black"
                   />
                 </div>
                 <div>
@@ -947,7 +947,7 @@ export default function SettingsPage() {
                     name="whoWeAreSubtitle"
                     value={form.whoWeAreSubtitle}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-black"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-black"
                   />
                 </div>
               </div>
@@ -969,7 +969,7 @@ export default function SettingsPage() {
                     onChange={handleChange}
                     className="flex-1 px-3 py-2 rounded-xl border border-slate-300 text-xs text-black"
                   />
-                  <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs transition shadow-md shadow-red-600/20 whitespace-nowrap">
+                  <label className="cursor-pointer inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs transition shadow-md shadow-emerald-700/20 whitespace-nowrap">
                     <FiUploadCloud className="w-3.5 h-3.5" />
                     <span>{uploadingField === 'whoWeAreBannerUrl' ? 'Uploading...' : 'Upload Image'}</span>
                     <input
@@ -999,7 +999,7 @@ export default function SettingsPage() {
                   value={form.whoWeAreStory}
                   onChange={handleChange}
                   placeholder="Enter the complete foundational story..."
-                  className="w-full px-4 py-3 rounded-2xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 leading-relaxed text-black font-normal"
+                  className="w-full px-4 py-3 rounded-2xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 leading-relaxed text-black font-normal"
                 />
               </div>
 
@@ -1012,7 +1012,7 @@ export default function SettingsPage() {
                     name="whoWeAreMission"
                     value={form.whoWeAreMission}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-black leading-relaxed"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-black leading-relaxed"
                   />
                 </div>
                 <div>
@@ -1022,7 +1022,7 @@ export default function SettingsPage() {
                     name="whoWeAreVision"
                     value={form.whoWeAreVision}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-black leading-relaxed"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-black leading-relaxed"
                   />
                 </div>
               </div>
@@ -1038,7 +1038,7 @@ export default function SettingsPage() {
                   name="whoWeAreValues"
                   value={form.whoWeAreValues}
                   onChange={handleChange}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-black leading-relaxed font-normal"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-black leading-relaxed font-normal"
                 />
               </div>
             </div>
@@ -1049,7 +1049,7 @@ export default function SettingsPage() {
             <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm space-y-8">
               <div className="border-b pb-4">
                 <h2 className="text-base font-extrabold text-black flex items-center gap-2">
-                  <FiFileText className="text-red-600" />
+                  <FiFileText className="text-emerald-700" />
                   <span>6. Dynamic Legal CMS: Privacy Policy &amp; Terms of Service</span>
                 </h2>
                 <p className="text-xs text-slate-500 mt-0.5">
@@ -1061,12 +1061,12 @@ export default function SettingsPage() {
               <div className="p-6 rounded-3xl bg-slate-50/70 border border-slate-200 space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
                   <div className="flex items-center gap-2">
-                    <FiShield className="text-red-600 w-5 h-5" />
+                    <FiShield className="text-emerald-700 w-5 h-5" />
                     <h3 className="text-sm font-black text-slate-900">Privacy Policy Page Settings (/privacy-policy)</h3>
                   </div>
                   <Link
                     href="/privacy-policy"
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white text-red-600 hover:text-red-700 font-bold text-xs border border-slate-200 shadow-2xs"
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white text-emerald-700 hover:text-emerald-800 font-bold text-xs border border-slate-200 shadow-2xs"
                   >
                     <FiExternalLink className="w-3.5 h-3.5" />
                     <span>View Live Privacy Policy</span>
@@ -1081,7 +1081,7 @@ export default function SettingsPage() {
                       name="privacyPolicyTitle"
                       value={form.privacyPolicyTitle}
                       onChange={handleChange}
-                      className="w-full px-4 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-bold text-black"
+                      className="w-full px-4 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-bold text-black"
                     />
                   </div>
                   <div>
@@ -1092,7 +1092,7 @@ export default function SettingsPage() {
                       value={form.privacyLastUpdated}
                       onChange={handleChange}
                       placeholder="e.g. October 2026"
-                      className="w-full px-4 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-mono text-black"
+                      className="w-full px-4 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono text-black"
                     />
                   </div>
                 </div>
@@ -1104,7 +1104,7 @@ export default function SettingsPage() {
                     name="privacyPolicySubtitle"
                     value={form.privacyPolicySubtitle}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-black"
+                    className="w-full px-4 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-black"
                   />
                 </div>
 
@@ -1118,7 +1118,7 @@ export default function SettingsPage() {
                     name="privacyPolicyContent"
                     value={form.privacyPolicyContent}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-2xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-mono text-xs text-black leading-relaxed"
+                    className="w-full px-4 py-3 rounded-2xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono text-xs text-black leading-relaxed"
                   />
                 </div>
               </div>
@@ -1127,12 +1127,12 @@ export default function SettingsPage() {
               <div className="p-6 rounded-3xl bg-slate-50/70 border border-slate-200 space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
                   <div className="flex items-center gap-2">
-                    <FiFileText className="text-red-600 w-5 h-5" />
+                    <FiFileText className="text-emerald-700 w-5 h-5" />
                     <h3 className="text-sm font-black text-slate-900">Terms &amp; Conditions Page Settings (/terms)</h3>
                   </div>
                   <Link
                     href="/terms"
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white text-red-600 hover:text-red-700 font-bold text-xs border border-slate-200 shadow-2xs"
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white text-emerald-700 hover:text-emerald-800 font-bold text-xs border border-slate-200 shadow-2xs"
                   >
                     <FiExternalLink className="w-3.5 h-3.5" />
                     <span>View Live Terms &amp; Conditions</span>
@@ -1147,7 +1147,7 @@ export default function SettingsPage() {
                       name="termsTitle"
                       value={form.termsTitle}
                       onChange={handleChange}
-                      className="w-full px-4 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-bold text-black"
+                      className="w-full px-4 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-bold text-black"
                     />
                   </div>
                   <div>
@@ -1158,7 +1158,7 @@ export default function SettingsPage() {
                       value={form.termsEffectiveDate}
                       onChange={handleChange}
                       placeholder="e.g. October 2026"
-                      className="w-full px-4 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-mono text-black"
+                      className="w-full px-4 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono text-black"
                     />
                   </div>
                 </div>
@@ -1170,7 +1170,7 @@ export default function SettingsPage() {
                     name="termsSubtitle"
                     value={form.termsSubtitle}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-black"
+                    className="w-full px-4 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-black"
                   />
                 </div>
 
@@ -1184,7 +1184,7 @@ export default function SettingsPage() {
                     name="termsContent"
                     value={form.termsContent}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-2xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-mono text-xs text-black leading-relaxed"
+                    className="w-full px-4 py-3 rounded-2xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono text-xs text-black leading-relaxed"
                   />
                 </div>
               </div>
@@ -1195,7 +1195,7 @@ export default function SettingsPage() {
           {activeTab === 'about' && (
             <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm space-y-4">
               <h2 className="text-base font-extrabold text-black flex items-center gap-2 border-b pb-3">
-                <FiCompass className="text-red-600" />
+                <FiCompass className="text-emerald-700" />
                 <span>7. Dynamic About Us Story &amp; Mission / Vision Statements</span>
               </h2>
 
@@ -1206,7 +1206,7 @@ export default function SettingsPage() {
                   name="aboutHeading"
                   value={form.aboutHeading}
                   onChange={handleChange}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-bold text-black"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-bold text-black"
                 />
               </div>
 
@@ -1217,7 +1217,7 @@ export default function SettingsPage() {
                   name="aboutSubtitle"
                   value={form.aboutSubtitle}
                   onChange={handleChange}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-black"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-black"
                 />
               </div>
 
@@ -1228,7 +1228,7 @@ export default function SettingsPage() {
                   name="aboutStory"
                   value={form.aboutStory}
                   onChange={handleChange}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 leading-relaxed text-black"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 leading-relaxed text-black"
                 />
               </div>
 
@@ -1240,7 +1240,7 @@ export default function SettingsPage() {
                     name="missionStatement"
                     value={form.missionStatement}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 leading-relaxed text-black"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 leading-relaxed text-black"
                   />
                 </div>
                 <div>
@@ -1250,7 +1250,7 @@ export default function SettingsPage() {
                     name="visionStatement"
                     value={form.visionStatement}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 leading-relaxed text-black"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 leading-relaxed text-black"
                   />
                 </div>
               </div>
@@ -1263,7 +1263,7 @@ export default function SettingsPage() {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-3">
                 <div>
                   <h2 className="text-base font-extrabold text-black flex items-center gap-2">
-                    <FiImage className="text-red-600" />
+                    <FiImage className="text-emerald-700" />
                     <span>8. Home Hero Carousel Slides &amp; Banners</span>
                   </h2>
                   <p className="text-xs text-slate-500 mt-0.5">
@@ -1289,7 +1289,7 @@ export default function SettingsPage() {
                       heroSlides: [...(prev.heroSlides || []), newSlide]
                     }));
                   }}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-md transition cursor-pointer self-start sm:self-auto"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-md transition cursor-pointer self-start sm:self-auto"
                 >
                   <FiPlus className="w-4 h-4" />
                   <span>Add New Slide</span>
@@ -1342,7 +1342,7 @@ export default function SettingsPage() {
                         ]
                       }));
                     }}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-red-200 text-red-600 font-bold text-xs rounded-xl hover:bg-red-50 transition cursor-pointer shadow-xs"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-emerald-200 text-emerald-700 font-bold text-xs rounded-xl hover:bg-emerald-50 transition cursor-pointer shadow-xs"
                   >
                     <span>Load Default 3 Slides to Edit</span>
                   </button>
@@ -1353,7 +1353,7 @@ export default function SettingsPage() {
                     <div key={sIdx} className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-4 shadow-xs relative">
                       <div className="flex items-center justify-between border-b border-slate-200 pb-2.5">
                         <span className="font-extrabold text-sm text-slate-800 flex items-center gap-2">
-                          <span className="w-6 h-6 rounded-lg bg-red-600 text-white flex items-center justify-center text-xs">
+                          <span className="w-6 h-6 rounded-lg bg-emerald-700 text-white flex items-center justify-center text-xs">
                             {sIdx + 1}
                           </span>
                           Slide #{sIdx + 1} {slide.title ? `– ${slide.title.slice(0, 30)}...` : ''}
@@ -1368,7 +1368,7 @@ export default function SettingsPage() {
                               }));
                             }
                           }}
-                          className="flex items-center gap-1 text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer"
+                          className="flex items-center gap-1 text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer"
                         >
                           <FiTrash2 className="w-3.5 h-3.5" />
                           <span>Delete Slide</span>
@@ -1396,8 +1396,8 @@ export default function SettingsPage() {
 
                           <div className="flex items-center gap-2 pt-1">
                             <label className="flex-1 cursor-pointer">
-                              <span className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-white border border-slate-300 hover:border-red-400 text-slate-700 hover:text-red-600 font-bold text-xs rounded-xl shadow-xs transition">
-                                <FiUploadCloud className="w-4 h-4 text-red-600" />
+                              <span className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-white border border-slate-300 hover:border-emerald-400 text-slate-700 hover:text-emerald-700 font-bold text-xs rounded-xl shadow-xs transition">
+                                <FiUploadCloud className="w-4 h-4 text-emerald-700" />
                                 <span>{uploadingField === `slide_${sIdx}` ? 'Uploading...' : 'Upload Image'}</span>
                               </span>
                               <input
@@ -1442,7 +1442,7 @@ export default function SettingsPage() {
                                 return { ...prev, heroSlides: updated };
                               });
                             }}
-                            className="w-full px-3 py-1.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-1 focus:ring-red-500 text-[11px] text-slate-800 bg-white"
+                            className="w-full px-3 py-1.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-1 focus:ring-emerald-500 text-[11px] text-slate-800 bg-white"
                           />
                         </div>
 
@@ -1463,7 +1463,7 @@ export default function SettingsPage() {
                                     return { ...prev, heroSlides: updated };
                                   });
                                 }}
-                                className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-xs bg-white text-slate-900"
+                                className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-xs bg-white text-slate-900"
                               />
                             </div>
                             <div>
@@ -1480,7 +1480,7 @@ export default function SettingsPage() {
                                     return { ...prev, heroSlides: updated };
                                   });
                                 }}
-                                className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-xs bg-white text-slate-900"
+                                className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-xs bg-white text-slate-900"
                               />
                             </div>
                           </div>
@@ -1500,7 +1500,7 @@ export default function SettingsPage() {
                                   return { ...prev, heroSlides: updated };
                                 });
                               }}
-                              className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-xs font-bold bg-white text-slate-900"
+                              className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-xs font-bold bg-white text-slate-900"
                             />
                           </div>
 
@@ -1518,13 +1518,13 @@ export default function SettingsPage() {
                                   return { ...prev, heroSlides: updated };
                                 });
                               }}
-                              className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-xs bg-white text-slate-900"
+                              className="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-xs bg-white text-slate-900"
                             />
                           </div>
 
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                             <div className="p-3 bg-white rounded-xl border border-slate-200 space-y-2">
-                              <span className="font-bold text-[11px] text-red-600 block">Primary Action Button</span>
+                              <span className="font-bold text-[11px] text-emerald-700 block">Primary Action Button</span>
                               <input
                                 type="text"
                                 placeholder="Button Text (e.g. Donate Online)"
@@ -1601,7 +1601,7 @@ export default function SettingsPage() {
             <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm space-y-6">
               <div className="flex items-center justify-between border-b pb-3">
                 <h2 className="text-base font-extrabold text-black flex items-center gap-2">
-                  <FiShield className="text-red-600" />
+                  <FiShield className="text-emerald-700" />
                   <span>8. Dynamic SMTP Email Server &amp; Security Settings</span>
                 </h2>
                 <span className="text-[10px] px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-bold">
@@ -1629,7 +1629,7 @@ export default function SettingsPage() {
                     value={form.smtpHost}
                     onChange={handleChange}
                     placeholder="smtp.gmail.com"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-black"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-black"
                   />
                   <span className="text-[10px] text-gray-500 mt-1 block">Default: smtp.gmail.com</span>
                 </div>
@@ -1640,7 +1640,7 @@ export default function SettingsPage() {
                     name="smtpPort"
                     value={form.smtpPort}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 text-black"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-black"
                   >
                     <option value="">Select SMTP Port</option>
                     <option value="587">587 (SSL/TLS - Recommended)</option>
@@ -1658,7 +1658,7 @@ export default function SettingsPage() {
                     value={form.smtpUser}
                     onChange={handleChange}
                     placeholder="e.g. yourorg@gmail.com (leave blank to keep current)"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium text-black"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium text-black"
                   />
                 </div>
 
@@ -1673,7 +1673,7 @@ export default function SettingsPage() {
                       value={form.smtpPass}
                       onChange={handleChange}
                       placeholder="Leave blank to keep existing password"
-                      className="w-full px-4 py-2.5 pr-10 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-mono text-black text-xs"
+                      className="w-full px-4 py-2.5 pr-10 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono text-black text-xs"
                     />
                     <button
                       type="button"
@@ -1701,7 +1701,7 @@ export default function SettingsPage() {
                     value={form.smtpFromName}
                     onChange={handleChange}
                     placeholder="Indian Youth Foundation"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium text-black"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium text-black"
                   />
                   <span className="text-[10px] text-gray-500 mt-1 block">
                     The organization name displayed in the recipient's inbox (e.g. &quot;Indian Youth Foundation&quot;).
@@ -1713,13 +1713,13 @@ export default function SettingsPage() {
               <div className="p-5 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 text-white space-y-4 shadow-xl border border-slate-800/80">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
                   <div className="flex items-center gap-2">
-                    <div className="p-2 bg-red-600/20 text-red-400 rounded-xl">
-                      <FiMail className="w-5 h-5 text-red-500" />
+                    <div className="p-2 bg-emerald-700/20 text-emerald-400 rounded-xl">
+                      <FiMail className="w-5 h-5 text-emerald-500" />
                     </div>
                     <div>
                       <h3 className="font-black text-sm text-white flex items-center gap-2">
                         <span className='text-white'>Live SMTP Connection &amp; Delivery Tester</span>
-                        <span className="text-[9px] px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-500/30">
+                        <span className="text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                           Real-Time Testing
                         </span>
                       </h3>
@@ -1740,7 +1740,7 @@ export default function SettingsPage() {
                       value={testReceiverEmail}
                       onChange={(e) => setTestReceiverEmail(e.target.value)}
                       placeholder="Enter receiver email address (e.g. yourname@gmail.com)"
-                      className="w-full px-4 py-2.5 rounded-xl bg-slate-800/60 border border-slate-700/60 text-white text-xs placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-red-500 font-medium"
+                      className="w-full px-4 py-2.5 rounded-xl bg-slate-800/60 border border-slate-700/60 text-white text-xs placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium"
                     />
                   </div>
 
@@ -1750,7 +1750,7 @@ export default function SettingsPage() {
                     disabled={testingMail || !testReceiverEmail}
                     className={`w-full sm:w-auto mt-auto sm:self-end px-6 py-2.5 rounded-xl font-black text-xs transition flex items-center justify-center gap-2 shadow-md cursor-pointer ${testingMail || !testReceiverEmail
                       ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700/50'
-                      : 'bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white shadow-red-950/50'
+                      : 'bg-gradient-to-r from-emerald-700 to-teal-700 hover:from-emerald-800 hover:to-teal-800 text-white shadow-emerald-950/50'
                       }`}
                   >
                     {testingMail ? (
@@ -1772,13 +1772,13 @@ export default function SettingsPage() {
                   <div
                     className={`p-4 rounded-xl text-xs font-semibold flex items-start gap-2.5 transition ${mailTestResult.success
                       ? 'bg-emerald-950/40 border border-emerald-500/30 text-emerald-200'
-                      : 'bg-red-950/40 border border-red-500/30 text-red-200'
+                      : 'bg-emerald-950/40 border border-emerald-500/30 text-emerald-200'
                       }`}
                   >
                     {mailTestResult.success ? (
                       <FiCheckCircle className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
                     ) : (
-                      <FiAlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+                      <FiAlertCircle className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
                     )}
                     <div className="space-y-1">
                       <div className="font-bold text-sm">
@@ -1805,7 +1805,7 @@ export default function SettingsPage() {
                   value={form.adminSecretKey}
                   onChange={handleChange}
                   placeholder="Leave blank to keep existing secret key / Type new secret key to change"
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-red-500 font-mono bg-slate-50 text-black text-xs"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono bg-slate-50 text-black text-xs"
                 />
                 <span className="text-[10px] text-gray-600 mt-1 block">
                   Protected master secret key. Leave blank to keep existing key unchanged, or enter a new secret key to update.
@@ -1821,7 +1821,7 @@ export default function SettingsPage() {
             </span>
             <button
               type="submit"
-              className="flex items-center gap-2 px-8 py-3.5 rounded-2xl bg-red-600 hover:bg-red-700 text-white font-extrabold text-sm shadow-xl shadow-red-600/30 transition cursor-pointer"
+              className="flex items-center gap-2 px-8 py-3.5 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-sm shadow-xl shadow-emerald-700/30 transition cursor-pointer"
             >
               <FiSave className="w-4 h-4" />
               <span>Save Settings</span>

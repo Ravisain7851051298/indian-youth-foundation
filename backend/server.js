@@ -8,14 +8,11 @@ const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
   try {
-    console.log('🚀 Starting भारतीय युवा क्रांति (Indian Youth Foundation) Backend Server...');
-    
     // Connect to MongoDB
     await connectDB();
 
     // Ensure super admin, official settings, and plans exist in MongoDB
     await initDatabase();
-    console.log('📦 Real MongoDB datastore ready.');
 
     const server = http.createServer(app);
 
@@ -31,9 +28,6 @@ const startServer = async () => {
       console.log(`====================================================`);
       console.log(`🌐 Server running live at: http://localhost:${PORT}`);
       console.log(`📡 Health Check: http://localhost:${PORT}/api/health`);
-      console.log(`🛡️ Admin Bootstrap: POST /api/auth/create-admin`);
-      console.log(`🔑 Header Required: X-ADMIN-SECRET-KEY`);
-      console.log(`🔒 Token Architecture: HTTP-Only Cookie + Space-Optimized TTL Blacklist`);
       console.log(`====================================================`);
     });
   } catch (error) {

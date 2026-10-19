@@ -145,7 +145,7 @@ export default function Footer() {
       {/* ---------------- 2. MAIN FOOTER: BRAND, QUICK LINKS, SOCIAL MEDIA ---------------- */}
       <div className="py-12 px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
-          
+
           {/* Left Column: NGO Brand, Mission & Seal (Col 4) */}
           <div className="md:col-span-4 space-y-4">
             <div className="flex items-center gap-3">
@@ -262,7 +262,7 @@ export default function Footer() {
                 Connect With Us
               </h3>
             </div>
-            
+
             <p className="text-xs text-slate-400 leading-relaxed font-medium">
               Follow our official media channels for real-time welfare drives, beneficiary stories, and urgent emergency appeals.
             </p>
@@ -289,7 +289,7 @@ export default function Footer() {
 
             {/* Quick Action Button: Member Login & Donation */}
             <div className="space-y-2 pt-2">
-              <Link
+              {/* <Link
                 href="/login"
                 className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white font-extrabold text-xs shadow-md shadow-red-900/30 transition group"
               >
@@ -298,11 +298,11 @@ export default function Footer() {
                   <span>Member &amp; Volunteer Login</span>
                 </span>
                 <FiArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-              </Link>
+              </Link> */}
 
               <Link
                 href="/donation"
-                className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-[#0b8026] text-slate-200 hover:text-white border border-slate-700 hover:border-[#0b8026] font-bold text-xs transition group"
+                className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-red-600 hover:text-white text-slate-200 border border-slate-700 font-bold text-xs transition group"
               >
                 <span className="flex items-center gap-2">
                   <FiHeart className="w-4 h-4 text-red-400 group-hover:text-white transition" />

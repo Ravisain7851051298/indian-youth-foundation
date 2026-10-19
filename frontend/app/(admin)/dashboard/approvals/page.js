@@ -62,7 +62,9 @@ export default function ApprovalsPage() {
       setTimeout(() => setActionNotice(null), 5000);
       dispatch(fetchMemberApplications());
     } catch (err) {
-      alert(err || 'Failed to approve membership');
+      const errMsg = typeof err === 'string' ? err : err?.message || 'Failed to approve membership';
+      setActionNotice(`⚠️ ${errMsg}`);
+      setTimeout(() => setActionNotice(null), 6000);
     } finally {
       setProcessingId(null);
     }
@@ -76,7 +78,9 @@ export default function ApprovalsPage() {
       setTimeout(() => setActionNotice(null), 5000);
       dispatch(fetchVolunteerApplications());
     } catch (err) {
-      alert(err || 'Failed to approve volunteer');
+      const errMsg = typeof err === 'string' ? err : err?.message || 'Failed to approve volunteer';
+      setActionNotice(`⚠️ ${errMsg}`);
+      setTimeout(() => setActionNotice(null), 6000);
     } finally {
       setProcessingId(null);
     }
@@ -91,7 +95,9 @@ export default function ApprovalsPage() {
       dispatch(fetchDonations());
       dispatch(fetchCampaigns());
     } catch (err) {
-      alert(err || 'Failed to approve donation');
+      const errMsg = typeof err === 'string' ? err : err?.message || 'Failed to approve donation';
+      setActionNotice(`⚠️ ${errMsg}`);
+      setTimeout(() => setActionNotice(null), 6000);
     } finally {
       setProcessingId(null);
     }
@@ -116,7 +122,9 @@ export default function ApprovalsPage() {
       setActionNotice('Application marked as rejected.');
       setTimeout(() => setActionNotice(null), 4000);
     } catch (err) {
-      alert(err || 'Error rejecting');
+      const errMsg = typeof err === 'string' ? err : err?.message || 'Error rejecting application';
+      setActionNotice(`⚠️ ${errMsg}`);
+      setTimeout(() => setActionNotice(null), 6000);
     } finally {
       setProcessingId(null);
     }
@@ -135,7 +143,7 @@ export default function ApprovalsPage() {
 
         <Link
           href="/dashboard"
-          className="text-xs font-bold text-black hover:text-red-600 transition flex items-center gap-1 self-start md:self-auto"
+          className="text-xs font-bold text-black hover:text-emerald-700 transition flex items-center gap-1 self-start md:self-auto"
         >
           ← Back to Overview
         </Link>
@@ -154,8 +162,8 @@ export default function ApprovalsPage() {
         <button
           onClick={() => setActiveTab('members')}
           className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${activeTab === 'members'
-              ? 'bg-red-600 text-white shadow-md shadow-red-600/20'
-              : 'bg-slate-100 text-slate-700 hover:bg-red-50 hover:text-red-600'
+            ? 'bg-emerald-700 text-white shadow-md shadow-emerald-700/20'
+            : 'bg-slate-100 text-slate-700 hover:bg-emerald-50 hover:text-emerald-700'
             }`}
         >
           <FiCreditCard className="w-3.5 h-3.5" />
@@ -169,8 +177,8 @@ export default function ApprovalsPage() {
         <button
           onClick={() => setActiveTab('volunteers')}
           className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${activeTab === 'volunteers'
-              ? 'bg-red-600 text-white shadow-md shadow-red-600/20'
-              : 'bg-slate-100 text-slate-700 hover:bg-red-50 hover:text-red-600'
+            ? 'bg-emerald-700 text-white shadow-md shadow-emerald-700/20'
+            : 'bg-slate-100 text-slate-700 hover:bg-emerald-50 hover:text-emerald-700'
             }`}
         >
           <FiUserCheck className="w-3.5 h-3.5" />
@@ -184,8 +192,8 @@ export default function ApprovalsPage() {
         <button
           onClick={() => setActiveTab('donations')}
           className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer ${activeTab === 'donations'
-              ? 'bg-red-600 text-white shadow-md shadow-red-600/20'
-              : 'bg-slate-100 text-slate-700 hover:bg-red-50 hover:text-red-600'
+            ? 'bg-emerald-700 text-white shadow-md shadow-emerald-700/20'
+            : 'bg-slate-100 text-slate-700 hover:bg-emerald-50 hover:text-emerald-700'
             }`}
         >
           <FiHeart className="w-3.5 h-3.5" />
@@ -222,11 +230,11 @@ export default function ApprovalsPage() {
               {pendingMembers.map((app) => (
                 <div
                   key={app._id}
-                  className="bg-white rounded-3xl p-5 border border-slate-200 shadow-2xs hover:border-red-300 transition flex flex-col lg:flex-row lg:items-center justify-between gap-6"
+                  className="bg-white rounded-3xl p-5 border border-slate-200 shadow-2xs hover:border-emerald-300 transition flex flex-col lg:flex-row lg:items-center justify-between gap-6"
                 >
                   <div className="space-y-2 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-red-100 text-red-700">
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800">
                         {app.planName}
                       </span>
                       <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-black">
@@ -255,7 +263,7 @@ export default function ApprovalsPage() {
                         <button
                           type="button"
                           onClick={() => setPreviewImage(app.paymentScreenshot)}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 font-bold text-xs transition border border-red-200 cursor-pointer"
+                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs transition border border-emerald-200 cursor-pointer"
                         >
                           <FiEye className="w-3.5 h-3.5" />
                           <span>View Payment Screenshot</span>
@@ -294,7 +302,7 @@ export default function ApprovalsPage() {
                       type="button"
                       disabled={!!processingId}
                       onClick={() => setRejectModal({ open: true, type: 'member', id: app._id, reason: '' })}
-                      className="w-full px-5 py-2.5 rounded-2xl bg-slate-100 hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed text-slate-700 hover:text-red-700 border border-slate-200 hover:border-red-200 font-bold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer"
+                      className="w-full px-5 py-2.5 rounded-2xl bg-slate-100 hover:bg-emerald-50 disabled:opacity-50 disabled:cursor-not-allowed text-slate-700 hover:text-emerald-800 border border-slate-200 hover:border-emerald-200 font-bold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer"
                     >
                       <FiXCircle className="w-4 h-4" />
                       <span>Reject</span>
@@ -395,7 +403,7 @@ export default function ApprovalsPage() {
                       type="button"
                       disabled={!!processingId}
                       onClick={() => setRejectModal({ open: true, type: 'volunteer', id: app._id, reason: '' })}
-                      className="w-full px-5 py-2.5 rounded-2xl bg-slate-100 hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed text-slate-700 hover:text-red-700 border border-slate-200 hover:border-red-200 font-bold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer"
+                      className="w-full px-5 py-2.5 rounded-2xl bg-slate-100 hover:bg-emerald-50 disabled:opacity-50 disabled:cursor-not-allowed text-slate-700 hover:text-emerald-800 border border-slate-200 hover:border-emerald-200 font-bold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer"
                     >
                       <FiXCircle className="w-4 h-4" />
                       <span>Reject</span>
@@ -463,7 +471,7 @@ export default function ApprovalsPage() {
                         <strong className="text-black">{d.campaignTitle}</strong>
                         <div className="text-[11px] text-gray-700 mt-1 font-mono">
                           <span>Bank UTR / Transaction ID: </span>
-                          <strong className="text-red-600 font-bold bg-red-50 px-2 py-0.5 rounded border border-red-200">
+                          <strong className="text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                             {d.transactionId || d.paymentId || 'Pending UTR'}
                           </strong>
                           <span className="text-gray-500 ml-2">({d.paymentMethod})</span>
@@ -507,7 +515,7 @@ export default function ApprovalsPage() {
                       type="button"
                       disabled={!!processingId}
                       onClick={() => setRejectModal({ open: true, type: 'donation', id: d._id, reason: '' })}
-                      className="w-full px-5 py-2.5 rounded-2xl bg-slate-100 hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed text-slate-700 hover:text-red-700 border border-slate-200 hover:border-red-200 font-bold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer"
+                      className="w-full px-5 py-2.5 rounded-2xl bg-slate-100 hover:bg-emerald-50 disabled:opacity-50 disabled:cursor-not-allowed text-slate-700 hover:text-emerald-800 border border-slate-200 hover:border-emerald-200 font-bold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer"
                     >
                       <FiXCircle className="w-4 h-4" />
                       <span>Reject</span>
@@ -570,7 +578,7 @@ export default function ApprovalsPage() {
               value={rejectModal.reason}
               onChange={(e) => setRejectModal(prev => ({ ...prev, reason: e.target.value }))}
               placeholder="Enter reason for audit record..."
-              className="w-full text-xs p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500"
+              className="w-full text-xs p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
             <div className="flex justify-end gap-2 pt-2">
               <button
@@ -583,7 +591,7 @@ export default function ApprovalsPage() {
               <button
                 disabled={!!processingId}
                 onClick={submitReject}
-                className="px-4 py-2 rounded-xl bg-red-600 disabled:bg-red-400 disabled:cursor-not-allowed text-white font-bold text-xs hover:bg-red-700 flex items-center gap-1.5"
+                className="px-4 py-2 rounded-xl bg-emerald-700 disabled:bg-emerald-400 disabled:cursor-not-allowed text-white font-bold text-xs hover:bg-emerald-800 flex items-center gap-1.5"
               >
                 {processingId ? <FiRefreshCw className="w-3.5 h-3.5 animate-spin" /> : null}
                 <span>{processingId ? 'Rejecting...' : 'Confirm Rejection'}</span>

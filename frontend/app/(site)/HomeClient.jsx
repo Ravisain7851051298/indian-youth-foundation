@@ -276,48 +276,62 @@ export default function HomePage() {
                         Latest News &amp; Bulletins
                       </h3>
                     </div>
-                    <span className="text-[11px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">Live Updates</span>
+                    <Link
+                      href="/blogs"
+                      className="text-[11px] font-bold text-emerald-700 hover:text-emerald-800 hover:underline flex items-center gap-1"
+                    >
+                      <span>View All News</span>
+                      <FiArrowRight className="w-3 h-3" />
+                    </Link>
                   </div>
 
                   <div className="space-y-3">
                     {blogs && blogs.length > 0 ? (
-                      blogs.slice(0, 3).map((item, idx) => (
-                        <div
-                          key={item._id || item.id || idx}
-                          className="p-3.5 bg-slate-50 hover:bg-[#eef8f0] transition-colors rounded-xl border border-slate-200 hover:border-[#0b8026]/40 flex gap-3.5 items-start group"
-                        >
-                          {item.image && (
-                            <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0 bg-slate-200 border border-slate-200">
-                              <img
-                                src={getContentImageUrl(item.image)}
-                                alt={item.title}
-                                className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
-                                onError={(e) => {
-                                  e.currentTarget.onerror = null;
-                                  e.currentTarget.src = '/logo.jpeg';
-                                }}
-                              />
+                      blogs.slice(0, 3).map((item, idx) => {
+                        const bId = item._id || item.id || idx;
+                        return (
+                          <Link
+                            key={bId}
+                            href={`/blogs/${bId}`}
+                            className="p-3.5 bg-slate-50 hover:bg-[#eef8f0] transition-colors rounded-xl border border-slate-200 hover:border-emerald-600/40 flex gap-3.5 items-start group cursor-pointer block"
+                          >
+                            {item.image && (
+                              <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0 bg-slate-200 border border-slate-200">
+                                <img
+                                  src={getContentImageUrl(item.image)}
+                                  alt={item.title}
+                                  className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                                  onError={(e) => {
+                                    e.currentTarget.onerror = null;
+                                    e.currentTarget.src = '/logo.jpeg';
+                                  }}
+                                />
+                              </div>
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 text-[10px] font-bold text-emerald-700">
+                                <FiCalendar className="w-3 h-3" />
+                                <span>{item.date || item.createdAt ? new Date(item.date || item.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Official Update'}</span>
+                                {item.category && <span className="bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded text-[9px] uppercase">{item.category}</span>}
+                              </div>
+                              <h4 className="font-bold text-xs sm:text-sm text-slate-900 mt-1 line-clamp-1 group-hover:text-emerald-700 transition-colors">
+                                {item.title}
+                              </h4>
+                              <p className="text-[11px] text-slate-600 mt-0.5 line-clamp-2 leading-relaxed">
+                                {item.content || item.description || item.summary}
+                              </p>
+                              <span className="text-[10px] font-bold text-emerald-700 mt-1 inline-flex items-center gap-1 group-hover:underline">
+                                <span>Read full story</span>
+                                <FiChevronRight className="w-3 h-3" />
+                              </span>
                             </div>
-                          )}
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 text-[10px] font-bold text-[#0b8026]">
-                              <FiCalendar className="w-3 h-3" />
-                              <span>{item.date || item.createdAt ? new Date(item.date || item.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Official Update'}</span>
-                              {item.category && <span className="bg-green-100 text-[#0b8026] px-1.5 py-0.2 rounded text-[9px] uppercase">{item.category}</span>}
-                            </div>
-                            <h4 className="font-bold text-xs sm:text-sm text-slate-900 mt-1 line-clamp-1 group-hover:text-[#0b8026] transition-colors">
-                              {item.title}
-                            </h4>
-                            <p className="text-[11px] text-slate-600 mt-0.5 line-clamp-2 leading-relaxed">
-                              {item.content || item.description || item.summary}
-                            </p>
-                          </div>
-                        </div>
-                      ))
+                          </Link>
+                        );
+                      })
                     ) : (
                       <>
                         <div className="p-3.5 bg-slate-50 hover:bg-[#eef8f0] transition rounded-xl border border-slate-200">
-                          <div className="text-[10px] font-bold text-[#0b8026] flex items-center gap-1.5">
+                          <div className="text-[10px] font-bold text-emerald-700 flex items-center gap-1.5">
                             <FiCalendar className="w-3 h-3" />
                             <span>National Bulletin • 2026</span>
                           </div>
@@ -330,7 +344,7 @@ export default function HomePage() {
                         </div>
 
                         <div className="p-3.5 bg-slate-50 hover:bg-[#eef8f0] transition rounded-xl border border-slate-200">
-                          <div className="text-[10px] font-bold text-[#0b8026] flex items-center gap-1.5">
+                          <div className="text-[10px] font-bold text-emerald-700 flex items-center gap-1.5">
                             <FiCalendar className="w-3 h-3" />
                             <span>District Camp Announcement</span>
                           </div>
@@ -668,6 +682,99 @@ Thank you for your unwavering commitment to our cause. Together, we are truly ma
               </div>
 
             </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* ---------------- 4.5 OUR WELFARE SERVICES SECTION (NEW DYNAMIC SHOWCASE) ---------------- */}
+      <section id="services-section" className="py-14 bg-white border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div className="text-center mb-10">
+            <span className="inline-block px-8 py-1.5 rounded-md border-2 border-emerald-700 text-emerald-800 font-extrabold text-sm tracking-wide bg-white shadow-2xs">
+              Our Services &amp; Initiatives
+            </span>
+            <p className="text-xs text-slate-600 mt-2 max-w-xl mx-auto font-medium">
+              Explore active grassroots welfare initiatives launched for child education, healthcare relief, women empowerment, and youth livelihood.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {(services && services.length > 0 ? services.slice(0, 6) : DEFAULT_OBJECTIVES.slice(0, 3)).map((srv, idx) => {
+              const sId = srv._id || srv.id || idx;
+              const sImg = getContentImageUrl(srv.image || srv.bannerImage || srv.imageUrl || (Array.isArray(srv.images) && srv.images[0])) || 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=600';
+              const title = srv.titleEn || srv.title || 'Social Welfare Program';
+              const desc = srv.description || srv.content || 'Dedicated community support and field relief intervention program.';
+              const cat = srv.category || 'Grassroots Relief';
+
+              return (
+                <div
+                  key={sId}
+                  className="bg-slate-50 hover:bg-white rounded-3xl border border-slate-200 hover:border-emerald-500 overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
+                >
+                  <div>
+                    <div className="relative w-full h-48 bg-slate-200 overflow-hidden">
+                      <img
+                        src={sImg}
+                        alt={title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = '/logo.jpeg';
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                      
+                      <div className="absolute top-3 left-3">
+                        <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-white/95 text-emerald-800 shadow-xs backdrop-blur-xs">
+                          {cat}
+                        </span>
+                      </div>
+
+                      <div className="absolute bottom-3 left-3 right-3 text-white">
+                        <h4 className="font-extrabold text-sm line-clamp-1 text-white">
+                          {title}
+                        </h4>
+                      </div>
+                    </div>
+
+                    <div className="p-5 space-y-2">
+                      <p className="text-xs text-slate-600 line-clamp-3 leading-relaxed">
+                        {desc}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="p-5 pt-0 border-t border-slate-100 flex items-center justify-between mt-3">
+                    <Link
+                      href={`/services/${sId}`}
+                      className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 hover:text-emerald-900 group-hover:underline"
+                    >
+                      <span>Explore Program</span>
+                      <FiArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    </Link>
+
+                    <Link
+                      href="/donation"
+                      className="px-3 py-1.5 rounded-lg bg-emerald-100 hover:bg-emerald-700 text-emerald-800 hover:text-white font-bold text-[11px] transition"
+                    >
+                      Support
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="text-center mt-8">
+            <Link
+              href="/services"
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs shadow-md transition transform hover:scale-105"
+            >
+              <span>View All Services &amp; Initiatives</span>
+              <FiChevronRight className="w-4 h-4" />
+            </Link>
           </div>
 
         </div>

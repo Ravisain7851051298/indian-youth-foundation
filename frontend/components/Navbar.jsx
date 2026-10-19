@@ -123,7 +123,6 @@ export default function Navbar() {
     },
     { label: 'Complains & Enquries', href: '/complaints' },
     { label: 'Feedback', href: '/feedback' },
-    ...(isAdmin ? [{ label: 'Admin Panel', href: '/dashboard' }] : []),
     currentUser ? {
       label: currentUser.name ? `${currentUser.name.split(' ')[0]}` : 'My Profile',
       id: 'user_profile',
@@ -203,10 +202,10 @@ export default function Navbar() {
             </a>
           </div>
 
-          {/* Middle: News & Updates Red Button + White Ticker Bar */}
+          {/* Middle: News & Updates Green Button + White Ticker Bar */}
           <div className="flex-1 flex items-center min-w-50 max-w-xl lg:max-w-3xl mx-2 sm:mx-3 overflow-hidden">
-            <div className="hidden sm:flex bg-[#d50000] text-white px-3 py-1.5 rounded-l-md font-black text-xs whitespace-nowrap items-center gap-1 shadow-sm shrink-0">
-              <FiActivity className="w-3.5 h-3.5" />
+            <div className="hidden sm:flex bg-[#075018] text-white px-3 py-1.5 rounded-l-md font-black text-xs whitespace-nowrap items-center gap-1 shadow-sm shrink-0 border-r border-emerald-600">
+              <FiActivity className="w-3.5 h-3.5 text-emerald-300" />
               <span>News &amp; Updates</span>
             </div>
             <div className="flex-1 bg-white h-7 flex items-center px-3 rounded-md sm:rounded-l-none sm:rounded-r-md overflow-hidden">
@@ -247,26 +246,49 @@ export default function Navbar() {
                 }}
               />
             </div>
-            <div className="flex flex-col">
-              <span className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-[#d50000] tracking-tight leading-tight uppercase">
+            <div className="hidden md:flex flex-col">
+              <span className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-[#0b8026] tracking-tight leading-tight uppercase">
                 {settings?.ngoName || 'YUVA KRANTI DAL'}
               </span>
             </div>
           </Link>
 
-          {/* Right: Red Donate Us Button with Bouncing Heart + Google Translate */}
-          <div className="flex items-center gap-3">
+          {/* Right Actions: Admin Dashboard Link (if role is admin) + Donate Us Button + Google Translate */}
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            {isAdmin && (
+              <Link
+                href="/dashboard"
+                id="header-admin-dashboard-btn"
+                className="hidden relative md:inline-flex items-center justify-center p-0.5 rounded-full group overflow-hidden shadow-sm transition-transform duration-300 hover:scale-105 active:scale-95"
+                title="Go to Admin Dashboard"
+              >
+                {/* 100% Guaranteed Visible Rotating Conic Gradient Border */}
+                <span
+                  className="absolute inset-[-150%] animate-[spin_3s_linear_infinite]"
+                  style={{
+                    background: 'conic-gradient(from 0deg, #3b82f6 0%, #8b5cf6 25%, #ec4899 50%, #f97316 75%, #10b981 90%, #3b82f6 100%)'
+                  }}
+                />
+
+                {/* Inner Button Content with Solid White Background */}
+                <span className="relative z-10 flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-white group-hover:bg-emerald-50/60 font-extrabold text-xs sm:text-sm text-[#0b8026] group-hover:text-[#075018] transition-colors duration-200">
+                  <FiLayers className="w-4 h-4 text-[#0b8026] shrink-0 group-hover:rotate-12 transition-transform duration-300" />
+                  <span className=''>Dashboard</span>
+                </span>
+              </Link>
+            )}
+
             <Link
               href="/donation"
-              className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#d50000] hover:bg-red-700 text-white font-extrabold text-xs sm:text-sm shadow-md transition transform hover:scale-105 animate-bounce"
+              className="flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-red-500 hover:bg-red-600 text-white font-extrabold text-xs sm:text-sm shadow-md transition transform hover:scale-105 animate-bounce"
             >
               <FiHeart className="w-4 h-4 text-white fill-white shrink-0" />
               <span>Donate Us</span>
             </Link>
 
-            <div className="hidden sm:block">
-              <GoogleTranslate />
-            </div>
+
+            <GoogleTranslate />
+
           </div>
 
         </div>
@@ -283,7 +305,7 @@ export default function Navbar() {
               <Link
                 href="/"
                 className={`flex items-center justify-center w-11 h-11 transition ${pathname === '/'
-                  ? 'bg-[#d50000] text-white shadow-inner font-black'
+                  ? 'bg-[#075018] text-white shadow-inner font-black'
                   : 'bg-[#09661f] text-white hover:bg-[#075018]'
                   }`}
                 title="Home"
@@ -304,7 +326,7 @@ export default function Navbar() {
                       <button
                         onClick={() => toggleDropdown(item.id)}
                         className={`flex items-center gap-1 px-3 py-2.5 transition cursor-pointer rounded-sm ${isDropdownActive
-                          ? 'bg-[#d50000] text-white font-black shadow-inner'
+                          ? 'bg-[#075018] text-white font-black shadow-inner'
                           : 'hover:bg-[#09661f] text-white'
                           }`}
                       >
@@ -328,11 +350,11 @@ export default function Navbar() {
                                 href={link.href}
                                 onClick={() => setActiveDropdown(null)}
                                 className={`flex items-center gap-2 px-4 py-2 text-xs font-semibold transition ${isSubActive
-                                  ? 'bg-red-50 text-[#d50000] font-black'
-                                  : 'hover:bg-green-50 hover:text-[#0b8026] text-slate-700'
+                                  ? 'bg-emerald-50 text-[#0b8026] font-black'
+                                  : 'hover:bg-emerald-50/60 hover:text-[#0b8026] text-slate-700'
                                   }`}
                               >
-                                {IconComponent && <IconComponent className={`w-3.5 h-3.5 shrink-0 ${isSubActive ? 'text-[#d50000]' : 'text-[#0b8026]'}`} />}
+                                {IconComponent && <IconComponent className={`w-3.5 h-3.5 shrink-0 ${isSubActive ? 'text-[#0b8026]' : 'text-emerald-700'}`} />}
                                 <span>{link.label}</span>
                               </Link>
                             );
@@ -365,7 +387,7 @@ export default function Navbar() {
                     key={item.href + item.label}
                     href={item.href}
                     className={`px-3 py-2.5 transition rounded-sm whitespace-nowrap ${isActive
-                      ? 'bg-[#d50000] text-white font-black shadow-inner'
+                      ? 'bg-[#075018] text-white font-black shadow-inner'
                       : 'hover:bg-[#09661f] text-white'
                       }`}
                   >
@@ -379,7 +401,7 @@ export default function Navbar() {
             <div className="flex lg:hidden items-center justify-between w-full">
               <Link
                 href="/"
-                className={`flex items-center gap-1 font-bold text-xs py-1.5 px-2.5 rounded-md transition ${pathname === '/' ? 'bg-[#d50000] text-white' : 'hover:bg-[#09661f]'
+                className={`flex items-center gap-1 font-bold text-xs py-1.5 px-2.5 rounded-md transition ${pathname === '/' ? 'bg-[#075018] text-white font-black' : 'hover:bg-[#09661f]'
                   }`}
               >
                 <FiHome className="w-4 h-4" />
@@ -408,11 +430,11 @@ export default function Navbar() {
               href="/"
               onClick={() => setMobileMenuOpen(false)}
               className={`flex items-center gap-2 py-2 px-3 rounded-lg transition ${pathname === '/'
-                ? 'bg-red-50 text-[#d50000] font-black'
-                : 'hover:bg-green-50 text-slate-800 hover:text-[#0b8026]'
+                ? 'bg-emerald-50 text-[#0b8026] font-black'
+                : 'hover:bg-emerald-50/60 text-slate-800 hover:text-[#0b8026]'
                 }`}
             >
-              <FiHome className={`w-4 h-4 ${pathname === '/' ? 'text-[#d50000]' : 'text-[#0b8026]'}`} />
+              <FiHome className={`w-4 h-4 ${pathname === '/' ? 'text-[#0b8026]' : 'text-emerald-700'}`} />
               <span>Home</span>
             </Link>
             {navMenuItems.map((item) => {
@@ -429,8 +451,8 @@ export default function Navbar() {
                       href={item.href}
                       onClick={() => setMobileMenuOpen(false)}
                       className={`block py-2 px-3 rounded-lg transition ${isDirectActive || isChildActive
-                        ? 'bg-red-50 text-[#d50000] font-black'
-                        : 'hover:bg-green-50 text-slate-800 hover:text-[#0b8026]'
+                        ? 'bg-emerald-50 text-[#0b8026] font-black'
+                        : 'hover:bg-emerald-50/60 text-slate-800 hover:text-[#0b8026]'
                         }`}
                     >
                       {item.label}
@@ -454,12 +476,12 @@ export default function Navbar() {
                             href={sub.href}
                             onClick={() => setMobileMenuOpen(false)}
                             className={`flex items-center gap-2 py-1.5 px-2 rounded-md text-[11px] transition ${isSubActive
-                              ? 'bg-red-50 text-[#d50000] font-black'
+                              ? 'bg-emerald-50 text-[#0b8026] font-black'
                               : 'text-slate-600 hover:text-[#0b8026] hover:bg-slate-50'
                               }`}
                           >
                             {SubIcon ? (
-                              <SubIcon className={`w-3.5 h-3.5 ${isSubActive ? 'text-[#d50000]' : 'text-[#0b8026]'}`} />
+                              <SubIcon className={`w-3.5 h-3.5 ${isSubActive ? 'text-[#0b8026]' : 'text-emerald-700'}`} />
                             ) : (
                               <span>•</span>
                             )}

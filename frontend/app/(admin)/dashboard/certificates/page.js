@@ -260,7 +260,7 @@ export default function AdminOrganizationCertificatesPage() {
       <div className="bg-white p-4 rounded-b-2xl border-b border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-lg font-black text-slate-900 tracking-tight flex items-center gap-2">
-            <FiAward className="text-red-600 w-5 h-5" />
+            <FiAward className="text-emerald-700 w-5 h-5" />
             <span>Organization Statutory Certificates &amp; Legal Documents CMS</span>
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
@@ -272,7 +272,7 @@ export default function AdminOrganizationCertificatesPage() {
           <button
             type="button"
             onClick={openCreateModal}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-md shadow-red-600/20 transition cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow-md shadow-emerald-700/20 transition cursor-pointer"
           >
             <FiPlus className="w-4 h-4" />
             <span>Upload New Certificate</span>
@@ -282,13 +282,13 @@ export default function AdminOrganizationCertificatesPage() {
             href="/certificates"
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold transition shadow-2xs cursor-pointer"
           >
-            <FiExternalLink className="w-3.5 h-3.5 text-red-600" />
+            <FiExternalLink className="w-3.5 h-3.5 text-emerald-700" />
             <span>Public Showcase</span>
           </Link>
 
           <Link
             href="/dashboard"
-            className="text-xs font-bold text-slate-500 hover:text-red-600 transition px-2 py-1"
+            className="text-xs font-bold text-slate-500 hover:text-emerald-700 transition px-2 py-1"
           >
             ← Overview
           </Link>
@@ -313,7 +313,7 @@ export default function AdminOrganizationCertificatesPage() {
             placeholder="Search by certificate title, reg no, or issuing authority..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full text-xs pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 text-slate-900"
+            className="w-full text-xs pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-900"
           />
         </div>
 
@@ -332,8 +332,8 @@ export default function AdminOrganizationCertificatesPage() {
               key={tab.key}
               onClick={() => setActiveCategory(tab.key)}
               className={`px-3 py-1.5 rounded-xl transition cursor-pointer whitespace-nowrap text-xs font-black ${activeCategory === tab.key
-                  ? 'bg-red-600 text-white shadow-md shadow-red-600/20'
-                  : 'bg-slate-100 text-slate-700 hover:bg-red-50 hover:text-red-600'
+                  ? 'bg-emerald-700 text-white shadow-md shadow-emerald-700/20'
+                  : 'bg-slate-100 text-slate-700 hover:bg-emerald-50 hover:text-emerald-700'
                 }`}
             >
               {tab.label}
@@ -362,7 +362,7 @@ export default function AdminOrganizationCertificatesPage() {
               {loading ? (
                 <tr>
                   <td colSpan={6} className="py-12 text-center text-slate-400">
-                    <FiRefreshCw className="w-5 h-5 animate-spin mx-auto text-red-600 mb-1" />
+                    <FiRefreshCw className="w-5 h-5 animate-spin mx-auto text-emerald-700 mb-1" />
                     <span>Loading organization certificates...</span>
                   </td>
                 </tr>
@@ -385,7 +385,7 @@ export default function AdminOrganizationCertificatesPage() {
                       {/* Title & Category */}
                       <td className="py-3 px-3.5">
                         <div className="flex items-center gap-2.5">
-                          <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${isPdf ? 'bg-red-50 text-red-600 border border-red-200' : 'bg-blue-50 text-blue-600 border border-blue-200'
+                          <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${isPdf ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-blue-50 text-blue-600 border border-blue-200'
                             }`}>
                             {isPdf ? <FiFileText className="w-4 h-4" /> : <FiImage className="w-4 h-4" />}
                           </div>
@@ -402,7 +402,7 @@ export default function AdminOrganizationCertificatesPage() {
 
                       {/* Reg No & Authority */}
                       <td className="py-3 px-3.5">
-                        <div className="flex items-center gap-1.5 font-mono font-bold text-red-600 text-xs">
+                        <div className="flex items-center gap-1.5 font-mono font-bold text-emerald-700 text-xs">
                           <span>{doc.documentNumber || 'Pending Order No.'}</span>
                           {doc.documentNumber && (
                             <button
@@ -426,7 +426,7 @@ export default function AdminOrganizationCertificatesPage() {
 
                       {/* File format */}
                       <td className="py-3 px-3.5 whitespace-nowrap">
-                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${isPdf ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'
+                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${isPdf ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'
                           }`}>
                           {isPdf ? 'PDF Document' : 'Image Scan'}
                         </span>
@@ -474,7 +474,7 @@ export default function AdminOrganizationCertificatesPage() {
                           <button
                             type="button"
                             onClick={() => openEditModal(doc)}
-                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 font-bold text-[11px] transition border border-red-200 cursor-pointer"
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-[11px] transition border border-emerald-200 cursor-pointer"
                             title="Edit Certificate Details"
                           >
                             <FiEdit3 className="w-3.5 h-3.5" />
@@ -507,7 +507,7 @@ export default function AdminOrganizationCertificatesPage() {
           <div className="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-3 border-b border-slate-200">
               <h3 className="font-black text-slate-900 text-base flex items-center gap-2">
-                <FiAward className="text-red-600" />
+                <FiAward className="text-emerald-700" />
                 <span>{editingDoc ? 'Edit Organization Certificate' : 'Upload Verified Organization Certificate'}</span>
               </h3>
               <button
@@ -530,7 +530,7 @@ export default function AdminOrganizationCertificatesPage() {
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   placeholder="e.g. Section 12A Tax Exemption Registration Certificate"
-                  className="w-full text-xs p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 text-slate-900"
+                  className="w-full text-xs p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-900"
                 />
               </div>
 
@@ -543,7 +543,7 @@ export default function AdminOrganizationCertificatesPage() {
                   <select
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full text-xs p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 text-slate-900 bg-white cursor-pointer"
+                    className="w-full text-xs p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-900 bg-white cursor-pointer"
                   >
                     <option value="12A Registration">12A Tax Exemption Registration</option>
                     <option value="80G Exemption">80G Donor Tax Deduction Approval</option>
@@ -567,7 +567,7 @@ export default function AdminOrganizationCertificatesPage() {
                     value={formData.documentNumber}
                     onChange={(e) => setFormData({ ...formData, documentNumber: e.target.value })}
                     placeholder="e.g. CIT(EXEMP)/12A/2021-22/A-492"
-                    className="w-full text-xs p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 font-mono text-slate-900"
+                    className="w-full text-xs p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono text-slate-900"
                   />
                 </div>
               </div>
@@ -584,7 +584,7 @@ export default function AdminOrganizationCertificatesPage() {
                     value={formData.issuingAuthority}
                     onChange={(e) => setFormData({ ...formData, issuingAuthority: e.target.value })}
                     placeholder="e.g. Income Tax Department, Govt. of India"
-                    className="w-full text-xs p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 text-slate-900"
+                    className="w-full text-xs p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-900"
                   />
                 </div>
 
@@ -598,7 +598,7 @@ export default function AdminOrganizationCertificatesPage() {
                     value={formData.validity}
                     onChange={(e) => setFormData({ ...formData, validity: e.target.value })}
                     placeholder="e.g. Perpetual / AY 2022-23 Onwards"
-                    className="w-full text-xs p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 text-slate-900"
+                    className="w-full text-xs p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-900"
                   />
                 </div>
               </div>
@@ -613,7 +613,7 @@ export default function AdminOrganizationCertificatesPage() {
                     type="date"
                     value={formData.issueDate}
                     onChange={(e) => setFormData({ ...formData, issueDate: e.target.value })}
-                    className="w-full text-xs p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 text-slate-900"
+                    className="w-full text-xs p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-900"
                   />
                 </div>
 
@@ -624,7 +624,7 @@ export default function AdminOrganizationCertificatesPage() {
                   <select
                     value={formData.fileType}
                     onChange={(e) => setFormData({ ...formData, fileType: e.target.value })}
-                    className="w-full text-xs p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 text-slate-900 bg-white"
+                    className="w-full text-xs p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-900 bg-white"
                   >
                     <option value="pdf">PDF Document (.pdf)</option>
                     <option value="image">Image Scan (.jpg, .png)</option>
@@ -638,7 +638,7 @@ export default function AdminOrganizationCertificatesPage() {
                   Select Certificate File (PDF or Image) *
                 </label>
                 <div className="flex flex-col sm:flex-row items-center gap-3">
-                  <label className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl cursor-pointer text-xs flex items-center gap-1.5 transition">
+                  <label className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-xl cursor-pointer text-xs flex items-center gap-1.5 transition">
                     <FiUploadCloud className="w-4 h-4" />
                     <span>{isUploading ? 'Uploading...' : 'Choose File from Computer'}</span>
                     <input
@@ -674,7 +674,7 @@ export default function AdminOrganizationCertificatesPage() {
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="Explain donor tax exemption, government recognition, or legal significance..."
-                  className="w-full text-xs p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 text-slate-900"
+                  className="w-full text-xs p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-900"
                 />
               </div>
 
@@ -690,7 +690,7 @@ export default function AdminOrganizationCertificatesPage() {
                 <button
                   type="submit"
                   disabled={isUploading}
-                  className="px-6 py-2.5 rounded-xl bg-red-600 text-white font-bold text-xs hover:bg-red-700 shadow-md shadow-red-600/20 cursor-pointer disabled:opacity-50"
+                  className="px-6 py-2.5 rounded-xl bg-emerald-700 text-white font-bold text-xs hover:bg-emerald-800 shadow-md shadow-emerald-700/20 cursor-pointer disabled:opacity-50"
                 >
                   {editingDoc ? 'Update Certificate' : 'Save & Publish Certificate'}
                 </button>
@@ -707,7 +707,7 @@ export default function AdminOrganizationCertificatesPage() {
             <div className="flex items-center justify-between pb-3 border-b border-slate-200">
               <div>
                 <h3 className="font-black text-slate-900 text-base">{previewDoc.title}</h3>
-                <span className="text-xs text-red-600 font-mono font-bold">
+                <span className="text-xs text-emerald-700 font-mono font-bold">
                   Order No: {previewDoc.documentNumber}
                 </span>
               </div>

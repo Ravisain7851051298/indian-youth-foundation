@@ -439,17 +439,22 @@ class AuthService {
       throw new Error('User not found.');
     }
 
+    // Explicitly protect against privilege escalation & unauthorized role changes
+    if (updateData.role !== undefined && updateData.role !== user.role) {
+      throw new Error('Unauthorized: Role modification is strictly forbidden.');
+    }
+
     const { name, phone, designation, bloodGroup, dob, address, district, state, photoUrl } = updateData;
-    if (name) user.name = name;
-    if (phone) user.phone = phone;
-    if (designation && user.role === 'Admin') user.designation = designation;
+    if (name) user.name = name.trim();
+    if (phone) user.phone = phone.trim();
+    // Only existing Admins can adjust their leadership designation
+    if (designation && user.role === 'Admin') user.designation = designation.trim();
     if (bloodGroup) user.bloodGroup = bloodGroup;
     if (dob) user.dob = dob;
-    if (address) user.address = address;
-    if (district) user.district = district;
-    if (state) user.state = state;
+    if (address) user.address = address.trim();
+    if (district) user.district = district.trim();
+    if (state) user.state = state.trim();
     if (photoUrl !== undefined) {
-      // Do not delete file from disk while document exists in database
       user.photoUrl = photoUrl;
     }
 

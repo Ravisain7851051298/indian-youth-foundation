@@ -148,7 +148,7 @@ export default function AdminLayout({ children }) {
             {!collapsed ? (
               <>
                 <div className="flex items-center gap-3 overflow-hidden">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-red-600 to-rose-600 flex items-center justify-center shadow-lg shadow-red-600/20 font-black text-white text-base shrink-0 overflow-hidden">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#0b8026] to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-700/20 font-black text-white text-base shrink-0 overflow-hidden">
                     {settings?.logoUrl ? (
                       /* eslint-disable-next-line @next/next/no-img-element */
                       <img
@@ -168,25 +168,16 @@ export default function AdminLayout({ children }) {
                     <h2 className="text-xs font-black text-black leading-tight truncate">
                       {settings?.ngoName || 'Indian Youth Foundation'}
                     </h2>
-                    <span className="text-[10px] text-red-600 font-extrabold uppercase tracking-wider block truncate">
+                    <span className="text-[10px] text-[#0b8026] font-extrabold uppercase tracking-wider block truncate">
                       Trustee Admin
                     </span>
                   </div>
                 </div>
-                {/* 
-                <button
-                  type="button"
-                  onClick={toggleCollapsed}
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-black hover:bg-slate-100 transition cursor-pointer"
-                  title="Collapse sidebar to icons only"
-                >
-                  <FiChevronLeft className="w-4 h-4" />
-                </button> */}
               </>
             ) : (
               <div className="flex flex-col items-center gap-2">
                 <div
-                  className="w-10 h-10 rounded-xl bg-gradient-to-tr from-red-600 to-rose-600 flex items-center justify-center shadow-lg shadow-red-600/20 font-black text-white text-base shrink-0 cursor-pointer overflow-hidden"
+                  className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#0b8026] to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-700/20 font-black text-white text-base shrink-0 cursor-pointer overflow-hidden"
                   onClick={toggleCollapsed}
                   title="Expand sidebar"
                 >
@@ -205,14 +196,6 @@ export default function AdminLayout({ children }) {
                     'युवा'
                   )}
                 </div>
-                {/* <button
-                  type="button"
-                  onClick={toggleCollapsed}
-                  className="p-1 rounded-md text-slate-400 hover:text-black hover:bg-slate-100 transition cursor-pointer flex items-center justify-center"
-                  title="Expand sidebar"
-                >
-                  <FiChevronRight className="w-4 h-4" />
-                </button> */}
               </div>
             )}
           </div>
@@ -236,8 +219,8 @@ export default function AdminLayout({ children }) {
                     href={item.href}
                     title={item.label}
                     className={`group relative flex items-center justify-center w-11 h-11 mx-auto rounded-xl transition-all ${active
-                      ? 'bg-red-600 text-white shadow-md shadow-red-600/25'
-                      : 'text-slate-600 hover:text-red-600 hover:bg-red-50'
+                      ? 'bg-[#0b8026] text-white shadow-md shadow-emerald-800/25'
+                      : 'text-slate-600 hover:text-[#0b8026] hover:bg-emerald-50'
                       }`}
                   >
                     <Icon className="w-5 h-5 shrink-0" />
@@ -263,8 +246,8 @@ export default function AdminLayout({ children }) {
                   key={item.href}
                   href={item.href}
                   className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-all ${active
-                    ? 'bg-red-600 text-white shadow-md shadow-red-600/20'
-                    : 'text-slate-700 hover:text-red-700 hover:bg-red-50/80'
+                    ? 'bg-[#0b8026] text-white shadow-md shadow-emerald-800/20'
+                    : 'text-slate-700 hover:text-[#0b8026] hover:bg-emerald-50/80'
                     }`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
@@ -272,7 +255,7 @@ export default function AdminLayout({ children }) {
                     <span className="truncate">{item.label}</span>
                   </div>
                   {badge > 0 && (
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-black shrink-0 ${active ? 'bg-white text-red-700' : 'bg-red-100 text-red-700'
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-black shrink-0 ${active ? 'bg-white text-[#0b8026]' : 'bg-emerald-100 text-[#0b8026]'
                       }`}>
                       {badge}
                     </span>
@@ -368,7 +351,7 @@ export default function AdminLayout({ children }) {
               {/* Drawer Top Header */}
               <div className="p-4 border-b border-slate-200 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-red-600 to-rose-600 flex items-center justify-center font-bold text-white text-sm">
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#0b8026] to-emerald-600 flex items-center justify-center font-bold text-white text-sm shadow-sm">
                     युवा
                   </div>
                   <div>
@@ -396,7 +379,7 @@ export default function AdminLayout({ children }) {
                       key={item.href}
                       href={item.href}
                       onClick={() => setMobileOpen(false)}
-                      className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition ${active ? 'bg-red-600 text-white shadow-md' : 'text-slate-800 hover:bg-red-50 hover:text-red-700'
+                      className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition ${active ? 'bg-[#0b8026] text-white shadow-md' : 'text-slate-800 hover:bg-emerald-50 hover:text-[#0b8026]'
                         }`}
                     >
                       <div className="flex items-center gap-3">
@@ -404,7 +387,7 @@ export default function AdminLayout({ children }) {
                         <span>{item.label}</span>
                       </div>
                       {badge > 0 && (
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${active ? 'bg-white text-red-700' : 'bg-red-100 text-red-700'
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${active ? 'bg-white text-[#0b8026]' : 'bg-emerald-100 text-[#0b8026]'
                           }`}>
                           {badge}
                         </span>
@@ -421,7 +404,7 @@ export default function AdminLayout({ children }) {
                   onClick={() => setMobileOpen(false)}
                   className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-black hover:bg-white transition"
                 >
-                  <FiShield className="w-4 h-4 text-red-600" />
+                  <FiShield className="w-4 h-4 text-[#0b8026]" />
                   <span>User Portal View</span>
                 </Link>
                 <Link
@@ -480,7 +463,7 @@ export default function AdminLayout({ children }) {
               <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-bold uppercase tracking-wider">
                 <span>Trustee Admin</span>
                 <span>/</span>
-                <span className="text-red-600 font-black">{activeItem?.label}</span>
+                <span className="text-[#0b8026] font-black">{activeItem?.label}</span>
               </div>
               <h1 className="text-sm sm:text-base font-black text-black truncate flex items-center gap-2">
                 <span>{activeItem?.label}</span>
@@ -506,15 +489,15 @@ export default function AdminLayout({ children }) {
 
             <Link
               href="/profile"
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-red-200 bg-red-50 hover:bg-red-100 text-red-700 text-xs font-bold transition shadow-2xs"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-[#0b8026] text-xs font-bold transition shadow-2xs"
               title="Open User Portal View"
             >
-              <FiShield className="w-3.5 h-3.5 text-red-600" />
+              <FiShield className="w-3.5 h-3.5 text-[#0b8026]" />
               <span>User Portal</span>
             </Link>
 
             <div className="flex items-center gap-2 pl-2 sm:border-l border-slate-200">
-              <div className="w-8 h-8 rounded-full bg-red-600 text-white font-extrabold flex items-center justify-center text-xs shadow-xs overflow-hidden">
+              <div className="w-8 h-8 rounded-full bg-[#0b8026] text-white font-extrabold flex items-center justify-center text-xs shadow-xs overflow-hidden">
                 {currentUser?.photoUrl ? (
                   <img
                     src={getContentImageUrl(currentUser.photoUrl)}
@@ -534,7 +517,7 @@ export default function AdminLayout({ children }) {
               <button
                 type="button"
                 onClick={handleLogout}
-                className="p-2 rounded-lg text-slate-500 bg-red-100 border border-red-200 shadow-sm hover:text-red-600 hover:bg-red-200 hover:border-red-600 hover:shadow-md transition cursor-pointer"
+                className="p-2 rounded-lg text-slate-500 bg-emerald-50 border border-emerald-200 shadow-sm hover:text-emerald-800 hover:bg-emerald-100 transition cursor-pointer"
                 title="Sign Out Session"
               >
                 <FiLogOut className="w-4 h-4" />

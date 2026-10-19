@@ -99,7 +99,7 @@ export default function MembershipPlansPage() {
       <div className="bg-white p-4 rounded-b-2xl border-b border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="text-lg font-black text-slate-900 tracking-tight flex items-center gap-2">
-            <FiLayers className="text-red-600 w-5 h-5" />
+            <FiLayers className="text-emerald-700 w-5 h-5" />
             Custom Membership Plans CMS
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
@@ -109,7 +109,7 @@ export default function MembershipPlansPage() {
 
         <button
           onClick={openCreateModal}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-md shadow-red-600/20 transition cursor-pointer self-start sm:self-auto"
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-md shadow-emerald-700/20 transition cursor-pointer self-start sm:self-auto"
         >
           <FiPlus className="w-4 h-4" />
           <span>Create New Plan</span>
@@ -129,18 +129,18 @@ export default function MembershipPlansPage() {
         {plans.map((plan) => (
           <div
             key={plan._id}
-            className={`bg-white rounded-3xl p-6 border shadow-2xs flex flex-col justify-between transition relative ${plan.popular ? 'border-red-600 ring-2 ring-red-500/20 shadow-md' : 'border-slate-200 hover:border-red-200'
+            className={`bg-white rounded-3xl p-6 border shadow-2xs flex flex-col justify-between transition relative ${plan.popular ? 'border-emerald-700 ring-2 ring-emerald-500/20 shadow-md' : 'border-slate-200 hover:border-emerald-200'
               }`}
           >
             {plan.popular && (
-              <span className="absolute top-4 right-4 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-red-600 text-white flex items-center gap-1 shadow-xs">
+              <span className="absolute top-4 right-4 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-700 text-white flex items-center gap-1 shadow-xs">
                 <FiStar className="w-3 h-3 fill-current" />
                 <span>Popular</span>
               </span>
             )}
 
             <div>
-              <div className="flex items-center gap-2 text-xs font-bold text-red-600 uppercase tracking-wider">
+              <div className="flex items-center gap-2 text-xs font-bold text-emerald-700 uppercase tracking-wider">
                 <FiShield className="w-3.5 h-3.5" />
                 <span>{plan.duration || 'Annual'}</span>
               </div>
@@ -180,7 +180,7 @@ export default function MembershipPlansPage() {
               <button
                 type="button"
                 onClick={() => handleDelete(plan._id)}
-                className="py-2 px-3 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs flex items-center justify-center gap-1.5 transition cursor-pointer"
+                className="py-2 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs flex items-center justify-center gap-1.5 transition cursor-pointer"
                 title="Delete Plan"
               >
                 <FiTrash2 className="w-3.5 h-3.5" />
@@ -216,7 +216,7 @@ export default function MembershipPlansPage() {
                   value={formData.name}
                   onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="e.g. Active Youth Member"
-                  className="w-full text-xs p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 text-slate-900"
+                  className="w-full text-xs p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-900"
                 />
               </div>
 
@@ -229,7 +229,7 @@ export default function MembershipPlansPage() {
                     min="0"
                     value={formData.fee}
                     onChange={(e) => setFormData(prev => ({ ...prev, fee: e.target.value }))}
-                    className="w-full text-xs p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 font-mono text-slate-900"
+                    className="w-full text-xs p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono text-slate-900"
                   />
                 </div>
                 <div>
@@ -240,7 +240,7 @@ export default function MembershipPlansPage() {
                     value={formData.duration}
                     onChange={(e) => setFormData(prev => ({ ...prev, duration: e.target.value }))}
                     placeholder="e.g. 1 Year, 2 Years, Lifetime"
-                    className="w-full text-xs p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 text-slate-900"
+                    className="w-full text-xs p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-900"
                   />
                 </div>
               </div>
@@ -252,7 +252,7 @@ export default function MembershipPlansPage() {
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                   placeholder="Short summary of this membership category..."
-                  className="w-full text-xs p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 text-slate-900"
+                  className="w-full text-xs p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-900"
                 />
               </div>
 
@@ -265,7 +265,7 @@ export default function MembershipPlansPage() {
                   value={formData.perks}
                   onChange={(e) => setFormData(prev => ({ ...prev, perks: e.target.value }))}
                   placeholder="Official Dual-Sided Digital ID Card&#10;Formal Letter of Appointment&#10;Voting Rights in General Body Meeting"
-                  className="w-full text-xs p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 font-mono text-[11px] text-slate-900"
+                  className="w-full text-xs p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono text-[11px] text-slate-900"
                 />
               </div>
 
@@ -275,7 +275,7 @@ export default function MembershipPlansPage() {
                   id="popularCheck"
                   checked={formData.popular}
                   onChange={(e) => setFormData(prev => ({ ...prev, popular: e.target.checked }))}
-                  className="rounded text-red-600 focus:ring-red-500"
+                  className="rounded text-emerald-700 focus:ring-emerald-500"
                 />
                 <label htmlFor="popularCheck" className="text-xs font-bold text-slate-700 cursor-pointer">
                   Mark as &ldquo;Popular / Recommended&rdquo; Plan
@@ -292,7 +292,7 @@ export default function MembershipPlansPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-xl bg-red-600 text-white font-bold text-xs hover:bg-red-700 shadow-md shadow-red-600/20 cursor-pointer"
+                  className="px-6 py-2.5 rounded-xl bg-emerald-700 text-white font-bold text-xs hover:bg-emerald-800 shadow-md shadow-emerald-700/20 cursor-pointer"
                 >
                   {editingId ? 'Update Plan' : 'Save New Plan'}
                 </button>

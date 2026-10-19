@@ -1,8 +1,6 @@
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
-const path = require('path');
-const fs = require('fs');
 const apiRoutes = require('./routes/apiRoutes');
 
 const app = express();
@@ -48,6 +46,48 @@ app.use(cors({
   optionsSuccessStatus: 200
 }));
 
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+
+// Security HTTP headers
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' }
+}));
+
+// Global Rate Limiting: 500 requests per 15 minutes per IP
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 500,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: 'Too many requests from this IP, please try again after 15 minutes.'
+  }
+});
+
+// Strict Rate Limiting on Authentication & Sensitive Endpoints:
+// Only counts failed attempts or limits repeated attempts, avoiding blocking valid users
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100, // Generous limit for normal user actions
+  skipSuccessfulRequests: true, // Only failed logins/requests count towards the limit!
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: 'Too many authentication attempts, please try again after 15 minutes.'
+  }
+});
+
+// Apply rate limiting middleware
+app.use('/api', apiLimiter);
+app.post('/api/auth/login', authLimiter);
+app.post('/api/auth/register', authLimiter);
+app.post('/api/auth/forgot-password', authLimiter);
+app.post('/api/auth/reset-password', authLimiter);
+app.post('/api/auth/create-admin', authLimiter);
+
 // Cookie Parser Middleware
 app.use(cookieParser());
 
@@ -60,10 +100,10 @@ app.use('/uploads', express.static(uploadsPath));
 
 // Health Check
 app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'online', 
-    timestamp: new Date(), 
-    ngo: 'भारतीय युवा क्रांति (Indian Youth Foundation)' 
+  res.json({
+    status: 'online',
+    timestamp: new Date(),
+    ngo: 'भारतीय युवा क्रांति'
   });
 });
 

@@ -10,18 +10,16 @@ router.post('/apply', verifyToken, handleOptionalFileUpload, applicationControll
 router.post('/volunteers', verifyToken, handleOptionalFileUpload, applicationController.applyVolunteer);
 
 // Applications listing (Admin / Manager)
-router.get('/members', verifyToken, requireRole(['admin', 'manager']), applicationController.getMembershipApplications);
-router.get('/memberships', verifyToken, requireRole(['admin', 'manager']), applicationController.getMembershipApplications);
-router.get('/admin/all', verifyToken, requireRole(['admin', 'manager']), applicationController.getMembershipApplications);
-router.get('/volunteers', verifyToken, requireRole(['admin', 'manager']), applicationController.getVolunteerApplications);
+router.get('/members', verifyToken, requireRole(['admin']), applicationController.getMembershipApplications);
+router.get('/memberships', verifyToken, requireRole(['admin']), applicationController.getMembershipApplications);
+router.get('/admin/all', verifyToken, requireRole(['admin']), applicationController.getMembershipApplications);
+router.get('/volunteers', verifyToken, requireRole(['admin']), applicationController.getVolunteerApplications);
 
 // Approval & Rejection workflows (Admin)
-router.put('/members/:id/approve', verifyToken, requireRole(['admin', 'manager']), applicationController.approveMembershipApplication);
-router.put('/members/:id/reject', verifyToken, requireRole(['admin', 'manager']), applicationController.rejectMembershipApplication);
-router.put('/volunteers/:id/approve', verifyToken, requireRole(['admin', 'manager']), applicationController.approveVolunteerApplication);
-router.put('/volunteers/:id/reject', verifyToken, requireRole(['admin', 'manager']), applicationController.rejectVolunteerApplication);
-router.put('/:id/approve', verifyToken, requireRole(['admin', 'manager']), applicationController.approveMembershipApplication);
-router.put('/:id/reject', verifyToken, requireRole(['admin', 'manager']), applicationController.rejectMembershipApplication);
+router.put('/members/:id/approve', verifyToken, requireRole(['admin']), applicationController.approveMembershipApplication);
+router.put('/members/:id/reject', verifyToken, requireRole(['admin']), applicationController.rejectMembershipApplication);
+router.put('/volunteers/:id/approve', verifyToken, requireRole(['admin']), applicationController.approveVolunteerApplication);
+router.put('/volunteers/:id/reject', verifyToken, requireRole(['admin']), applicationController.rejectVolunteerApplication);
 
 // Deletion endpoints (Admin only)
 router.delete('/members/:id', verifyToken, requireRole(['admin']), applicationController.deleteMembershipApplication);

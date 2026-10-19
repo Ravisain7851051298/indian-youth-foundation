@@ -3,7 +3,7 @@ const router = express.Router();
 const memberController = require('../controllers/memberController');
 const { verifyToken, requireRole } = require('../middlewares/auth');
 
-router.get('/coordinator-report', verifyToken, requireRole(['coordinator', 'admin', 'manager']), memberController.getCoordinatorReport);
-router.get('/coordinator-leaderboard', verifyToken, requireRole(['admin', 'manager']), memberController.getAllCoordinatorsStats);
+router.get('/coordinator-report', verifyToken, requireRole(['admin']), memberController.getCoordinatorReport);
+router.get('/coordinator-leaderboard', verifyToken, requireRole(['admin']), memberController.getAllCoordinatorsStats);
 
 module.exports = router;

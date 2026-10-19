@@ -5,9 +5,9 @@ const { verifyToken, optionalAuth, requireRole } = require('../middlewares/auth'
 const { handleOptionalFileUpload } = require('../middlewares/upload');
 
 router.post('/', optionalAuth, handleOptionalFileUpload, grievanceController.submitGrievance);
-router.get('/admin/all', verifyToken, requireRole(['Admin', 'Manager']), grievanceController.getGrievances);
+router.get('/admin/all', verifyToken, requireRole(['admin']), grievanceController.getGrievances);
 router.get('/', optionalAuth, grievanceController.getGrievances);
-router.put('/:id', verifyToken, requireRole(['Admin', 'Manager']), handleOptionalFileUpload, grievanceController.updateGrievance);
-router.delete('/:id', verifyToken, requireRole(['Admin']), grievanceController.deleteGrievance);
+router.put('/:id', verifyToken, requireRole(['admin']), handleOptionalFileUpload, grievanceController.updateGrievance);
+router.delete('/:id', verifyToken, requireRole(['admin']), grievanceController.deleteGrievance);
 
 module.exports = router;
