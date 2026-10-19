@@ -8,9 +8,9 @@ router.get('/', optionalAuth, orgDocumentController.getAllOrgDocuments);
 router.get('/all', optionalAuth, orgDocumentController.getAllOrgDocuments);
 
 // Admin-Only Mutation Routes
-router.post('/', verifyToken, requireRole(['admin']), orgDocumentController.createOrgDocument);
-router.post('/create', verifyToken, requireRole(['admin']), orgDocumentController.createOrgDocument);
-router.put('/:id', verifyToken, requireRole(['admin']), orgDocumentController.updateOrgDocument);
-router.delete('/:id', verifyToken, requireRole(['admin']), orgDocumentController.deleteOrgDocument);
+router.post('/', verifyToken, requireRole(['admin', 'Admin']), orgDocumentController.createOrgDocument);
+router.post('/create', verifyToken, requireRole(['admin', 'Admin']), orgDocumentController.createOrgDocument);
+router.put('/:id', verifyToken, requireRole(['admin', 'Admin']), orgDocumentController.updateOrgDocument);
+router.delete('/:id', verifyToken, requireRole(['admin', 'Admin']), orgDocumentController.deleteOrgDocument);
 
 module.exports = router;

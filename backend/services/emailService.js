@@ -276,7 +276,7 @@ const sendDonationApprovalEmail = async (data) => {
         </div>
 
         <div style="text-align: center; margin: 26px 0 16px;">
-          <a href="http://localhost:3000/profile/donations" style="background: #ea580c; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px; display: inline-block;">
+          <a href="https://www.yuvakrantidal.com/profile/donations" style="background: #ea580c; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px; display: inline-block;">
             View Donations & Receipts in Portal
           </a>
         </div>
@@ -387,7 +387,7 @@ const sendMembershipApprovalEmail = async (param) => {
         </div>
 
         <div style="text-align: center; margin: 26px 0 16px;">
-          <a href="http://localhost:3000/profile/appointment-letter" style="background: #0f172a; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px; display: inline-block;">
+          <a href="https://www.yuvakrantidal.com/profile/appointment-letter" style="background: #0f172a; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px; display: inline-block;">
             Access Official Portal Profile
           </a>
         </div>
@@ -487,7 +487,7 @@ const sendVolunteerApprovalEmail = async (param) => {
         </div>
 
         <div style="text-align: center; margin: 26px 0 16px;">
-          <a href="http://localhost:3000/profile/appointment-letter" style="background: #059669; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px; display: inline-block;">
+          <a href="https://www.yuvakrantidal.com/profile/appointment-letter" style="background: #059669; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px; display: inline-block;">
             Access Volunteer Portal
           </a>
         </div>
@@ -583,7 +583,7 @@ const sendCertificateEmail = async (param) => {
         </div>
 
         <div style="text-align: center; margin: 26px 0 16px;">
-          <a href="http://localhost:3000/certificates?view=${certificateNo}" style="background: #c2410c; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px; display: inline-block;">
+          <a href="https://www.yuvakrantidal.com/certificates?view=${certificateNo}" style="background: #c2410c; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px; display: inline-block;">
             Verify Certificate on Portal
           </a>
         </div>

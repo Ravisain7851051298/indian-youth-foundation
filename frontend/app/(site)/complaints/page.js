@@ -470,7 +470,7 @@ export default function ComplaintsPage() {
                           <span>
                             Phone:{' '}
                             <strong className="text-black">
-                              {isAdmin
+                              {isAdminOrTeam
                                 ? c.phone
                                 : c.phone.length > 5
                                 ? `${c.phone.slice(0, 3)}****${c.phone.slice(-3)}`

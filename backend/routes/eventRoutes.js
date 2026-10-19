@@ -30,12 +30,12 @@ router.get('/:id', eventController.getEventById);
 router.post('/:id/join', optionalAuth, eventController.joinEvent);
 
 // Admin / Manager Routes
-router.post('/', verifyToken, requireRole(['admin']), handleOptionalFileUpload, eventController.createEvent);
-router.put('/:id', verifyToken, requireRole(['admin']), handleOptionalFileUpload, eventController.updateEvent);
-router.delete('/:id', verifyToken, requireRole(['admin']), eventController.deleteEvent);
+router.post('/', verifyToken, requireRole(['admin', 'Admin']), handleOptionalFileUpload, eventController.createEvent);
+router.put('/:id', verifyToken, requireRole(['admin', 'Admin']), handleOptionalFileUpload, eventController.updateEvent);
+router.delete('/:id', verifyToken, requireRole(['admin', 'Admin']), eventController.deleteEvent);
 
 // Attendee Management Routes
-router.get('/:id/attendees', verifyToken, requireRole(['admin']), eventController.getEventAttendees);
-router.delete('/:id/attendees/:attendeeId', verifyToken, requireRole(['admin', 'manager']), eventController.removeAttendee);
+router.get('/:id/attendees', verifyToken, requireRole(['admin', 'Admin']), eventController.getEventAttendees);
+router.delete('/:id/attendees/:attendeeId', verifyToken, requireRole(['admin', 'Admin']), eventController.removeAttendee);
 
 module.exports = router;

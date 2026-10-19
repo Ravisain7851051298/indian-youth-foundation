@@ -96,7 +96,7 @@ router.get('/coordinators/report', (req, res, next) => {
   const { verifyToken, requireRole } = require('../middlewares/auth');
   const memberController = require('../controllers/memberController');
   verifyToken(req, res, () => {
-    requireRole(['coordinator', 'admin', 'manager'])(req, res, () => {
+    requireRole(['admin', 'Admin'])(req, res, () => {
       memberController.getCoordinatorReport(req, res, next);
     });
   });
@@ -106,7 +106,7 @@ router.get('/coordinators/all-stats', (req, res, next) => {
   const { verifyToken, requireRole } = require('../middlewares/auth');
   const memberController = require('../controllers/memberController');
   verifyToken(req, res, () => {
-    requireRole(['admin', 'manager'])(req, res, () => {
+    requireRole(['admin', 'Admin'])(req, res, () => {
       memberController.getAllCoordinatorsStats(req, res, next);
     });
   });
