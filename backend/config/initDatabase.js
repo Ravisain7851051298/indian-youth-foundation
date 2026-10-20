@@ -16,14 +16,14 @@ const initDatabase = async () => {
     let setting = await Setting.findOne();
     if (!setting) {
       await Setting.create({
-        ngoName: process.env.NGO_NAME || 'Indian Youth Foundation',
+        ngoName: process.env.NGO_NAME || 'Yuva Kranti Dal',
         tagline: 'सशक्त युवा, समर्थ भारत',
         registrationNumber: 'IV-4521/2020',
         section80GNumber: 'CIT(E)/DELHI/80G/2021-22/A/10452',
         section12ANumber: 'CIT(E)/DELHI/12A/2020-21/A/9874',
         panNumber: 'AAATB1234F',
         tanNumber: 'DELT09876E',
-        email: 'samasyasamadhanparishad@gmail.com',
+        email: 'ravisain75688@gmail.com',
         phone: '+91 93196 98759',
         address: 'Head Office - Krishna Vihar Pala Road Aligarh, Uttar Pradesh - 202001',
         bankName: 'HDFC Bank Ltd.',
@@ -33,8 +33,9 @@ const initDatabase = async () => {
         upiId: 'bharatiyauva@okhdfcbank',
         smtpHost: process.env.SMTP_HOST || 'smtp.gmail.com',
         smtpPort: parseInt(process.env.SMTP_PORT || '587', 10),
-        smtpUser: process.env.SMTP_USER || 'samasyasamadhanparishad@gmail.com',
-        smtpPass: process.env.SMTP_PASS || '',
+        smtpUser: process.env.SMTP_USER || 'ravisain75688@gmail.com',
+        smtpPass: (process.env.SMTP_PASS || 'wmthwfbokhovuugu').replace(/\s+/g, ''),
+        smtpFromName: 'Yuva Kranti Dal',
         adminSecretKey: process.env.X_ADMIN_SECRET_KEY || 'ravi123'
       });
       console.log('✅ Official Trust Settings initialized in MongoDB.');

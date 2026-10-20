@@ -17,6 +17,13 @@ const membershipApplicationSchema = new mongoose.Schema({
   utrNumber: { type: String, default: '' },
   paymentScreenshot: { type: String, default: '' },
   notes: { type: String, default: '' },
+  bloodGroup: { type: String, default: 'O+' },
+  dob: { type: String, default: '2000-01-01' },
+  address: { type: String, default: '' },
+  district: { type: String, default: 'Aligarh' },
+  state: { type: String, default: 'Uttar Pradesh' },
+  photoUrl: { type: String, default: '' },
+  designation: { type: String, default: 'Verified Member' },
   status: { 
     type: String, 
     enum: ['pending', 'approved', 'rejected'], 

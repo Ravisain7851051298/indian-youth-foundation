@@ -23,7 +23,7 @@ import ContentRenderer from '@/components/ContentRenderer';
 export default function WhoWeArePage() {
   const { settings } = useNGO();
 
-  const fallbackStory = `Founded by passionate young patriots and grassroots social activists, Indian Youth Foundation (भारतीय युवा क्रांति) was born from a deep conviction: that India's greatest reservoir of untapped power is its youth. Guided by the ethos of "Nation First, Society Always", we bridge the chasm between compassionate intent and concrete ground action.
+  const fallbackStory = `Founded by passionate young patriots and grassroots social activists, Yuva Kranti Dal (युवा क्रांति दल) was born from a deep conviction: that India's greatest reservoir of untapped power is its youth. Guided by the ethos of "Nation First, Society Always", we bridge the chasm between compassionate intent and concrete ground action.
 
 From running evening community literacy circles for slum children and maintaining an agile 24x7 emergency blood donor network across districts, to providing women self-reliance tailoring skills and mounting rapid relief during natural disasters, our youth task force stands on the frontlines of humanitarian transformation.
 
@@ -55,11 +55,11 @@ Empathy in Action: Rapid, unconditional grassroots aid for every vulnerable citi
           <div className="text-center max-w-3xl mx-auto space-y-4">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100 border border-emerald-200 text-emerald-800 text-xs font-black shadow-xs">
               <FiUsers className="w-4 h-4 text-emerald-700" />
-              <span>Who We Are • {settings?.ngoNameHi || 'भारतीय युवा क्रांति'}</span>
+              <span>Who We Are • {settings?.ngoNameHi || 'युवा क्रांति दल'}</span>
             </div>
 
             <h1 className="text-3xl sm:text-5xl font-black text-black tracking-tight leading-tight">
-              {settings?.whoWeAreHeading || 'Who We Are — The Pulse of Indian Youth Foundation'}
+              {settings?.whoWeAreHeading || 'Who We Are — The Pulse of Yuva Kranti Dal'}
             </h1>
 
             <p className="text-sm sm:text-base text-slate-700 leading-relaxed font-medium">
@@ -121,7 +121,7 @@ Empathy in Action: Rapid, unconditional grassroots aid for every vulnerable citi
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={bannerImg}
-                  alt={settings?.whoWeAreHeading || 'Indian Youth Foundation'}
+                  alt={settings?.whoWeAreHeading || 'Yuva Kranti Dal'}
                   className="w-full h-72 sm:h-80 object-cover group-hover:scale-105 transition-transform duration-500"
                   onError={(e) => {
                     e.currentTarget.onerror = null;
@@ -134,7 +134,7 @@ Empathy in Action: Rapid, unconditional grassroots aid for every vulnerable citi
                       Ground Social Action
                     </span>
                     <h3 className="text-sm font-black text-white">
-                      {settings?.ngoName || 'Indian Youth Foundation'}
+                      {settings?.ngoName || 'Yuva Kranti Dal'}
                     </h3>
                     <p className="text-[11px] text-slate-300">
                       Mobilizing over 3,500+ verified volunteers across India.

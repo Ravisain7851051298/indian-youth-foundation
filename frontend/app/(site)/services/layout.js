@@ -4,12 +4,12 @@ import JsonLd from '@/components/seo/JsonLd';
 export const metadata = {
   title: 'Social Services & Community Initiatives',
   description:
-    'Key welfare services provided by Indian Youth Foundation: Shiksha Kranti free education, 24/7 blood helpline, women livelihood training, emergency ambulance, and legal awareness.',
+    'Key welfare services provided by Yuva Kranti Dal: Shiksha Kranti free education, 24/7 blood helpline, women livelihood training, emergency ambulance, and legal awareness.',
   alternates: {
     canonical: '/services',
   },
   openGraph: {
-    title: 'Our Social Services | Indian Youth Foundation',
+    title: 'Our Social Services | Yuva Kranti Dal',
     description:
       'Grassroots welfare initiatives transforming society through education, healthcare, and livelihood support.',
     url: `${SITE_CONFIG.url}/services`,

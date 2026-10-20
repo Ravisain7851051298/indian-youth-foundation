@@ -60,7 +60,7 @@ export default function ServiceDetailPage({ params }) {
   const shareWhatsApp = () => {
     if (typeof window === 'undefined') return;
     const url = window.location.href;
-    const text = encodeURIComponent(`🤝 *${service?.titleEn || service?.title}*\n\nExplore this humanitarian initiative by Indian Youth Foundation:\n${url}`);
+    const text = encodeURIComponent(`🤝 *${service?.titleEn || service?.title}*\n\nExplore this humanitarian initiative by Yuva Kranti Dal:\n${url}`);
     window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
   };
 

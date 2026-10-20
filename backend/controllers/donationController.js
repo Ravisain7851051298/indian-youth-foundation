@@ -58,8 +58,10 @@ const getDonations = async (req, res) => {
     const query = {};
     if (status) query.status = status;
     if (donorId) query.donor = donorId;
-    if (req.user?.role !== 'Admin' && req.user?.role !== 'Manager') {
-      query.donor = req.user.id;
+    const userRole = (req.user?.role || '').toLowerCase();
+    const isAdminOrManager = userRole === 'admin' || userRole === 'manager' || req.isAdminSecretVerified;
+    if (!isAdminOrManager) {
+      query.donor = req.user?.id;
     }
 
     const donations = await donationService.getDonations(query);

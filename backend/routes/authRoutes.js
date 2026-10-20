@@ -7,6 +7,8 @@ const { verifyToken } = require('../middlewares/auth');
 router.post('/register', authController.register);
 router.post('/login', authController.login);
 router.post('/create-admin', authController.createAdmin);
+router.post('/refresh', authController.refresh);
+router.post('/refresh-token', authController.refresh);
 
 // Session Termination & Token Invalidation (TTL Blacklist + Cookie Clearance)
 router.post('/logout', (req, res, next) => {

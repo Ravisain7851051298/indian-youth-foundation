@@ -59,7 +59,7 @@ export default function BlogDetailPage({ params }) {
   const shareWhatsApp = () => {
     if (typeof window === 'undefined') return;
     const url = window.location.href;
-    const text = encodeURIComponent(`📰 *${blog?.title}*\n\nRead official press release on Indian Youth Foundation portal:\n${url}`);
+    const text = encodeURIComponent(`📰 *${blog?.title}*\n\nRead official press release on Yuva Kranti Dal portal:\n${url}`);
     window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
   };
 

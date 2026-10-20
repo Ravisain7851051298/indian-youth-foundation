@@ -127,7 +127,7 @@ export default function ProfileOverviewPage() {
                     Membership Application Under Review by Trustees
                   </h2>
                   <p className="text-xs text-slate-800 leading-relaxed max-w-2xl font-medium">
-                    <strong>Zero-Fraud Institutional Policy:</strong> To protect the legal integrity of Indian Youth Foundation (12A &amp; 80G Certified NGO), official credentials (ID Cards, Formal Appointment Letters, or Certificates) are validated against bank ledgers by the administrative committee.
+                    <strong>Zero-Fraud Institutional Policy:</strong> To protect the legal integrity of Yuva Kranti Dal (12A &amp; 80G Certified NGO), official credentials (ID Cards, Formal Appointment Letters, or Certificates) are validated against bank ledgers by the administrative committee.
                   </p>
                 </div>
               </div>
@@ -408,7 +408,7 @@ export default function ProfileOverviewPage() {
               <p className="text-xs text-slate-600 mt-1 leading-relaxed">
                 {isMember 
                   ? `Enrolled as ${currentUser?.membershipPlan || 'Official Foundation Member'}. View your statutory voting rights, appointment letter, and ID card.`
-                  : 'Join as an official verified member of Indian Youth Foundation. Receive official photo ID card, appointment letter, and governance voting rights.'
+                  : 'Join as an official verified member of Yuva Kranti Dal. Receive official photo ID card, appointment letter, and governance voting rights.'
                 }
               </p>
             </div>

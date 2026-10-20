@@ -35,6 +35,7 @@ export default function MembershipManagement() {
   const [rejectReason, setRejectReason] = useState("");
   const [deleteModalItem, setDeleteModalItem] = useState(null);
   const [processingId, setProcessingId] = useState(null);
+  const [approvalNotice, setApprovalNotice] = useState(null);
 
   // Certificate Modal State
   const [certModalItem, setCertModalItem] = useState(null);
@@ -64,8 +65,14 @@ export default function MembershipManagement() {
     try {
       setProcessingId(id);
       const res = await api.put(`/applications/members/${id}/approve`);
-      toast.success(res.data?.message || "Membership approved! ID Card & Appointment Letter generated.");
+      const successMsg = res.data?.message || "सदस्यता सफलतापूर्वक स्वीकृत (Approved) कर दी गई है! आईडी कार्ड और नियुक्ति पत्र ईमेल पर भेज दिया गया है।";
+      setApprovalNotice(successMsg);
+      toast.success(successMsg, { duration: 6000 });
       loadData();
+      // Auto refresh the page so all dashboard metrics and tables sync up
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
     } catch (err) {
       toast.error(err.response?.data?.message || "Approval failed");
     } finally {
@@ -163,6 +170,20 @@ export default function MembershipManagement() {
           <FiRefreshCw className={`w-4 h-4 ${loading ? "animate-spin text-red-600" : ""}`} />
         </button>
       </div>
+
+      {/* Approval Success Banner */}
+      {approvalNotice && (
+        <div className="mx-3 p-4 rounded-2xl bg-emerald-50 border-2 border-emerald-400 text-emerald-950 font-bold flex items-center justify-between shadow-sm animate-in fade-in slide-in-from-top-2">
+          <div className="flex items-center gap-3">
+            <FiCheckCircle className="w-6 h-6 text-emerald-600 shrink-0" />
+            <div>
+              <p className="text-sm font-black text-emerald-950">{approvalNotice}</p>
+              <p className="text-xs text-emerald-750 font-medium mt-0.5">डैशबोर्ड अपडेट करने के लिए पेज रिफ्रेश हो रहा है...</p>
+            </div>
+          </div>
+          <FiRefreshCw className="w-5 h-5 text-emerald-700 animate-spin shrink-0" />
+        </div>
+      )}
 
       {/* Filter and Search Bar */}
       <div className="bg-white mx-3 p-1 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -296,7 +317,7 @@ export default function MembershipManagement() {
                                 setCertModalItem(m);
                                 setCertRole(m.user?.designation || m.planName || "Official Foundation Member");
                                 setCertTitle("Certificate of Official Membership & Recognition");
-                                setCertReason("In honor of official membership, lifelong commitment to community welfare, and support of the Indian Youth Foundation.");
+                                setCertReason("In honor of official membership, lifelong commitment to community welfare, and support of the Yuva Kranti Dal.");
                               }}
                               className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold text-[11px] transition cursor-pointer shadow-xs"
                               title="Offer Official Member Certificate"

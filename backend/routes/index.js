@@ -29,7 +29,7 @@ router.get('/health', (req, res) => {
   res.json({
     status: 'online',
     timestamp: new Date(),
-    ngo: 'भारतीय युवा क्रांति (Indian Youth Foundation)',
+    ngo: 'युवा क्रांति दल (Yuva Kranti Dal)',
     version: '2.0.0'
   });
 });

@@ -18,19 +18,19 @@ const baseUrl = new URL(SITE_CONFIG.url);
 export const metadata = {
   metadataBase: baseUrl,
   title: {
-    default: 'Indian Youth Foundation | भारतीय युवा क्रांति - 12A & 80G Certified NGO',
-    template: '%s | Indian Youth Foundation',
+    default: 'Yuva Kranti Dal | युवा क्रांति दल - 12A & 80G Certified NGO',
+    template: '%s | Yuva Kranti Dal',
   },
   description:
-    'सशक्त युवा, समर्थ समाज, राष्ट्र निर्माण में समर्पित - Indian Youth Foundation is a 12A & 80G certified NGO in India. Support child education, 24/7 emergency blood donation, youth livelihood, and relief projects with 50% income tax exemption.',
-  applicationName: 'Indian Youth Foundation',
-  authors: [{ name: 'Indian Youth Foundation', url: SITE_CONFIG.url }],
-  creator: 'Indian Youth Foundation',
-  publisher: 'Indian Youth Foundation',
+    'सशक्त युवा, समर्थ समाज, राष्ट्र निर्माण में समर्पित - Yuva Kranti Dal is a 12A & 80G certified NGO in India. Support child education, 24/7 emergency blood donation, youth livelihood, and relief projects with 50% income tax exemption.',
+  applicationName: 'Yuva Kranti Dal',
+  authors: [{ name: 'Yuva Kranti Dal', url: SITE_CONFIG.url }],
+  creator: 'Yuva Kranti Dal',
+  publisher: 'Yuva Kranti Dal',
   category: 'Non-Governmental Organization',
   keywords: [
-    'Indian Youth Foundation',
-    'भारतीय युवा क्रांति',
+    'Yuva Kranti Dal',
+    'युवा क्रांति दल',
     'NGO in India',
     '80G tax exemption donation',
     '12A registered NGO',
@@ -53,11 +53,11 @@ export const metadata = {
     },
   },
   openGraph: {
-    title: 'Indian Youth Foundation | भारतीय युवा क्रांति - 12A & 80G Certified NGO',
+    title: 'Yuva Kranti Dal | युवा क्रांति दल - 12A & 80G Certified NGO',
     description:
       'Empowering Youth, Transforming Society, Nation First. Join India’s leading youth social welfare movement for child literacy, emergency healthcare, and grassroots change.',
     url: SITE_CONFIG.url,
-    siteName: 'Indian Youth Foundation',
+    siteName: 'Yuva Kranti Dal',
     locale: 'en_IN',
     type: 'website',
     images: [
@@ -65,13 +65,13 @@ export const metadata = {
         url: '/logo.jpeg',
         width: 800,
         height: 800,
-        alt: 'Indian Youth Foundation - भारतीय युवा क्रांति Logo',
+        alt: 'Yuva Kranti Dal - युवा क्रांति दल Logo',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Indian Youth Foundation | भारतीय युवा क्रांति',
+    title: 'Yuva Kranti Dal | युवा क्रांति दल',
     description:
       '12A & 80G certified NGO empowering youth for education, emergency blood donation, and nation building.',
     images: ['/logo.jpeg'],

@@ -2,7 +2,17 @@ const newsRepository = require('../repositories/newsRepository');
 
 class NewsService {
   async getNews(query = {}) {
-    return newsRepository.find(query);
+    const list = await newsRepository.find(query);
+    return list.map((item) => {
+      const obj = item.toObject ? item.toObject() : { ...item };
+      if (!obj.category) {
+        obj.category = (Array.isArray(obj.tags) && obj.tags.length > 0) ? obj.tags[0] : 'News';
+      }
+      if (!Array.isArray(obj.tags) || obj.tags.length === 0) {
+        obj.tags = [obj.category];
+      }
+      return obj;
+    });
   }
 
   async createNews(data) {
@@ -13,6 +23,9 @@ class NewsService {
       throw new Error('Title and content are required');
     }
 
+    const category = (data.category || (Array.isArray(data.tags) && data.tags[0]) || 'News').trim();
+    const tags = Array.isArray(data.tags) && data.tags.length > 0 ? data.tags : [category];
+
     const payload = {
       ...data,
       title,
@@ -20,9 +33,10 @@ class NewsService {
       content,
       contentHi: (data.contentHi || content).trim(),
       date: data.date || new Date().toISOString().split('T')[0],
-      author: (data.author || 'संपादक, भारतीय युवा क्रांति').trim(),
+      author: (data.author || 'संपादक, युवा क्रांति दल').trim(),
       image: data.image || data.imageUrl || (Array.isArray(data.images) && data.images[0]) || '',
-      tags: Array.isArray(data.tags) ? data.tags : (data.category ? [data.category] : [])
+      category,
+      tags
     };
 
     return newsRepository.create(payload);
@@ -44,6 +58,11 @@ class NewsService {
     if (!updateData.image) {
       if (updateData.imageUrl) updateData.image = updateData.imageUrl;
       else if (Array.isArray(updateData.images) && updateData.images[0]) updateData.image = updateData.images[0];
+    }
+    if (data.category !== undefined || data.tags !== undefined) {
+      const category = (data.category || (Array.isArray(data.tags) && data.tags[0]) || 'News').trim();
+      updateData.category = category;
+      updateData.tags = Array.isArray(data.tags) && data.tags.length > 0 ? data.tags : [category];
     }
 
     const news = await newsRepository.updateById(id, updateData);

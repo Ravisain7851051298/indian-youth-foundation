@@ -29,6 +29,7 @@ import {
   FiPlay,
   FiBookOpen
 } from 'react-icons/fi';
+import { useSelector } from 'react-redux';
 import { useNGO } from '@/context/NGOContext';
 import { getContentImageUrl } from '@/lib/authApi';
 
@@ -36,9 +37,14 @@ export default function AdminLayout({ children }) {
   const pathname = usePathname();
   const router = useRouter();
   const { currentUser, logout, settings, members, donations, complaints } = useNGO();
+  const reduxUser = useSelector((state) => state.auth?.user);
+  const authLoading = useSelector((state) => state.auth?.loading);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [mounted, setMounted] = useState(false);
+
+  // Active user resolution prioritizing whichever is available
+  const user = currentUser || reduxUser;
 
   // Initialize and persist collapsed state from localStorage
   useEffect(() => {
@@ -61,7 +67,7 @@ export default function AdminLayout({ children }) {
     });
   };
 
-  const isAdmin = currentUser?.role?.toLowerCase() === 'admin';
+  const isAdmin = user?.role?.toLowerCase() === 'admin';
 
   // Real-time counter metrics for badge indicators
   const pendingMembers = members?.filter(m => m.status === 'pending')?.length || 0;
@@ -103,6 +109,30 @@ export default function AdminLayout({ children }) {
     await logout();
     router.push('/login');
   };
+
+  // Wait for client mount to avoid hydration mismatch
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-3 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-xs font-bold text-slate-500">Initializing Trustee Workspace...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If auth is still checking and user is not yet populated
+  if (authLoading && !user) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-3 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-xs font-bold text-slate-500">Verifying Trustee Credentials...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!isAdmin) {
     return (
@@ -166,7 +196,7 @@ export default function AdminLayout({ children }) {
                   </div>
                   <div className="overflow-hidden">
                     <h2 className="text-xs font-black text-black leading-tight truncate">
-                      {settings?.ngoName || 'Indian Youth Foundation'}
+                      {settings?.ngoName || 'Yuva Kranti Dal'}
                     </h2>
                     <span className="text-[10px] text-[#0b8026] font-extrabold uppercase tracking-wider block truncate">
                       Trustee Admin

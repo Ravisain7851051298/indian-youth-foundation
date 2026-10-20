@@ -90,7 +90,7 @@ export default function PublicOrganizationCertificatesPage() {
           </h1>
 
           <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
-            Transparent and verifiable legal documents establishing Indian Youth Foundation (Bharatiya Yuva Kranti) as a registered, 100% compliant, and tax-exempt national youth welfare movement.
+            Transparent and verifiable legal documents establishing Yuva Kranti Dal (युवा क्रांति दल) as a registered, 100% compliant, and tax-exempt national youth welfare movement.
           </p>
 
           {/* Accreditations Trust Badges Strip */}

@@ -461,7 +461,7 @@ export default function DashboardPage() {
                 {isAdmin ? 'Admin Master Control & Analytics Hub' : 'Team Member Operations Hub'}
               </h1>
               {/* <p className="text-xs text-slate-500">
-                Organization: <strong className="text-slate-800">{settings?.ngoName || 'Indian Youth Foundation'}</strong> • Real-time Financials, Network Analytics &amp; Approvals
+                Organization: <strong className="text-slate-800">{settings?.ngoName || 'Yuva Kranti Dal'}</strong> • Real-time Financials, Network Analytics &amp; Approvals
               </p> */}
             </div>
           </div>

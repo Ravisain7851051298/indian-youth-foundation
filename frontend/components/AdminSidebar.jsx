@@ -101,11 +101,17 @@ export default function AdminSidebar({ activeRole = null }) {
   const pathname = usePathname();
   const { currentUser, logout, settings } = useNGO();
   const reduxUser = useSelector((state) => state.auth?.user);
-  const effectiveUser = reduxUser || currentUser;
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const effectiveUser = isMounted ? (reduxUser || currentUser) : null;
 
   // Determine effective role
-  const role = activeRole || effectiveUser?.role || 'Member';
+  const role = activeRole || effectiveUser?.role || 'Admin';
   const navItems = ROLE_NAV_ITEMS[role] || ROLE_NAV_ITEMS.Member;
 
   const roleBadgeText = {
@@ -151,7 +157,7 @@ export default function AdminSidebar({ activeRole = null }) {
             </div>
             <div className="overflow-hidden">
               <h2 className="font-bold text-xs tracking-wide text-black truncate">
-                {settings?.ngoName || 'Indian Youth Foundation'}
+                {settings?.ngoName || 'Yuva Kranti Dal'}
               </h2>
               <span className="text-[10px] text-[#0b8026] font-bold px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 inline-block mt-0.5">
                 {role}

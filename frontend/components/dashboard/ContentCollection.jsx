@@ -29,6 +29,16 @@ import { CONTENT_COLLECTIONS } from "@/constants/dashboard";
 import api from "@/services/api";
 import { getContentImageUrl } from "@/lib/authApi";
 
+export function getItemCategory(item) {
+  if (!item) return "";
+  if (item.category && typeof item.category === "string" && item.category.trim()) return item.category.trim();
+  if (Array.isArray(item.tags) && item.tags.length > 0 && item.tags[0]) return String(item.tags[0]).trim();
+  if (typeof item.tags === "string" && item.tags.trim()) return item.tags.trim();
+  if (item.statementType) return item.statementType;
+  if (item.certificateType) return item.certificateType;
+  return "";
+}
+
 export default function ContentCollection({ resource }) {
   const config = CONTENT_COLLECTIONS[resource] || CONTENT_COLLECTIONS.blogs;
   const endpoint = config.endpoint || resource;
@@ -45,6 +55,10 @@ export default function ContentCollection({ resource }) {
   // Service Filters & Inspect Modal
   const [serviceCategory, setServiceCategory] = useState("All");
   const [viewServiceModalItem, setViewServiceModalItem] = useState(null);
+
+  // Blog Filters & Inspect Modal
+  const [blogCategory, setBlogCategory] = useState("All");
+  const [viewBlogModalItem, setViewBlogModalItem] = useState(null);
 
   const [initialFormSnapshot, setInitialFormSnapshot] = useState("");
   const [initialImgsCount, setInitialImgsCount] = useState(0);
@@ -121,6 +135,9 @@ export default function ContentCollection({ resource }) {
     if (config?.customFields) {
       config.customFields.forEach((f) => {
         let val = item[f.name];
+        if (f.name === "category" && (!val || val === "")) {
+          val = getItemCategory(item);
+        }
         if (Array.isArray(val)) {
           val = val.join(', ');
         }
@@ -234,6 +251,7 @@ export default function ContentCollection({ resource }) {
       const textContent = (form.description || form.content || form.caption || form.summary || "").trim();
       const textTitle = (form.title || form.name || form.headline || "").trim();
 
+      const itemCat = form.category || getItemCategory(editingItem) || (resource === "blogs" ? "News" : "");
       const payload = {
         ...form,
         title: textTitle,
@@ -248,8 +266,13 @@ export default function ContentCollection({ resource }) {
         bannerImage: finalImages[0] || form.bannerImage || "",
         url: finalImages[0] || form.url || form.videoUrl || "",
         caption: textContent,
-        author: form.author || "संपादक, भारतीय युवा क्रांति"
+        author: form.author || "संपादक, युवा क्रांति दल"
       };
+
+      if (resource === "blogs" || itemCat) {
+        payload.category = itemCat;
+        payload.tags = Array.isArray(form.tags) && form.tags.length > 0 ? form.tags : [itemCat];
+      }
 
       if (editingItem) {
         const id = editingItem._id || editingItem.id;
@@ -307,10 +330,11 @@ export default function ContentCollection({ resource }) {
     const q = searchQuery.toLowerCase();
     const title = (item.title || item.name || "").toLowerCase();
     const desc = (item.description || item.content || item.summary || item.caption || item.bio || "").toLowerCase();
-    const cat = (item.category || "").toLowerCase();
+    const cat = getItemCategory(item).toLowerCase();
     const loc = (item.location || "").toLowerCase();
     const addr = (item.locationAddress || "").toLowerCase();
-    const matchesSearch = title.includes(q) || desc.includes(q) || cat.includes(q) || loc.includes(q) || addr.includes(q);
+    const tagsStr = Array.isArray(item.tags) ? item.tags.join(" ").toLowerCase() : "";
+    const matchesSearch = title.includes(q) || desc.includes(q) || cat.includes(q) || loc.includes(q) || addr.includes(q) || tagsStr.includes(q);
 
     if (!matchesSearch) return false;
 
@@ -329,6 +353,12 @@ export default function ContentCollection({ resource }) {
 
     if (resource === "services") {
       if (serviceCategory !== "All" && cat !== serviceCategory.toLowerCase() && !cat.includes(serviceCategory.toLowerCase())) {
+        return false;
+      }
+    }
+
+    if (resource === "blogs") {
+      if (blogCategory !== "All" && cat !== blogCategory.toLowerCase() && !cat.includes(blogCategory.toLowerCase())) {
         return false;
       }
     }
@@ -435,6 +465,25 @@ export default function ContentCollection({ resource }) {
           </div>
         )}
 
+        {/* Blogs-Specific Filter: Category Options */}
+        {resource === "blogs" && (
+          <div className="flex items-center gap-1.5 text-xs">
+            <FiFilter className="w-3.5 h-3.5 text-slate-400" />
+            <select
+              value={blogCategory}
+              onChange={(e) => setBlogCategory(e.target.value)}
+              className="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-black bg-slate-50 focus:outline-red-500 cursor-pointer"
+            >
+              <option value="All">All Categories</option>
+              <option value="News">News</option>
+              <option value="Blog">Blog</option>
+              <option value="Announcement">Announcement</option>
+              <option value="Field Story">Field Story</option>
+              <option value="Press Release">Press Release</option>
+            </select>
+          </div>
+        )}
+
         <div className="bg-red-500 rounded-xl px-4 py-1.5 flex items-center text-xs font-bold text-white shrink-0 self-end md:self-auto">
           Records: <span className="ml-1.5">{filteredItems.length}</span>
         </div>
@@ -518,7 +567,7 @@ export default function ContentCollection({ resource }) {
                           {item.description || item.content || item.summary || item.caption || item.bio}
                         </div>
 
-                        {/* Extra metadata tags for Events and Gallery */}
+                        {/* Extra metadata tags for Events, Gallery, and Blogs */}
                         <div className="flex flex-wrap items-center gap-1.5 mt-1">
                           {resource === "events" && Array.isArray(item.images) && item.images.length > 1 && (
                             <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-red-50 text-red-700 font-bold border border-red-200">
@@ -544,6 +593,18 @@ export default function ContentCollection({ resource }) {
                                 </span>
                               )}
                             </>
+                          )}
+                          {resource === "blogs" && (
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-2xs">
+                                🏷️ {getItemCategory(item) || "News"}
+                              </span>
+                              {Array.isArray(item.tags) && item.tags.filter(t => t && String(t).toLowerCase() !== (getItemCategory(item) || "").toLowerCase()).map((tag, idx) => (
+                                <span key={idx} className="inline-block px-1.5 py-0.5 rounded text-[10px] bg-slate-100 text-slate-600 font-medium border border-slate-200">
+                                  #{tag}
+                                </span>
+                              ))}
+                            </div>
                           )}
                         </div>
                       </td>
@@ -584,10 +645,28 @@ export default function ContentCollection({ resource }) {
                             </span>
                           </td>
                         </>
+                      ) : resource === "blogs" ? (
+                        <>
+                          <td className="py-3 px-3.5 whitespace-nowrap">
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-2xs">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                              {getItemCategory(item) || "News"}
+                            </span>
+                          </td>
+                          <td className="py-3 px-3.5 text-slate-800 font-semibold whitespace-nowrap">
+                            {item.author || "संपादक, युवा क्रांति दल"}
+                          </td>
+                        </>
                       ) : (
                         config.customFields?.slice(0, 2).map((f) => (
                           <td key={f.name} className="py-3 px-3.5 text-slate-800 font-semibold">
-                            {String(item[f.name] ?? "-")}
+                            {f.name === "category" ? (
+                              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-red-50 text-red-700 border border-red-200">
+                                {getItemCategory(item) || "-"}
+                              </span>
+                            ) : (
+                              String(item[f.name] ?? "-")
+                            )}
                           </td>
                         ))
                       )}
@@ -598,6 +677,19 @@ export default function ContentCollection({ resource }) {
                       )}
                       <td className="py-3 px-3.5 text-right whitespace-nowrap sticky right-0 bg-white group-hover:bg-slate-50 z-10 shadow-[-6px_0_10px_-2px_rgba(0,0,0,0.06)]">
                         <div className="flex items-center justify-end gap-1.5">
+                          {/* Blogs: Inspect Modal Button */}
+                          {resource === "blogs" && (
+                            <button
+                              type="button"
+                              onClick={() => setViewBlogModalItem(item)}
+                              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs border border-emerald-200 shadow-2xs transition cursor-pointer"
+                              title="Inspect Article Details"
+                            >
+                              <FiEye className="w-3.5 h-3.5 text-emerald-600" />
+                              <span>Inspect</span>
+                            </button>
+                          )}
+
                           {/* Services: Inspect Modal Button */}
                           {resource === "services" && (
                             <button
@@ -1405,6 +1497,112 @@ export default function ContentCollection({ resource }) {
                   <button
                     type="button"
                     onClick={() => setViewServiceModalItem(null)}
+                    className="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold transition cursor-pointer"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Blogs Enhanced Inspect Modal */}
+      {viewBlogModalItem && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-6 sm:p-7 max-w-xl w-full border border-slate-200 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <button
+              onClick={() => setViewBlogModalItem(null)}
+              className="absolute top-4 right-4 p-2 rounded-full text-slate-400 hover:text-black hover:bg-slate-100 transition cursor-pointer z-10"
+            >
+              <FiX className="w-5 h-5" />
+            </button>
+
+            {/* Banner Photo */}
+            {(viewBlogModalItem.bannerImage || viewBlogModalItem.image || viewBlogModalItem.imageUrl || (Array.isArray(viewBlogModalItem.images) && viewBlogModalItem.images[0])) ? (
+              <div className="w-full h-48 sm:h-56 rounded-2xl overflow-hidden mb-4 border border-slate-200 relative bg-slate-100">
+                <img
+                  src={getContentImageUrl(viewBlogModalItem.bannerImage || viewBlogModalItem.image || viewBlogModalItem.imageUrl || viewBlogModalItem.images[0])}
+                  alt={viewBlogModalItem.title}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute top-3 left-3 flex flex-wrap gap-2">
+                  <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-600 text-white backdrop-blur-sm shadow-sm flex items-center gap-1.5">
+                    🏷️ {getItemCategory(viewBlogModalItem) || "News"}
+                  </span>
+                  <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-black/75 text-white backdrop-blur-sm shadow-sm">
+                    ✍️ {viewBlogModalItem.author || "संपादक"}
+                  </span>
+                </div>
+              </div>
+            ) : null}
+
+            <div className="space-y-4">
+              <div>
+                <div className="flex flex-wrap items-center gap-2 mb-1">
+                  <span className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                    Category: {getItemCategory(viewBlogModalItem) || "News"}
+                  </span>
+                  {viewBlogModalItem.date && (
+                    <span className="text-[11px] font-semibold text-slate-500 flex items-center gap-1">
+                      <FiCalendar className="w-3.5 h-3.5 text-slate-400" />
+                      {new Date(viewBlogModalItem.date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                    </span>
+                  )}
+                </div>
+                <h2 className="text-xl font-black text-black mt-1 leading-snug">
+                  {viewBlogModalItem.title}
+                </h2>
+              </div>
+
+              {/* Tags Array Display */}
+              {Array.isArray(viewBlogModalItem.tags) && viewBlogModalItem.tags.length > 0 && (
+                <div>
+                  <h4 className="text-xs font-extrabold text-black uppercase tracking-wider mb-1.5">Tags</h4>
+                  <div className="flex flex-wrap gap-1.5">
+                    {viewBlogModalItem.tags.map((tg, idx) => (
+                      <span key={idx} className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                        #{tg}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <h4 className="text-xs font-extrabold text-black uppercase tracking-wider mb-1.5">Article Content</h4>
+                <p className="text-xs text-slate-700 font-medium leading-relaxed bg-slate-50 p-4 rounded-2xl border border-slate-200 whitespace-pre-line">
+                  {viewBlogModalItem.content || viewBlogModalItem.description || viewBlogModalItem.summary || "No content provided."}
+                </p>
+              </div>
+
+              <div className="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs">
+                <a
+                  href={`/blogs/${viewBlogModalItem._id || viewBlogModalItem.id}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold transition"
+                >
+                  <FiExternalLink className="w-3.5 h-3.5" />
+                  <span>View on Public Site</span>
+                </a>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const itm = viewBlogModalItem;
+                      setViewBlogModalItem(null);
+                      openEditForm(itm);
+                    }}
+                    className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold transition cursor-pointer"
+                  >
+                    Edit Article
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setViewBlogModalItem(null)}
                     className="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold transition cursor-pointer"
                   >
                     Close

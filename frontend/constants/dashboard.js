@@ -20,8 +20,8 @@ import {
 } from "react-icons/fi";
 
 export const DASHBOARD_BRAND = {
-  name: "Indian Youth",
-  suffix: "Foundation",
+  name: "Yuva Kranti",
+  suffix: "Dal",
 };
 
 export const DASHBOARD_NAVIGATION = [
@@ -248,7 +248,7 @@ export const CONTENT_COLLECTIONS = {
     customFields: [
       { name: "certificateType", label: "Certificate Type", type: "select", options: ["Registration", "80G & 12A", "Tax Exemption", "Recognition", "Volunteer", "Appreciation", "Partnership", "Legal", "Other"] },
       { name: "certificateNumber", label: "Certificate Number / ID", type: "text", placeholder: "e.g. IYF-2024-80G-01" },
-      { name: "recipientName", label: "Issued To / Recipient", type: "text", placeholder: "e.g. Indian Youth Foundation" },
+      { name: "recipientName", label: "Issued To / Recipient", type: "text", placeholder: "e.g. Yuva Kranti Dal" },
       { name: "issuingAuthority", label: "Issuing Authority", type: "text", placeholder: "e.g. Ministry of Corporate Affairs / Income Tax Dept" },
     ],
   },

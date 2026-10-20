@@ -187,8 +187,8 @@ export default function ProfileCertificatesPage() {
             <div class="header-row">
               <img src="${logoSrc}" class="logo-img" alt="Logo" />
               <div>
-                <h1>${settings?.ngoName || 'INDIAN YOUTH FOUNDATION'}</h1>
-                <h2>${settings?.ngoNameHi || 'भारतीय युवा क्रांति (राष्ट्रीय सामाजिक न्यास)'}</h2>
+                <h1>${settings?.ngoName || 'YUVA KRANTI DAL'}</h1>
+                <h2>${settings?.ngoNameHi || 'युवा क्रांति दल (राष्ट्रीय सामाजिक न्यास)'}</h2>
                 <p class="meta">Registered Public Charitable Trust • Reg. No: ${settings?.registrationNo || '421/2019'} • 12A & 80G Certified NGO</p>
                 <p class="meta">NITI Aayog Darpan ID: ${settings?.nitiAayogDarpanId || 'RJ/2022/0319482'} • PAN: ${settings?.panNo || 'AAATB4321Q'}</p>
               </div>
@@ -569,10 +569,10 @@ export default function ProfileCertificatesPage() {
                   />
                   <div>
                     <h2 className="text-2xl font-black text-red-900 tracking-wide font-serif">
-                      {settings?.ngoName || 'INDIAN YOUTH FOUNDATION'}
+                      {settings?.ngoName || 'YUVA KRANTI DAL'}
                     </h2>
                     <h3 className="text-sm font-bold text-slate-800 font-sans">
-                      {settings?.ngoNameHi || 'भारतीय युवा क्रांति (राष्ट्रीय सामाजिक न्यास)'}
+                      {settings?.ngoNameHi || 'युवा क्रांति दल (राष्ट्रीय सामाजिक न्यास)'}
                     </h3>
                     <p className="text-[10px] text-slate-600 font-medium">
                       Registered Public Charitable Trust • Reg. No: {settings?.registrationNo || '421/2019'} • 12A &amp; 80G Certified NGO

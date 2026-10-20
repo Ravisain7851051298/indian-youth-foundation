@@ -2,12 +2,12 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { 
-  FiUserCheck, 
-  FiUploadCloud, 
-  FiCheckCircle, 
+import {
+  FiUserCheck,
+  FiUploadCloud,
+  FiCheckCircle,
   FiTrash2,
-  FiClock, 
+  FiClock,
   FiHeart
 } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
@@ -23,7 +23,15 @@ export default function ApplyVolunteerPage() {
   const [availability, setAvailability] = useState('Weekends & Evenings');
   const [interests, setInterests] = useState('Child Education & Emergency Blood Donation');
   const [whyJoin, setWhyJoin] = useState('');
-  
+
+  // Guest applicant fields (active when user is not signed in)
+  const [guestName, setGuestName] = useState('');
+  const [guestEmail, setGuestEmail] = useState('');
+  const [guestPhone, setGuestPhone] = useState('');
+  const [guestBloodGroup, setGuestBloodGroup] = useState('O+');
+  const [guestDistrict, setGuestDistrict] = useState('Aligarh');
+  const [guestState, setGuestState] = useState('Uttar Pradesh');
+
   // Single-API upload state: raw file stored locally until form submission
   const [selectedFile, setSelectedFile] = useState(null);
   const [fileName, setFileName] = useState('');
@@ -64,6 +72,11 @@ export default function ApplyVolunteerPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!currentUser && (!guestName.trim() || !guestEmail.trim() || !guestPhone.trim())) {
+      setValidationError('Please provide your Full Legal Name, Email Address, and 10-digit Mobile Number.');
+      return;
+    }
+
     if (!selectedFile) {
       setValidationError('Please select an ID proof document or photo before submitting your volunteer application.');
       return;
@@ -74,6 +87,12 @@ export default function ApplyVolunteerPage() {
     try {
       // Single-API call: send form fields and file together in one FormData payload
       const formData = new FormData();
+      formData.append('name', currentUser ? currentUser.name : guestName.trim());
+      formData.append('email', currentUser ? currentUser.email : guestEmail.trim());
+      formData.append('phone', currentUser ? currentUser.phone : guestPhone.trim());
+      formData.append('bloodGroup', currentUser?.bloodGroup || guestBloodGroup);
+      formData.append('district', currentUser?.district || guestDistrict);
+      formData.append('state', currentUser?.state || guestState);
       formData.append('skills', skills);
       formData.append('availability', availability);
       formData.append('interests', interests);
@@ -102,26 +121,124 @@ export default function ApplyVolunteerPage() {
       </div>
 
       {submitted ? (
-        <div className="bg-red-50 border-2 border-red-300 rounded-3xl p-6 text-black space-y-2 shadow-2xs">
+        <div className="bg-red-50 border-2 border-red-300 rounded-3xl p-6 text-black space-y-3 shadow-2xs">
           <div className="flex items-center gap-2 font-black text-base text-red-800">
             <FiCheckCircle className="w-5 h-5 text-red-600" />
-            <span>Volunteer Application Received!</span>
+            <span>Volunteer Application Received Successfully!</span>
           </div>
           <p className="text-xs text-black leading-relaxed font-medium">
-            Thank you, <strong className="text-black">{currentUser?.name}</strong>. Your voluntary application has been forwarded to our district youth coordination team.
-            Upon verification, your <strong>Volunteer Offer Letter</strong> and <strong>Official Volunteer Badge</strong> will be unlocked in your portal and emailed to <code className="text-black font-bold">{currentUser?.email}</code>.
+            Thank you, <strong className="text-black">{currentUser?.name || guestName}</strong>! Your voluntary application has been forwarded to the Trustee Verification Desk.
           </p>
-          <div className="pt-2">
+          <div className="bg-white p-4 rounded-2xl border border-red-200 text-xs text-slate-800 space-y-1.5">
+            <p className="font-bold text-red-700">📧 Next Steps Upon Admin Approval:</p>
+            <p>1. When the Admin approves your application, your <strong>Official Portal Login Credentials (Email &amp; Temporary Password)</strong> will be emailed to <code className="text-black font-bold">{currentUser?.email || guestEmail}</code>.</p>
+            <p>2. Your <strong>Official Volunteer Offer Letter</strong> and <strong>Verifiable Digital Badge</strong> will be attached to the email for immediate download.</p>
+          </div>
+          <div className="pt-2 flex items-center gap-3">
             <Link
-              href="/profile"
+              href="/"
               className="px-5 py-2.5 rounded-xl bg-red-600 text-white font-bold text-xs hover:bg-red-700 transition inline-block shadow-md"
             >
-              Back to Profile Overview
+              Back to Home
+            </Link>
+            <Link
+              href="/login"
+              className="px-5 py-2.5 rounded-xl bg-white border border-slate-300 text-black font-bold text-xs hover:bg-slate-100 transition inline-block"
+            >
+              Go to Sign In
             </Link>
           </div>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-2xs space-y-5">
+          {/* Guest User Information Inputs */}
+          {!currentUser && (
+            <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-black uppercase tracking-wider text-red-700">
+                  This Email ID is used for sending offer letter and id verification mails
+                </span>
+                <Link href="/login?redirect=/apply-volunteer" className="text-xs font-bold text-blue-600 hover:underline">
+                  Already have an account? Sign in
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                <div>
+                  <label className="block font-bold text-black mb-1">Full Name *</label>
+                  <input
+                    type="text"
+                    required
+                    value={guestName}
+                    onChange={(e) => setGuestName(e.target.value)}
+                    placeholder="Legal full name"
+                    className="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-medium text-black focus:ring-2 focus:ring-red-500"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-black mb-1">Email Address *</label>
+                  <input
+                    type="email"
+                    required
+                    value={guestEmail}
+                    onChange={(e) => setGuestEmail(e.target.value)}
+                    placeholder="Credentials will be sent here"
+                    className="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-medium text-black focus:ring-2 focus:ring-red-500"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-black mb-1">Mobile Number *</label>
+                  <input
+                    type="tel"
+                    required
+                    value={guestPhone}
+                    onChange={(e) => setGuestPhone(e.target.value)}
+                    placeholder="10-digit mobile"
+                    className="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-medium text-black focus:ring-2 focus:ring-red-500"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                <div>
+                  <label className="block font-bold text-black mb-1">Blood Group</label>
+                  <select
+                    value={guestBloodGroup}
+                    onChange={(e) => setGuestBloodGroup(e.target.value)}
+                    className="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-medium text-black"
+                  >
+                    <option value="O+">O+</option>
+                    <option value="O-">O-</option>
+                    <option value="A+">A+</option>
+                    <option value="A-">A-</option>
+                    <option value="B+">B+</option>
+                    <option value="B-">B-</option>
+                    <option value="AB+">AB+</option>
+                    <option value="AB-">AB-</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block font-bold text-black mb-1">District / City</label>
+                  <input
+                    type="text"
+                    value={guestDistrict}
+                    onChange={(e) => setGuestDistrict(e.target.value)}
+                    className="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-medium text-black"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-black mb-1">State</label>
+                  <input
+                    type="text"
+                    value={guestState}
+                    onChange={(e) => setGuestState(e.target.value)}
+                    className="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-medium text-black"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
             <div>
               <label className="block font-bold text-black mb-1">Key Skills &amp; Capabilities *</label>
@@ -164,7 +281,7 @@ export default function ApplyVolunteerPage() {
 
           <div>
             <label className="block text-xs font-bold text-black mb-1">
-              Why do you want to volunteer with {settings?.ngoName || 'Indian Youth Foundation'}? *
+              Why do you want to volunteer with {settings?.ngoName || 'Yuva Kranti Dal'}? *
             </label>
             <textarea
               rows={3}
@@ -257,11 +374,11 @@ export default function ApplyVolunteerPage() {
             >
               <FiUserCheck className="w-4 h-4" />
               <span>
-                {loading 
-                  ? 'Submitting Application...' 
-                  : (!selectedFile 
-                      ? 'Select ID Proof to Submit' 
-                      : 'Submit Volunteer Application')}
+                {loading
+                  ? 'Submitting Application...'
+                  : (!selectedFile
+                    ? 'Select ID Proof to Submit'
+                    : 'Submit Volunteer Application')}
               </span>
             </button>
           </div>

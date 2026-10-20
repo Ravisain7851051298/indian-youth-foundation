@@ -102,7 +102,7 @@ export default function MyAwardsPage() {
   const totalPoints = awards.reduce((sum, item) => sum + (item.award?.points || 0), 0);
 
   const handleShare = (badge) => {
-    const text = `I am honored to have received the official "${badge.award?.title || 'Honor Badge'}" (${badge.badgeNumber}) from Indian Youth Foundation for youth service and community development!`;
+    const text = `I am honored to have received the official "${badge.award?.title || 'Honor Badge'}" (${badge.badgeNumber}) from Yuva Kranti Dal for youth service and community development!`;
     if (navigator.share) {
       navigator.share({
         title: badge.award?.title,
@@ -227,7 +227,7 @@ export default function MyAwardsPage() {
             <div class="header">
               <img src="${logoSrc}" class="logo" alt="Logo" />
               <div>
-                <h1 class="org-title">${settings?.ngoName || 'INDIAN YOUTH FOUNDATION'}</h1>
+                <h1 class="org-title">${settings?.ngoName || 'YUVA KRANTI DAL'}</h1>
                 <p class="org-sub">Registered Public Charitable Trust • 12A & 80G Certified • National Youth Excellence Wing</p>
               </div>
               <div style="text-align: right;">
@@ -283,7 +283,7 @@ export default function MyAwardsPage() {
               My Awards &amp; Badges of Honor
             </h1>
             <p className="text-xs sm:text-sm text-slate-300 max-w-xl font-medium leading-relaxed">
-              Official distinctions conferred by the Indian Youth Foundation Board of Trustees for exceptional leadership, social service, volunteer action, and charitable dedication.
+              Official distinctions conferred by the Yuva Kranti Dal Board of Trustees for exceptional leadership, social service, volunteer action, and charitable dedication.
             </p>
           </div>
 

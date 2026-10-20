@@ -29,13 +29,14 @@ class DonationService {
       orderId, transactionId, paymentScreenshot
     } = donationData;
 
-    const finalName = (donorName || '').trim();
+    const finalName = (donorName || donationData.name || '').trim();
     const finalEmail = (email || donationData.donorEmail || '').toLowerCase().trim();
     const finalPhone = (phone || donationData.donorPhone || '').trim();
     const finalPan = (pan || donationData.panNumber || '').toUpperCase().trim();
+    const finalScreenshot = paymentScreenshot || donationData.screenshot || donationData.fileUrl || '';
 
     if (!amount || !finalName || !finalEmail) {
-      throw new Error('Amount, donor name, and email are required');
+      throw new Error('Donation amount, donor name, and email address are required');
     }
 
     let finalCampaignTitle = campaignTitle || donationData.campaignTitle || '';
@@ -70,7 +71,7 @@ class DonationService {
       transactionId: transactionId || donationData.transactionId || '',
       paymentId: donationData.paymentId || '',
       paymentMethod: donationData.paymentMethod || 'UPI',
-      paymentScreenshot: paymentScreenshot || '',
+      paymentScreenshot: finalScreenshot,
       status: 'pending'
     });
 

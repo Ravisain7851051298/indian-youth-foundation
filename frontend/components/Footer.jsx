@@ -74,7 +74,10 @@ export default function Footer() {
   ].filter((item) => Boolean(item.url));
 
   return (
-    <footer className="bg-slate-900 text-slate-300 font-sans border-t-4 border-[#0b8026] relative overflow-hidden">
+    <footer className="bg-slate-900 text-slate-300 font-sans relative overflow-hidden">
+      {/* Top Green & Red dual gradient bar */}
+      <div className="h-1.5 w-full bg-gradient-to-r from-[#0b8026] via-rose-600 to-[#dc2626]" />
+
       {/* Decorative subtle ambient lights */}
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#0b8026]/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-red-600/10 rounded-full blur-3xl pointer-events-none" />

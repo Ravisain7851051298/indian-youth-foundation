@@ -214,11 +214,11 @@ export default function IdCardPage() {
                         }}
                       />
                       <span className="text-[11px] font-black tracking-wider uppercase text-red-100">
-                        {settings?.ngoName || 'Indian Youth Foundation'}
+                        {settings?.ngoName || 'Yuva Kranti Dal'}
                       </span>
                     </div>
                     <h3 className="text-base font-black tracking-wide leading-tight">
-                      {settings?.ngoNameHi || 'भारतीय युवा क्रांति'}
+                      {settings?.ngoNameHi || 'युवा क्रांति दल'}
                     </h3>
                     <p className="text-[10px] text-red-100 font-medium">
                       Reg. No: {settings?.registrationNo || '421/2019'} • 12A &amp; 80G Certified NGO
@@ -424,7 +424,7 @@ export default function IdCardPage() {
                         }}
                       />
                       <span className="text-[11px] font-black tracking-wider uppercase text-indigo-100">
-                        {settings?.ngoName || 'Indian Youth Foundation'}
+                        {settings?.ngoName || 'Yuva Kranti Dal'}
                       </span>
                     </div>
                     <h3 className="text-base font-black tracking-wide leading-tight">

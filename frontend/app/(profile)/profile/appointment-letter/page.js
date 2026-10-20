@@ -203,10 +203,10 @@ export default function AppointmentLetterPage() {
                     />
                     <div className="text-left">
                       <h1 className="text-xl sm:text-2xl font-black text-red-600 tracking-wide leading-tight">
-                        INDIAN YOUTH FOUNDATION
+                        YUVA KRANTI DAL
                       </h1>
                       <h2 className="text-sm font-black text-black">
-                        भारतीय युवा क्रांति (राष्ट्रीय सामाजिक न्यास)
+                        युवा क्रांति दल (राष्ट्रीय सामाजिक न्यास)
                       </h2>
                     </div>
                   </div>
@@ -253,7 +253,7 @@ export default function AppointmentLetterPage() {
                     Dear <strong>{effectiveUser?.name}</strong>,
                   </p>
                   <p>
-                    We are pleased to inform you that upon careful review and verification of your application and statutory contribution receipt, the Board of Trustees and the National Executive Committee of <strong>Indian Youth Foundation (Bharatiya Yuva Kranti)</strong> have formally approved your appointment as an active member in our nationwide youth movement.
+                    We are pleased to inform you that upon careful review and verification of your application and statutory contribution receipt, the Board of Trustees and the National Executive Committee of <strong>Yuva Kranti Dal (युवा क्रांति दल)</strong> have formally approved your appointment as an active member in our nationwide youth movement.
                   </p>
                   <p>
                     In this esteemed role, you are entrusted with representing the core mission of our organization—uplifting underprivileged children through education, organizing voluntary blood donation helplines, promoting environmental sustainability, and extending humanitarian relief to vulnerable families across India.
@@ -307,7 +307,7 @@ export default function AppointmentLetterPage() {
                         {settings?.presidentName || 'Ravi Saini (National President & Trustee)'}
                       </h4>
                       <p className="text-[10px] text-black font-bold">National President &amp; Trustee</p>
-                      <p className="text-[9px] text-black font-medium">{settings?.ngoName || 'Indian Youth Foundation'}</p>
+                      <p className="text-[9px] text-black font-medium">{settings?.ngoName || 'Yuva Kranti Dal'}</p>
                     </div>
                   </div>
                 </div>
@@ -383,7 +383,7 @@ export default function AppointmentLetterPage() {
                     />
                     <div className="text-left">
                       <h1 className="text-xl sm:text-2xl font-black text-indigo-700 tracking-wide leading-tight">
-                        INDIAN YOUTH FOUNDATION
+                        YUVA KRANTI DAL
                       </h1>
                       <h2 className="text-sm font-black text-black">
                         राष्ट्रीय युवा स्वयंसेवक कोर (Grassroots Volunteer Wing)
@@ -433,7 +433,7 @@ export default function AppointmentLetterPage() {
                     Dear <strong>{effectiveUser?.name}</strong>,
                   </p>
                   <p>
-                    On behalf of the Board of Trustees and the National Executive Committee of <strong>Indian Youth Foundation (Bharatiya Yuva Kranti)</strong>, we are pleased to appoint you as an <strong>Active Grassroots Volunteer</strong> in our National Youth Social Wing.
+                    On behalf of the Board of Trustees and the National Executive Committee of <strong>Yuva Kranti Dal (युवा क्रांति दल)</strong>, we are pleased to appoint you as an <strong>Active Grassroots Volunteer</strong> in our National Youth Social Wing.
                   </p>
                   <p>
                     We acknowledge with gratitude your willingness to offer your voluntary services, expertise, and leadership for community empowerment. You are authorized to coordinate field outreach programs, assist in 24x7 emergency blood donor mobilization, teach underprivileged children, and support disaster relief campaigns.
@@ -487,7 +487,7 @@ export default function AppointmentLetterPage() {
                         {settings?.presidentName || 'Ravi Saini (National President & Trustee)'}
                       </h4>
                       <p className="text-[10px] text-black font-bold">National President &amp; Trustee</p>
-                      <p className="text-[9px] text-black font-medium">{settings?.ngoName || 'Indian Youth Foundation'}</p>
+                      <p className="text-[9px] text-black font-medium">{settings?.ngoName || 'Yuva Kranti Dal'}</p>
                     </div>
                   </div>
                 </div>

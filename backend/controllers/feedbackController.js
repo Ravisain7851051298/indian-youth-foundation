@@ -106,7 +106,7 @@ const replyFeedback = async (req, res) => {
 
     feedback.adminReply = reply.trim();
     feedback.adminRepliedAt = new Date();
-    feedback.repliedBy = (repliedBy || req.user?.name || 'Indian Youth Foundation Management').trim();
+    feedback.repliedBy = (repliedBy || req.user?.name || 'Yuva Kranti Dal Management').trim();
     feedback.repliedByRole = (repliedByRole || req.user?.role || 'Administrator').trim();
     feedback.status = 'Approved';
 

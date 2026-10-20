@@ -4,14 +4,14 @@ import JsonLd from '@/components/seo/JsonLd';
 export const metadata = {
   title: 'Privacy Policy',
   description:
-    'Privacy Policy of Indian Youth Foundation: how we protect donor data, personal information, and respect online donor privacy.',
+    'Privacy Policy of Yuva Kranti Dal: how we protect donor data, personal information, and respect online donor privacy.',
   alternates: {
     canonical: '/privacy-policy',
   },
   openGraph: {
-    title: 'Privacy Policy | Indian Youth Foundation',
+    title: 'Privacy Policy | Yuva Kranti Dal',
     description:
-      'Learn how Indian Youth Foundation protects donor and volunteer data with bank-grade encryption and privacy compliance.',
+      'Learn how Yuva Kranti Dal protects donor and volunteer data with bank-grade encryption and privacy compliance.',
     url: `${SITE_CONFIG.url}/privacy-policy`,
   },
 };

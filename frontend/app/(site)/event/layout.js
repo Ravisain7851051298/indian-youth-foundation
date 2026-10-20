@@ -4,12 +4,12 @@ import JsonLd from '@/components/seo/JsonLd';
 export const metadata = {
   title: 'Social Welfare Events & Drives',
   description:
-    'Stay updated with upcoming and past social welfare events organized by Indian Youth Foundation - blood donation camps, stationery distribution, youth rallies, and environmental plantation drives.',
+    'Stay updated with upcoming and past social welfare events organized by Yuva Kranti Dal - blood donation camps, stationery distribution, youth rallies, and environmental plantation drives.',
   alternates: {
     canonical: '/event',
   },
   openGraph: {
-    title: 'Events & Community Drives | Indian Youth Foundation',
+    title: 'Events & Community Drives | Yuva Kranti Dal',
     description:
       'Participate in impactful community events, health checkup camps, and youth mobilization programs across districts.',
     url: `${SITE_CONFIG.url}/event`,

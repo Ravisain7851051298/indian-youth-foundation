@@ -5,9 +5,82 @@ const userRepository = require('../repositories/userRepository');
 const settingRepository = require('../repositories/settingRepository');
 const tokenBlacklistRepository = require('../repositories/tokenBlacklistRepository');
 const { sendPasswordResetEmail } = require('./emailService');
-const { JWT_SECRET, ADMIN_SECRET_KEY } = require('../middlewares/auth');
+const { JWT_SECRET, JWT_ACCESS_SECRET, JWT_REFRESH_SECRET, ADMIN_SECRET_KEY } = require('../middlewares/auth');
 
 class AuthService {
+  /**
+   * Generates both short-lived Access Token and long-lived Refresh Token
+   */
+  generateTokens(user) {
+    const payload = {
+      id: (user._id || user.id).toString(),
+      email: user.email,
+      role: user.role,
+      name: user.name,
+      memberId: user.memberId
+    };
+
+    const accessToken = jwt.sign(
+      { ...payload, tokenType: 'access' },
+      JWT_ACCESS_SECRET,
+      { expiresIn: process.env.ACCESS_TOKEN_EXPIRY || '15m' }
+    );
+
+    const refreshToken = jwt.sign(
+      { id: payload.id, tokenType: 'refresh' },
+      JWT_REFRESH_SECRET,
+      { expiresIn: process.env.REFRESH_TOKEN_EXPIRY || '7d' }
+    );
+
+    return {
+      accessToken,
+      refreshToken,
+      token: accessToken // backwards compatibility
+    };
+  }
+
+  /**
+   * Refreshes access token using a valid refresh token
+   */
+  async refreshAccessToken(providedRefreshToken) {
+    if (!providedRefreshToken) {
+      throw new Error('Refresh token is required');
+    }
+
+    const isBlacklisted = await tokenBlacklistRepository.isBlacklisted(providedRefreshToken);
+    if (isBlacklisted) {
+      throw new Error('Refresh token has been revoked or invalidated. Please sign in again.');
+    }
+
+    let decoded;
+    try {
+      decoded = jwt.verify(providedRefreshToken, JWT_REFRESH_SECRET);
+    } catch {
+      try {
+        decoded = jwt.verify(providedRefreshToken, JWT_SECRET);
+      } catch {
+        throw new Error('Invalid or expired refresh token. Please sign in again.');
+      }
+    }
+
+    if (decoded.tokenType && decoded.tokenType !== 'refresh') {
+      throw new Error('Invalid token type provided for refresh.');
+    }
+
+    const user = await userRepository.findById(decoded.id);
+    if (!user) {
+      throw new Error('User associated with this refresh token no longer exists.');
+    }
+
+    if (user.status === 'blocked' || user.status === 'deactivated') {
+      throw new Error(`Your account is currently marked as ${user.status}.`);
+    }
+
+    const tokens = this.generateTokens(user);
+    const { password: _, ...userSafe } = user.toObject ? user.toObject() : user;
+    return { user: userSafe, ...tokens };
+  }
+
   /**
    * Creates a verified Admin account dynamically using X-ADMIN-SECRET-KEY
    */
@@ -136,21 +209,10 @@ class AuthService {
       verifiedBy: 'System Bootstrap Authorization (X-ADMIN-SECRET-KEY)'
     });
 
-    // 8. Sign JWT
-    const token = jwt.sign(
-      {
-        id: newAdmin._id.toString(),
-        email: newAdmin.email,
-        role: newAdmin.role,
-        name: newAdmin.name,
-        memberId: newAdmin.memberId
-      },
-      JWT_SECRET,
-      { expiresIn: '7d' }
-    );
-
+    // 8. Sign Access & Refresh Tokens
+    const tokens = this.generateTokens(newAdmin);
     const { password: _, ...adminSafe } = newAdmin.toObject();
-    return { user: adminSafe, token };
+    return { user: adminSafe, ...tokens };
   }
 
   /**
@@ -232,20 +294,10 @@ class AuthService {
       appointmentLetterGenerated: false
     });
 
-    const token = jwt.sign(
-      {
-        id: newUser._id.toString(),
-        email: newUser.email,
-        role: newUser.role,
-        name: newUser.name,
-        memberId: newUser.memberId
-      },
-      JWT_SECRET,
-      { expiresIn: '7d' }
-    );
-
+    // 8. Sign Access & Refresh Tokens
+    const tokens = this.generateTokens(newUser);
     const { password: _, ...userSafe } = newUser.toObject();
-    return { user: userSafe, token };
+    return { user: userSafe, ...tokens };
   }
 
   /**
@@ -271,20 +323,9 @@ class AuthService {
       throw new Error('Invalid credentials. The password entered is incorrect.');
     }
 
-    const token = jwt.sign(
-      {
-        id: user._id.toString(),
-        email: user.email,
-        role: user.role,
-        name: user.name,
-        memberId: user.memberId
-      },
-      JWT_SECRET,
-      { expiresIn: '7d' }
-    );
-
+    const tokens = this.generateTokens(user);
     const { password: _, ...userSafe } = user.toObject();
-    return { user: userSafe, token };
+    return { user: userSafe, ...tokens };
   }
 
   /**

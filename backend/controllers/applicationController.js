@@ -2,7 +2,8 @@ const applicationService = require('../services/applicationService');
 
 const applyMembership = async (req, res) => {
   try {
-    const application = await applicationService.applyMembership(req.user.id, req.body);
+    const userId = req.user?.id || req.body?.userId || null;
+    const application = await applicationService.applyMembership(userId, req.body);
     return res.status(201).json({
       success: true,
       message: 'Membership application submitted successfully! Pending Trustee approval.',
@@ -15,7 +16,8 @@ const applyMembership = async (req, res) => {
 
 const applyVolunteer = async (req, res) => {
   try {
-    const application = await applicationService.applyVolunteer(req.user.id, req.body);
+    const userId = req.user?.id || req.body?.userId || null;
+    const application = await applicationService.applyVolunteer(userId, req.body);
     return res.status(201).json({
       success: true,
       message: 'Volunteer application submitted successfully! Pending Trustee verification.',

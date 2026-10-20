@@ -103,7 +103,7 @@ export default function VerificationPage() {
             <h1 className="text-xl font-black text-black mb-4">{title}</h1>
             {details}
             <div className="mt-6 pt-4 border-t border-slate-100 text-[11px] text-slate-500">
-              Organization: <strong className="text-black">{settings?.ngoName || 'Indian Youth Foundation'}</strong> | 12A &amp; 80G Certified
+              Organization: <strong className="text-black">{settings?.ngoName || 'Yuva Kranti Dal'}</strong> | 12A &amp; 80G Certified
             </div>
           </>
         ) : (

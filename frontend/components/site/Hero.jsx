@@ -32,7 +32,7 @@ export default function Hero() {
       {
         title: 'Empowering Youth, Transforming Society, Nation First',
         subtitle:
-          'Indian Youth Foundation (भारतीय युवा क्रांति) is a premier 12A & 80G certified NGO mobilizing young leaders for free child literacy, emergency healthcare, and rural empowerment.',
+          'Yuva Kranti Dal (युवा क्रांति दल) is a premier 12A & 80G certified NGO mobilizing young leaders for free child literacy, emergency healthcare, and rural empowerment.',
         imageUrl: DEFAULT_CAROUSEL_IMAGES[0],
         tag: 'National Youth Movement',
         ctaPrimaryText: 'Donate Online (Instant 80G)',
@@ -122,7 +122,7 @@ export default function Hero() {
             >
               <img
                 src={getContentImageUrl(bgImg)}
-                alt={`Indian Youth Foundation Background Initiative ${idx + 1}`}
+                alt={`Yuva Kranti Dal Background Initiative ${idx + 1}`}
                 className={`w-full h-full object-cover transition-transform duration-[7000ms] ease-out ${isActive ? 'scale-110 translate-x-1 -translate-y-1' : 'scale-100 translate-x-0 translate-y-0'
                   }`}
                 onError={(e) => {
@@ -246,7 +246,7 @@ export default function Hero() {
               <img
                 key={`slide-img-${activeSlide}`}
                 src={getContentImageUrl(currentSlide.imageUrl)}
-                alt={currentSlide.title || 'Indian Youth Foundation Grassroots Initiatives'}
+                alt={currentSlide.title || 'Yuva Kranti Dal Grassroots Initiatives'}
                 className="w-full h-[400px] sm:h-[440px] object-cover group-hover:scale-105 transition-transform duration-700 animate-fadeIn"
                 onError={(e) => {
                   e.currentTarget.onerror = null;

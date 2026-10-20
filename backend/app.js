@@ -105,7 +105,7 @@ app.get('/api/health', (req, res) => {
   res.json({
     status: 'online',
     timestamp: new Date(),
-    ngo: 'भारतीय युवा क्रांति'
+    ngo: 'युवा क्रांति दल'
   });
 });
 

@@ -1,12 +1,12 @@
 export const SITE_CONFIG = {
-  name: 'Indian Youth Foundation',
-  hindiName: 'भारतीय युवा क्रांति',
-  shortName: 'IYF',
-  url: process.env.NEXT_PUBLIC_SITE_URL || 'https://indianyouthfoundation.org',
+  name: 'Yuva Kranti Dal',
+  hindiName: 'युवा क्रांति दल',
+  shortName: 'YKD',
+  url: process.env.NEXT_PUBLIC_SITE_URL || 'https://yuvakrantidal.org',
   tagline: 'Empowering Youth, Transforming Society, Nation First',
-  description: 'Indian Youth Foundation (भारतीय युवा क्रांति) is a government-registered 12A & 80G certified NGO in India. We mobilize youth for underprivileged child education, 24/7 emergency blood donation, women skill training, and rapid humanitarian relief.',
+  description: 'Yuva Kranti Dal (युवा क्रांति दल) is a government-registered 12A & 80G certified NGO in India. We mobilize youth for underprivileged child education, 24/7 emergency blood donation, women skill training, and rapid humanitarian relief.',
   phone: '+91 93196 98759',
-  email: 'samasyasamadhanparishad@gmail.com',
+  email: 'ravisain75688@gmail.com',
   address: {
     streetAddress: 'Krishna Vihar, Pala Road',
     addressLocality: 'Aligarh',
@@ -26,7 +26,7 @@ export const defaultOrganizationSchema = {
   '@context': 'https://schema.org',
   '@type': 'NGO',
   name: SITE_CONFIG.name,
-  alternateName: [SITE_CONFIG.hindiName, SITE_CONFIG.shortName, 'Indian Youth Foundation NGO'],
+  alternateName: [SITE_CONFIG.hindiName, SITE_CONFIG.shortName, 'Yuva Kranti Dal NGO'],
   url: SITE_CONFIG.url,
   logo: `${SITE_CONFIG.url}/logo.jpeg`,
   image: `${SITE_CONFIG.url}/logo.jpeg`,
@@ -82,8 +82,8 @@ export const defaultOrganizationSchema = {
 export const defaultWebSiteSchema = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
-  name: 'Indian Youth Foundation',
-  alternateName: 'भारतीय युवा क्रांति',
+  name: 'Yuva Kranti Dal',
+  alternateName: 'युवा क्रांति दल',
   url: SITE_CONFIG.url,
   inLanguage: ['en-IN', 'hi-IN'],
   potentialAction: {

@@ -158,7 +158,7 @@ export default function ProfileDonationsPage() {
           ⚖️ Statutory Tax Exemption Notice (Income Tax Act 1961 - Section 80G)
         </p>
         <p>
-          Donations to Indian Youth Foundation qualify for 50% tax deduction under Section 80G.
+          Donations to Yuva Kranti Dal qualify for 50% tax deduction under Section 80G.
           In compliance with Form 10BD regulations, tax receipts are generated exclusively following bank reconciliation by our accountants.
         </p>
       </div>
@@ -286,10 +286,10 @@ export default function ProfileDonationsPage() {
               {/* Receipt Top Letterhead */}
               <div className="text-center border-b-2 border-red-500 pb-4 space-y-1">
                 <h2 className="text-lg sm:text-xl font-black text-red-600 uppercase tracking-wide">
-                  INDIAN YOUTH FOUNDATION
+                  YUVA KRANTI DAL
                 </h2>
                 <h3 className="text-xs font-black text-black">
-                  भारतीय युवा क्रांति (राष्ट्रीय सामाजिक संगठन)
+                  युवा क्रांति दल (राष्ट्रीय सामाजिक संगठन)
                 </h3>
                 <p className="text-[10px] text-black font-medium">
                   Trust Reg No: <strong>421/2019</strong> • NITI Aayog Darpan: <strong>{settings?.nitiAayogDarpanId || 'RJ/2022/0319482'}</strong><br/>
@@ -454,7 +454,7 @@ export default function ProfileDonationsPage() {
                 </span>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={settings?.upiQrImage || 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=bharatiyauva@okhdfcbank%26pn=Indian%20Youth%20Foundation%26cu=INR'}
+                  src={settings?.upiQrImage || 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=bharatiyauva@okhdfcbank%26pn=Yuva%20Kranti%20Dal%26cu=INR'}
                   alt="UPI QR"
                   className="w-36 h-36 mx-auto object-contain bg-white p-2 rounded-xl border border-red-300 shadow-2xs"
                 />

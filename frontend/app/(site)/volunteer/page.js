@@ -42,7 +42,7 @@ function VolunteerContent() {
             Volunteer &amp; Membership Enrolment
           </h1>
           <p className="text-xs sm:text-sm text-slate-700 mt-2 leading-relaxed">
-            Join the grassroots movement of <strong>{settings?.ngoName || 'Indian Youth Foundation'}</strong>. All official volunteers and members receive government-recognized verifiable credentials following Trustee approval.
+            Join the grassroots movement of <strong>{settings?.ngoName || 'Yuva Kranti Dal'}</strong>. All official volunteers and members receive government-recognized verifiable credentials following Trustee approval.
           </p>
         </div>
 
@@ -53,9 +53,9 @@ function VolunteerContent() {
             <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-sm mb-3">
               1
             </div>
-            <h4 className="font-extrabold text-black text-sm">Account Login / Register</h4>
+            <h4 className="font-extrabold text-black text-sm">Direct Online Application</h4>
             <p className="text-[11px] text-slate-600 mt-1">
-              Create your secure personal account with password and confirm password.
+              Apply freely as a guest or with your registered account in minutes.
             </p>
           </div>
 
@@ -64,9 +64,9 @@ function VolunteerContent() {
             <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-sm mb-3">
               2
             </div>
-            <h4 className="font-extrabold text-black text-sm">Submit Application</h4>
+            <h4 className="font-extrabold text-black text-sm">Trustee Verification</h4>
             <p className="text-[11px] text-slate-600 mt-1">
-              Apply for Volunteer Service or choose a Membership Plan with your details.
+              Our executive board audits application details and statutory criteria.
             </p>
           </div>
 
@@ -75,54 +75,14 @@ function VolunteerContent() {
             <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-sm mb-3">
               3
             </div>
-            <h4 className="font-extrabold text-black text-sm">Admin Approval &amp; ID Card</h4>
+            <h4 className="font-extrabold text-black text-sm">Credentials &amp; Documents Emailed</h4>
             <p className="text-[11px] text-slate-600 mt-1">
-              Trustee committee audits application; ID Card &amp; Appointment Letter unlock automatically.
+              Upon approval, login credentials and verified ID card are sent straight to your email.
             </p>
           </div>
         </div>
 
-        {/* ---------------- STATE 1: USER IS NOT LOGGED IN ---------------- */}
-        {!currentUser && (
-          <div className="bg-white rounded-3xl p-6 sm:p-10 border border-slate-200 shadow-xl text-center space-y-6">
-            <div className="w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center mx-auto text-2xl shadow-md border border-emerald-200">
-              <FiLock className="w-8 h-8" />
-            </div>
-
-            <div className="max-w-lg mx-auto space-y-2">
-              <h2 className="text-xl sm:text-2xl font-black text-black">
-                Please Sign In or Register to Apply
-              </h2>
-              <p className="text-xs text-slate-700 leading-relaxed">
-                To maintain the statutory compliance and legal integrity of Indian Youth Foundation (12A &amp; 80G Certified NGO), all volunteer and membership applications must be linked to a verified user account.
-              </p>
-            </div>
-
-            {/* Quick Action Buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-              <Link
-                href="/login?redirect=/volunteer"
-                className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-lg shadow-emerald-700/25 transition flex items-center justify-center gap-2"
-              >
-                <FiLogIn className="w-4 h-4" />
-                <span>Sign In to Apply</span>
-              </Link>
-              <Link
-                href="/register?redirect=/volunteer"
-                className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-black hover:bg-slate-900 text-white font-bold text-xs shadow-md transition flex items-center justify-center gap-2"
-              >
-                <FiUserPlus className="w-4 h-4" />
-                <span>Create New User Account</span>
-              </Link>
-            </div>
-
-            <div className="pt-4 border-t border-slate-100 text-[11px] text-slate-500">
-              Already have an account? Sign in above and your application will be instantly connected to your profile.
-            </div>
-          </div>
-        )}
-
-        {/* ---------------- STATE 2: USER IS LOGGED IN & APPROVED ---------------- */}
+        {/* ---------------- STATE 1: USER IS LOGGED IN & APPROVED ---------------- */}
         {currentUser && isApproved && (
           <div className="bg-white border-2 border-emerald-500/30 rounded-3xl p-6 sm:p-10 shadow-md">
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
@@ -166,7 +126,7 @@ function VolunteerContent() {
           </div>
         )}
 
-        {/* ---------------- STATE 3: USER IS LOGGED IN & PENDING APPROVAL ---------------- */}
+        {/* ---------------- STATE 2: USER IS LOGGED IN & PENDING APPROVAL ---------------- */}
         {currentUser && isPending && (
           <div className="bg-white border-2 border-emerald-200 rounded-3xl p-6 sm:p-10 shadow-sm space-y-4">
             <div className="flex items-start gap-4">
@@ -204,24 +164,47 @@ function VolunteerContent() {
           </div>
         )}
 
-        {/* ---------------- STATE 4: LOGGED IN USER READY TO APPLY ---------------- */}
-        {currentUser && !isApproved && !isPending && (
+        {/* ---------------- STATE 3: READY TO APPLY (GUEST OR LOGGED IN) ---------------- */}
+        {(!currentUser || (!isApproved && !isPending)) && (
           <div className="space-y-6">
-            {/* Authenticated User Status Bar */}
-            <div className="bg-white border-2 border-slate-200 text-black p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-md">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-700 flex items-center justify-center font-bold text-white text-base">
-                  <FiUser className="w-5 h-5" />
+            {/* Authenticated vs Guest Status Banner */}
+            {currentUser ? (
+              <div className="bg-white border-2 border-slate-200 text-black p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-md">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-700 flex items-center justify-center font-bold text-white text-base">
+                    <FiUser className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="font-extrabold text-sm text-black">{currentUser.name}</div>
+                    <div className="text-[11px] text-slate-600">{currentUser.email} • Authenticated User</div>
+                  </div>
                 </div>
-                <div>
-                  <div className="font-extrabold text-sm text-black">{currentUser.name}</div>
-                  <div className="text-[11px] text-slate-600">{currentUser.email} • Authenticated User</div>
-                </div>
+                <span className="text-[11px] px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 font-bold border border-emerald-200">
+                  Ready to Apply
+                </span>
               </div>
-              <span className="text-[11px] px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 font-bold border border-emerald-200">
-                Ready to Apply
-              </span>
-            </div>
+            ) : (
+              <div className="bg-emerald-50/70 border border-emerald-200 text-slate-800 p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div className="flex items-start sm:items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-700 text-white flex items-center justify-center shrink-0">
+                    <FiUserPlus className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="font-extrabold text-xs sm:text-sm text-black">Direct Guest Enrolment Active</div>
+                    <div className="text-[11px] text-slate-600">
+                      You can apply directly without logging in. Upon admin approval, your login credentials will be emailed to you automatically.
+                    </div>
+                  </div>
+                </div>
+                <Link
+                  href="/login?redirect=/volunteer"
+                  className="shrink-0 text-xs font-bold text-emerald-800 hover:text-emerald-950 underline flex items-center gap-1"
+                >
+                  <FiLogIn className="w-3.5 h-3.5" />
+                  <span>Already have an account? Sign in</span>
+                </Link>
+              </div>
+            )}
 
             {/* Application Options Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -277,7 +260,7 @@ function VolunteerContent() {
                   </span>
                   <h3 className="text-xl font-black text-black">Verified Member Enrolment</h3>
                   <p className="text-xs text-slate-700 mt-2 leading-relaxed">
-                    Become a voting/constitutional member of Indian Youth Foundation. Receive official appointment letter, dual-sided digital ID card, and verified portal access.
+                    Become a voting/constitutional member of Yuva Kranti Dal. Receive official appointment letter, dual-sided digital ID card, and verified portal access.
                   </p>
 
                   <div className="mt-4 space-y-2 border-t border-slate-100 pt-3 text-xs text-black">

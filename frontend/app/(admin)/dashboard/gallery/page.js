@@ -1,7 +1,7 @@
 import ContentCollection from "@/components/dashboard/ContentCollection";
 
 export const metadata = {
-  title: "Photo & Video Gallery Management | Indian Youth Foundation Dashboard",
+  title: "Photo & Video Gallery Management | Yuva Kranti Dal Dashboard",
   description: "Upload and manage visual archives, field photos, relief drives, and YouTube videos.",
 };
 

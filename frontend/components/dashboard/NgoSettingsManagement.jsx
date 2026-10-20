@@ -77,8 +77,8 @@ export default function NgoSettingsManagement() {
       if (res.data?.success && res.data?.settings) {
         const s = res.data.settings;
         setForm({
-          ngoName: s.ngoName || "Indian Youth Foundation",
-          ngoNameHi: s.ngoNameHi || "भारतीय युवा क्रांति",
+          ngoName: s.ngoName || "Yuva Kranti Dal",
+          ngoNameHi: s.ngoNameHi || "युवा क्रांति दल",
           tagline: s.tagline || "",
           taglineHi: s.taglineHi || "",
           aboutStory: s.aboutStory || "",

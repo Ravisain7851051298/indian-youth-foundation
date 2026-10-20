@@ -2,12 +2,12 @@ const express = require('express');
 const router = express.Router();
 const memberController = require('../controllers/memberController');
 const applicationController = require('../controllers/applicationController');
-const { verifyToken, requireRole } = require('../middlewares/auth');
+const { verifyToken, optionalAuth, requireRole } = require('../middlewares/auth');
 const { handleOptionalFileUpload } = require('../middlewares/upload');
 
-// Apply for membership (authenticated user)
-router.post('/apply', verifyToken, handleOptionalFileUpload, applicationController.applyMembership);
-router.post('/', verifyToken, handleOptionalFileUpload, applicationController.applyMembership);
+// Apply for membership (Supports both guest applicants and authenticated users)
+router.post('/apply', optionalAuth, handleOptionalFileUpload, applicationController.applyMembership);
+router.post('/', optionalAuth, handleOptionalFileUpload, applicationController.applyMembership);
 
 // Public Member Directory (sanitized, non-sensitive)
 router.get('/public', memberController.getPublicMembers);

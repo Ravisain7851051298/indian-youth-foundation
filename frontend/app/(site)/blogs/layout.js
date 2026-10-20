@@ -4,12 +4,12 @@ import JsonLd from '@/components/seo/JsonLd';
 export const metadata = {
   title: 'Blog & Articles - Stories of Grassroots Change',
   description:
-    'Read articles, news, and real stories of impact from the Indian Youth Foundation editorial desk. Insights on child education, emergency blood donation, and youth leadership in India.',
+    'Read articles, news, and real stories of impact from the Yuva Kranti Dal editorial desk. Insights on child education, emergency blood donation, and youth leadership in India.',
   alternates: {
     canonical: '/blogs',
   },
   openGraph: {
-    title: 'Stories of Change & Articles | Indian Youth Foundation',
+    title: 'Stories of Change & Articles | Yuva Kranti Dal',
     description:
       'Inspirational updates, ground reports, and grassroots stories of transforming lives through youth action.',
     url: `${SITE_CONFIG.url}/blogs`,

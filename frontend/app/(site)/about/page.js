@@ -197,7 +197,7 @@ export default function AboutPage() {
               </h2>
 
               <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium">
-                The <strong>Indian Youth Foundation</strong> was established with a singular conviction: when the passion of Indian youth is focused on nation-building, social inequities can be eradicated. What began as a small group of university volunteers teaching street children on weekends has evolved into a registered national movement.
+                The <strong>Yuva Kranti Dal</strong> was established with a singular conviction: when the passion of Indian youth is focused on nation-building, social inequities can be eradicated. What began as a small group of university volunteers teaching street children on weekends has evolved into a registered national movement.
               </p>
 
               <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium">
@@ -232,7 +232,7 @@ export default function AboutPage() {
               <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white bg-slate-100">
                 <img
                   src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&auto=format&fit=crop&q=80"
-                  alt="Indian Youth Foundation Volunteers"
+                  alt="Yuva Kranti Dal Volunteers"
                   className="w-full h-[420px] object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent flex items-end p-6">

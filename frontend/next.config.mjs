@@ -16,14 +16,16 @@ const nextConfig = {
     ]
   },
   async rewrites() {
+    const rawTarget = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+    const cleanTarget = rawTarget.trim().replace(/\/api\/?$/, '');
     return [
       {
         source: '/api/:path*',
-        destination: 'https://api.yuvakrantidal.com/api/:path*'
+        destination: `${cleanTarget}/api/:path*`
       },
       {
         source: '/uploads/:path*',
-        destination: 'https://api.yuvakrantidal.com/uploads/:path*'
+        destination: `${cleanTarget}/uploads/:path*`
       }
     ];
   }

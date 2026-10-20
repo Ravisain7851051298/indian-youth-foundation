@@ -30,7 +30,7 @@ export default function BlogsPage() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [image, setImage] = useState('');
-  const [author, setAuthor] = useState('Editorial Desk, Indian Youth Foundation');
+  const [author, setAuthor] = useState('Editorial Desk, Yuva Kranti Dal');
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState('');
 
@@ -39,7 +39,7 @@ export default function BlogsPage() {
     setTitle('');
     setContent('');
     setImage('');
-    setAuthor('Editorial Desk, Indian Youth Foundation');
+    setAuthor('Editorial Desk, Yuva Kranti Dal');
     setSelectedFile(null);
     setPreviewUrl('');
     setFormOpen(true);
@@ -50,7 +50,7 @@ export default function BlogsPage() {
     setTitle(item.title || '');
     setContent(item.content || item.summary || '');
     setImage(item.image || item.imageUrl || '');
-    setAuthor(item.author || 'Editorial Desk, Indian Youth Foundation');
+    setAuthor(item.author || 'Editorial Desk, Yuva Kranti Dal');
     setSelectedFile(null);
     setPreviewUrl(item.image || item.imageUrl || '');
     setFormOpen(true);
@@ -126,7 +126,7 @@ export default function BlogsPage() {
   };
 
   const shareWhatsApp = (item) => {
-    const text = `*${item.title}*\n${item.content}\n\nRead more at Indian Youth Foundation: https://bharatiyayuvakranti.org/blogs`;
+    const text = `*${item.title}*\n${item.content}\n\nRead more at Yuva Kranti Dal: https://bharatiyayuvakranti.org/blogs`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
   };
 
@@ -145,7 +145,7 @@ export default function BlogsPage() {
               News &amp; Media Publications
             </h1>
             <p className="text-xs sm:text-sm text-slate-700 mt-2 max-w-2xl font-medium">
-              Read verified field reports, grassroots milestones, press coverage, and editorial announcements from the Indian Youth Foundation.
+              Read verified field reports, grassroots milestones, press coverage, and editorial announcements from the Yuva Kranti Dal.
             </p>
           </div>
 

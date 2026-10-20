@@ -14,7 +14,7 @@ const DEFAULT_AWARDS = [
   },
   {
     title: 'Yuva Kranti Ratna',
-    description: 'The highest honor of Indian Youth Foundation for transformative leadership and national contribution.',
+    description: 'The highest honor of Yuva Kranti Dal for transformative leadership and national contribution.',
     badgeIcon: 'FiAward',
     badgeColor: 'red',
     category: 'Social Service',

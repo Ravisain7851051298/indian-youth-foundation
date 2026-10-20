@@ -4,13 +4,31 @@ const { extractToken } = require('../middlewares/auth');
 /**
  * Cookie security options configuration
  */
-const getCookieOptions = () => ({
+const getAccessTokenCookieOptions = () => ({
   httpOnly: true, // Prevents JavaScript XSS attack vectors
   secure: process.env.NODE_ENV === 'production', // Transmitted only via HTTPS in production
   sameSite: 'lax', // CSRF protection
+  maxAge: 15 * 60 * 1000, // 15 minutes TTL
+  path: '/'
+});
+
+const getRefreshTokenCookieOptions = () => ({
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax',
   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days TTL
   path: '/'
 });
+
+const setAuthCookies = (res, accessToken, refreshToken) => {
+  if (accessToken) {
+    res.cookie('byk_token', accessToken, getAccessTokenCookieOptions());
+    res.cookie('token', accessToken, getAccessTokenCookieOptions());
+  }
+  if (refreshToken) {
+    res.cookie('byk_refresh_token', refreshToken, getRefreshTokenCookieOptions());
+  }
+};
 
 /**
  * Creates an Admin account with X-ADMIN-SECRET-KEY
@@ -33,16 +51,19 @@ const createAdmin = async (req, res) => {
     console.log('🛡️ [API /create-admin] Body Keys:', Object.keys(req.body || {}));
     if (req.body?.adminSecretKey) console.log('🛡️ [API /create-admin] Body.adminSecretKey:', `"${req.body.adminSecretKey}"`);
 
-    const { user, token } = await authService.createAdminAccount(req.body, secretKey);
+    const result = await authService.createAdminAccount(req.body, secretKey);
+    const { user, accessToken, refreshToken, token } = result;
 
-    // Set secure HTTP-only cookie
-    res.cookie('byk_token', token, getCookieOptions());
+    // Set secure HTTP-only cookies for both tokens
+    setAuthCookies(res, accessToken, refreshToken);
 
     return res.status(201).json({
       success: true,
       message: 'Verified Administrator account created successfully with custom credentials.',
       user,
-      token
+      accessToken,
+      refreshToken,
+      token: token || accessToken
     });
   } catch (error) {
     const status = error.message.includes('Unauthorized') ? 403 : 400;
@@ -55,16 +76,19 @@ const createAdmin = async (req, res) => {
  */
 const register = async (req, res) => {
   try {
-    const { user, token } = await authService.register(req.body);
+    const result = await authService.register(req.body);
+    const { user, accessToken, refreshToken, token } = result;
 
-    // Set secure HTTP-only cookie
-    res.cookie('byk_token', token, getCookieOptions());
+    // Set secure HTTP-only cookies
+    setAuthCookies(res, accessToken, refreshToken);
 
     return res.status(201).json({
       success: true,
       message: 'Account registered successfully! Select your plan and submit verification payment.',
       user,
-      token
+      accessToken,
+      refreshToken,
+      token: token || accessToken
     });
   } catch (error) {
     return res.status(400).json({ success: false, message: error.message });
@@ -78,16 +102,55 @@ const login = async (req, res) => {
   try {
     const identifier = req.body.email || req.body.phone || req.body.identifier;
     const { password } = req.body;
-    const { user, token } = await authService.login(identifier, password);
+    const result = await authService.login(identifier, password);
+    const { user, accessToken, refreshToken, token } = result;
 
-    // Set secure HTTP-only cookie
-    res.cookie('byk_token', token, getCookieOptions());
+    // Set secure HTTP-only cookies
+    setAuthCookies(res, accessToken, refreshToken);
 
     return res.json({
       success: true,
       message: `Welcome back, ${user.name}!`,
       user,
-      token
+      accessToken,
+      refreshToken,
+      token: token || accessToken
+    });
+  } catch (error) {
+    return res.status(401).json({ success: false, message: error.message });
+  }
+};
+
+/**
+ * Refresh expired access token using refresh token
+ */
+const refresh = async (req, res) => {
+  try {
+    const rawRefreshToken =
+      req.body?.refreshToken ||
+      req.headers['x-refresh-token'] ||
+      req.cookies?.byk_refresh_token ||
+      req.cookies?.refreshToken;
+
+    if (!rawRefreshToken) {
+      return res.status(401).json({
+        success: false,
+        message: 'Refresh token is required. Please sign in again.'
+      });
+    }
+
+    const result = await authService.refreshAccessToken(rawRefreshToken);
+    const { user, accessToken, refreshToken, token } = result;
+
+    setAuthCookies(res, accessToken, refreshToken);
+
+    return res.json({
+      success: true,
+      message: 'Access token refreshed successfully',
+      user,
+      accessToken,
+      refreshToken,
+      token: token || accessToken
     });
   } catch (error) {
     return res.status(401).json({ success: false, message: error.message });
@@ -114,6 +177,7 @@ const logout = async (req, res) => {
     };
     res.clearCookie('byk_token', clearOptions);
     res.clearCookie('token', clearOptions);
+    res.clearCookie('byk_refresh_token', clearOptions);
 
     return res.json({
       success: true,
@@ -131,7 +195,8 @@ const verifySession = async (req, res) => {
   return res.json({
     success: true,
     isAuthenticated: true,
-    user: req.user
+    user: req.user,
+    token: req.token
   });
 };
 
@@ -141,7 +206,7 @@ const verifySession = async (req, res) => {
 const getMe = async (req, res) => {
   try {
     const user = await authService.getMe(req.user.id);
-    return res.json({ success: true, user });
+    return res.json({ success: true, user, token: req.token });
   } catch (error) {
     return res.status(404).json({ success: false, message: error.message });
   }
@@ -183,6 +248,7 @@ module.exports = {
   createAdmin,
   register,
   login,
+  refresh,
   logout,
   verifySession,
   getMe,

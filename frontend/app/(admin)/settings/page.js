@@ -30,7 +30,7 @@ import toast from "react-hot-toast";
 
 export default function SettingsPage() {
   const { settings, updateSettings, testEmailSettings, currentUser, uploadFile } = useNGO();
-  const isAdmin = currentUser?.role === 'Admin';
+  const isAdmin = currentUser?.role?.toLowerCase() === 'admin';
 
   const [activeTab, setActiveTab] = useState('branding');
   const [uploadingField, setUploadingField] = useState(null);
@@ -39,8 +39,8 @@ export default function SettingsPage() {
   const [mailTestResult, setMailTestResult] = useState(null);
 
   const [form, setForm] = useState({
-    ngoNameHi: settings?.ngoNameHi || 'भारतीय युवा क्रांति',
-    ngoName: settings?.ngoName || 'Indian Youth Foundation',
+    ngoNameHi: settings?.ngoNameHi || 'युवा क्रांति दल',
+    ngoName: settings?.ngoName || 'Yuva Kranti Dal',
     taglineHi: settings?.taglineHi || 'Dedicated to Youth Empowerment & Nation Building',
     tagline: settings?.tagline || 'Empowering Youth, Transforming Society, Nation First',
     logoUrl: settings?.logoUrl || '',
@@ -61,11 +61,11 @@ export default function SettingsPage() {
     youtube: settings?.youtube || 'https://youtube.com',
     linkedin: settings?.linkedin || 'https://linkedin.com',
     telegram: settings?.telegram || '',
-    email: settings?.email || 'samasyasamadhanparishad@gmail.com',
-    newsTickerText: settings?.newsTickerText || 'समस्या समाधान परिषद (SSP) में आपका स्वागत है • निःशुल्क सदस्यता एवं समाज सेवा अभियान • हेल्पलाइन: +919319698759',
+    email: settings?.email || 'ravisain75688@gmail.com',
+    newsTickerText: settings?.newsTickerText || 'युवा क्रांति दल में आपका स्वागत है • निःशुल्क सदस्यता एवं समाज सेवा अभियान • हेल्पलाइन: +919319698759',
     address: settings?.address || 'Head Office - Krishna Vihar Pala Road Aligarh, Uttar Pradesh',
     googleMapEmbed: settings?.googleMapEmbed || '',
-    accountName: settings?.bankDetails?.accountName || 'INDIAN YOUTH FOUNDATION SANSTHA',
+    accountName: settings?.bankDetails?.accountName || 'YUVA KRANTI DAL',
     accountNumber: settings?.bankDetails?.accountNumber || '50200088991234',
     ifscCode: settings?.bankDetails?.ifscCode || 'HDFC0001234',
     bankName: settings?.bankDetails?.bankName || 'HDFC Bank Ltd.',
@@ -73,45 +73,52 @@ export default function SettingsPage() {
     upiId: settings?.upiId || 'bharatiyauva@okhdfcbank',
     upiQrImage: settings?.upiQrImage || '',
     membershipFee: settings?.membershipFee || 250,
-    aboutHeading: settings?.aboutHeading || 'About Indian Youth Foundation (Bharatiya Yuva Kranti)',
+    aboutHeading: settings?.aboutHeading || 'About Yuva Kranti Dal',
     aboutSubtitle: settings?.aboutSubtitle || 'A Government-Recognized Youth Social Welfare Movement Dedicated to Nation Building',
     aboutStory: settings?.aboutStory || '',
     missionStatement: settings?.missionStatement || '',
     visionStatement: settings?.visionStatement || '',
     footerDescription: settings?.footerDescription || '',
     footerCopyright: settings?.footerCopyright || '',
-    whoWeAreHeading: settings?.whoWeAreHeading || 'Who We Are — The Pulse of Indian Youth Foundation',
+    whoWeAreHeading: settings?.whoWeAreHeading || 'Who We Are — The Pulse of Yuva Kranti Dal',
     whoWeAreSubtitle: settings?.whoWeAreSubtitle || 'A Catalyst for Grassroots Youth Empowerment, Civil Welfare & Nation Building',
-    whoWeAreStory: settings?.whoWeAreStory || 'Founded by passionate young patriots and grassroots social activists, Indian Youth Foundation (भारतीय युवा क्रांति) was born from a deep conviction: that India\'s greatest reservoir of untapped power is its youth. Guided by the ethos of "Nation First, Society Always", we bridge the chasm between compassionate intent and concrete ground action.\n\nFrom running evening community literacy circles for slum children and maintaining an agile 24x7 emergency blood donor network across districts, to providing women self-reliance tailoring skills and mounting rapid relief during natural disasters, our youth task force stands on the frontlines of humanitarian transformation.\n\nWe operate with unwavering corporate governance, complete CBDT statutory transparency, zero administrative overhead leakage, and an uncompromising dedication to human dignity.',
+    whoWeAreStory: settings?.whoWeAreStory || 'Founded by passionate young patriots and grassroots social activists, Yuva Kranti Dal was born from a deep conviction: that India\'s greatest reservoir of untapped power is its youth. Guided by the ethos of "Nation First, Society Always", we bridge the chasm between compassionate intent and concrete ground action.',
     whoWeAreVision: settings?.whoWeAreVision || 'To foster an empowered, educated, and self-reliant India where proactive youth leadership eliminates socioeconomic disparities, champions community brotherhood, and builds a prosperous nation.',
     whoWeAreMission: settings?.whoWeAreMission || 'To channel the vibrant energy, intellect, and civic dedication of Indian youth into measurable grassroots social welfare initiatives, ensuring quality education for every underprivileged child, immediate healthcare access, women economic self-reliance, and disaster relief.',
     whoWeAreValues: settings?.whoWeAreValues || 'Nation First: Every action is dedicated to national strength and social harmony.\nIntegrity & Transparency: 100% statutory adherence, audited accounts, and public receipts.\nYouth Leadership: Placing young changemakers in driving seats of community solutions.\nEmpathy in Action: Rapid, unconditional grassroots aid for every vulnerable citizen.',
     whoWeAreBannerUrl: settings?.whoWeAreBannerUrl || 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1200&auto=format&fit=crop&q=80',
     privacyPolicyTitle: settings?.privacyPolicyTitle || 'Privacy Policy & Data Security',
-    privacyPolicySubtitle: settings?.privacyPolicySubtitle || 'Indian Youth Foundation (Bharatiya Yuva Kranti) is dedicated to maintaining full transparency, safeguarding donor privacy, and protecting personal data.',
+    privacyPolicySubtitle: settings?.privacyPolicySubtitle || 'Yuva Kranti Dal is dedicated to maintaining full transparency, safeguarding donor privacy, and protecting personal data.',
     privacyLastUpdated: settings?.privacyLastUpdated || 'October 2026',
-    privacyPolicyContent: settings?.privacyPolicyContent || '## 1. Information We Collect\nWhen you interact with Indian Youth Foundation through donations, membership registrations, volunteer drives, or contact inquiries, we collect information necessary to fulfill our statutory non-profit functions:\n- Personal Identity: Full name, date of birth, gender, blood group, and residential address.\n- Contact Information: Verified mobile phone number, WhatsApp contact, and email address.\n- Statutory Tax Data (for 80G Receipts): Permanent Account Number (PAN Card No.) and postal address, mandatory under the Income Tax Act, 1961 (Form 10BD reporting).\n- Payment Transaction Data: Unique transaction ID, payment method (UPI, Netbanking, Debit/Credit Card), timestamp, and donation amount. We do NOT store credit card numbers, CVVs, or net banking passwords on our servers.\n\n## 2. How We Use Your Information\nAll personal and financial details collected by the Foundation are used strictly for legitimate charitable administration:\n- Generating and delivering instant, digitally signed Section 80G tax exemption donation receipts.\n- Issuing verified digital membership ID cards, appointment letters, and appreciation certificates.\n- Reporting donor contribution records to the Income Tax Department via Form 10BD for donor tax deductions.\n- Communicating program updates, emergency blood donation appeals, and humanitarian relief bulletins.\n- Investigating grievances, feedback, and community service inquiries submitted to the administration.\n\n## 3. Payment Gateway Security & Encryption\nOnline payments on this portal are processed via Reserve Bank of India (RBI) authorized payment gateways (including Razorpay & UPI rails) utilizing industry-grade 256-bit SSL encryption. Indian Youth Foundation adheres to PCI-DSS compliance standards ensuring seamless, tamper-proof electronic transactions.\n\n## 4. Non-Disclosure & Data Confidentiality\nWe enforce a strict non-disclosure policy. Indian Youth Foundation does never rent, sell, trade, or commercially share our donor or member records with any third-party marketing agency. Information is disclosed solely when mandated by Indian law or competent regulatory bodies (e.g., Income Tax Department, NITI Aayog).\n\n## 5. Your Rights & Grievance Redressal\nDonors and registered members maintain the right to review their records, request correction of inaccurate details, or download their cumulative donation statements. For questions or grievance escalation, reach out directly to our official grievance contacts.',
+    privacyPolicyContent: settings?.privacyPolicyContent || '## 1. Information We Collect\nWhen you interact with Yuva Kranti Dal through donations, membership registrations, volunteer drives, or contact inquiries, we collect information necessary to fulfill our statutory non-profit functions.',
     termsTitle: settings?.termsTitle || 'Terms & Conditions of Service',
-    termsSubtitle: settings?.termsSubtitle || 'Rules, guidelines, and legal agreements governing the use of the Indian Youth Foundation website, online donations, and member services.',
+    termsSubtitle: settings?.termsSubtitle || 'Rules, guidelines, and legal agreements governing the use of the Yuva Kranti Dal website, online donations, and member services.',
     termsEffectiveDate: settings?.termsEffectiveDate || 'October 2026',
-    termsContent: settings?.termsContent || '## 1. Acceptance of Terms\nBy accessing, browsing, registering as a member, or donating on this website, you agree to be legally bound by these Terms and Conditions and our Privacy Policy. If you do not accept these terms, you should discontinue using this portal.\n\n## 2. Online Donations & 80G Tax Receipts\n- All donations contributed through this portal are applied directly towards humanitarian relief, child education, healthcare assistance, and community welfare programs.\n- Donations are eligible for 50% income tax deduction under Section 80G of the Indian Income Tax Act, 1961.\n- To receive a valid Section 80G tax certificate, donors must provide their valid Indian Permanent Account Number (PAN) and postal address during payment.\n- Official digitally verified donation receipts bearing unique receipt numbers and QR codes are issued immediately upon successful transaction completion.\n\n## 3. Non-Refundable Donation Policy\nAs donations are voluntary charitable contributions committed promptly towards ongoing social causes and emergency supplies, they are generally non-refundable. However, in verified instances of technical error (such as erroneous double deductions through the payment gateway), a written refund request can be filed within 7 calendar days accompanied by transaction proof.\n\n## 4. Code of Conduct for Members & Volunteers\n- Every registered Member and Volunteer must conduct themselves in alignment with the national ideals and peaceful constitution of the Foundation.\n- Official Member ID Cards, Appointment Letters, and certificates issued by the Foundation remain the intellectual property of Indian Youth Foundation.\n- Members are strictly prohibited from using foundation identification, seals, or letterheads for personal commercial exploitation, unauthorized political lobbying, or illegal activities. Any misuse results in immediate termination of membership and criminal prosecution.\n\n## 5. Protection of Official Logo, Seals & Signatures\nAll trademarks, logos, official stamps/seals, digital signatures of executive trustees, website graphics, and software workflows displayed across this portal are exclusively owned by Indian Youth Foundation. Unauthorized reproduction, modification, or counterfeit duplication is actionable under Indian Copyright and Intellectual Property laws.\n\n## 6. Governing Law & Legal Jurisdiction\nThese Terms and Conditions are governed by and construed in accordance with the laws of the Republic of India. In the event of any dispute or arbitration, the courts having jurisdiction in Aligarh, Uttar Pradesh shall have exclusive jurisdiction.',
+    termsContent: settings?.termsContent || '## 1. Acceptance of Terms\nBy accessing, browsing, registering as a member, or donating on this website, you agree to be legally bound by these Terms and Conditions and our Privacy Policy.',
     smtpHost: settings?.smtpHost || 'smtp.gmail.com',
     smtpPort: settings?.smtpPort || 587,
-    smtpUser: settings?.smtpUser || '',
-    smtpPass: '',
-    smtpFromName: settings?.smtpFromName || 'Indian Youth Foundation',
-    adminSecretKey: '',
+    smtpUser: settings?.smtpUser || 'ravisain75688@gmail.com',
+    smtpPass: settings?.smtpPass || 'wmth wfbo khov uugu',
+    smtpFromName: settings?.smtpFromName || 'Yuva Kranti Dal',
+    adminSecretKey: settings?.adminSecretKey || 'ravi123',
     heroSlides: settings?.heroSlides || []
   });
 
-  // Keep form in sync when settings are loaded from server
+  // Keep form in sync when settings are loaded from server without wiping edited or existing fields
   useEffect(() => {
-    if (settings) {
+    if (settings && Object.keys(settings).length > 0) {
       setForm(prev => ({
         ...prev,
         ...settings,
-        adminSecretKey: prev.adminSecretKey || '',
-        smtpPass: prev.smtpPass || '',
+        ngoName: settings.ngoName || prev.ngoName || 'Yuva Kranti Dal',
+        ngoNameHi: settings.ngoNameHi || prev.ngoNameHi || 'युवा क्रांति दल',
+        email: settings.email || prev.email || 'ravisain75688@gmail.com',
+        adminSecretKey: settings.adminSecretKey !== undefined ? settings.adminSecretKey : prev.adminSecretKey,
+        smtpPass: settings.smtpPass !== undefined ? settings.smtpPass : prev.smtpPass,
+        smtpUser: settings.smtpUser || prev.smtpUser || 'ravisain75688@gmail.com',
+        smtpHost: settings.smtpHost || prev.smtpHost || 'smtp.gmail.com',
+        smtpPort: settings.smtpPort || prev.smtpPort || 587,
+        smtpFromName: settings.smtpFromName || prev.smtpFromName || 'Yuva Kranti Dal',
         accountName: settings.bankDetails?.accountName ?? prev.accountName,
         accountNumber: settings.bankDetails?.accountNumber ?? prev.accountNumber,
         ifscCode: settings.bankDetails?.ifscCode ?? prev.ifscCode,
@@ -190,13 +197,13 @@ export default function SettingsPage() {
 
   const handleTestEmail = async (e) => {
     e.preventDefault();
-    if (!testReceiverEmail) {
-      alert('Please enter a recipient email address to send the diagnostic test.');
+    if (!testReceiverEmail || !testReceiverEmail.trim()) {
+      toast.error('Please enter a recipient email address to send the diagnostic test.');
       return;
     }
     const cleanPass = (form.smtpPass || '').trim();
     if (cleanPass && (cleanPass.includes('•') || cleanPass.includes('*'))) {
-      alert('⚠️ Important: Please enter your actual 16-character Google App Password in the "SMTP App Password" field above.\n\nMasked bullet dots (••••) cannot be used for SMTP login.\n\nTo generate an App Password:\n1. Open https://myaccount.google.com/apppasswords\n2. Ensure 2-Step Verification is active on your Google Account.\n3. Create an App Name (e.g. "IYF Mail") and copy the 16 characters here.');
+      toast.error('Masked bullet dots (••••) cannot be used. Type your 16-character Google App Password or leave blank to use the active server password.');
       return;
     }
     setTestingMail(true);
@@ -212,11 +219,18 @@ export default function SettingsPage() {
         adminSecretKey: form.adminSecretKey
       });
       setMailTestResult(res);
+      if (res?.success) {
+        toast.success(res.message || 'SMTP Connection & Delivery Test Passed!');
+      } else {
+        toast.error(res?.message || 'SMTP Connection Test Failed');
+      }
     } catch (err) {
+      const errMsg = err.response?.data?.message || err.message || 'SMTP diagnostic request encountered a failure.';
       setMailTestResult({
         success: false,
-        message: err.message || 'SMTP diagnostic request encountered a failure.'
+        message: errMsg
       });
+      toast.error(errMsg);
     } finally {
       setTestingMail(false);
     }
@@ -1308,7 +1322,7 @@ export default function SettingsPage() {
                         heroSlides: [
                           {
                             title: 'Empowering Youth, Transforming Society, Nation First',
-                            subtitle: 'Indian Youth Foundation (भारतीय युवा क्रांति) is a premier 12A & 80G certified NGO mobilizing young leaders for free child literacy, emergency healthcare, and rural empowerment.',
+                            subtitle: 'Yuva Kranti Dal (युवा क्रांति दल) is a premier 12A & 80G certified NGO mobilizing young leaders for free child literacy, emergency healthcare, and rural empowerment.',
                             imageUrl: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1920&auto=format&fit=crop&q=80',
                             tag: 'National Youth Movement',
                             ctaPrimaryText: 'Donate Online (Instant 80G)',
@@ -1508,7 +1522,7 @@ export default function SettingsPage() {
                             <label className="font-bold text-slate-700 block text-[11px] mb-1">Slide Subtitle / Description</label>
                             <textarea
                               rows={2}
-                              placeholder="e.g. Indian Youth Foundation is a premier 12A & 80G certified NGO mobilizing young leaders..."
+                              placeholder="e.g. Yuva Kranti Dal is a premier 12A & 80G certified NGO mobilizing young leaders..."
                               value={slide.subtitle || ''}
                               onChange={(e) => {
                                 const val = e.target.value;
@@ -1700,11 +1714,11 @@ export default function SettingsPage() {
                     name="smtpFromName"
                     value={form.smtpFromName}
                     onChange={handleChange}
-                    placeholder="Indian Youth Foundation"
+                    placeholder="Yuva Kranti Dal"
                     className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium text-black"
                   />
                   <span className="text-[10px] text-gray-500 mt-1 block">
-                    The organization name displayed in the recipient's inbox (e.g. &quot;Indian Youth Foundation&quot;).
+                    The organization name displayed in the recipient's inbox (e.g. &quot;Yuva Kranti Dal&quot;).
                   </span>
                 </div>
               </div>
@@ -1771,17 +1785,17 @@ export default function SettingsPage() {
                 {mailTestResult && (
                   <div
                     className={`p-4 rounded-xl text-xs font-semibold flex items-start gap-2.5 transition ${mailTestResult.success
-                      ? 'bg-emerald-950/40 border border-emerald-500/30 text-emerald-200'
-                      : 'bg-emerald-950/40 border border-emerald-500/30 text-emerald-200'
+                      ? 'bg-emerald-950/60 border border-emerald-500/40 text-emerald-200'
+                      : 'bg-rose-950/60 border border-rose-500/40 text-rose-200'
                       }`}
                   >
                     {mailTestResult.success ? (
                       <FiCheckCircle className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
                     ) : (
-                      <FiAlertCircle className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+                      <FiAlertCircle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
                     )}
                     <div className="space-y-1">
-                      <div className="font-bold text-sm">
+                      <div className={`font-bold text-sm ${mailTestResult.success ? 'text-emerald-300' : 'text-rose-300'}`}>
                         {mailTestResult.success ? 'SMTP Verification Succeeded!' : 'SMTP Connection Failed'}
                       </div>
                       <p className="text-xs leading-relaxed opacity-95">

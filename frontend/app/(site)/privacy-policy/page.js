@@ -10,7 +10,7 @@ export default function PrivacyPolicyPage() {
   const { settings } = useNGO();
 
   const defaultPolicyContent = `## 1. Information We Collect
-When you interact with Indian Youth Foundation through donations, membership registrations, volunteer drives, or contact inquiries, we collect information necessary to fulfill our statutory non-profit functions:
+When you interact with Yuva Kranti Dal through donations, membership registrations, volunteer drives, or contact inquiries, we collect information necessary to fulfill our statutory non-profit functions:
 - **Personal Identity:** Full name, date of birth, gender, blood group, and residential address.
 - **Contact Information:** Verified mobile phone number, WhatsApp contact, and email address.
 - **Statutory Tax Data (for 80G Receipts):** Permanent Account Number (PAN Card No.) and postal address, mandatory under the Income Tax Act, 1961 (Form 10BD reporting).
@@ -25,10 +25,10 @@ All personal and financial details collected by the Foundation are used strictly
 - Investigating grievances, feedback, and community service inquiries submitted to the administration.
 
 ## 3. Payment Gateway Security & Encryption
-Online payments on this portal are processed via Reserve Bank of India (RBI) authorized payment gateways (including Razorpay & UPI rails) utilizing industry-grade 256-bit SSL encryption. Indian Youth Foundation adheres to PCI-DSS compliance standards ensuring seamless, tamper-proof electronic transactions.
+Online payments on this portal are processed via Reserve Bank of India (RBI) authorized payment gateways (including Razorpay & UPI rails) utilizing industry-grade 256-bit SSL encryption. Yuva Kranti Dal adheres to PCI-DSS compliance standards ensuring seamless, tamper-proof electronic transactions.
 
 ## 4. Non-Disclosure & Data Confidentiality
-We enforce a strict non-disclosure policy. Indian Youth Foundation does **never rent, sell, trade, or commercially share** our donor or member records with any third-party marketing agency. Information is disclosed solely when mandated by Indian law or competent regulatory bodies (e.g., Income Tax Department, NITI Aayog).
+We enforce a strict non-disclosure policy. Yuva Kranti Dal does **never rent, sell, trade, or commercially share** our donor or member records with any third-party marketing agency. Information is disclosed solely when mandated by Indian law or competent regulatory bodies (e.g., Income Tax Department, NITI Aayog).
 
 ## 5. Your Rights & Grievance Redressal
 Donors and registered members maintain the right to review their records, request correction of inaccurate details, or download their cumulative donation statements. For questions or grievance escalation, please reach out directly to our grievance desk below.`;
@@ -49,7 +49,7 @@ Donors and registered members maintain the right to review their records, reques
             {settings?.privacyPolicyTitle || 'Privacy Policy & Data Security'}
           </h1>
           <p className="text-xs sm:text-sm text-slate-700 mt-2 max-w-2xl mx-auto font-medium">
-            {settings?.privacyPolicySubtitle || 'Indian Youth Foundation (Bharatiya Yuva Kranti) is dedicated to maintaining full transparency, safeguarding donor privacy, and protecting personal data.'}
+            {settings?.privacyPolicySubtitle || 'Yuva Kranti Dal (युवा क्रांति दल) is dedicated to maintaining full transparency, safeguarding donor privacy, and protecting personal data.'}
           </p>
           <div className="text-[11px] text-slate-500 mt-2 font-mono">
             Last Updated: {settings?.privacyLastUpdated || 'October 2026'} • Valid for All Online Donations &amp; Member Registrations

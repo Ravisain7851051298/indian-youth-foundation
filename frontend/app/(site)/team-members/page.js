@@ -273,7 +273,7 @@ export default function TeamMembersPage() {
               Management &amp; Board of Directors
             </h1>
             <p className="text-xs sm:text-sm text-slate-600 max-w-2xl font-medium">
-              National trustees, executive officers, program directors, and departmental heads leading Indian Youth Foundation (Bharatiya Yuva Kranti).
+              National trustees, executive officers, program directors, and departmental heads leading Yuva Kranti Dal (युवा क्रांति दल).
             </p>
           </div>
 

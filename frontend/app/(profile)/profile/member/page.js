@@ -86,7 +86,7 @@ export default function ProfileMemberPage() {
                   {effectiveUser?.name}
                 </h2>
                 <p className="text-xs text-emerald-100 max-w-xl leading-relaxed">
-                  You are officially enrolled as a verified member of <strong>Indian Youth Foundation</strong>. Your statutory rights include voting participation in the annual general assembly, digital identity verification, and community representation.
+                  You are officially enrolled as a verified member of <strong>Yuva Kranti Dal</strong>. Your statutory rights include voting participation in the annual general assembly, digital identity verification, and community representation.
                 </p>
               </div>
 
@@ -228,7 +228,7 @@ export default function ProfileMemberPage() {
                     <span className="text-xs text-slate-500 font-semibold">• Not Enrolled</span>
                   </div>
                   <h2 className="text-xl sm:text-2xl font-black text-black">
-                    Join as an Official Member of Indian Youth Foundation
+                    Join as an Official Member of Yuva Kranti Dal
                   </h2>
                   <p className="text-xs text-black leading-relaxed max-w-2xl font-medium">
                     Become a voting, verified member of an official 12A &amp; 80G Certified Non-Governmental Organization registered under Indian Trust Bylaws.

@@ -4,12 +4,12 @@ import JsonLd from '@/components/seo/JsonLd';
 export const metadata = {
   title: '80G Income Tax Exemption Guide & Calculator',
   description:
-    'Calculate and save tax with Section 80G deductions by donating to Indian Youth Foundation. Learn eligibility rules, deduction limits, and download instant 80G receipts.',
+    'Calculate and save tax with Section 80G deductions by donating to Yuva Kranti Dal. Learn eligibility rules, deduction limits, and download instant 80G receipts.',
   alternates: {
     canonical: '/donation/80G',
   },
   openGraph: {
-    title: '80G Tax Exemption Guide & Calculator | Indian Youth Foundation',
+    title: '80G Tax Exemption Guide & Calculator | Yuva Kranti Dal',
     description:
       'Understand how 50% tax deductions work under Section 80G of the Indian Income Tax Act. Donate to certified NGO and download official receipts.',
     url: `${SITE_CONFIG.url}/donation/80G`,
@@ -24,7 +24,7 @@ const breadcrumbs = [
 
 const taxFaqs = [
   {
-    question: 'How much tax deduction can I claim under Section 80G for donations to Indian Youth Foundation?',
+    question: 'How much tax deduction can I claim under Section 80G for donations to Yuva Kranti Dal?',
     answer:
       'Donors are eligible to claim a 50% deduction of the donated amount from their taxable income under Section 80G of the Income Tax Act, subject to statutory limits.',
   },

@@ -35,7 +35,7 @@ const SEED_TEAM_MEMBERS = [
     phone: '+91 98765 43210',
     email: 'president@bharatiyayuvakranti.org',
     image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
-    bio: 'Leading youth empowerment, child literacy, and social reform movements for over 15 years with Bharatiya Yuva Kranti.',
+    bio: 'Leading youth empowerment, child literacy, and social reform movements for over 15 years with Yuva Kranti Dal.',
     status: 'active',
     order: 1
   },

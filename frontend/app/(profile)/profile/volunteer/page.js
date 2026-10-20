@@ -84,7 +84,7 @@ export default function ProfileVolunteerPage() {
                   {effectiveUser?.name}
                 </h2>
                 <p className="text-xs text-indigo-100 max-w-xl leading-relaxed">
-                  Thank you for serving on the frontlines of humanitarian action! As an authorized volunteer of <strong>Indian Youth Foundation</strong>, you lead blood donation helplines, free child teaching classes, and relief distribution.
+                  Thank you for serving on the frontlines of humanitarian action! As an authorized volunteer of <strong>Yuva Kranti Dal</strong>, you lead blood donation helplines, free child teaching classes, and relief distribution.
                 </p>
               </div>
 
@@ -207,7 +207,7 @@ export default function ProfileVolunteerPage() {
                     Join the Grassroots Volunteer Movement
                   </h2>
                   <p className="text-xs text-black leading-relaxed max-w-2xl font-medium">
-                    Volunteer with Indian Youth Foundation to bring real change at the grassroots level: free child slum teaching, 24x7 blood bank helplines, tree plantations, and emergency relief drives.
+                    Volunteer with Yuva Kranti Dal to bring real change at the grassroots level: free child slum teaching, 24x7 blood bank helplines, tree plantations, and emergency relief drives.
                   </p>
                 </div>
               </div>

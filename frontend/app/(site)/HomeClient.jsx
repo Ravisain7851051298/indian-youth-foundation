@@ -135,7 +135,7 @@ export default function HomePage() {
           rating: 5,
           profilePicture: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80',
           comment:
-            'Transparent operations, real ground impact, and immediate 80G tax acknowledgment. Truly proud to be associated with Samasya Samadhan Parishad.',
+            'Transparent operations, real ground impact, and immediate 80G tax acknowledgment. Truly proud to be associated with Yuva Kranti Dal.',
           adminReply: 'Sunil ji, corporate CSR support like yours allows us to provide school supplies and uniforms to 450+ village children.',
           adminRepliedAt: new Date().toISOString(),
           repliedBy: 'Foundation Core Administration'
@@ -186,14 +186,14 @@ export default function HomePage() {
       <section className="py-8 bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-          {/* 3 Top Buttons matching reference: Latest News, Latest Activity, Our Members */}
+          {/* 3 Top Buttons: Latest News (Red theme), Latest Activity (Green theme), Our Members (Green-Red mix) */}
           <div className="grid grid-cols-3 gap-3 sm:gap-6 md:gap-8 lg:gap-44 max-w-full mx-auto mb-8">
             <button
               type="button"
               onClick={() => setActiveTab('news')}
-              className={`py-2 px-6 rounded-md border-2 font-bold text-sm transition cursor-pointer shadow-2xs ${activeTab === 'news'
-                ? 'border-emerald-700 text-emerald-800 bg-emerald-50'
-                : 'border-emerald-600/60 text-emerald-700 hover:bg-emerald-50/50'
+              className={`py-2 px-6 rounded-xl border-2 font-black text-xs sm:text-sm transition cursor-pointer shadow-xs ${activeTab === 'news'
+                ? 'border-red-600 bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-500/25 scale-102'
+                : 'border-red-600/60 text-red-700 hover:bg-rose-50/60'
                 }`}
             >
               Latest News
@@ -201,9 +201,9 @@ export default function HomePage() {
             <button
               type="button"
               onClick={() => setActiveTab('activity')}
-              className={`py-2 px-6 rounded-md border-2 font-bold text-sm transition cursor-pointer shadow-2xs ${activeTab === 'activity'
-                ? 'border-emerald-700 text-emerald-800 bg-emerald-50'
-                : 'border-emerald-600/60 text-emerald-700 hover:bg-emerald-50/50'
+              className={`py-2 px-6 rounded-xl border-2 font-black text-xs sm:text-sm transition cursor-pointer shadow-xs ${activeTab === 'activity'
+                ? 'border-[#0b8026] bg-gradient-to-r from-[#0b8026] to-[#075018] text-white shadow-md shadow-emerald-500/25 scale-102'
+                : 'border-emerald-600/60 text-[#0b8026] hover:bg-emerald-50/60'
                 }`}
             >
               Latest Activity
@@ -211,57 +211,70 @@ export default function HomePage() {
             <button
               type="button"
               onClick={() => setActiveTab('members')}
-              className={`py-2 px-6 rounded-md border-2 font-bold text-sm transition cursor-pointer shadow-2xs ${activeTab === 'members'
-                ? 'border-emerald-700 text-emerald-800 bg-emerald-50'
-                : 'border-emerald-600/60 text-emerald-700 hover:bg-emerald-50/50'
+              className={`py-2 px-6 rounded-xl border-2 font-black text-xs sm:text-sm transition cursor-pointer shadow-xs ${activeTab === 'members'
+                ? 'border-[#0b8026] bg-gradient-to-r from-[#0b8026] via-rose-600 to-red-600 text-white shadow-md scale-102'
+                : 'border-emerald-600/60 text-slate-800 hover:bg-emerald-50/60'
                 }`}
             >
               Our Members
             </button>
           </div>
 
-          {/* 3-Column Content Layout (Matching reference screenshot #2) */}
+          {/* 3-Column Content Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
-            {/* Left Column (col-span-3): Green border card + Member Apply & Donate Us buttons */}
+            {/* Left Column (col-span-3): Green & Red border card + Member Apply & Donate Us buttons */}
             <div className="lg:col-span-3 space-y-4">
-              {/* Green thick-bordered box from reference */}
-              <div className="border-8 border-emerald-700 bg-emerald-50/70 rounded-xl p-5 min-h-[220px] sm:min-h-[260px] flex flex-col justify-center items-center text-center shadow-xs">
-                <div className="w-14 h-14 rounded-full bg-white border border-emerald-200 flex items-center justify-center text-emerald-700 mb-3 shadow-2xs">
-                  <FiCheckCircle className="w-7 h-7 text-emerald-700" />
+              {/* Dual-bordered Welcome box */}
+              <div className="border-4 border-[#0b8026] bg-gradient-to-b from-emerald-50/90 via-white to-rose-50/40 rounded-2xl p-5 min-h-[220px] sm:min-h-[260px] flex flex-col justify-center items-center text-center shadow-sm relative overflow-hidden">
+                <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-red-600 text-white mb-2 shadow-xs">
+                  🇮🇳 Rashtra Hit Sarvopari
+                </span>
+                <div className="w-14 h-14 rounded-full bg-white border-2 border-[#0b8026] ring-2 ring-red-500/30 flex items-center justify-center text-[#0b8026] mb-2 shadow-xs">
+                  <FiCheckCircle className="w-7 h-7 text-[#0b8026]" />
                 </div>
-                <h4 className="font-extrabold text-emerald-800 text-base uppercase tracking-wide">
-                  Welcome to SSP
+                <h4 className="font-black text-[#0b8026] text-lg uppercase tracking-wide">
+                  YUVA KRANTI <span className="text-[#dc2626]">DAL</span>
                 </h4>
-                <p className="text-sm text-slate-800 mt-2 font-bold leading-snug">
-                  {settings?.ngoName || 'Samasya Samadhan Parishad (SSP)'}
+                <p className="text-xs text-slate-800 mt-1 font-bold leading-snug">
+                  {settings?.ngoName || 'Yuva Kranti Dal'}
                 </p>
-                <span className="text-xs text-slate-500 mt-1">
-                  National Social Welfare Organization
+                <span className="text-[11px] text-slate-500 mt-0.5 font-medium">
+                  National Youth &amp; Social Welfare Movement
                 </span>
               </div>
 
-              {/* Action card buttons matching emerald theme */}
+              {/* Action card buttons in Green & Red theme */}
               <Link
                 href={isMember ? '/profile/member' : '/apply-member'}
-                className="flex items-center gap-3 w-full p-3.5 rounded-xl border-2 border-emerald-700 bg-white hover:bg-emerald-50 text-slate-800 font-extrabold text-sm shadow-xs transition group"
+                className="flex items-center justify-between w-full p-3.5 rounded-xl border-2 border-[#0b8026] bg-white hover:bg-emerald-50 text-slate-800 font-extrabold text-sm shadow-xs transition group"
               >
-                <div className="w-9 h-9 rounded-full bg-emerald-700 text-white flex items-center justify-center group-hover:scale-105 transition">
-                  <FiUsers className="w-5 h-5" />
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-[#0b8026] text-white flex items-center justify-center group-hover:scale-105 transition shadow-xs">
+                    <FiUsers className="w-5 h-5" />
+                  </div>
+                  <span className="text-[#0b8026] font-black">
+                    {isMember ? 'Member Profile' : 'Apply for Member'}
+                  </span>
                 </div>
-                <span className="text-emerald-800 font-black">
-                  {isMember ? 'Member Profile' : 'Member Apply'}
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-700 border border-red-200">
+                  Free
                 </span>
               </Link>
 
               <Link
                 href="/donation"
-                className="flex items-center gap-3 w-full p-3.5 rounded-xl border-2 border-emerald-700 bg-white hover:bg-emerald-50 text-slate-800 font-extrabold text-sm shadow-xs transition group"
+                className="flex items-center justify-between w-full p-3.5 rounded-xl border-2 border-red-600 bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-emerald-600 hover:to-emerald-700 text-white font-extrabold text-sm shadow-md shadow-red-500/25 transition group"
               >
-                <div className="w-9 h-9 rounded-full bg-emerald-700 text-white flex items-center justify-center group-hover:scale-105 transition">
-                  <FiHeart className="w-5 h-5 fill-white" />
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-white text-red-600 flex items-center justify-center group-hover:scale-105 transition shadow-xs">
+                    <FiHeart className="w-5 h-5 fill-red-600" />
+                  </div>
+                  <span className="text-white font-black">Donate Us</span>
                 </div>
-                <span className="text-emerald-800 font-black">Donate Us</span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/20 text-white border border-white/40">
+                  80G Tax Free
+                </span>
               </Link>
             </div>
 
@@ -269,19 +282,19 @@ export default function HomePage() {
             <div className="lg:col-span-6 bg-white border border-slate-200 rounded-xl p-5 sm:p-6 min-h-[380px] shadow-sm flex flex-col justify-between">
               {activeTab === 'news' && (
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div className="flex items-center justify-between border-b-2 border-red-100 pb-3">
                     <div className="flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse" />
-                      <h3 className="font-black text-emerald-800 text-sm sm:text-base uppercase tracking-wide">
+                      <span className="w-2.5 h-2.5 rounded-full bg-red-600 animate-pulse" />
+                      <h3 className="font-black text-red-700 text-sm sm:text-base uppercase tracking-wide">
                         Latest News &amp; Bulletins
                       </h3>
                     </div>
                     <Link
                       href="/blogs"
-                      className="text-[11px] font-bold text-emerald-700 hover:text-emerald-800 hover:underline flex items-center gap-1"
+                      className="text-[11px] font-bold text-[#0b8026] hover:text-[#075018] hover:underline flex items-center gap-1"
                     >
                       <span>View All News</span>
-                      <FiArrowRight className="w-3 h-3" />
+                      <FiArrowRight className="w-3 h-3 text-red-600" />
                     </Link>
                   </div>
 
@@ -293,7 +306,7 @@ export default function HomePage() {
                           <Link
                             key={bId}
                             href={`/blogs/${bId}`}
-                            className="p-3.5 bg-slate-50 hover:bg-[#eef8f0] transition-colors rounded-xl border border-slate-200 hover:border-emerald-600/40 flex gap-3.5 items-start group cursor-pointer block"
+                            className="p-3.5 bg-slate-50 hover:bg-rose-50/40 transition-colors rounded-xl border border-slate-200 hover:border-red-400 flex gap-3.5 items-start group cursor-pointer block shadow-2xs"
                           >
                             {item.image && (
                               <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0 bg-slate-200 border border-slate-200">
@@ -309,18 +322,20 @@ export default function HomePage() {
                               </div>
                             )}
                             <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 text-[10px] font-bold text-emerald-700">
-                                <FiCalendar className="w-3 h-3" />
+                              <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500">
+                                <FiCalendar className="w-3 h-3 text-red-600" />
                                 <span>{item.date || item.createdAt ? new Date(item.date || item.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Official Update'}</span>
-                                {item.category && <span className="bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded text-[9px] uppercase">{item.category}</span>}
+                                <span className="bg-red-50 text-red-700 border border-red-200 px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase">
+                                  {item.category || (Array.isArray(item.tags) && item.tags[0]) || 'News'}
+                                </span>
                               </div>
-                              <h4 className="font-bold text-xs sm:text-sm text-slate-900 mt-1 line-clamp-1 group-hover:text-emerald-700 transition-colors">
+                              <h4 className="font-bold text-xs sm:text-sm text-slate-900 mt-1 line-clamp-1 group-hover:text-red-700 transition-colors">
                                 {item.title}
                               </h4>
                               <p className="text-[11px] text-slate-600 mt-0.5 line-clamp-2 leading-relaxed">
                                 {item.content || item.description || item.summary}
                               </p>
-                              <span className="text-[10px] font-bold text-emerald-700 mt-1 inline-flex items-center gap-1 group-hover:underline">
+                              <span className="text-[10px] font-bold text-red-600 mt-1 inline-flex items-center gap-1 group-hover:underline">
                                 <span>Read full story</span>
                                 <FiChevronRight className="w-3 h-3" />
                               </span>
@@ -330,13 +345,13 @@ export default function HomePage() {
                       })
                     ) : (
                       <>
-                        <div className="p-3.5 bg-slate-50 hover:bg-[#eef8f0] transition rounded-xl border border-slate-200">
-                          <div className="text-[10px] font-bold text-emerald-700 flex items-center gap-1.5">
+                        <div className="p-3.5 bg-slate-50 hover:bg-rose-50/40 transition rounded-xl border border-slate-200">
+                          <div className="text-[10px] font-bold text-red-700 flex items-center gap-1.5">
                             <FiCalendar className="w-3 h-3" />
                             <span>National Bulletin • 2026</span>
                           </div>
                           <h4 className="font-bold text-xs sm:text-sm text-slate-900 mt-1">
-                            {settings?.newsTickerText || 'समस्या समाधान परिषद (SSP) द्वारा राष्ट्रीय कार्यकारिणी एवं जिला स्तरीय समितियों का गठन प्रारंभ।'}
+                            {settings?.newsTickerText || 'युवा क्रांति दल द्वारा राष्ट्रीय कार्यकारिणी एवं जिला स्तरीय समितियों का गठन प्रारंभ।'}
                           </h4>
                           <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">
                             इच्छुक समाजसेवी, युवा एवं वरिष्ठ नागरिक संगठन की सदस्यता प्राप्त कर समाज सेवा में योगदान दें।
@@ -495,11 +510,11 @@ export default function HomePage() {
 
                   <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-3">
                     <span className="text-[11px] text-slate-500">
-                      Join our nationwide humanitarian initiative
+                      Join our nationwide humanitarian youth initiative
                     </span>
                     <Link
                       href={isMember ? '/profile/member' : '/apply-member'}
-                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#0b8026] hover:bg-[#09661f] text-white text-xs font-bold transition shadow-xs"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-[#0b8026] to-[#dc2626] hover:from-[#09661f] hover:to-[#b91c1c] text-white text-xs font-bold transition shadow-xs"
                     >
                       <span>{isMember ? 'My Profile' : 'Apply for Member'}</span>
                       <FiArrowRight className="w-3.5 h-3.5" />
@@ -509,16 +524,16 @@ export default function HomePage() {
               )}
 
               <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
-                <span>Samasya Samadhan Parishad Portal</span>
+                <span>Yuva Kranti Dal Portal</span>
                 <span className="font-bold text-[#0b8026]">Verified NGO</span>
               </div>
             </div>
 
             {/* Right Column (col-span-3): Management Team Card */}
             <div className="lg:col-span-3 space-y-4">
-              <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm min-h-[300px] flex flex-col justify-between">
+              <div className="bg-white border-2 border-emerald-600/30 rounded-xl p-5 shadow-sm min-h-[300px] flex flex-col justify-between">
                 <div>
-                  <div className="w-20 h-20 mx-auto rounded-full overflow-hidden border-2 border-[#0b8026] p-1 bg-white mb-3">
+                  <div className="w-20 h-20 mx-auto rounded-full overflow-hidden border-2 border-[#0b8026] ring-2 ring-red-500/30 p-1 bg-white mb-3 shadow-xs">
                     <img
                       src="/logo.jpeg"
                       alt="Management Logo"
@@ -536,7 +551,7 @@ export default function HomePage() {
                 <div className="pt-4">
                   <Link
                     href="/team-members"
-                    className="block text-center py-2 px-4 rounded-md border-2 border-emerald-700 text-emerald-800 hover:bg-emerald-50 text-xs font-bold transition"
+                    className="block text-center py-2 px-4 rounded-xl border-2 border-red-600 text-red-700 hover:bg-red-600 hover:text-white text-xs font-extrabold transition shadow-2xs"
                   >
                     Management Team
                   </Link>
@@ -553,23 +568,25 @@ export default function HomePage() {
       <section className="py-14 bg-white border-b border-slate-200">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 
-          {/* Centered Pill Header */}
+          {/* Centered Pill Header with Green & Red Accents */}
           <div className="text-center mb-10">
-            <span className="inline-block px-8 py-1.5 rounded-md border-2 border-emerald-700 text-emerald-800 font-extrabold text-sm tracking-wide bg-white shadow-2xs">
-              About Us
+            <span className="inline-flex items-center gap-2 px-8 py-2 rounded-full border-2 border-[#0b8026] bg-gradient-to-r from-emerald-50 via-white to-rose-50 text-slate-900 font-black text-sm tracking-wide shadow-xs">
+              <span className="w-2 h-2 rounded-full bg-[#0b8026]"></span>
+              <span>About Us</span>
+              <span className="w-2 h-2 rounded-full bg-[#dc2626]"></span>
             </span>
           </div>
 
-          {/* 2-Column Card with SSP Logo on Left and Content on Right */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-10 shadow-sm">
+          {/* 2-Column Card with Logo on Left and Content on Right */}
+          <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-10 shadow-sm">
             <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
 
               {/* Left Logo / Seal */}
               <div className="md:col-span-4 flex items-center justify-center p-4">
-                <div className="w-52 h-52 sm:w-64 sm:h-64 rounded-2xl border border-slate-200 p-4 bg-white shadow-sm flex items-center justify-center">
+                <div className="w-52 h-52 sm:w-64 sm:h-64 rounded-3xl border-2 border-[#0b8026] ring-4 ring-red-500/20 p-4 bg-white shadow-md flex items-center justify-center">
                   <img
                     src={getContentImageUrl(settings?.logoUrl) || '/logo.jpeg'}
-                    alt="Samasya Samadhan Parishad Seal"
+                    alt="Yuva Kranti Dal Seal"
                     className="max-h-full max-w-full object-contain"
                     onError={(e) => {
                       e.currentTarget.onerror = null;
@@ -630,24 +647,26 @@ export default function HomePage() {
       <section id="president-message" className="py-14 bg-slate-50 border-b border-slate-200 scroll-mt-24">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 
-          {/* Centered Pill Header */}
+          {/* Centered Pill Header with Green & Red Accents */}
           <div className="text-center mb-10">
-            <span className="inline-block px-8 py-1.5 rounded-md border-2 border-emerald-700 text-emerald-800 font-extrabold text-sm tracking-wide bg-white shadow-2xs">
-              {settings?.presidentMessageTitle || 'President Message'}
+            <span className="inline-flex items-center gap-2 px-8 py-2 rounded-full border-2 border-[#0b8026] bg-gradient-to-r from-emerald-50 via-white to-rose-50 text-slate-900 font-black text-sm tracking-wide shadow-xs">
+              <span className="w-2 h-2 rounded-full bg-[#0b8026]"></span>
+              <span>{settings?.presidentMessageTitle || 'President Message'}</span>
+              <span className="w-2 h-2 rounded-full bg-[#dc2626]"></span>
             </span>
           </div>
 
           {/* 2-Column Card */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-10 shadow-sm">
+          <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-10 shadow-sm">
             <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
 
               {/* Left Seal / President Photo */}
               <div className="md:col-span-4 flex items-center justify-center p-4">
-                <div className="w-52 h-52 sm:w-64 sm:h-64 rounded-2xl border border-slate-200 p-2 bg-white shadow-sm flex items-center justify-center overflow-hidden">
+                <div className="w-52 h-52 sm:w-64 sm:h-64 rounded-3xl border-2 border-[#0b8026] ring-4 ring-red-500/20 p-2 bg-white shadow-md flex items-center justify-center overflow-hidden">
                   <img
                     src={getContentImageUrl(settings?.presidentPhotoUrl) || getContentImageUrl(settings?.logoUrl) || '/logo.jpeg'}
                     alt="President Portrait"
-                    className="w-full h-full object-cover rounded-xl"
+                    className="w-full h-full object-cover rounded-2xl"
                     onError={(e) => {
                       e.currentTarget.onerror = null;
                       e.currentTarget.src = '/logo.jpeg';
@@ -658,13 +677,13 @@ export default function HomePage() {
 
               {/* Right Letter */}
               <div className="md:col-span-8 space-y-3 text-xs sm:text-sm text-slate-700 leading-relaxed">
-                <p className="font-bold text-slate-900">Dear Friends,</p>
+                <p className="font-black text-red-700 text-sm">Dear Friends,</p>
 
                 <div className="space-y-3 whitespace-pre-line">
                   {settings?.presidentMessageContent ||
-                    `It is with great pride and humility that I address you as the President of Samasya Samadhan Parishadh (SSP). Since our founding 2022, our organization has been driven by a simple yet profound belief: that every individual, regardless of circumstance, deserves the opportunity to thrive.
+                    `It is with great pride and humility that I address you as the President of Yuva Kranti Dal. Since our founding 2022, our organization has been driven by a simple yet profound belief: that every individual, regardless of circumstance, deserves the opportunity to thrive.
 
-At Samasya Samadhan Parishadh (SSP), we are not just dreamers; we are doers. We roll up our sleeves and work tirelessly to turn our vision of a better world into reality. From providing access to education and healthcare to championing environmental sustainability and social justice, our efforts are guided by a deep commitment to making a meaningful difference in the lives of others.
+At Yuva Kranti Dal, we are not just dreamers; we are doers. We roll up our sleeves and work tirelessly to turn our vision of a better world into reality. From providing access to education and healthcare to championing environmental sustainability and social justice, our efforts are guided by a deep commitment to making a meaningful difference in the lives of others.
 
 But we cannot do it alone. Our success is built on the support of passionate individuals like you—individuals who share our values and our vision for a brighter future. Together, we can amplify our impact and create lasting change that reverberates far beyond our borders.
 
@@ -673,11 +692,16 @@ As we look to the future, I am filled with hope and optimism. The challenges we 
 Thank you for your unwavering commitment to our cause. Together, we are truly making a difference.`}
                 </div>
 
-                <div className="pt-3 border-t border-slate-100">
-                  <p className="font-semibold text-slate-800">Warm regards,</p>
-                  <p className="font-black text-[#0b8026] text-sm mt-0.5">
-                    {settings?.ngoName || 'Samasya Samadhan Parishadh (SSP)'}
-                  </p>
+                <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+                  <div>
+                    <p className="font-semibold text-slate-800">Warm regards,</p>
+                    <p className="font-black text-[#0b8026] text-sm mt-0.5">
+                      {settings?.ngoName || 'Yuva Kranti Dal'}
+                    </p>
+                  </div>
+                  <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-red-50 text-red-700 border border-red-200">
+                    National President
+                  </span>
                 </div>
               </div>
 
@@ -692,8 +716,10 @@ Thank you for your unwavering commitment to our cause. Together, we are truly ma
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="text-center mb-10">
-            <span className="inline-block px-8 py-1.5 rounded-md border-2 border-emerald-700 text-emerald-800 font-extrabold text-sm tracking-wide bg-white shadow-2xs">
-              Our Services &amp; Initiatives
+            <span className="inline-flex items-center gap-2 px-8 py-2 rounded-full border-2 border-[#0b8026] bg-gradient-to-r from-emerald-50 via-white to-rose-50 text-slate-900 font-black text-sm tracking-wide shadow-xs">
+              <span className="w-2 h-2 rounded-full bg-[#0b8026]"></span>
+              <span>Our Services &amp; Initiatives</span>
+              <span className="w-2 h-2 rounded-full bg-[#dc2626]"></span>
             </span>
             <p className="text-xs text-slate-600 mt-2 max-w-xl mx-auto font-medium">
               Explore active grassroots welfare initiatives launched for child education, healthcare relief, women empowerment, and youth livelihood.
@@ -707,11 +733,12 @@ Thank you for your unwavering commitment to our cause. Together, we are truly ma
               const title = srv.titleEn || srv.title || 'Social Welfare Program';
               const desc = srv.description || srv.content || 'Dedicated community support and field relief intervention program.';
               const cat = srv.category || 'Grassroots Relief';
+              const isEven = idx % 2 === 0;
 
               return (
                 <div
                   key={sId}
-                  className="bg-slate-50 hover:bg-white rounded-3xl border border-slate-200 hover:border-emerald-500 overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
+                  className="bg-slate-50 hover:bg-white rounded-3xl border border-slate-200 hover:border-red-500 overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
                 >
                   <div>
                     <div className="relative w-full h-48 bg-slate-200 overflow-hidden">
@@ -724,10 +751,12 @@ Thank you for your unwavering commitment to our cause. Together, we are truly ma
                           e.currentTarget.src = '/logo.jpeg';
                         }}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent" />
                       
                       <div className="absolute top-3 left-3">
-                        <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-white/95 text-emerald-800 shadow-xs backdrop-blur-xs">
+                        <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider text-white shadow-xs backdrop-blur-xs ${
+                          isEven ? 'bg-gradient-to-r from-red-600 to-rose-600' : 'bg-gradient-to-r from-[#0b8026] to-emerald-700'
+                        }`}>
                           {cat}
                         </span>
                       </div>
@@ -749,15 +778,15 @@ Thank you for your unwavering commitment to our cause. Together, we are truly ma
                   <div className="p-5 pt-0 border-t border-slate-100 flex items-center justify-between mt-3">
                     <Link
                       href={`/services/${sId}`}
-                      className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 hover:text-emerald-900 group-hover:underline"
+                      className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0b8026] hover:text-[#075018] group-hover:underline"
                     >
                       <span>Explore Program</span>
-                      <FiArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                      <FiArrowRight className="w-3.5 h-3.5 text-red-600 group-hover:translate-x-1 transition-transform" />
                     </Link>
 
                     <Link
                       href="/donation"
-                      className="px-3 py-1.5 rounded-lg bg-emerald-100 hover:bg-emerald-700 text-emerald-800 hover:text-white font-bold text-[11px] transition"
+                      className="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-[#0b8026] text-white font-bold text-[11px] shadow-xs transition"
                     >
                       Support
                     </Link>
@@ -770,7 +799,7 @@ Thank you for your unwavering commitment to our cause. Together, we are truly ma
           <div className="text-center mt-8">
             <Link
               href="/services"
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs shadow-md transition transform hover:scale-105"
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-gradient-to-r from-[#0b8026] via-rose-600 to-red-600 hover:from-[#09661f] hover:to-red-700 text-white font-extrabold text-xs shadow-lg shadow-red-500/20 transition transform hover:scale-105"
             >
               <span>View All Services &amp; Initiatives</span>
               <FiChevronRight className="w-4 h-4" />
@@ -784,10 +813,12 @@ Thank you for your unwavering commitment to our cause. Together, we are truly ma
       <section className="py-14 bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-          {/* Centered Pill Header */}
+          {/* Centered Pill Header with Green & Red Accents */}
           <div className="text-center mb-10">
-            <span className="inline-block px-8 py-1.5 rounded-md border-2 border-emerald-700 text-emerald-800 font-extrabold text-sm tracking-wide bg-white shadow-2xs">
-              Our Objectives
+            <span className="inline-flex items-center gap-2 px-8 py-2 rounded-full border-2 border-[#0b8026] bg-gradient-to-r from-emerald-50 via-white to-rose-50 text-slate-900 font-black text-sm tracking-wide shadow-xs">
+              <span className="w-2 h-2 rounded-full bg-[#0b8026]"></span>
+              <span>Our Objectives</span>
+              <span className="w-2 h-2 rounded-full bg-[#dc2626]"></span>
             </span>
           </div>
 
@@ -843,10 +874,12 @@ Thank you for your unwavering commitment to our cause. Together, we are truly ma
       <section id="youtube-videos" className="py-14 bg-slate-50 border-b border-slate-200 scroll-mt-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-          {/* Centered Pill Header */}
+          {/* Centered Pill Header with Red & Green Theme */}
           <div className="text-center mb-10">
-            <span className="inline-block px-8 py-1.5 rounded-md border-2 border-emerald-700 text-emerald-800 font-extrabold text-sm tracking-wide bg-white shadow-2xs">
-              Youtube Videos
+            <span className="inline-flex items-center gap-2 px-8 py-2 rounded-full border-2 border-red-600 bg-gradient-to-r from-rose-50 via-white to-emerald-50 text-slate-900 font-black text-sm tracking-wide shadow-xs">
+              <span className="w-2 h-2 rounded-full bg-red-600"></span>
+              <span>YouTube Videos</span>
+              <span className="w-2 h-2 rounded-full bg-[#0b8026]"></span>
             </span>
           </div>
 
@@ -878,10 +911,12 @@ Thank you for your unwavering commitment to our cause. Together, we are truly ma
       <section className="py-14 bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-          {/* Centered Pill Header */}
+          {/* Centered Pill Header with Green & Red Accents */}
           <div className="text-center mb-8">
-            <span className="inline-block px-8 py-1.5 rounded-md border-2 border-slate-300 text-slate-700 font-extrabold text-sm tracking-wide bg-white shadow-2xs">
-              Photo Gallery
+            <span className="inline-flex items-center gap-2 px-8 py-2 rounded-full border-2 border-[#0b8026] bg-gradient-to-r from-emerald-50 via-white to-rose-50 text-slate-900 font-black text-sm tracking-wide shadow-xs">
+              <span className="w-2 h-2 rounded-full bg-[#0b8026]"></span>
+              <span>Photo Gallery</span>
+              <span className="w-2 h-2 rounded-full bg-[#dc2626]"></span>
             </span>
           </div>
 
@@ -895,7 +930,7 @@ Thank you for your unwavering commitment to our cause. Together, we are truly ma
               >
                 <img
                   src={getContentImageUrl(item.url || item.imageUrl)}
-                  alt={item.title || `SSP Gallery ${idx + 1}`}
+                  alt={item.title || `Yuva Kranti Dal Gallery ${idx + 1}`}
                   className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   onError={(e) => {
                     e.currentTarget.onerror = null;
@@ -919,7 +954,7 @@ Thank you for your unwavering commitment to our cause. Together, we are truly ma
                 type="button"
                 onClick={() => setGalleryIdx((prev) => Math.max(0, prev - 1))}
                 disabled={galleryIdx === 0}
-                className="w-9 h-9 rounded-full bg-white border border-slate-300 text-slate-700 hover:text-[#0b8026] hover:border-[#0b8026] disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center transition shadow-2xs cursor-pointer"
+                className="w-9 h-9 rounded-full bg-white border border-slate-300 text-slate-700 hover:text-red-600 hover:border-red-600 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center transition shadow-2xs cursor-pointer"
                 aria-label="Previous Gallery"
               >
                 <FiChevronLeft className="w-5 h-5" />
@@ -936,9 +971,9 @@ Thank you for your unwavering commitment to our cause. Together, we are truly ma
 
             <Link
               href="/gallery"
-              className="inline-flex items-center px-6 py-2 rounded-full bg-[#0b8026] hover:bg-[#09661f] text-white font-extrabold text-xs shadow-md transition cursor-pointer"
+              className="inline-flex items-center px-6 py-2.5 rounded-full bg-gradient-to-r from-[#0b8026] to-[#dc2626] hover:from-[#09661f] hover:to-[#b91c1c] text-white font-extrabold text-xs shadow-md transition cursor-pointer"
             >
-              <span>View All</span>
+              <span>View All Photos</span>
             </Link>
           </div>
 
@@ -949,10 +984,12 @@ Thank you for your unwavering commitment to our cause. Together, we are truly ma
       <section id="feedback-section" className="py-16 bg-slate-50 border-b border-slate-200 scroll-mt-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
-          {/* Centered Pill Header */}
+          {/* Centered Pill Header with Green & Red Accents */}
           <div className="text-center mb-12">
-            <span className="inline-block px-7 py-1.5 rounded-md border-2 border-emerald-700 text-emerald-800 font-extrabold text-sm tracking-wide bg-white shadow-2xs">
-              What People Says
+            <span className="inline-flex items-center gap-2 px-8 py-2 rounded-full border-2 border-[#0b8026] bg-gradient-to-r from-emerald-50 via-white to-rose-50 text-slate-900 font-black text-sm tracking-wide shadow-xs">
+              <span className="w-2 h-2 rounded-full bg-[#0b8026]"></span>
+              <span>What People Say</span>
+              <span className="w-2 h-2 rounded-full bg-[#dc2626]"></span>
             </span>
             <p className="text-xs text-slate-500 mt-2 font-medium">
               Verified community feedback, member testimonials, and official foundation responses
@@ -961,9 +998,9 @@ Thank you for your unwavering commitment to our cause. Together, we are truly ma
 
           {/* Testimonial Card with Circular Profile on Top and Left/Right Arrows */}
           <div className="relative pt-12">
-            {/* Circular Avatar floating on top */}
+            {/* Circular Avatar floating on top in Green & Red Ring */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 z-20">
-              <div className="w-24 h-24 rounded-full border-4 border-[#0b8026] p-1 bg-white shadow-lg flex items-center justify-center overflow-hidden">
+              <div className="w-24 h-24 rounded-full border-4 border-red-600 ring-4 ring-[#0b8026]/40 p-1 bg-white shadow-xl flex items-center justify-center overflow-hidden">
                 {approvedReviews[reviewIdx]?.profilePicture || approvedReviews[reviewIdx]?.photoUrl || approvedReviews[reviewIdx]?.userId?.photoUrl ? (
                   <img
                     src={getContentImageUrl(approvedReviews[reviewIdx]?.profilePicture || approvedReviews[reviewIdx]?.photoUrl || approvedReviews[reviewIdx]?.userId?.photoUrl)}
@@ -1107,11 +1144,11 @@ Thank you for your unwavering commitment to our cause. Together, we are truly ma
                   </div>
                 )}
 
-                {/* Action Buttons: Write Feedback & View All Reviews */}
+                {/* Action Buttons: Write Feedback & View All Reviews in Green & Red */}
                 <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-center gap-3">
                   <Link
                     href="/feedback"
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#0b8026] hover:bg-[#09661f] text-white text-xs font-bold transition shadow-xs cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#0b8026] to-[#dc2626] hover:from-[#09661f] hover:to-[#b91c1c] text-white text-xs font-black transition shadow-md shadow-red-500/20 cursor-pointer"
                   >
                     <FiMessageSquare className="w-3.5 h-3.5" />
                     <span>View All Reviews &amp; Write Feedback</span>
@@ -1139,12 +1176,14 @@ Thank you for your unwavering commitment to our cause. Together, we are truly ma
       <section className="py-14 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
-            <span className="inline-block px-8 py-1.5 rounded-md border-2 border-emerald-700 text-emerald-800 font-extrabold text-sm tracking-wide bg-white shadow-2xs">
-              Locate us
+            <span className="inline-flex items-center gap-2 px-8 py-2 rounded-full border-2 border-[#0b8026] bg-gradient-to-r from-emerald-50 via-white to-rose-50 text-slate-900 font-black text-sm tracking-wide shadow-xs">
+              <span className="w-2 h-2 rounded-full bg-[#0b8026]"></span>
+              <span>Locate Us</span>
+              <span className="w-2 h-2 rounded-full bg-[#dc2626]"></span>
             </span>
           </div>
 
-          <div className="w-full h-80 sm:h-96 rounded-2xl overflow-hidden border border-slate-300 shadow-sm bg-slate-100">
+          <div className="w-full h-80 sm:h-96 rounded-3xl overflow-hidden border-2 border-[#0b8026] ring-4 ring-red-500/20 shadow-md bg-slate-100">
             <iframe
               title="NGO Head Office Location Map"
               src={

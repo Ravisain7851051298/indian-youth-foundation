@@ -23,11 +23,11 @@ As donations are voluntary charitable contributions committed promptly towards o
 
 ## 4. Code of Conduct for Members & Volunteers
 - Every registered Member and Volunteer must conduct themselves in alignment with the national ideals and peaceful constitution of the Foundation.
-- Official Member ID Cards, Appointment Letters, and certificates issued by the Foundation remain the intellectual property of Indian Youth Foundation.
+- Official Member ID Cards, Appointment Letters, and certificates issued by the Foundation remain the intellectual property of Yuva Kranti Dal.
 - Members are strictly prohibited from using foundation identification, seals, or letterheads for personal commercial exploitation, unauthorized political lobbying, or illegal activities. Any misuse results in immediate termination of membership and criminal prosecution.
 
 ## 5. Protection of Official Logo, Seals & Signatures
-All trademarks, logos, official stamps/seals, digital signatures of executive trustees, website graphics, and software workflows displayed across this portal are exclusively owned by Indian Youth Foundation. Unauthorized reproduction, modification, or counterfeit duplication is actionable under Indian Copyright and Intellectual Property laws.
+All trademarks, logos, official stamps/seals, digital signatures of executive trustees, website graphics, and software workflows displayed across this portal are exclusively owned by Yuva Kranti Dal. Unauthorized reproduction, modification, or counterfeit duplication is actionable under Indian Copyright and Intellectual Property laws.
 
 ## 6. Governing Law & Legal Jurisdiction
 These Terms and Conditions are governed by and construed in accordance with the laws of the Republic of India. In the event of any dispute or arbitration, the courts having jurisdiction in **Aligarh, Uttar Pradesh** shall have exclusive jurisdiction.`;
@@ -48,7 +48,7 @@ These Terms and Conditions are governed by and construed in accordance with the 
             {settings?.termsTitle || 'Terms & Conditions of Service'}
           </h1>
           <p className="text-xs sm:text-sm text-slate-700 mt-2 max-w-2xl mx-auto font-medium">
-            {settings?.termsSubtitle || 'Rules, guidelines, and legal agreements governing the use of the Indian Youth Foundation website, online donations, and member services.'}
+            {settings?.termsSubtitle || 'Rules, guidelines, and legal agreements governing the use of the Yuva Kranti Dal website, online donations, and member services.'}
           </p>
           <div className="text-[11px] text-slate-500 mt-2 font-mono">
             Effective Date: {settings?.termsEffectiveDate || 'October 2026'} • Statutory Non-Profit Jurisdiction

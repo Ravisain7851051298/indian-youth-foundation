@@ -59,7 +59,7 @@ const SEED_DOCUMENTS = [
     fileUrl: '/uploads/documents/trust-deed-registration.pdf',
     fileType: 'pdf',
     fileSize: '2.8 MB',
-    description: 'Founding statutory charter and trust deed establishing Indian Youth Foundation (Bharatiya Yuva Kranti).',
+    description: 'Founding statutory charter and trust deed establishing Yuva Kranti Dal (युवा क्रांति दल).',
     status: 'Verified',
     order: 4
   },
@@ -74,7 +74,7 @@ const SEED_DOCUMENTS = [
     fileUrl: '/uploads/documents/csr1-registration-mca.pdf',
     fileType: 'pdf',
     fileSize: '820 KB',
-    description: 'Certifies Indian Youth Foundation as an authorized implementing agency for corporate CSR grants and funding partnerships.',
+    description: 'Certifies Yuva Kranti Dal as an authorized implementing agency for corporate CSR grants and funding partnerships.',
     status: 'Verified',
     order: 5
   },
@@ -89,7 +89,7 @@ const SEED_DOCUMENTS = [
     fileUrl: '/uploads/documents/pan-card-organization.pdf',
     fileType: 'pdf',
     fileSize: '650 KB',
-    description: 'Official Permanent Account Number card issued in the name of Indian Youth Foundation Sanstha.',
+    description: 'Official Permanent Account Number card issued in the name of Yuva Kranti Dal Sanstha.',
     status: 'Verified',
     order: 6
   }

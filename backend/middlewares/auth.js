@@ -3,6 +3,8 @@ const tokenBlacklistRepository = require('../repositories/tokenBlacklistReposito
 const User = require('../models/User');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'byk_super_secret_jwt_key_2026_trust_secure';
+const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET || JWT_SECRET;
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || (JWT_SECRET + '_refresh_2026');
 const ADMIN_SECRET_KEY = process.env.X_ADMIN_SECRET_KEY || 'iyf_admin_master_secret_2026';
 
 /**
@@ -25,23 +27,36 @@ const isValidAdminSecret = (providedSecret) => {
  * Extracts JWT token from HTTP-only cookie, Authorization Bearer header, or query
  */
 const extractToken = (req) => {
-  // 1. Check HTTP-Only Cookie (Recommended & Secure)
-  if (req.cookies && (req.cookies.byk_token || req.cookies.token)) {
-    return req.cookies.byk_token || req.cookies.token;
+  // 1. Check HTTP-Only / Secure Cookie
+  if (req.cookies) {
+    if (req.cookies.byk_token) return req.cookies.byk_token;
+    if (req.cookies.accessToken) return req.cookies.accessToken;
+    if (req.cookies.token) return req.cookies.token;
   }
 
-  // 2. Check Authorization Header (Bearer token)
-  const authHeader = req.headers.authorization || req.get('Authorization');
-  if (authHeader && authHeader.startsWith('Bearer ')) {
-    return authHeader.split(' ')[1].trim();
+  // 2. Check Authorization Header (Bearer or raw)
+  const authHeader = req.headers.authorization || req.get?.('Authorization') || req.headers?.['authorization'];
+  if (authHeader && typeof authHeader === 'string') {
+    if (/^bearer\s+/i.test(authHeader)) {
+      return authHeader.replace(/^bearer\s+/i, '').trim();
+    }
+    if (authHeader.trim().length > 10) {
+      return authHeader.trim();
+    }
   }
 
-  // 3. Optional Signed Cookie fallback
-  if (req.signedCookies && req.signedCookies.byk_token) {
-    return req.signedCookies.byk_token;
+  // 3. Check X-Access-Token header
+  const xAccessToken = req.headers?.['x-access-token'] || req.get?.('x-access-token');
+  if (xAccessToken && typeof xAccessToken === 'string') {
+    return xAccessToken.trim();
   }
 
-  // 4. Query param fallback for export/download links
+  // 4. Optional Signed Cookie fallback
+  if (req.signedCookies && (req.signedCookies.byk_token || req.signedCookies.accessToken)) {
+    return req.signedCookies.byk_token || req.signedCookies.accessToken;
+  }
+
+  // 5. Query param fallback for export/download links
   if (req.query && req.query.token) {
     return req.query.token;
   }
@@ -89,7 +104,16 @@ const verifyToken = async (req, res, next) => {
     }
 
     // Verify JWT cryptographic signature and expiration
-    const decoded = jwt.verify(token, JWT_SECRET);
+    let decoded;
+    try {
+      decoded = jwt.verify(token, JWT_ACCESS_SECRET);
+    } catch (err) {
+      if (JWT_ACCESS_SECRET !== JWT_SECRET) {
+        decoded = jwt.verify(token, JWT_SECRET);
+      } else {
+        throw err;
+      }
+    }
 
     // Verify user exists and check if account is active/blocked
     if (decoded.id && decoded.id !== 'admin_master') {
@@ -163,7 +187,16 @@ const optionalAuth = async (req, res, next) => {
     const isRevoked = await tokenBlacklistRepository.isBlacklisted(token);
     if (isRevoked) return next();
 
-    const decoded = jwt.verify(token, JWT_SECRET);
+    let decoded;
+    try {
+      decoded = jwt.verify(token, JWT_ACCESS_SECRET);
+    } catch {
+      try {
+        decoded = jwt.verify(token, JWT_SECRET);
+      } catch {
+        return next();
+      }
+    }
     if (decoded.id && decoded.id !== 'admin_master') {
       const user = await User.findById(decoded.id).select('status role name email memberId').lean();
       if (user && user.status !== 'blocked' && user.status !== 'deactivated') {
@@ -263,6 +296,8 @@ const requireActiveUser = (req, res, next) => {
 
 module.exports = {
   JWT_SECRET,
+  JWT_ACCESS_SECRET,
+  JWT_REFRESH_SECRET,
   ADMIN_SECRET_KEY,
   extractToken,
   verifyToken,

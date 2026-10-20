@@ -37,7 +37,7 @@ const DEFAULT_FEEDBACKS = [
     role: 'Regular 80G Donor',
     rating: 5,
     profilePicture: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
-    comment: 'The transparency and ground dedication of Indian Youth Foundation is commendable. The 80G tax receipt was generated instantly and every rupee was accounted for in their child education drive.',
+    comment: 'The transparency and ground dedication of Yuva Kranti Dal is commendable. The 80G tax receipt was generated instantly and every rupee was accounted for in their child education drive.',
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString(), // 3 hours ago
     adminReply: 'Thank you Dr. Manish! Your generous contributions support 45 slum children with school kits and nutrition packets. We deeply value your ongoing trust.',
     adminRepliedAt: new Date(Date.now() - 1000 * 60 * 60 * 1).toISOString(),
@@ -86,7 +86,7 @@ const DEFAULT_FEEDBACKS = [
     role: 'Youth Supporter',
     rating: 5,
     profilePicture: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&auto=format&fit=crop&q=80',
-    comment: 'The tree plantation campaign with community geotagging was an innovative initiative. Proud to be associated with Bharatiya Yuva Kranti youth leadership movement.',
+    comment: 'The tree plantation campaign with community geotagging was an innovative initiative. Proud to be associated with Yuva Kranti Dal youth leadership movement.',
     createdAt: new Date(Date.now() - 1000 * 60 * 60 * 180).toISOString() // 7 days ago
   },
   {
@@ -877,7 +877,7 @@ export default function FeedbackPage() {
             <div className="bg-slate-50 border border-slate-200 p-3.5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
               <div className="flex items-center gap-2 text-slate-600">
                 <FiUser className="w-4 h-4 text-slate-400" />
-                <span>Posting as Guest. Have an Indian Youth Foundation account?</span>
+                <span>Posting as Guest. Have an Yuva Kranti Dal account?</span>
               </div>
               <Link
                 href="/login?redirect=/feedback"

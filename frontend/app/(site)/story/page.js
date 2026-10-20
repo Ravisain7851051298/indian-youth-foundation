@@ -121,7 +121,7 @@ export default function StoryPage() {
                   <textarea
                     rows={4}
                     required
-                    placeholder="Describe their journey, challenges overcome, and the role of Indian Youth Foundation..."
+                    placeholder="Describe their journey, challenges overcome, and the role of Yuva Kranti Dal..."
                     value={summary}
                     onChange={(e) => setSummary(e.target.value)}
                     className="w-full px-3.5 py-2.5 border rounded-xl border-slate-300 focus:outline-emerald-600 font-medium text-black bg-white"

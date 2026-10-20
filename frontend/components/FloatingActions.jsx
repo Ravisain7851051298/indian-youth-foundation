@@ -9,7 +9,7 @@ import { useNGO } from '../context/NGOContext';
 export default function FloatingActions() {
   const { settings } = useNGO();
   const whatsappNum = settings?.whatsapp?.replace(/[^0-9]/g, '') || '919876543210';
-  const whatsappUrl = `https://wa.me/${whatsappNum}?text=${encodeURIComponent('Hello! I would like to know more about Indian Youth Foundation, social welfare initiatives, and membership.')}`;
+  const whatsappUrl = `https://wa.me/${whatsappNum}?text=${encodeURIComponent('Hello! I would like to know more about Yuva Kranti Dal, social welfare initiatives, and membership.')}`;
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3 no-print">

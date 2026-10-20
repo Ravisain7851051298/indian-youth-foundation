@@ -1,12 +1,26 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../services/api';
 
-const saveUserToStorage = (user) => {
-  if (typeof window !== 'undefined' && user) {
+const saveUserToStorage = (user, token, refreshToken) => {
+  if (typeof window !== 'undefined') {
     try {
-      const serialized = JSON.stringify(user);
-      sessionStorage.setItem('byk_user', serialized);
-      localStorage.setItem('byk_user', serialized);
+      if (user) {
+        const serialized = JSON.stringify(user);
+        sessionStorage.setItem('byk_user', serialized);
+        localStorage.setItem('byk_user', serialized);
+      }
+      if (token) {
+        sessionStorage.setItem('byk_token', token);
+        localStorage.setItem('byk_token', token);
+        sessionStorage.setItem('token', token);
+        localStorage.setItem('token', token);
+      }
+      if (refreshToken) {
+        sessionStorage.setItem('byk_refresh_token', refreshToken);
+        localStorage.setItem('byk_refresh_token', refreshToken);
+        sessionStorage.setItem('refreshToken', refreshToken);
+        localStorage.setItem('refreshToken', refreshToken);
+      }
     } catch (e) {
       console.warn('Storage save warning:', e);
     }
@@ -18,11 +32,28 @@ const clearUserFromStorage = () => {
     try {
       sessionStorage.removeItem('byk_user');
       localStorage.removeItem('byk_user');
+      sessionStorage.removeItem('byk_token');
+      localStorage.removeItem('byk_token');
+      sessionStorage.removeItem('byk_refresh_token');
+      localStorage.removeItem('byk_refresh_token');
+      sessionStorage.removeItem('token');
+      localStorage.removeItem('token');
+      sessionStorage.removeItem('refreshToken');
+      localStorage.removeItem('refreshToken');
     } catch (e) {
       console.warn('Storage clear warning:', e);
     }
   }
 };
+
+const getInitialAuthState = () => ({
+  user: null,
+  token: null,
+  refreshToken: null,
+  loading: false,
+  error: null,
+  successMessage: null
+});
 
 const notifyUserUpdated = (user) => {
   if (typeof window !== 'undefined' && user) {
@@ -43,7 +74,10 @@ export const createAdminUser = createAsyncThunk(
         }
       });
       if (res.data.success) {
-        saveUserToStorage(res.data.user);
+        saveUserToStorage(res.data.user, res.data.accessToken || res.data.token, res.data.refreshToken);
+        if (adminSecretKey) {
+          localStorage.setItem('iyf_admin_secret_key', adminSecretKey);
+        }
         notifyUserUpdated(res.data.user);
         return res.data;
       }
@@ -55,15 +89,20 @@ export const createAdminUser = createAsyncThunk(
 );
 
 /**
- * Sign in (Browser automatically handles secure HTTP-Only cookie)
+ * Sign in (Browser automatically handles secure HTTP-Only cookie and Bearer token)
  */
 export const loginUser = createAsyncThunk(
   'auth/loginUser',
-  async ({ email, password }, { rejectWithValue }) => {
+  async ({ email, password, identifier }, { rejectWithValue }) => {
     try {
-      const res = await api.post('/auth/login', { email, password });
+      const loginPayload = {
+        email: email || identifier,
+        password,
+        identifier: identifier || email
+      };
+      const res = await api.post('/auth/login', loginPayload);
       if (res.data.success) {
-        saveUserToStorage(res.data.user);
+        saveUserToStorage(res.data.user, res.data.accessToken || res.data.token, res.data.refreshToken);
         notifyUserUpdated(res.data.user);
         return res.data;
       }
@@ -83,7 +122,7 @@ export const registerUser = createAsyncThunk(
     try {
       const res = await api.post('/auth/register', userData);
       if (res.data.success) {
-        saveUserToStorage(res.data.user);
+        saveUserToStorage(res.data.user, res.data.accessToken || res.data.token, res.data.refreshToken);
         notifyUserUpdated(res.data.user);
         return res.data;
       }
@@ -112,7 +151,7 @@ export const logoutUser = createAsyncThunk(
 );
 
 /**
- * Fetch Current User from backend using HTTP-Only cookie session
+ * Fetch Current User from backend using HTTP-Only cookie session or Bearer token
  */
 export const fetchCurrentUser = createAsyncThunk(
   'auth/fetchCurrentUser',
@@ -120,9 +159,9 @@ export const fetchCurrentUser = createAsyncThunk(
     try {
       const res = await api.get('/auth/me');
       if (res.data.success && res.data.user) {
-        saveUserToStorage(res.data.user);
+        saveUserToStorage(res.data.user, res.data.accessToken || res.data.token, res.data.refreshToken);
         notifyUserUpdated(res.data.user);
-        return res.data.user;
+        return res.data;
       }
       return rejectWithValue('User fetch failed');
     } catch (err) {
@@ -193,28 +232,34 @@ export const uploadAndUpdateAvatar = createAsyncThunk(
 
 const authSlice = createSlice({
   name: 'auth',
-  initialState: {
-    user: null,
-    loading: false,
-    error: null,
-    successMessage: null
-  },
+  initialState: getInitialAuthState(),
   reducers: {
     logout: (state) => {
       state.user = null;
+      state.token = null;
+      state.refreshToken = null;
       state.error = null;
       state.successMessage = null;
       clearUserFromStorage();
     },
+    setCredentials: (state, action) => {
+      const { user, token, accessToken, refreshToken } = action.payload || {};
+      if (user) state.user = user;
+      const activeToken = accessToken || token;
+      if (activeToken) state.token = activeToken;
+      if (refreshToken) state.refreshToken = refreshToken;
+      saveUserToStorage(state.user, state.token, state.refreshToken);
+      if (user) notifyUserUpdated(user);
+    },
     setUser: (state, action) => {
       state.user = action.payload;
-      saveUserToStorage(action.payload);
+      saveUserToStorage(action.payload, state.token, state.refreshToken);
       notifyUserUpdated(action.payload);
     },
     updateUserPhoto: (state, action) => {
       if (state.user) {
         state.user.photoUrl = action.payload;
-        saveUserToStorage(state.user);
+        saveUserToStorage(state.user, state.token, state.refreshToken);
         notifyUserUpdated(state.user);
       }
     },
@@ -235,6 +280,8 @@ const authSlice = createSlice({
       .addCase(createAdminUser.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload.user;
+        state.token = action.payload.accessToken || action.payload.token || state.token;
+        state.refreshToken = action.payload.refreshToken || state.refreshToken;
         state.successMessage = 'Admin account verified & initialized!';
       })
       .addCase(createAdminUser.rejected, (state, action) => {
@@ -249,6 +296,8 @@ const authSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload.user;
+        state.token = action.payload.accessToken || action.payload.token || state.token;
+        state.refreshToken = action.payload.refreshToken || state.refreshToken;
         state.successMessage = 'Login successful!';
       })
       .addCase(loginUser.rejected, (state, action) => {
@@ -263,6 +312,8 @@ const authSlice = createSlice({
       .addCase(registerUser.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload.user;
+        state.token = action.payload.accessToken || action.payload.token || state.token;
+        state.refreshToken = action.payload.refreshToken || state.refreshToken;
         state.successMessage = action.payload.message || 'Registration successful!';
       })
       .addCase(registerUser.rejected, (state, action) => {
@@ -272,19 +323,32 @@ const authSlice = createSlice({
       // Logout
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
+        state.token = null;
+        state.refreshToken = null;
         state.loading = false;
         state.error = null;
       })
       .addCase(logoutUser.rejected, (state) => {
         state.user = null;
+        state.token = null;
+        state.refreshToken = null;
         state.loading = false;
       })
       // Fetch Current User
       .addCase(fetchCurrentUser.fulfilled, (state, action) => {
-        state.user = action.payload;
+        const payloadUser = action.payload?.user || action.payload;
+        state.user = payloadUser;
+        if (action.payload?.accessToken || action.payload?.token) {
+          state.token = action.payload.accessToken || action.payload.token;
+        }
+        if (action.payload?.refreshToken) {
+          state.refreshToken = action.payload.refreshToken;
+        }
       })
       .addCase(fetchCurrentUser.rejected, (state) => {
         state.user = null;
+        state.token = null;
+        state.refreshToken = null;
       })
       // Update User Profile
       .addCase(updateUserProfile.pending, (state) => {
@@ -319,5 +383,5 @@ const authSlice = createSlice({
   }
 });
 
-export const { logout, setUser, updateUserPhoto, clearError, clearSuccess } = authSlice.actions;
+export const { logout, setCredentials, setUser, updateUserPhoto, clearError, clearSuccess } = authSlice.actions;
 export default authSlice.reducer;

@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const applicationController = require('../controllers/applicationController');
-const { verifyToken, requireRole } = require('../middlewares/auth');
+const { verifyToken, optionalAuth, requireRole } = require('../middlewares/auth');
 const { handleOptionalFileUpload } = require('../middlewares/upload');
 
-// Applications creation (Member & Volunteer) with single-API file upload
-router.post('/members', verifyToken, handleOptionalFileUpload, applicationController.applyMembership);
-router.post('/apply', verifyToken, handleOptionalFileUpload, applicationController.applyMembership);
-router.post('/volunteers', verifyToken, handleOptionalFileUpload, applicationController.applyVolunteer);
+// Applications creation (Member & Volunteer) with single-API file upload - Supports guest applicants without login
+router.post('/members', optionalAuth, handleOptionalFileUpload, applicationController.applyMembership);
+router.post('/apply', optionalAuth, handleOptionalFileUpload, applicationController.applyMembership);
+router.post('/volunteers', optionalAuth, handleOptionalFileUpload, applicationController.applyVolunteer);
 
 // Applications listing (Admin / Manager)
 router.get('/members', verifyToken, requireRole(['admin', 'Admin']), applicationController.getMembershipApplications);

@@ -10,7 +10,7 @@ const getTransporterConfig = async () => {
   let port = 587;
   let user = '';
   let pass = '';
-  let fromName = 'Indian Youth Foundation';
+  let fromName = 'Yuva Kranti Dal';
 
   try {
     if (mongoose.connection && mongoose.connection.readyState === 1) {
@@ -20,7 +20,7 @@ const getTransporterConfig = async () => {
         if (dbSettings.smtpHost) host = dbSettings.smtpHost.trim();
         if (dbSettings.smtpPort) port = Number(dbSettings.smtpPort) || 587;
         if (dbSettings.smtpUser) user = dbSettings.smtpUser.trim();
-        if (dbSettings.smtpPass) pass = dbSettings.smtpPass.trim();
+        if (dbSettings.smtpPass) pass = dbSettings.smtpPass.replace(/\s+/g, '').trim();
         if (dbSettings.smtpFromName) fromName = dbSettings.smtpFromName.trim();
         else if (dbSettings.ngoName) fromName = dbSettings.ngoName.trim();
       }
@@ -73,7 +73,7 @@ const testSmtpConnection = async ({ host, port, user, pass, fromName, to }) => {
   const parsedPort = Number(port) || 587;
   const parsedHost = (host || 'smtp.gmail.com').trim();
   const parsedUser = user.trim();
-  const senderTitle = (fromName || 'Indian Youth Foundation').trim();
+  const senderTitle = (fromName || 'Yuva Kranti Dal').trim();
 
   const transporter = nodemailer.createTransport({
     host: parsedHost,
@@ -95,11 +95,11 @@ const testSmtpConnection = async ({ host, port, user, pass, fromName, to }) => {
   const info = await transporter.sendMail({
     from: `"${senderTitle}" <${parsedUser}>`,
     to: to.trim(),
-    subject: `✅ SMTP Diagnostic Test Passed - Indian Youth Foundation`,
+    subject: `✅ SMTP Diagnostic Test Passed - Yuva Kranti Dal`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff;">
         <div style="text-align: center; margin-bottom: 24px;">
-          <h2 style="color: #dc2626; margin-bottom: 4px;">INDIAN YOUTH FOUNDATION</h2>
+          <h2 style="color: #dc2626; margin-bottom: 4px;">YUVA KRANTI DAL</h2>
           <p style="color: #64748b; font-size: 13px; margin: 0;">Automated SMTP Server Diagnostics &amp; Validation</p>
         </div>
         <div style="background-color: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
@@ -132,7 +132,7 @@ const testSmtpConnection = async ({ host, port, user, pass, fromName, to }) => {
             <td style="padding: 8px 0; color: #059669; font-weight: bold;">250 OK (Accepted)</td>
           </tr>
         </table>
-        <p style="font-size: 11px; color: #94a3b8; text-align: center; margin: 0;">Sent automatically from the Indian Youth Foundation Admin CMS.</p>
+        <p style="font-size: 11px; color: #94a3b8; text-align: center; margin: 0;">Sent automatically from the Yuva Kranti Dal Admin CMS.</p>
       </div>
     `
   });
@@ -155,7 +155,7 @@ const sendEmail = async ({ to, subject, htmlText, template = 'general', attachme
 
   if (transporter) {
     try {
-      const fromName = dbFromName || 'Indian Youth Foundation';
+      const fromName = dbFromName || 'Yuva Kranti Dal';
       const fromEmail = smtpUser || 'samasyasamadhanparishad@gmail.com';
       const mailOptions = {
         from: `"${fromName}" <${fromEmail}>`,
@@ -228,11 +228,11 @@ const sendDonationApprovalEmail = async (data) => {
     console.error('Error generating donation receipt PDF:', err);
   }
 
-  const subject = `Official 80G Tax Receipt #${receiptNumber} Attached - Indian Youth Foundation`;
+  const subject = `Official 80G Tax Receipt #${receiptNumber} Attached - Yuva Kranti Dal`;
   const htmlText = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 14px; background-color: #ffffff;">
       <div style="background: linear-gradient(135deg, #c2410c, #ea580c); padding: 18px; border-radius: 10px; text-align: center; color: white;">
-        <h2 style="margin: 0; font-size: 22px; letter-spacing: 0.5px;">INDIAN YOUTH FOUNDATION</h2>
+        <h2 style="margin: 0; font-size: 22px; letter-spacing: 0.5px;">YUVA KRANTI DAL</h2>
         <p style="margin: 4px 0 0; font-size: 12px; opacity: 0.95;">12A & 80G Certified Non-Profit Trust • Reg. No: 421/2019</p>
       </div>
 
@@ -308,6 +308,8 @@ const sendMembershipApprovalEmail = async (param) => {
   const designation = memberObj.designation || memberObj.user?.designation || 'Active Social Worker';
   const planName = memberObj.planName || memberObj.membershipPlan || memberObj.user?.membershipPlan || 'Standard Active Member';
 
+  const temporaryPassword = memberObj.temporaryPassword || param.temporaryPassword || '';
+
   if (!to) {
     console.warn('⚠️ [EMAIL NOTICE] No recipient email found for membership approval notification.');
     return null;
@@ -337,11 +339,11 @@ const sendMembershipApprovalEmail = async (param) => {
     console.error('Error generating membership PDFs:', err);
   }
 
-  const subject = `Official Appointment Letter & ID Card Attached (${memberId}) - Indian Youth Foundation`;
+  const subject = `Official Appointment Letter & ID Card Attached (${memberId}) - Yuva Kranti Dal`;
   const htmlText = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 14px; background-color: #ffffff;">
       <div style="background: linear-gradient(135deg, #b91c1c, #ea580c); padding: 18px; border-radius: 10px; text-align: center; color: white;">
-        <h2 style="margin: 0; font-size: 22px; letter-spacing: 0.5px;">INDIAN YOUTH FOUNDATION</h2>
+        <h2 style="margin: 0; font-size: 22px; letter-spacing: 0.5px;">YUVA KRANTI DAL</h2>
         <p style="margin: 4px 0 0; font-size: 12px; opacity: 0.95;">Nationwide Non-Profit Movement • NITI Aayog Registered NGO</p>
       </div>
 
@@ -352,7 +354,7 @@ const sendMembershipApprovalEmail = async (param) => {
 
         <p style="font-size: 15px; margin: 8px 0;">Dear <strong>${memberName}</strong>,</p>
         <p style="font-size: 14px; line-height: 1.6; color: #334155;">
-          Following thorough verification of your credentials and enrollment details, the Board of Trustees and National Executive Council of <strong>Indian Youth Foundation</strong> have officially approved your appointment as a registered member.
+          Following thorough verification of your credentials and enrollment details, the Board of Trustees and National Executive Council of <strong>Yuva Kranti Dal</strong> have officially approved your appointment as a registered member.
         </p>
         
         <div style="background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; padding: 16px; margin: 18px 0; font-size: 13px;">
@@ -380,6 +382,24 @@ const sendMembershipApprovalEmail = async (param) => {
           </table>
         </div>
 
+        ${temporaryPassword ? `
+        <div style="background-color: #fefce8; border: 2px dashed #ca8a04; border-radius: 10px; padding: 16px; margin: 18px 0; font-size: 13px;">
+          <h4 style="margin: 0 0 8px; color: #854d0e; font-size: 14px;">🔑 Your Portal Login Credentials</h4>
+          <p style="margin: 4px 0; color: #475569;">Your authenticated portal account has been created by the Trustee Administration. Use the credentials below to log in:</p>
+          <div style="background: white; border: 1px solid #fef08a; padding: 10px 14px; border-radius: 6px; margin: 8px 0;">
+            <p style="margin: 4px 0;"><strong>Login Email / Identifier:</strong> <span style="font-family: monospace; color: #0f172a; font-weight: bold;">${to}</span></p>
+            <p style="margin: 4px 0;"><strong>Initial Password:</strong> <span style="font-family: monospace; background: #fee2e2; color: #991b1b; padding: 2px 8px; border-radius: 4px; font-weight: bold; letter-spacing: 0.5px;">${temporaryPassword}</span></p>
+          </div>
+          <p style="margin: 6px 0 0; font-size: 12px; color: #854d0e;">
+            🔒 For security, please sign in and change your password in your Profile Settings upon first login.
+          </p>
+        </div>
+        ` : `
+        <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; margin: 14px 0; font-size: 12.5px; color: #334155;">
+          🔐 Sign in with your registered email (<strong>${to}</strong>) and password to access your verifiable dashboard.
+        </div>
+        `}
+
         <div style="background-color: #f0fdf4; border-left: 4px solid #16a34a; padding: 12px 14px; margin: 16px 0; font-size: 12.5px; color: #166534; border-radius: 4px;">
           📄 <strong>PDF Credentials Attached to this Email:</strong><br/>
           • <strong>Member_Appointment_Letter_${memberId}.pdf</strong> (Official Letter of Appointment)<br/>
@@ -387,8 +407,8 @@ const sendMembershipApprovalEmail = async (param) => {
         </div>
 
         <div style="text-align: center; margin: 26px 0 16px;">
-          <a href="https://www.yuvakrantidal.com/profile/appointment-letter" style="background: #0f172a; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px; display: inline-block;">
-            Access Official Portal Profile
+          <a href="http://localhost:3000/login" style="background: #0f172a; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px; display: inline-block;">
+            Sign In to Member Portal
           </a>
         </div>
       </div>
@@ -415,6 +435,8 @@ const sendVolunteerApprovalEmail = async (param) => {
   const to = volObj.to || volObj.email || volObj.user?.email;
   const volunteerName = volObj.volunteerName || volObj.name || volObj.user?.name || 'Valued Volunteer';
   const volunteerId = volObj.volunteerId || volObj.memberId || volObj.user?.memberId || 'BYK-VOL-2026-PENDING';
+
+  const temporaryPassword = volObj.temporaryPassword || param.temporaryPassword || '';
 
   if (!to) {
     console.warn('⚠️ [EMAIL NOTICE] No recipient email found for volunteer approval notification.');
@@ -445,11 +467,11 @@ const sendVolunteerApprovalEmail = async (param) => {
     console.error('Error generating volunteer PDFs:', err);
   }
 
-  const subject = `Volunteer Offer Letter & ID Card Attached (${volunteerId}) - Indian Youth Foundation`;
+  const subject = `Volunteer Offer Letter & ID Card Attached (${volunteerId}) - Yuva Kranti Dal`;
   const htmlText = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 14px; background-color: #ffffff;">
       <div style="background: linear-gradient(135deg, #059669, #10b981); padding: 18px; border-radius: 10px; text-align: center; color: white;">
-        <h2 style="margin: 0; font-size: 22px; letter-spacing: 0.5px;">INDIAN YOUTH FOUNDATION</h2>
+        <h2 style="margin: 0; font-size: 22px; letter-spacing: 0.5px;">YUVA KRANTI DAL</h2>
         <p style="margin: 4px 0 0; font-size: 12px; opacity: 0.95;">Volunteer Wing • Serving Humanity with Compassion</p>
       </div>
 
@@ -460,7 +482,7 @@ const sendVolunteerApprovalEmail = async (param) => {
 
         <p style="font-size: 15px; margin: 8px 0;">Dear <strong>${volunteerName}</strong>,</p>
         <p style="font-size: 14px; line-height: 1.6; color: #334155;">
-          We are delighted to welcome you to the volunteer wing of <strong>Indian Youth Foundation</strong>. Your application has been approved by the Executive Committee, and you are now an active grassroots ambassador.
+          We are delighted to welcome you to the volunteer wing of <strong>Yuva Kranti Dal</strong>. Your application has been approved by the Executive Committee, and you are now an active grassroots ambassador.
         </p>
         
         <div style="background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; padding: 16px; margin: 18px 0; font-size: 13px;">
@@ -480,6 +502,24 @@ const sendVolunteerApprovalEmail = async (param) => {
           </table>
         </div>
 
+        ${temporaryPassword ? `
+        <div style="background-color: #fefce8; border: 2px dashed #ca8a04; border-radius: 10px; padding: 16px; margin: 18px 0; font-size: 13px;">
+          <h4 style="margin: 0 0 8px; color: #854d0e; font-size: 14px;">🔑 Your Volunteer Portal Login Credentials</h4>
+          <p style="margin: 4px 0; color: #475569;">Your authenticated portal account has been created by the Trustee Administration. Use the credentials below to log in:</p>
+          <div style="background: white; border: 1px solid #fef08a; padding: 10px 14px; border-radius: 6px; margin: 8px 0;">
+            <p style="margin: 4px 0;"><strong>Login Email / Identifier:</strong> <span style="font-family: monospace; color: #0f172a; font-weight: bold;">${to}</span></p>
+            <p style="margin: 4px 0;"><strong>Initial Password:</strong> <span style="font-family: monospace; background: #fee2e2; color: #991b1b; padding: 2px 8px; border-radius: 4px; font-weight: bold; letter-spacing: 0.5px;">${temporaryPassword}</span></p>
+          </div>
+          <p style="margin: 6px 0 0; font-size: 12px; color: #854d0e;">
+            🔒 For security, please sign in and change your password in your Profile Settings upon first login.
+          </p>
+        </div>
+        ` : `
+        <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; margin: 14px 0; font-size: 12.5px; color: #334155;">
+          🔐 Sign in with your registered email (<strong>${to}</strong>) and password to access your verifiable dashboard.
+        </div>
+        `}
+
         <div style="background-color: #f0fdf4; border-left: 4px solid #059669; padding: 12px 14px; margin: 16px 0; font-size: 12.5px; color: #065f46; border-radius: 4px;">
           📄 <strong>PDF Credentials Attached to this Email:</strong><br/>
           • <strong>Volunteer_Offer_Letter_${volunteerId}.pdf</strong> (Formal Appointment Offer Letter)<br/>
@@ -487,7 +527,7 @@ const sendVolunteerApprovalEmail = async (param) => {
         </div>
 
         <div style="text-align: center; margin: 26px 0 16px;">
-          <a href="https://www.yuvakrantidal.com/profile/appointment-letter" style="background: #059669; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px; display: inline-block;">
+          <a href="http://localhost:3000/login" style="background: #059669; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px; display: inline-block;">
             Access Volunteer Portal
           </a>
         </div>
@@ -543,11 +583,11 @@ const sendCertificateEmail = async (param) => {
     console.error('Error generating certificate PDF:', err);
   }
 
-  const subject = `Certificate of Appreciation Awarded & Attached (${certificateNo}) - Indian Youth Foundation`;
+  const subject = `Certificate of Appreciation Awarded & Attached (${certificateNo}) - Yuva Kranti Dal`;
   const htmlText = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 14px; background-color: #ffffff;">
       <div style="background: linear-gradient(135deg, #c2410c, #d97706); padding: 18px; border-radius: 10px; text-align: center; color: white;">
-        <h2 style="margin: 0; font-size: 22px; letter-spacing: 0.5px;">INDIAN YOUTH FOUNDATION</h2>
+        <h2 style="margin: 0; font-size: 22px; letter-spacing: 0.5px;">YUVA KRANTI DAL</h2>
         <p style="margin: 4px 0 0; font-size: 12px; opacity: 0.95;">National Honours & Civic Recognition Council</p>
       </div>
 
@@ -558,7 +598,7 @@ const sendCertificateEmail = async (param) => {
 
         <p style="font-size: 15px; margin: 8px 0;">Dear <strong>${recipientName}</strong>,</p>
         <p style="font-size: 14px; line-height: 1.6; color: #334155;">
-          The National Executive Council of <strong>Indian Youth Foundation</strong> is proud to confer upon you the official citation: <strong>"${awardTitle}"</strong>.
+          The National Executive Council of <strong>Yuva Kranti Dal</strong> is proud to confer upon you the official citation: <strong>"${awardTitle}"</strong>.
         </p>
         
         <div style="background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; padding: 16px; margin: 18px 0; font-size: 13px;">
@@ -632,11 +672,11 @@ const sendPasswordResetEmail = async (param1, param2) => {
     return null;
   }
 
-  const subject = `Password Reset Request - Indian Youth Foundation Portal`;
+  const subject = `Password Reset Request - Yuva Kranti Dal Portal`;
   const htmlText = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 14px; background-color: #ffffff;">
       <div style="background: linear-gradient(135deg, #ea580c, #f59e0b); padding: 18px; border-radius: 10px; text-align: center; color: white;">
-        <h2 style="margin: 0; font-size: 22px; letter-spacing: 0.5px;">INDIAN YOUTH FOUNDATION</h2>
+        <h2 style="margin: 0; font-size: 22px; letter-spacing: 0.5px;">YUVA KRANTI DAL</h2>
         <p style="margin: 4px 0 0; font-size: 12px; opacity: 0.95;">Member & Administrative Portal Security</p>
       </div>
 
@@ -644,7 +684,7 @@ const sendPasswordResetEmail = async (param1, param2) => {
         <h3 style="color: #ea580c; margin-top: 0; font-size: 18px;">🔐 Password Reset Instructions</h3>
         <p style="font-size: 15px; margin: 8px 0;">Dear <strong>${userName || 'Valued Member'}</strong>,</p>
         <p style="font-size: 14px; line-height: 1.6; color: #334155;">
-          We received a request to reset the password for your Indian Youth Foundation portal account.
+          We received a request to reset the password for your Yuva Kranti Dal portal account.
         </p>
         
         <p style="font-size: 14px; line-height: 1.6; color: #334155; margin: 16px 0;">

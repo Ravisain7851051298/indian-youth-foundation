@@ -4,12 +4,12 @@ import JsonLd from '@/components/seo/JsonLd';
 export const metadata = {
   title: 'Our Leadership Team & Board of Trustees',
   description:
-    'Meet the passionate executive board, regional coordinators, and community leaders steering Indian Youth Foundation across India.',
+    'Meet the passionate executive board, regional coordinators, and community leaders steering Yuva Kranti Dal across India.',
   alternates: {
     canonical: '/team-members',
   },
   openGraph: {
-    title: 'Leadership & Team | Indian Youth Foundation',
+    title: 'Leadership & Team | Yuva Kranti Dal',
     description:
       'Dedicated trustees, mentors, and youth coordinators driving our non-profit initiatives forward.',
     url: `${SITE_CONFIG.url}/team-members`,

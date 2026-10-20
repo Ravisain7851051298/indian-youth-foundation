@@ -56,7 +56,7 @@ export default function HomeAbout() {
           </div>
 
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-black tracking-tight leading-tight">
-            {settings?.aboutHeading || 'About Indian Youth Foundation (भारतीय युवा क्रांति)'}
+            {settings?.aboutHeading || 'About Yuva Kranti Dal (युवा क्रांति दल)'}
           </h2>
 
           <p className="text-xs sm:text-base text-slate-600 mt-3 font-medium leading-relaxed">
@@ -73,7 +73,7 @@ export default function HomeAbout() {
             {/* Dynamic About Story */}
             <p className="text-sm sm:text-base text-slate-700 leading-relaxed font-normal">
               {settings?.aboutStory ||
-                'Founded by visionary youth leaders, Indian Youth Foundation is committed to grassroots nation-building. Operating across multiple states, our volunteers organize child education initiatives, 24x7 emergency blood donor networks, rural women livelihood training, and rapid disaster relief assistance.'}
+                'Founded by visionary youth leaders, Yuva Kranti Dal is committed to grassroots nation-building. Operating across multiple states, our volunteers organize child education initiatives, 24x7 emergency blood donor networks, rural women livelihood training, and rapid disaster relief assistance.'}
             </p>
 
             {/* Mission & Vision Dynamic Cards */}
@@ -166,7 +166,7 @@ export default function HomeAbout() {
             <div className="relative rounded-3xl overflow-hidden shadow-xl border-4 border-white bg-slate-100 group">
               <img
                 src={getContentImageUrl(settings?.whoWeAreBannerUrl || 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&auto=format&fit=crop&q=80')}
-                alt="Indian Youth Foundation Leadership"
+                alt="Yuva Kranti Dal Leadership"
                 className="w-full h-72 sm:h-80 object-cover group-hover:scale-105 transition-transform duration-700"
                 onError={(e) => {
                   e.currentTarget.onerror = null;
@@ -180,7 +180,7 @@ export default function HomeAbout() {
                     Grassroots Youth Movement
                   </span>
                   <h3 className="text-lg font-black leading-snug">
-                    {settings?.ngoName || 'Indian Youth Foundation'}
+                    {settings?.ngoName || 'Yuva Kranti Dal'}
                   </h3>
                   <p className="text-xs text-slate-200 font-medium">
                     {settings?.tagline || 'Empowering Youth, Transforming Society, Nation First'}

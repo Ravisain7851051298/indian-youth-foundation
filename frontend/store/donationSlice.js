@@ -33,6 +33,9 @@ export const submitDonation = createAsyncThunk(
   }
 );
 
+// Backward-compatible alias for recordDonation
+export const recordDonation = submitDonation;
+
 // 3. Admin: Approve Donation (Generates 80G receipt, updates funds, sends tax receipt email)
 export const approveDonation = createAsyncThunk(
   'donations/approveDonation',

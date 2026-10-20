@@ -58,9 +58,12 @@ export default function ApprovalsPage() {
     try {
       setProcessingId(id);
       const res = await dispatch(approveMembershipApplication(id)).unwrap();
-      setActionNotice(res.message || 'Membership approved! Appointment letter and ID card emailed.');
+      setActionNotice(res.message || 'सदस्यता सफलतापूर्वक स्वीकृत (Approved) कर दी गई है! आईडी कार्ड और नियुक्ति पत्र ईमेल पर भेज दिया गया है।');
       setTimeout(() => setActionNotice(null), 5000);
       dispatch(fetchMemberApplications());
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
     } catch (err) {
       const errMsg = typeof err === 'string' ? err : err?.message || 'Failed to approve membership';
       setActionNotice(`⚠️ ${errMsg}`);

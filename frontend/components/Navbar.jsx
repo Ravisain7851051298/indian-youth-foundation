@@ -41,7 +41,13 @@ export default function Navbar() {
   const { settings, currentUser, logout } = useNGO();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
+  const [isMounted, setIsMounted] = useState(false);
   const dropdownRef = useRef(null);
+
+  // Mark client mount to avoid SSR hydration differences
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -64,25 +70,27 @@ export default function Navbar() {
     setActiveDropdown((prev) => (prev === id ? null : id));
   };
 
+  const activeUser = isMounted ? currentUser : null;
+
   const isMember = Boolean(
-    currentUser?.role === 'Member' ||
-    currentUser?.role === 'Admin' ||
-    (currentUser?.isMember && !currentUser?.memberId?.startsWith('BYK-DON-')) ||
-    (currentUser?.membershipApplication?.status === 'approved') ||
-    (currentUser?.memberId && (currentUser.memberId.startsWith('BYK-MEM-') || currentUser.memberId.startsWith('MEM-')))
+    activeUser?.role === 'Member' ||
+    activeUser?.role === 'Admin' ||
+    (activeUser?.isMember && !activeUser?.memberId?.startsWith('BYK-DON-')) ||
+    (activeUser?.membershipApplication?.status === 'approved') ||
+    (activeUser?.memberId && (activeUser.memberId.startsWith('BYK-MEM-') || activeUser.memberId.startsWith('MEM-')))
   );
 
   const isVolunteer = Boolean(
-    currentUser?.role === 'Volunteer' ||
-    currentUser?.isVolunteer ||
-    currentUser?.volunteerApplication?.status === 'approved' ||
-    currentUser?.volunteerApplication?.status === 'pending' ||
-    (currentUser?.volunteerId && !currentUser?.volunteerId?.startsWith('BYK-DON-'))
+    activeUser?.role === 'Volunteer' ||
+    activeUser?.isVolunteer ||
+    activeUser?.volunteerApplication?.status === 'approved' ||
+    activeUser?.volunteerApplication?.status === 'pending' ||
+    (activeUser?.volunteerId && !activeUser?.volunteerId?.startsWith('BYK-DON-'))
   );
 
   const isAdmin = Boolean(
-    currentUser?.role === 'Admin' ||
-    currentUser?.role === 'admin'
+    activeUser?.role === 'Admin' ||
+    activeUser?.role === 'admin'
   );
 
   const navMenuItems = [
@@ -123,8 +131,8 @@ export default function Navbar() {
     },
     { label: 'Complains & Enquries', href: '/complaints' },
     { label: 'Feedback', href: '/feedback' },
-    currentUser ? {
-      label: currentUser.name ? `${currentUser.name.split(' ')[0]}` : 'My Profile',
+    activeUser ? {
+      label: activeUser.name ? `${activeUser.name.split(' ')[0]}` : 'My Profile',
       id: 'user_profile',
       hasDropdown: true,
       links: [
@@ -134,7 +142,7 @@ export default function Navbar() {
         { label: 'Official ID Card', href: '/profile/id-card', icon: FiShield },
         { label: 'Appointment Letter', href: '/profile/appointment-letter', icon: FiFileText },
         { label: 'My Certificates', href: '/profile/certificates', icon: FiAward },
-        ...(currentUser.role === 'Admin' ? [{ label: 'Admin Dashboard', href: '/dashboard', icon: FiLayers }] : []),
+        ...(activeUser.role === 'Admin' || activeUser.role === 'admin' ? [{ label: 'Admin Dashboard', href: '/dashboard', icon: FiLayers }] : []),
         { label: 'Account Settings', href: '/profile/settings', icon: FiSettings },
       ]
     } : {
@@ -151,17 +159,17 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 shadow-md font-sans bg-white">
-      {/* ---------------- 1. TOP GREEN BAR ---------------- */}
-      <div className="bg-[#0b8026] text-white py-2 px-2 sm:px-4">
+      {/* ---------------- 1. TOP GREEN & RED THEMED BAR ---------------- */}
+      <div className="bg-gradient-to-r from-[#0b8026] via-[#08611c] to-[#dc2626] text-white py-2 px-2 sm:px-4 shadow-xs">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
 
-          {/* Left Social Icons (Hidden on small mobile devices to give space to ticker and helpline, always visible on tablet & desktop) */}
+          {/* Left Social Icons */}
           <div className="hidden md:flex items-center gap-2 shrink-0">
             <a
               href={settings?.facebook || 'https://facebook.com'}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-7 h-7 rounded-full bg-white text-[#0b8026] flex items-center justify-center hover:scale-110 transition shadow-2xs hover:bg-emerald-50 shrink-0"
+              className="w-7 h-7 rounded-full bg-white text-[#0b8026] hover:text-[#dc2626] flex items-center justify-center hover:scale-110 transition shadow-2xs hover:bg-rose-50 shrink-0"
               aria-label="Facebook"
               title="Facebook"
             >
@@ -172,7 +180,7 @@ export default function Navbar() {
               href={settings?.instagram || 'https://instagram.com'}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-7 h-7 rounded-full bg-white text-[#0b8026] flex items-center justify-center hover:scale-110 transition shadow-2xs hover:bg-emerald-50 shrink-0"
+              className="w-7 h-7 rounded-full bg-white text-[#0b8026] hover:text-[#dc2626] flex items-center justify-center hover:scale-110 transition shadow-2xs hover:bg-rose-50 shrink-0"
               aria-label="Instagram"
               title="Instagram"
             >
@@ -183,7 +191,7 @@ export default function Navbar() {
               href={settings?.youtube || 'https://youtube.com'}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-7 h-7 rounded-full bg-white text-[#0b8026] flex items-center justify-center hover:scale-110 transition shadow-2xs hover:bg-emerald-50 shrink-0"
+              className="w-7 h-7 rounded-full bg-white text-[#dc2626] hover:text-[#0b8026] flex items-center justify-center hover:scale-110 transition shadow-2xs hover:bg-emerald-50 shrink-0"
               aria-label="YouTube"
               title="YouTube"
             >
@@ -194,7 +202,7 @@ export default function Navbar() {
               href={settings?.twitter || 'https://x.com'}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-7 h-7 rounded-full bg-white text-[#0b8026] flex items-center justify-center hover:scale-110 transition shadow-2xs hover:bg-emerald-50 shrink-0"
+              className="w-7 h-7 rounded-full bg-white text-[#0b8026] hover:text-[#dc2626] flex items-center justify-center hover:scale-110 transition shadow-2xs hover:bg-rose-50 shrink-0"
               aria-label="X (Twitter)"
               title="X (Twitter)"
             >
@@ -202,43 +210,43 @@ export default function Navbar() {
             </a>
           </div>
 
-          {/* Middle: News & Updates Green Button + White Ticker Bar */}
-          <div className="flex-1 flex items-center min-w-50 max-w-xl lg:max-w-3xl mx-2 sm:mx-3 overflow-hidden">
-            <div className="hidden sm:flex bg-[#075018] text-white px-3 py-1.5 rounded-l-md font-black text-xs whitespace-nowrap items-center gap-1 shadow-sm shrink-0 border-r border-emerald-600">
-              <FiActivity className="w-3.5 h-3.5 text-emerald-300" />
+          {/* Middle: News & Updates Red Button + White Ticker Bar */}
+          <div className="flex-1 flex items-center min-w-50 max-w-xl lg:max-w-3xl mx-2 sm:mx-3 overflow-hidden shadow-xs rounded-md">
+            <div className="hidden sm:flex bg-red-600 text-white px-3 py-1.5 rounded-l-md font-black text-xs whitespace-nowrap items-center gap-1.5 shadow-sm shrink-0 border-r border-red-700">
+              <FiActivity className="w-3.5 h-3.5 text-white animate-pulse" />
               <span>News &amp; Updates</span>
             </div>
             <div className="flex-1 bg-white h-7 flex items-center px-3 rounded-md sm:rounded-l-none sm:rounded-r-md overflow-hidden">
               <div className="whitespace-nowrap animate-marquee text-xs font-semibold text-slate-800">
-                {settings?.newsTickerText || 'Welcome to Samasya Samadhan Parishad (SSP) • Free Membership & Social Welfare Mission • Helpline: +919319698759'}
+                {settings?.newsTickerText || 'Welcome to Yuva Kranti Dal • Free Membership & Social Welfare Mission • 24/7 Helpline: +919319698759'}
               </div>
             </div>
           </div>
 
           {/* Right: Phone Helpline */}
-          <div className="hidden md:flex items-center gap-1.5 text-xs font-bold shrink-0 border border-white rounded-full p-2">
-            <FiPhone className="w-3.5 h-3.5" />
+          <div className="hidden md:flex items-center gap-1.5 text-xs font-bold shrink-0 bg-red-700/90 hover:bg-red-800 text-white border border-white/60 rounded-full px-3 py-1 shadow-2xs transition">
+            <FiPhone className="w-3.5 h-3.5 text-amber-300" />
             <a
-              href={`tel:${settings?.phone}`}
-              className="hover:underline"
+              href={`tel:${settings?.phone || '+919319698759'}`}
+              className="hover:underline tracking-wide"
             >
-              {settings?.phone}
+              {settings?.phone || '+91 93196 98759'}
             </a>
           </div>
 
         </div>
       </div>
 
-      {/* ---------------- 2. MIDDLE WHITE BRANDING ROW ---------------- */}
-      <div className="bg-white py-0 px-4 sm:px-8 border-b border-slate-100">
+      {/* ---------------- 2. MIDDLE BRANDING ROW ---------------- */}
+      <div className="bg-white py-2 px-4 sm:px-8 border-b border-slate-100">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
 
-          {/* Logo & Big Bold English Name (Hindi name removed for cleaner layout) */}
+          {/* Logo & Dual Green & Red Typography */}
           <Link href="/" className="flex items-center gap-3 sm:gap-4 group">
-            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full border border-slate-200 p-0 flex items-center justify-center bg-white shrink-0 overflow-hidden shadow-sm">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full border-2 border-[#0b8026] ring-2 ring-red-500/30 p-0.5 flex items-center justify-center bg-white shrink-0 overflow-hidden shadow-sm group-hover:scale-105 transition-transform duration-300">
               <img
                 src={getContentImageUrl(settings?.logoUrl) || '/logo.jpeg'}
-                alt={settings?.ngoName}
+                alt={settings?.ngoName || 'Yuva Kranti Dal'}
                 className="w-full h-full object-contain"
                 onError={(e) => {
                   e.currentTarget.onerror = null;
@@ -247,13 +255,20 @@ export default function Navbar() {
               />
             </div>
             <div className="hidden md:flex flex-col">
-              <span className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-[#0b8026] tracking-tight leading-tight uppercase">
-                {settings?.ngoName || 'YUVA KRANTI DAL'}
+              <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black tracking-tight leading-tight uppercase flex items-center gap-2">
+                <span className="text-[#0b8026]">YUVA KRANTI</span>
+                <span className="text-[#dc2626]">DAL</span>
+              </div>
+              <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 tracking-wider uppercase flex items-center gap-1.5 mt-0.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#0b8026]"></span>
+                Empowering Youth
+                <span className="w-1.5 h-1.5 rounded-full bg-[#dc2626]"></span>
+                Transforming Society
               </span>
             </div>
           </Link>
 
-          {/* Right Actions: Admin Dashboard Link (if role is admin) + Donate Us Button + Google Translate */}
+          {/* Right Actions: Admin Dashboard + Green & Red Donate Us + Google Translate */}
           <div className="flex items-center gap-2.5 sm:gap-3">
             {isAdmin && (
               <Link
@@ -266,26 +281,25 @@ export default function Navbar() {
                 <span
                   className="absolute inset-[-150%] animate-[spin_3s_linear_infinite]"
                   style={{
-                    background: 'conic-gradient(from 0deg, #3b82f6 0%, #8b5cf6 25%, #ec4899 50%, #f97316 75%, #10b981 90%, #3b82f6 100%)'
+                    background: 'conic-gradient(from 0deg, #0b8026 0%, #dc2626 25%, #0b8026 50%, #dc2626 75%, #0b8026 100%)'
                   }}
                 />
 
-                {/* Inner Button Content with Solid White Background */}
+                {/* Inner Button Content */}
                 <span className="relative z-10 flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-white group-hover:bg-emerald-50/60 font-extrabold text-xs sm:text-sm text-[#0b8026] group-hover:text-[#075018] transition-colors duration-200">
                   <FiLayers className="w-4 h-4 text-[#0b8026] shrink-0 group-hover:rotate-12 transition-transform duration-300" />
-                  <span className=''>Dashboard</span>
+                  <span>Dashboard</span>
                 </span>
               </Link>
             )}
 
             <Link
               href="/donation"
-              className="flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-red-500 hover:bg-red-600 text-white font-extrabold text-xs sm:text-sm shadow-md transition transform hover:scale-105 animate-bounce"
+              className="flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-emerald-600 hover:to-emerald-700 text-white font-extrabold text-xs sm:text-sm shadow-lg shadow-red-500/25 hover:shadow-emerald-500/25 transition-all duration-300 transform hover:scale-105 active:scale-95 animate-pulse"
             >
-              <FiHeart className="w-4 h-4 text-white fill-white shrink-0" />
+              <FiHeart className="w-4 h-4 text-white fill-white shrink-0 animate-bounce" />
               <span>Donate Us</span>
             </Link>
-
 
             <GoogleTranslate />
 
@@ -294,8 +308,8 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* ---------------- 3. GREEN MAIN NAVIGATION BAR ---------------- */}
-      <nav className="bg-[#0b8026] text-white border-t border-[#09661f]" ref={dropdownRef}>
+      {/* ---------------- 3. GREEN MAIN NAVIGATION BAR WITH RED ACCENTS ---------------- */}
+      <nav className="bg-[#0b8026] text-white border-b-2 border-red-600 shadow-md" ref={dropdownRef}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-11">
 
@@ -305,8 +319,8 @@ export default function Navbar() {
               <Link
                 href="/"
                 className={`flex items-center justify-center w-11 h-11 transition ${pathname === '/'
-                  ? 'bg-[#075018] text-white shadow-inner font-black'
-                  : 'bg-[#09661f] text-white hover:bg-[#075018]'
+                  ? 'bg-red-600 text-white shadow-inner font-black'
+                  : 'bg-[#09661f] text-white hover:bg-red-600/90'
                   }`}
                 title="Home"
               >
@@ -326,8 +340,8 @@ export default function Navbar() {
                       <button
                         onClick={() => toggleDropdown(item.id)}
                         className={`flex items-center gap-1 px-3 py-2.5 transition cursor-pointer rounded-sm ${isDropdownActive
-                          ? 'bg-[#075018] text-white font-black shadow-inner'
-                          : 'hover:bg-[#09661f] text-white'
+                          ? 'bg-red-600 text-white font-black shadow-inner'
+                          : 'hover:bg-[#075018] text-white'
                           }`}
                       >
                         <span>{item.label}</span>
@@ -337,7 +351,7 @@ export default function Navbar() {
                       {isOpen && (
                         <div
                           onMouseLeave={() => setActiveDropdown(null)}
-                          className="absolute left-0 top-full mt-0 w-52 bg-white text-slate-800 rounded-b-xl shadow-xl border border-slate-100 py-1.5 z-50 animate-in fade-in slide-in-from-top-1 duration-150"
+                          className="absolute left-0 top-full mt-0 w-52 bg-white text-slate-800 rounded-b-xl shadow-xl border-t-2 border-red-600 border-x border-b border-slate-100 py-1.5 z-50 animate-in fade-in slide-in-from-top-1 duration-150"
                         >
                           {item.links.map((link) => {
                             const IconComponent = link.icon;
@@ -350,11 +364,11 @@ export default function Navbar() {
                                 href={link.href}
                                 onClick={() => setActiveDropdown(null)}
                                 className={`flex items-center gap-2 px-4 py-2 text-xs font-semibold transition ${isSubActive
-                                  ? 'bg-emerald-50 text-[#0b8026] font-black'
-                                  : 'hover:bg-emerald-50/60 hover:text-[#0b8026] text-slate-700'
+                                  ? 'bg-emerald-50 text-red-600 font-black'
+                                  : 'hover:bg-emerald-50/60 hover:text-emerald-800 text-slate-700'
                                   }`}
                               >
-                                {IconComponent && <IconComponent className={`w-3.5 h-3.5 shrink-0 ${isSubActive ? 'text-[#0b8026]' : 'text-emerald-700'}`} />}
+                                {IconComponent && <IconComponent className={`w-3.5 h-3.5 shrink-0 ${isSubActive ? 'text-red-600' : 'text-emerald-700'}`} />}
                                 <span>{link.label}</span>
                               </Link>
                             );
@@ -387,8 +401,8 @@ export default function Navbar() {
                     key={item.href + item.label}
                     href={item.href}
                     className={`px-3 py-2.5 transition rounded-sm whitespace-nowrap ${isActive
-                      ? 'bg-[#075018] text-white font-black shadow-inner'
-                      : 'hover:bg-[#09661f] text-white'
+                      ? 'bg-red-600 text-white font-black shadow-inner'
+                      : 'hover:bg-[#075018] text-white'
                       }`}
                   >
                     {item.label}
@@ -401,7 +415,7 @@ export default function Navbar() {
             <div className="flex lg:hidden items-center justify-between w-full">
               <Link
                 href="/"
-                className={`flex items-center gap-1 font-bold text-xs py-1.5 px-2.5 rounded-md transition ${pathname === '/' ? 'bg-[#075018] text-white font-black' : 'hover:bg-[#09661f]'
+                className={`flex items-center gap-1 font-bold text-xs py-1.5 px-2.5 rounded-md transition ${pathname === '/' ? 'bg-red-600 text-white font-black' : 'hover:bg-[#09661f]'
                   }`}
               >
                 <FiHome className="w-4 h-4" />
@@ -411,7 +425,7 @@ export default function Navbar() {
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-1.5 text-white hover:bg-[#09661f] rounded-lg cursor-pointer"
+                className="p-1.5 text-white hover:bg-red-600 rounded-lg cursor-pointer transition"
                 aria-label="Toggle Menu"
               >
                 {mobileMenuOpen ? <FiX className="w-6 h-6" /> : <FiMenu className="w-6 h-6" />}
@@ -424,17 +438,17 @@ export default function Navbar() {
 
       {/* ---------------- MOBILE DRAWER ---------------- */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-white text-slate-900 border-b-2 border-[#0b8026] py-3 px-4 shadow-xl max-h-[80vh] overflow-y-auto">
+        <div className="lg:hidden bg-white text-slate-900 border-b-4 border-red-600 py-3 px-4 shadow-2xl max-h-[80vh] overflow-y-auto">
           <div className="space-y-1 text-xs font-bold">
             <Link
               href="/"
               onClick={() => setMobileMenuOpen(false)}
               className={`flex items-center gap-2 py-2 px-3 rounded-lg transition ${pathname === '/'
-                ? 'bg-emerald-50 text-[#0b8026] font-black'
+                ? 'bg-red-50 text-red-600 font-black border-l-4 border-red-600'
                 : 'hover:bg-emerald-50/60 text-slate-800 hover:text-[#0b8026]'
                 }`}
             >
-              <FiHome className={`w-4 h-4 ${pathname === '/' ? 'text-[#0b8026]' : 'text-emerald-700'}`} />
+              <FiHome className={`w-4 h-4 ${pathname === '/' ? 'text-red-600' : 'text-emerald-700'}`} />
               <span>Home</span>
             </Link>
             {navMenuItems.map((item) => {
@@ -494,7 +508,7 @@ export default function Navbar() {
                 </div>
               );
             })}
-            {currentUser && (
+            {activeUser && (
               <div className="pt-2 border-t border-slate-100">
                 <button
                   type="button"
@@ -505,7 +519,7 @@ export default function Navbar() {
                   className="w-full text-left py-2 px-3 rounded-lg text-red-600 hover:bg-red-50 text-xs font-bold transition flex items-center gap-1.5"
                 >
                   <FiX className="w-4 h-4" />
-                  <span>Sign Out ({currentUser.name})</span>
+                  <span>Sign Out ({activeUser.name})</span>
                 </button>
               </div>
             )}

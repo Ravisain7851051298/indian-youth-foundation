@@ -4,12 +4,12 @@ import JsonLd from '@/components/seo/JsonLd';
 export const metadata = {
   title: 'Volunteer with Us - Join the Youth Revolution',
   description:
-    'Join Indian Youth Foundation as an active volunteer. Lead social drives in child education, blood donation camps, environmental initiatives, and gain recognized certificates.',
+    'Join Yuva Kranti Dal as an active volunteer. Lead social drives in child education, blood donation camps, environmental initiatives, and gain recognized certificates.',
   alternates: {
     canonical: '/volunteer',
   },
   openGraph: {
-    title: 'Volunteer with Indian Youth Foundation (भारतीय युवा क्रांति)',
+    title: 'Volunteer with Yuva Kranti Dal (युवा क्रांति दल)',
     description:
       'Empower yourself by empowering others. Become an active grassroots volunteer and earn verified certificates.',
     url: `${SITE_CONFIG.url}/volunteer`,
@@ -23,7 +23,7 @@ const breadcrumbs = [
 
 const volunteerFaqs = [
   {
-    question: 'Who can volunteer with Indian Youth Foundation?',
+    question: 'Who can volunteer with Yuva Kranti Dal?',
     answer:
       'Any passionate youth, student, or professional who wants to contribute time and skills towards education, health camps, or community drives can join.',
   },

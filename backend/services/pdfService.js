@@ -150,7 +150,7 @@ function drawVectorSeal(doc, cx, cy, radius = 34, accentColor = '#b91c1c') {
 
   // Seal Text
   doc.font('Helvetica-Bold').fontSize(5.5).fillColor(accentColor);
-  doc.text('INDIAN YOUTH FOUNDATION', cx - radius + 6, cy - 16, { width: (radius - 6) * 2, align: 'center' });
+  doc.text('YUVA KRANTI DAL', cx - radius + 6, cy - 16, { width: (radius - 6) * 2, align: 'center' });
   doc.fontSize(7).text('OFFICIAL SEAL', cx - radius + 6, cy - 5, { width: (radius - 6) * 2, align: 'center' });
   doc.fontSize(5).text('REG NO: 421/2019', cx - radius + 6, cy + 6, { width: (radius - 6) * 2, align: 'center' });
   doc.restore();
@@ -190,7 +190,7 @@ async function generateDonationReceiptPdf(donation = {}) {
 
       // Top Header
       doc.font('Helvetica-Bold').fontSize(18).fillColor('#c2410c');
-      doc.text('INDIAN YOUTH FOUNDATION', 40, 45, { align: 'center' });
+      doc.text('YUVA KRANTI DAL', 40, 45, { align: 'center' });
       doc.font('Helvetica-Bold').fontSize(11).fillColor('#0f172a');
       doc.text('BHARATIYA YUVA KRANTI', 40, 68, { align: 'center' });
       doc.font('Helvetica').fontSize(8.5).fillColor('#475569');
@@ -256,7 +256,7 @@ async function generateDonationReceiptPdf(donation = {}) {
       doc.text('STATUTORY 80G INCOME TAX EXEMPTION DECLARATION', 50, y + 8);
       doc.font('Helvetica').fontSize(7.5).fillColor('#78350f');
       doc.text(
-        '1. This receipt confirms that the donation received is voluntarily contributed and shall be utilized solely for the charitable objects of Indian Youth Foundation.\n' +
+        '1. This receipt confirms that the donation received is voluntarily contributed and shall be utilized solely for the charitable objects of Yuva Kranti Dal.\n' +
         '2. Donors are entitled to deduction under Section 80G(5)(vi) of the Income Tax Act, 1961 (Vide Trust Registration 421/2019).\n' +
         '3. This digital certificate is authenticated under electronic signature standards and registered in the Trust Audit Database.',
         50, y + 22, { width: 495, lineGap: 2 }
@@ -274,7 +274,7 @@ async function generateDonationReceiptPdf(donation = {}) {
 
       // Authorized Signatory
       doc.font('Helvetica-Bold').fontSize(9).fillColor('#0f172a');
-      doc.text('For INDIAN YOUTH FOUNDATION', 370, y + 10, { width: 175, align: 'center' });
+      doc.text('For YUVA KRANTI DAL', 370, y + 10, { width: 175, align: 'center' });
       doc.font('Helvetica-Oblique').fontSize(8).fillColor('#059669');
       doc.text('[Digitally Verified by Trustees]', 370, y + 38, { width: 175, align: 'center' });
       doc.font('Helvetica-Bold').fontSize(8.5).fillColor('#0f172a');
@@ -323,7 +323,7 @@ async function generateVolunteerOfferLetterPdf(user = {}) {
 
       // Header
       doc.font('Helvetica-Bold').fontSize(18).fillColor('#059669');
-      doc.text('INDIAN YOUTH FOUNDATION', 40, 45, { align: 'center' });
+      doc.text('YUVA KRANTI DAL', 40, 45, { align: 'center' });
       doc.font('Helvetica-Bold').fontSize(11).fillColor('#0f172a');
       doc.text('BHARATIYA YUVA KRANTI • VOLUNTEER WING', 40, 68, { align: 'center' });
       doc.font('Helvetica').fontSize(8.5).fillColor('#475569');
@@ -356,7 +356,7 @@ async function generateVolunteerOfferLetterPdf(user = {}) {
       doc.text(`Dear ${name},`, 40, textY);
 
       textY += 18;
-      const p1 = 'On behalf of the National Executive Council of Indian Youth Foundation (भारतीय युवा क्रांति), we are delighted to convey official approval of your volunteer application and warmly welcome you to our nationwide mission.';
+      const p1 = 'On behalf of the National Executive Council of Yuva Kranti Dal (युवा क्रांति दल), we are delighted to convey official approval of your volunteer application and warmly welcome you to our nationwide mission.';
       doc.text(p1, 40, textY, { width: 515, align: 'justify' });
 
       textY += 38;
@@ -395,7 +395,7 @@ async function generateVolunteerOfferLetterPdf(user = {}) {
       drawVectorSeal(doc, 290, signY + 35, 34, '#059669');
 
       doc.font('Helvetica-Bold').fontSize(9).fillColor('#0f172a');
-      doc.text('For INDIAN YOUTH FOUNDATION', 370, signY + 5, { width: 175, align: 'center' });
+      doc.text('For YUVA KRANTI DAL', 370, signY + 5, { width: 175, align: 'center' });
       doc.font('Helvetica-Oblique').fontSize(8).fillColor('#059669');
       doc.text('[Statutory Digital Seal & Signature]', 370, signY + 30, { width: 175, align: 'center' });
       doc.font('Helvetica-Bold').fontSize(8.5).fillColor('#0f172a');
@@ -404,7 +404,7 @@ async function generateVolunteerOfferLetterPdf(user = {}) {
       doc.text('National Executive Committee', 370, signY + 60, { width: 175, align: 'center' });
 
       doc.font('Helvetica').fontSize(7).fillColor('#94a3b8');
-      doc.text('This is an authentic official appointment document issued under the bylaws of Indian Youth Foundation Trust.', 40, 795, { align: 'center' });
+      doc.text('This is an authentic official appointment document issued under the bylaws of Yuva Kranti Dal Trust.', 40, 795, { align: 'center' });
 
       doc.end();
     } catch (err) {
@@ -449,7 +449,7 @@ async function generateAppointmentLetterPdf(user = {}) {
 
       // Header
       doc.font('Helvetica-Bold').fontSize(18).fillColor('#b91c1c');
-      doc.text('INDIAN YOUTH FOUNDATION', 40, 45, { align: 'center' });
+      doc.text('YUVA KRANTI DAL', 40, 45, { align: 'center' });
       doc.font('Helvetica-Bold').fontSize(11).fillColor('#0f172a');
       doc.text('BHARATIYA YUVA KRANTI • NATIONAL EXECUTIVE COUNCIL', 40, 68, { align: 'center' });
       doc.font('Helvetica').fontSize(8.5).fillColor('#475569');
@@ -482,7 +482,7 @@ async function generateAppointmentLetterPdf(user = {}) {
       doc.text(`Dear ${name},`, 40, textY);
 
       textY += 18;
-      const p1 = 'The Board of Trustees and the National Executive Committee of Indian Youth Foundation (भारतीय युवा क्रांति) are pleased to officially ratify and confirm your appointment as a Registered Member of the Foundation.';
+      const p1 = 'The Board of Trustees and the National Executive Committee of Yuva Kranti Dal (युवा क्रांति दल) are pleased to officially ratify and confirm your appointment as a Registered Member of the Foundation.';
       doc.text(p1, 40, textY, { width: 515, align: 'justify' });
 
       textY += 38;
@@ -497,7 +497,7 @@ async function generateAppointmentLetterPdf(user = {}) {
       const points = [
         '1. Deliberative Standing: You are authorized to participate in official foundation assemblies, regional conventions, and social development consultations.',
         '2. Welfare Initiatives: You are empowered to plan, lead, and execute educational, environmental, and humanitarian programs in alignment with trust objectives.',
-        '3. Public Representation: You hold official authority to represent the goals of Indian Youth Foundation before administrative and civic bodies within your jurisdiction.',
+        '3. Public Representation: You hold official authority to represent the goals of Yuva Kranti Dal before administrative and civic bodies within your jurisdiction.',
         '4. Code of Governance: You shall uphold high ethical standards, transparency, and fiduciary dedication to the trust constitution.'
       ];
 
@@ -531,7 +531,7 @@ async function generateAppointmentLetterPdf(user = {}) {
       }
 
       doc.font('Helvetica-Bold').fontSize(9).fillColor('#0f172a');
-      doc.text('For INDIAN YOUTH FOUNDATION', 370, signY + 5, { width: 175, align: 'center' });
+      doc.text('For YUVA KRANTI DAL', 370, signY + 5, { width: 175, align: 'center' });
       doc.font('Helvetica-Oblique').fontSize(8).fillColor('#b91c1c');
       doc.text('[Digitally Sealed & Ratified]', 370, signY + 30, { width: 175, align: 'center' });
       doc.font('Helvetica-Bold').fontSize(8.5).fillColor('#0f172a');
@@ -585,7 +585,7 @@ async function generateIdCardPdf(user = {}, roleType = 'volunteer') {
 
       // Title & Instruction at top
       doc.font('Helvetica-Bold').fontSize(16).fillColor(themeColor);
-      doc.text('INDIAN YOUTH FOUNDATION', 40, 45, { align: 'center' });
+      doc.text('YUVA KRANTI DAL', 40, 45, { align: 'center' });
       doc.font('Helvetica-Bold').fontSize(10).fillColor('#0f172a');
       doc.text(`OFFICIAL DUAL-SIDED DIGITAL IDENTITY BADGE (${id})`, 40, 68, { align: 'center' });
       doc.font('Helvetica').fontSize(8).fillColor('#64748b');
@@ -602,7 +602,7 @@ async function generateIdCardPdf(user = {}, roleType = 'volunteer') {
       // Front Header Banner
       doc.rect(frontX + 1, topY + 1, cardW - 2, 72).fillColor(themeColor).fill();
       doc.font('Helvetica-Bold').fontSize(11).fillColor('#ffffff');
-      doc.text('INDIAN YOUTH FOUNDATION', frontX, topY + 12, { width: cardW, align: 'center' });
+      doc.text('YUVA KRANTI DAL', frontX, topY + 12, { width: cardW, align: 'center' });
       doc.font('Helvetica-Bold').fontSize(8.5).fillColor('#fde047');
       doc.text(cardTitle, frontX, topY + 28, { width: cardW, align: 'center' });
       doc.font('Helvetica').fontSize(6.5).fillColor('#ffffff');
@@ -696,7 +696,7 @@ async function generateIdCardPdf(user = {}, roleType = 'volunteer') {
       doc.font('Helvetica').fontSize(6).fillColor('#64748b');
       doc.text(
         'PROPERTY NOTICE:\n' +
-        'This identity badge is the exclusive property of Indian Youth Foundation. Any unauthorized duplication, alteration, or misuse is strictly prohibited under IT Act 2000.\n' +
+        'This identity badge is the exclusive property of Yuva Kranti Dal. Any unauthorized duplication, alteration, or misuse is strictly prohibited under IT Act 2000.\n' +
         'If found, kindly return to: National Head Office, Krishna Vihar, Pala Road, Aligarh, UP - 202001.',
         backX + 14, topY + 314, { width: cardW - 28, lineGap: 1 }
       );
@@ -783,7 +783,7 @@ async function generateCertificatePdf(cert = {}) {
 
       // Organization Header
       doc.font('Helvetica-Bold').fontSize(22).fillColor('#7f1d1d');
-      doc.text('INDIAN YOUTH FOUNDATION', 110, 44, { align: 'center', width: w - 220 });
+      doc.text('YUVA KRANTI DAL', 110, 44, { align: 'center', width: w - 220 });
       doc.font('Helvetica-Bold').fontSize(11).fillColor('#0f172a');
       doc.text('BHARATIYA YUVA KRANTI • NATIONAL HONOURS & MERIT COUNCIL', 110, 70, { align: 'center', width: w - 220 });
       doc.font('Helvetica').fontSize(8).fillColor('#475569');
@@ -852,7 +852,7 @@ async function generateCertificatePdf(cert = {}) {
       }
 
       doc.font('Helvetica-Bold').fontSize(9.5).fillColor('#0f172a');
-      doc.text('For INDIAN YOUTH FOUNDATION', w - 300, bottomY + 8, { width: 220, align: 'center' });
+      doc.text('For YUVA KRANTI DAL', w - 300, bottomY + 8, { width: 220, align: 'center' });
       doc.font('Helvetica-Bold').fontSize(9).fillColor('#0f172a');
       doc.text(issuedBy, w - 300, bottomY + 54, { width: 220, align: 'center' });
       doc.font('Helvetica').fontSize(7.5).fillColor('#64748b');
@@ -860,7 +860,7 @@ async function generateCertificatePdf(cert = {}) {
 
       // Bottom Security Note
       doc.font('Helvetica').fontSize(6.8).fillColor('#94a3b8');
-      doc.text('This is an authentic verified digital award certificate issued by the National Executive Council of Indian Youth Foundation.', 50, h - 36, { align: 'center', width: w - 100 });
+      doc.text('This is an authentic verified digital award certificate issued by the National Executive Council of Yuva Kranti Dal.', 50, h - 36, { align: 'center', width: w - 100 });
 
       doc.end();
     } catch (err) {
