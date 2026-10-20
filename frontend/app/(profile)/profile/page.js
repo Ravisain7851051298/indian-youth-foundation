@@ -2,13 +2,13 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { 
-  FiUser, 
-  FiCreditCard, 
-  FiFileText, 
-  FiAward, 
-  FiHeart, 
-  FiShield, 
+import {
+  FiUser,
+  FiCreditCard,
+  FiFileText,
+  FiAward,
+  FiHeart,
+  FiShield,
   FiArrowRight,
   FiUploadCloud,
   FiCheckCircle,
@@ -57,8 +57,8 @@ export default function ProfileOverviewPage() {
   const memberApp = currentUser?.membershipApplication;
   const isMemberPending = memberApp?.status === 'pending' || (currentUser?.status === 'pending' && currentUser?.feePaid && !currentUser?.volunteerApplication);
   const isMember = Boolean(
-    currentUser?.role === 'Member' || 
-    currentUser?.role === 'Admin' || 
+    currentUser?.role === 'Member' ||
+    currentUser?.role === 'Admin' ||
     (currentUser?.isMember && !currentUser?.memberId?.startsWith('BYK-DON-')) ||
     (memberApp?.status === 'approved') ||
     (currentUser?.memberId && (currentUser.memberId.startsWith('BYK-MEM-') || currentUser.memberId.startsWith('MEM-')))
@@ -68,9 +68,9 @@ export default function ProfileOverviewPage() {
   const volunteerApp = currentUser?.volunteerApplication;
   const isVolunteerPending = volunteerApp?.status === 'pending' || (currentUser?.status === 'pending' && !memberApp && (currentUser?.role === 'Volunteer' || volunteerApp));
   const isVolunteer = Boolean(
-    currentUser?.role === 'Volunteer' || 
-    currentUser?.isVolunteer || 
-    volunteerApp?.status === 'approved' || 
+    currentUser?.role === 'Volunteer' ||
+    currentUser?.isVolunteer ||
+    volunteerApp?.status === 'approved' ||
     volunteerApp?.status === 'pending' ||
     (currentUser?.volunteerId && !currentUser?.volunteerId?.startsWith('BYK-DON-'))
   );
@@ -202,8 +202,8 @@ export default function ProfileOverviewPage() {
             </span>
           </div>
           <p className="text-[11px] text-slate-700 font-medium mt-1">
-            {certificates.length > 0 
-              ? `${certificates.length} National citations awarded & verifiable` 
+            {certificates.length > 0
+              ? `${certificates.length} National citations awarded & verifiable`
               : 'Appreciation honors issued by Board of Trustees'}
           </p>
           <div className="mt-4 flex items-center gap-1 text-xs font-bold text-amber-700">
@@ -359,7 +359,7 @@ export default function ProfileOverviewPage() {
                 </div>
 
                 <div className="mt-4 pt-3 border-t border-amber-200/60 flex items-center justify-between text-xs">
-                  <span className="text-[10px] font-bold text-slate-600 truncate max-w-[150px]">
+                  <span className="text-[10px] font-bold text-slate-600 truncate max-w-37.5">
                     {cert.issuedBy || 'National Executive Council'}
                   </span>
 
@@ -406,7 +406,7 @@ export default function ProfileOverviewPage() {
             <div>
               <h3 className="text-lg font-black text-black">Foundation Membership Hub</h3>
               <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                {isMember 
+                {isMember
                   ? `Enrolled as ${currentUser?.membershipPlan || 'Official Foundation Member'}. View your statutory voting rights, appointment letter, and ID card.`
                   : 'Join as an official verified member of Yuva Kranti Dal. Receive official photo ID card, appointment letter, and governance voting rights.'
                 }
@@ -463,7 +463,7 @@ export default function ProfileOverviewPage() {
             <div>
               <h3 className="text-lg font-black text-black">Grassroots Volunteer Wing</h3>
               <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                {isVolunteer 
+                {isVolunteer
                   ? 'Authorized volunteer for field outreach, slum child education, and emergency blood donation helplines.'
                   : 'Empower communities through grassroots action. Participate in relief drives, earn Certificates of Appreciation, and receive a volunteer badge.'
                 }
@@ -500,7 +500,7 @@ export default function ProfileOverviewPage() {
       <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-2xs">
         <h3 className="font-black text-black text-sm mb-4 pb-3 border-b border-slate-100 flex items-center justify-between">
           <span>Official Trust Enrolment Profile</span>
-          <span className="text-xs font-normal text-slate-700 font-medium">
+          <span className="text-xs text-slate-700 font-medium">
             Registered Head Office: Krishna Vihar Pala Road Aligarh
           </span>
         </h3>
@@ -530,8 +530,8 @@ export default function ProfileOverviewPage() {
             <div>
               <span className="text-slate-500 font-bold block">Official Volunteer ID</span>
               <span className="font-mono font-bold text-indigo-700 mt-0.5 block">
-                {currentUser?.volunteerId && !currentUser?.volunteerId.startsWith('BYK-DON-') 
-                  ? currentUser.volunteerId 
+                {currentUser?.volunteerId && !currentUser?.volunteerId.startsWith('BYK-DON-')
+                  ? currentUser.volunteerId
                   : (currentUser?.volunteerApplication?.assignedVolunteerId || `BYK-VOL-${currentUser?.phone ? currentUser.phone.slice(-4) : '2026'}`)}
               </span>
             </div>

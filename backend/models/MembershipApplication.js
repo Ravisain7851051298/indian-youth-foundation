@@ -23,6 +23,10 @@ const membershipApplicationSchema = new mongoose.Schema({
   district: { type: String, default: 'Aligarh' },
   state: { type: String, default: 'Uttar Pradesh' },
   photoUrl: { type: String, default: '' },
+  documentType: { type: String, default: 'Aadhaar Card' },
+  documentFront: { type: String, default: '' },
+  documentBack: { type: String, default: '' },
+  idProofUrl: { type: String, default: '' },
   designation: { type: String, default: 'Verified Member' },
   status: { 
     type: String, 
@@ -34,7 +38,8 @@ const membershipApplicationSchema = new mongoose.Schema({
   verifiedBy: { type: String, default: null },
   reviewedAt: { type: Date, default: null },
   reviewedBy: { type: String, default: null },
-  rejectionReason: { type: String, default: null }
+  rejectionReason: { type: String, default: null },
+  isGuest: { type: Boolean, default: false }
 }, {
   timestamps: true
 });

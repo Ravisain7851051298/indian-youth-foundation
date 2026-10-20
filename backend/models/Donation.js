@@ -26,6 +26,7 @@ const donationSchema = new mongoose.Schema({
   approvedAt: { type: Date, default: null },
   approvedBy: { type: String, default: null },
   rejectionReason: { type: String, default: null },
+  isGuest: { type: Boolean, default: false },
   date: { type: Date, default: Date.now }
 }, {
   timestamps: true

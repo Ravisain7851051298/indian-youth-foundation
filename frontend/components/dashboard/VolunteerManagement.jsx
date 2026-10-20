@@ -31,6 +31,7 @@ export default function VolunteerManagement() {
   const [searchQuery, setSearchQuery] = useState("");
 
   const [selectedProof, setSelectedProof] = useState(null);
+  const [viewModalItem, setViewModalItem] = useState(null);
   const [rejectModalItem, setRejectModalItem] = useState(null);
   const [rejectReason, setRejectReason] = useState("");
   const [deleteModalItem, setDeleteModalItem] = useState(null);
@@ -334,9 +335,9 @@ export default function VolunteerManagement() {
               <thead className="bg-slate-50 border-b border-slate-200 text-black font-extrabold">
                 <tr>
                   <th className="py-3 px-3.5">Volunteer</th>
+                  <th className="py-3 px-3.5">KYC Document</th>
                   <th className="py-3 px-3.5">Skills &amp; Motivation</th>
                   <th className="py-3 px-3.5">Availability</th>
-                  <th className="py-3 px-3.5">ID Proof Document</th>
                   <th className="py-3 px-3.5">Status</th>
                   <th className="py-3 px-3.5">Date</th>
                   <th className="py-3 px-3.5 text-right sticky right-0 bg-slate-50 z-20 shadow-[-6px_0_10px_-2px_rgba(0,0,0,0.06)]">Actions</th>
@@ -345,7 +346,8 @@ export default function VolunteerManagement() {
               <tbody className="divide-y divide-slate-100 text-black">
                 {filtered.map((v) => {
                   const id = v._id || v.id;
-                  const proof = v.idProofDocument || v.idProofUrl || v.documentUrl;
+                  const proof = v.documentFront || v.idProofDocument || v.idProofUrl || v.documentUrl;
+                  const photo = v.photoUrl || v.user?.photoUrl;
                   const status = (v.status || "pending").toLowerCase();
                   const isApproved = status === "approved" || status === "active";
                   const isRejected = status === "rejected";
@@ -356,31 +358,54 @@ export default function VolunteerManagement() {
                   const phone = v.user?.phone || v.phone || "-";
                   const skillsDisplay = formatSkills(v.skills) || "Social Work & Volunteering";
                   const assignedId = v.assignedVolunteerId || v.user?.memberId;
+                  const docType = v.documentType || "Aadhaar Card";
 
                   return (
                     <tr key={id} className="group hover:bg-slate-50/80 transition">
                       <td className="py-3 px-3.5">
-                        <div className="font-extrabold text-black text-sm flex flex-row items-left gap-1.5">
-                          <span>{name}</span>
-                          {/* {isApproved && assignedId && (
-                            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 font-bold border border-blue-200">
-                              {assignedId}
-                            </span>
-                          )} */}
-                        </div>
-                        <div className="text-[11px] text-slate-600 flex flex-col items-left gap-2 mt-0.5">
-                          <span className="flex items-center gap-1">
-                            <FiMail className="w-3 h-3 text-slate-400" />
-                            {email}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <FiPhone className="w-3 h-3 text-slate-400" />
-                            {phone}
-                          </span>
+                        <div className="flex items-center gap-2.5">
+                          <div 
+                            onClick={() => photo && setSelectedProof(getContentImageUrl(photo))}
+                            className={`w-9 h-9 rounded-full bg-slate-100 border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center ${photo ? 'cursor-pointer hover:ring-2 hover:ring-[#0b8026]' : ''}`}
+                            title={photo ? "Click to view photo" : "No photo"}
+                          >
+                            {photo ? (
+                              <img
+                                src={getContentImageUrl(photo)}
+                                alt={name}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <FiUser className="w-4 h-4 text-slate-400" />
+                            )}
+                          </div>
+                          <div>
+                            <div className="font-extrabold text-black text-sm">{name}</div>
+                            <div className="text-[11px] text-slate-600">{email} • {phone}</div>
+                          </div>
                         </div>
                       </td>
 
-                      <td className="py-3 px-3.5 max-w-[180px]">
+                      <td className="py-3 px-3.5 whitespace-nowrap">
+                        <div className="space-y-1">
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200 block w-fit">
+                            {docType}
+                          </span>
+                          {(proof || v.documentBack) ? (
+                            <button
+                              onClick={() => setViewModalItem(v)}
+                              className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-600 hover:text-blue-800 hover:underline cursor-pointer"
+                            >
+                              <FiEye className="w-3 h-3" />
+                              <span>Inspect Documents</span>
+                            </button>
+                          ) : (
+                            <span className="text-[10px] text-slate-400 italic">No Doc Attached</span>
+                          )}
+                        </div>
+                      </td>
+
+                      <td className="py-3 px-3.5 max-w-45">
                         <div className="font-bold text-black line-clamp-1">{skillsDisplay}</div>
                         {(v.motivation || v.whyJoin) && (
                           <div className="text-[11px] text-slate-600 line-clamp-1 mt-0.5" title={v.motivation || v.whyJoin}>
@@ -402,24 +427,6 @@ export default function VolunteerManagement() {
                       </td>
 
                       <td className="py-3 px-3.5 whitespace-nowrap">
-                        {proof ? (
-                          <button
-                            onClick={() => setSelectedProof(getContentImageUrl(proof))}
-                            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-red-50 text-red-700 hover:bg-red-100 font-bold text-[11px] transition cursor-pointer border border-red-200"
-                          >
-                            {isPdfDocument(proof) ? (
-                              <FiFileText className="w-3.5 h-3.5" />
-                            ) : (
-                              <FiEye className="w-3.5 h-3.5" />
-                            )}
-                            <span>{isPdfDocument(proof) ? "Inspect PDF" : "View ID Proof"}</span>
-                          </button>
-                        ) : (
-                          <span className="text-slate-400 text-[11px] italic">No Document</span>
-                        )}
-                      </td>
-
-                      <td className="py-3 px-3.5 whitespace-nowrap">
                         <div className="space-y-1">
                           <span
                             className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase ${isApproved
@@ -436,7 +443,7 @@ export default function VolunteerManagement() {
                           </span>
 
                           {isRejected && v.rejectionReason && (
-                            <p className="text-[10px] text-rose-600 max-w-[160px] truncate" title={v.rejectionReason}>
+                            <p className="text-[10px] text-rose-600 max-w-40 truncate" title={v.rejectionReason}>
                               Reason: {v.rejectionReason}
                             </p>
                           )}
@@ -449,6 +456,15 @@ export default function VolunteerManagement() {
 
                       <td className="py-3 px-3.5 text-right whitespace-nowrap sticky right-0 bg-white group-hover:bg-slate-50 z-10 shadow-[-6px_0_10px_-2px_rgba(0,0,0,0.06)]">
                         <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            onClick={() => setViewModalItem(v)}
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-[11px] transition cursor-pointer border border-blue-200 shadow-2xs"
+                            title="Inspect volunteer details, photo, and 2-sided KYC documents"
+                          >
+                            <FiEye className="w-3.5 h-3.5" />
+                            <span>View</span>
+                          </button>
+
                           {isPending && (
                             <>
                               <button
@@ -509,6 +525,236 @@ export default function VolunteerManagement() {
         )}
       </div>
 
+      {/* View Volunteer Application & KYC Inspection Modal */}
+      {viewModalItem && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-5">
+          <div className="bg-white rounded-3xl max-w-3xl w-full border border-slate-200 shadow-2xl relative text-black max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="p-5 sm:p-6 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-[#0b8026] text-white flex items-center justify-center font-black shadow-xs">
+                  <FiShield className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-black text-base text-black">
+                    Volunteer Application &amp; KYC Verification
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    Application ID: <span className="font-mono font-bold text-slate-800">{viewModalItem._id || viewModalItem.id}</span>
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase ${
+                  (viewModalItem.status || "pending").toLowerCase() === "approved" || (viewModalItem.status || "pending").toLowerCase() === "active"
+                    ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
+                    : (viewModalItem.status || "pending").toLowerCase() === "rejected"
+                    ? "bg-rose-100 text-rose-800 border border-rose-200"
+                    : "bg-amber-100 text-amber-800 border border-amber-200"
+                }`}>
+                  {viewModalItem.status || "pending"}
+                </span>
+                <button
+                  onClick={() => setViewModalItem(null)}
+                  className="p-2 rounded-full text-slate-400 hover:text-black hover:bg-slate-200 transition cursor-pointer"
+                >
+                  <FiX className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-5 sm:p-6 space-y-6 overflow-y-auto">
+              
+              {/* Volunteer Overview Card */}
+              <div className="bg-slate-50 rounded-2xl p-4 sm:p-5 border border-slate-200 flex flex-col sm:flex-row items-center sm:items-start gap-4">
+                <div 
+                  onClick={() => (viewModalItem.photoUrl || viewModalItem.user?.photoUrl) && setSelectedProof(getContentImageUrl(viewModalItem.photoUrl || viewModalItem.user?.photoUrl))}
+                  className="w-20 h-20 rounded-2xl border-2 border-[#0b8026] bg-white overflow-hidden shrink-0 flex items-center justify-center shadow-xs cursor-pointer hover:ring-2 hover:ring-[#0b8026] transition"
+                  title="Click to zoom photo"
+                >
+                  {(viewModalItem.photoUrl || viewModalItem.user?.photoUrl) ? (
+                    <img
+                      src={getContentImageUrl(viewModalItem.photoUrl || viewModalItem.user?.photoUrl)}
+                      alt="Volunteer Photo"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <FiUser className="w-8 h-8 text-slate-300" />
+                  )}
+                </div>
+
+                <div className="flex-1 space-y-1 text-center sm:text-left text-xs">
+                  <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                    <h4 className="font-black text-black text-base">
+                      {viewModalItem.user?.name || viewModalItem.name || "Volunteer Applicant"}
+                    </h4>
+                    {viewModalItem.assignedVolunteerId && (
+                      <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300">
+                        {viewModalItem.assignedVolunteerId}
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-slate-600 flex flex-wrap items-center justify-center sm:justify-start gap-x-3 gap-y-1 pt-1">
+                    <span><strong>Email:</strong> {viewModalItem.user?.email || viewModalItem.email || "-"}</span>
+                    <span><strong>Phone:</strong> {viewModalItem.user?.phone || viewModalItem.phone || "-"}</span>
+                    <span><strong>Blood Group:</strong> {viewModalItem.bloodGroup || viewModalItem.user?.bloodGroup || "O+"}</span>
+                  </div>
+                  <div className="text-slate-600 flex flex-wrap items-center justify-center sm:justify-start gap-x-3 gap-y-1 pt-0.5">
+                    <span><strong>District:</strong> {viewModalItem.district || viewModalItem.user?.district || "Aligarh"}</span>
+                    <span><strong>State:</strong> {viewModalItem.state || viewModalItem.user?.state || "Uttar Pradesh"}</span>
+                    <span><strong>Availability:</strong> {viewModalItem.availability || "Weekends"}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Volunteer Service Motivations & Skills */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-1">
+                  <span className="text-slate-500 font-bold block text-[11px]">Skills &amp; Capabilities:</span>
+                  <p className="font-extrabold text-slate-900">{formatSkills(viewModalItem.skills)}</p>
+                </div>
+                {viewModalItem.interests && (
+                  <div className="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-1">
+                    <span className="text-slate-500 font-bold block text-[11px]">Humanitarian Interests:</span>
+                    <p className="font-semibold text-slate-900">{viewModalItem.interests}</p>
+                  </div>
+                )}
+                {(viewModalItem.motivation || viewModalItem.whyJoin) && (
+                  <div className="sm:col-span-2 bg-slate-50 p-3.5 rounded-2xl border border-slate-200 space-y-1">
+                    <span className="text-slate-500 font-bold block text-[11px]">Why Join Motivation:</span>
+                    <p className="text-slate-800 leading-relaxed font-medium">{viewModalItem.motivation || viewModalItem.whyJoin}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* KYC Government Documents Section (Front & Back) */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between pb-1 border-b border-slate-200">
+                  <span className="text-xs font-black uppercase tracking-wider text-black flex items-center gap-1.5">
+                    <FiShield className="text-[#0b8026] w-4 h-4" />
+                    <span>Government Verification Document ({viewModalItem.documentType || "Aadhaar Card"})</span>
+                  </span>
+                  <span className="text-[11px] font-extrabold text-[#0b8026] bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                    {viewModalItem.documentType || "Aadhaar Card"}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Front Side Document */}
+                  <div className="border border-slate-200 rounded-2xl p-3.5 bg-slate-50 space-y-2">
+                    <div className="flex items-center justify-between text-xs font-bold text-black">
+                      <span className="flex items-center gap-1">
+                        <FiFileText className="text-[#0b8026] w-3.5 h-3.5" />
+                        <span>Document Front Side (सामने)</span>
+                      </span>
+                      {(viewModalItem.documentFront || viewModalItem.idProofUrl || viewModalItem.idProofDocument) && (
+                        <button
+                          onClick={() => setSelectedProof(getContentImageUrl(viewModalItem.documentFront || viewModalItem.idProofUrl || viewModalItem.idProofDocument))}
+                          className="text-[10px] text-blue-600 font-extrabold hover:underline"
+                        >
+                          Zoom Full
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="rounded-xl overflow-hidden border border-slate-200 bg-white h-44 flex items-center justify-center">
+                      {(viewModalItem.documentFront || viewModalItem.idProofUrl || viewModalItem.idProofDocument) ? (
+                        <img
+                          src={getContentImageUrl(viewModalItem.documentFront || viewModalItem.idProofUrl || viewModalItem.idProofDocument)}
+                          alt="Document Front"
+                          className="h-full w-full object-contain cursor-pointer hover:scale-105 transition"
+                          onClick={() => setSelectedProof(getContentImageUrl(viewModalItem.documentFront || viewModalItem.idProofUrl || viewModalItem.idProofDocument))}
+                        />
+                      ) : (
+                        <span className="text-xs text-slate-400 italic">No Front Scan Uploaded</span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Back Side Document */}
+                  <div className="border border-slate-200 rounded-2xl p-3.5 bg-slate-50 space-y-2">
+                    <div className="flex items-center justify-between text-xs font-bold text-black">
+                      <span className="flex items-center gap-1">
+                        <FiFileText className="text-[#dc2626] w-3.5 h-3.5" />
+                        <span>Document Back Side (पीछे)</span>
+                      </span>
+                      {viewModalItem.documentBack && (
+                        <button
+                          onClick={() => setSelectedProof(getContentImageUrl(viewModalItem.documentBack))}
+                          className="text-[10px] text-blue-600 font-extrabold hover:underline"
+                        >
+                          Zoom Full
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="rounded-xl overflow-hidden border border-slate-200 bg-white h-44 flex items-center justify-center">
+                      {viewModalItem.documentBack ? (
+                        <img
+                          src={getContentImageUrl(viewModalItem.documentBack)}
+                          alt="Document Back"
+                          className="h-full w-full object-contain cursor-pointer hover:scale-105 transition"
+                          onClick={() => setSelectedProof(getContentImageUrl(viewModalItem.documentBack))}
+                        />
+                      ) : (
+                        <span className="text-xs text-slate-400 italic">No Back Scan Uploaded</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            {/* Modal Footer Actions */}
+            <div className="p-4 sm:p-5 border-t border-slate-200 bg-slate-50 flex flex-wrap items-center justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => setViewModalItem(null)}
+                className="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-bold text-xs hover:bg-slate-100 transition cursor-pointer"
+              >
+                Close Audit
+              </button>
+
+              <div className="flex items-center gap-2">
+                {((viewModalItem.status || "pending").toLowerCase() === "pending") && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const v = viewModalItem;
+                        setViewModalItem(null);
+                        setRejectModalItem(v);
+                      }}
+                      className="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-xs transition cursor-pointer flex items-center gap-1.5"
+                    >
+                      <FiX className="w-4 h-4" />
+                      <span>Reject Application</span>
+                    </button>
+                    <button
+                      type="button"
+                      disabled={processingId === (viewModalItem._id || viewModalItem.id)}
+                      onClick={async () => {
+                        const id = viewModalItem._id || viewModalItem.id;
+                        await handleApprove(id);
+                        setViewModalItem(null);
+                      }}
+                      className="px-5 py-2.5 rounded-xl bg-[#0b8026] hover:bg-[#075018] text-white font-black text-xs shadow-md transition cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+                    >
+                      <FiCheck className="w-4 h-4" />
+                      <span>Approve &amp; Issue Offer Letter</span>
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
+
       {/* ID Proof Preview Modal */}
       {selectedProof && (
         <div
@@ -544,7 +790,7 @@ export default function VolunteerManagement() {
               </a>
             </div>
 
-            <div className="rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 flex items-center justify-center min-h-[340px] max-h-[70vh]">
+            <div className="rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 flex items-center justify-center min-h-85 max-h-[70vh]">
               {isPdfDocument(selectedProof) ? (
                 <iframe
                   src={selectedProof}

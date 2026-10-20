@@ -3,13 +3,13 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { 
-  FiHeart, 
-  FiShield, 
-  FiCheckCircle, 
-  FiFileText, 
-  FiUploadCloud, 
-  FiClock, 
+import {
+  FiHeart,
+  FiShield,
+  FiCheckCircle,
+  FiFileText,
+  FiUploadCloud,
+  FiClock,
   FiAlertTriangle,
   FiTrash2,
   FiTarget,
@@ -74,10 +74,10 @@ function DonationContent() {
     const rawParam = searchParams.get('campaign') || searchParams.get('campaignId') || searchParams.get('id');
     if (rawParam) {
       if (campaigns && campaigns.length > 0) {
-        const found = campaigns.find(c => 
-          c._id === rawParam || 
-          c.id === rawParam || 
-          String(c._id) === String(rawParam) || 
+        const found = campaigns.find(c =>
+          c._id === rawParam ||
+          c.id === rawParam ||
+          String(c._id) === String(rawParam) ||
           c.title?.toLowerCase() === rawParam.toLowerCase()
         );
         if (found) {
@@ -92,9 +92,9 @@ function DonationContent() {
   }, [searchParams, campaigns]);
 
   // Resolve currently attached crowdfunding campaign object
-  const currentCampaign = campaigns?.find(c => 
-    c._id === selectedCampaign || 
-    c.id === selectedCampaign || 
+  const currentCampaign = campaigns?.find(c =>
+    c._id === selectedCampaign ||
+    c.id === selectedCampaign ||
     String(c._id) === String(selectedCampaign)
   );
 
@@ -201,7 +201,7 @@ function DonationContent() {
 
         try {
           confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
-        } catch (e) {}
+        } catch (e) { }
       } else {
         setError(res.message || 'Error occurred while submitting donation. Please check your network and try again.');
       }
@@ -223,7 +223,7 @@ function DonationContent() {
   return (
     <div className="min-h-screen bg-slate-50 py-10 sm:py-14">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        
+
         {/* Top Header Card */}
         <div className="text-center max-w-2xl mx-auto space-y-2.5">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 text-[#0b8026] text-xs font-black border border-emerald-200 shadow-2xs">
@@ -383,7 +383,7 @@ function DonationContent() {
                   onChange={(e) => setSelectedCampaign(e.target.value)}
                   className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-[#0b8026] focus:ring-2 focus:ring-emerald-500/20 font-medium text-xs text-slate-900 bg-white"
                 >
-                  <option value="general">🌐 General NGO Social Welfare Fund (Unrestricted)</option>
+                  <option value="general">🌐 Yuva Kranti Dal Fund (Unrestricted)</option>
                   {campaigns && campaigns.map((c) => (
                     <option key={c._id || c.id} value={c._id || c.id}>
                       🎯 [ID: #{(c._id || c.id).slice(-6)}] {c.title}
@@ -414,11 +414,10 @@ function DonationContent() {
                       key={amt}
                       type="button"
                       onClick={() => setAmount(amt)}
-                      className={`py-2.5 rounded-xl font-black text-xs transition cursor-pointer border ${
-                        Number(amount) === amt 
-                          ? 'bg-[#dc2626] border-[#dc2626] text-white shadow-xs' 
+                      className={`py-2.5 rounded-xl font-black text-xs transition cursor-pointer border ${Number(amount) === amt
+                          ? 'bg-[#dc2626] border-[#dc2626] text-white shadow-xs'
                           : 'bg-slate-50 border-slate-200 text-slate-800 hover:border-red-300 hover:bg-red-50/30'
-                      }`}
+                        }`}
                     >
                       ₹{amt.toLocaleString('en-IN')}
                     </button>
@@ -455,11 +454,10 @@ function DonationContent() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <label
                   onClick={() => setDisplayMode('qr')}
-                  className={`flex items-start gap-3.5 p-4 rounded-2xl border-2 cursor-pointer transition ${
-                    displayMode === 'qr'
+                  className={`flex items-start gap-3.5 p-4 rounded-2xl border-2 cursor-pointer transition ${displayMode === 'qr'
                       ? 'border-[#0b8026] bg-emerald-50/70 ring-2 ring-emerald-500/20 shadow-xs'
                       : 'border-slate-200 bg-white hover:border-emerald-300'
-                  }`}
+                    }`}
                 >
                   <input
                     type="radio"
@@ -481,11 +479,10 @@ function DonationContent() {
 
                 <label
                   onClick={() => setDisplayMode('bank')}
-                  className={`flex items-start gap-3.5 p-4 rounded-2xl border-2 cursor-pointer transition ${
-                    displayMode === 'bank'
+                  className={`flex items-start gap-3.5 p-4 rounded-2xl border-2 cursor-pointer transition ${displayMode === 'bank'
                       ? 'border-[#dc2626] bg-red-50/60 ring-2 ring-red-500/20 shadow-xs'
                       : 'border-slate-200 bg-white hover:border-red-300'
-                  }`}
+                    }`}
                 >
                   <input
                     type="radio"
@@ -508,7 +505,7 @@ function DonationContent() {
 
               {/* Mode 1 Display: Official Trust UPI QR Code */}
               {displayMode === 'qr' && (
-                <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-emerald-50/60 via-white to-red-50/40 border-2 border-emerald-500/40 text-center space-y-4">
+                <div className="p-5 sm:p-6 rounded-2xl bg-linear-to-br from-emerald-50/60 via-white to-red-50/40 border-2 border-emerald-500/40 text-center space-y-4">
                   <div className="inline-block p-3 bg-white rounded-2xl border border-slate-200 shadow-md">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
@@ -545,7 +542,7 @@ function DonationContent() {
 
               {/* Mode 2 Display: Direct Bank Details */}
               {displayMode === 'bank' && (
-                <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-red-50/50 via-white to-emerald-50/40 border-2 border-red-500/40 space-y-4">
+                <div className="p-5 sm:p-6 rounded-2xl bg-linear-to-br from-red-50/50 via-white to-emerald-50/40 border-2 border-red-500/40 space-y-4">
                   <div className="flex items-center justify-between pb-2 border-b border-slate-200">
                     <span className="text-xs font-black uppercase tracking-wider text-[#dc2626]">
                       Official Trust Bank Account Details
@@ -703,7 +700,7 @@ function DonationContent() {
             {/* Step 4 Card: Screenshot & Transaction ID (Green and Red Mix Colors) */}
             <div className="bg-white rounded-3xl p-6 sm:p-8 border-2 border-emerald-500/30 shadow-md space-y-5">
               <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#0b8026] to-[#dc2626] text-white flex items-center justify-center font-black text-sm shrink-0 shadow-xs">
+                <div className="w-8 h-8 rounded-xl bg-linear-to-br from-[#0b8026] to-[#dc2626] text-white flex items-center justify-center font-black text-sm shrink-0 shadow-xs">
                   4
                 </div>
                 <div>
@@ -737,8 +734,8 @@ function DonationContent() {
                 <label className="block font-bold text-slate-900 text-xs mb-1">
                   Upload Payment Transfer Screenshot (PNG / JPG) *
                 </label>
-                
-                <div className="border-2 border-dashed border-emerald-600/50 hover:border-[#dc2626] rounded-2xl p-5 text-center transition bg-gradient-to-b from-emerald-50/20 via-white to-red-50/20">
+
+                <div className="border-2 border-dashed border-emerald-600/50 hover:border-[#dc2626] rounded-2xl p-5 text-center transition bg-linear-to-b from-emerald-50/20 via-white to-red-50/20">
                   <input
                     type="file"
                     accept="image/*"
@@ -749,7 +746,7 @@ function DonationContent() {
 
                   {!previewUrl ? (
                     <label htmlFor="donationScreenshotInput" className="cursor-pointer space-y-2 block py-2">
-                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-100 to-red-100 text-[#0b8026] flex items-center justify-center mx-auto text-2xl shadow-2xs border border-emerald-200">
+                      <div className="w-12 h-12 rounded-2xl bg-linear-to-br from-emerald-100 to-red-100 text-[#0b8026] flex items-center justify-center mx-auto text-2xl shadow-2xs border border-emerald-200">
                         <FiUploadCloud className="w-6 h-6 text-[#0b8026]" />
                       </div>
                       <span className="text-xs font-black text-[#0b8026] hover:text-[#dc2626] transition block">
@@ -796,7 +793,7 @@ function DonationContent() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#0b8026] via-emerald-600 to-[#dc2626] hover:from-[#08631e] hover:to-[#b91c1c] text-white font-black text-sm sm:text-base shadow-lg shadow-emerald-900/20 transition cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="w-full py-4 rounded-2xl bg-linear-to-r from-[#0b8026] via-emerald-600 to-[#dc2626] hover:from-[#08631e] hover:to-[#b91c1c] text-white font-black text-sm sm:text-base shadow-lg shadow-emerald-900/20 transition cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {loading ? (
                     <span>Submitting Contribution for Verification...</span>

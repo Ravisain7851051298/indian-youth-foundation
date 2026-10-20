@@ -8,7 +8,12 @@ import {
   FiCheck,
   FiCheckCircle,
   FiAlertTriangle,
-  FiTrash2
+  FiTrash2,
+  FiUser,
+  FiFileText,
+  FiShield,
+  FiCamera,
+  FiImage
 } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchPlans } from '@/store/planSlice';
@@ -34,7 +39,16 @@ export default function ApplyMembershipPage() {
   const [guestDistrict, setGuestDistrict] = useState('Aligarh');
   const [guestState, setGuestState] = useState('Uttar Pradesh');
 
-  // Single-API upload state: raw file stored locally until form submission
+  // KYC Verification Documents & User Photo State
+  const [photoFile, setPhotoFile] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState('');
+  const [documentType, setDocumentType] = useState('Aadhaar Card');
+  const [docFrontFile, setDocFrontFile] = useState(null);
+  const [docFrontPreview, setDocFrontPreview] = useState('');
+  const [docBackFile, setDocBackFile] = useState(null);
+  const [docBackPreview, setDocBackPreview] = useState('');
+
+  // Payment Screenshot upload state
   const [selectedRawFile, setSelectedRawFile] = useState(null);
   const [fileName, setFileName] = useState('');
   const [previewUrl, setPreviewUrl] = useState('');
@@ -49,6 +63,67 @@ export default function ApplyMembershipPage() {
   const selectedPlan = plans.find(p => p._id === effectivePlanId) || plans[0];
   const isFormValid = !!selectedPlan && (!!transactionId.trim() || !!selectedRawFile);
 
+  // File Handlers
+  const handlePhotoSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) {
+      setFormError('Applicant photo size must be under 10MB.');
+      return;
+    }
+    setFormError('');
+    setPhotoFile(file);
+    setPhotoPreview(URL.createObjectURL(file));
+  };
+
+  const handleRemovePhoto = () => {
+    if (photoPreview && photoPreview.startsWith('blob:')) URL.revokeObjectURL(photoPreview);
+    setPhotoPreview('');
+    setPhotoFile(null);
+    const input = document.getElementById('userPhotoInput');
+    if (input) input.value = '';
+  };
+
+  const handleDocFrontSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 15 * 1024 * 1024) {
+      setFormError('Document Front image must be under 15MB.');
+      return;
+    }
+    setFormError('');
+    setDocFrontFile(file);
+    setDocFrontPreview(URL.createObjectURL(file));
+  };
+
+  const handleRemoveDocFront = () => {
+    if (docFrontPreview && docFrontPreview.startsWith('blob:')) URL.revokeObjectURL(docFrontPreview);
+    setDocFrontPreview('');
+    setDocFrontFile(null);
+    const input = document.getElementById('docFrontInput');
+    if (input) input.value = '';
+  };
+
+  const handleDocBackSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 15 * 1024 * 1024) {
+      setFormError('Document Back image must be under 15MB.');
+      return;
+    }
+    setFormError('');
+    setDocBackFile(file);
+    setDocBackPreview(URL.createObjectURL(file));
+  };
+
+  const handleRemoveDocBack = () => {
+    if (docBackPreview && docBackPreview.startsWith('blob:')) URL.revokeObjectURL(docBackPreview);
+    setDocBackPreview('');
+    setDocBackFile(null);
+    const input = document.getElementById('docBackInput');
+    if (input) input.value = '';
+  };
+
   const handleFileSelect = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -61,8 +136,6 @@ export default function ApplyMembershipPage() {
     setFormError('');
     setSelectedRawFile(file);
     setFileName(file.name);
-
-    // Immediate local preview without separate premature upload network request
     const localPreview = URL.createObjectURL(file);
     setPreviewUrl(localPreview);
   };
@@ -91,6 +164,21 @@ export default function ApplyMembershipPage() {
       return;
     }
 
+    if (!photoFile && !currentUser?.photoUrl) {
+      setFormError('Please upload your User Image / Passport Photo for ID card generation.');
+      return;
+    }
+
+    if (!docFrontFile) {
+      setFormError(`Please upload the FRONT side scan/photo of your ${documentType}.`);
+      return;
+    }
+
+    if (!docBackFile) {
+      setFormError(`Please upload the BACK side scan/photo of your ${documentType}.`);
+      return;
+    }
+
     if (!transactionId && !selectedRawFile) {
       setFormError('Please provide your Transaction UTR or select a payment screenshot');
       return;
@@ -99,7 +187,6 @@ export default function ApplyMembershipPage() {
     setFormError('');
 
     try {
-      // Single-API call: package all application data + payment screenshot into one FormData payload
       const formData = new FormData();
       formData.append('name', currentUser ? currentUser.name : guestName.trim());
       formData.append('email', currentUser ? currentUser.email : guestEmail.trim());
@@ -114,7 +201,14 @@ export default function ApplyMembershipPage() {
       formData.append('transactionId', transactionId);
       formData.append('utrNumber', transactionId);
       formData.append('notes', notes);
-      formData.append('category', 'payments');
+      formData.append('category', 'applications');
+
+      // Append Verification Documents
+      formData.append('documentType', documentType);
+      if (photoFile) formData.append('photo', photoFile);
+      if (docFrontFile) formData.append('documentFront', docFrontFile);
+      if (docBackFile) formData.append('documentBack', docBackFile);
+
       if (selectedRawFile) {
         formData.append('file', selectedRawFile);
         formData.append('paymentScreenshot', selectedRawFile);
@@ -138,7 +232,7 @@ export default function ApplyMembershipPage() {
           <span>Apply for Verified Trust Membership</span>
         </h2>
         <p className="text-xs text-black mt-1 font-medium">
-          Select your custom membership plan, contribute via Trust UPI QR, and submit payment proof for Trustee verification in a single step.
+          Upload KYC documents, select membership tier, and submit verification details for instant Trustee review.
         </p>
       </div>
 
@@ -156,7 +250,7 @@ export default function ApplyMembershipPage() {
               सदस्यता आवेदन सफलतापूर्वक प्राप्त हुआ!
             </h3>
             <p className="text-xs sm:text-sm text-slate-600 font-medium max-w-lg mx-auto">
-              आपकी सदस्यता का विवरण व भुगतान रसीद सत्यापन हेतु ट्रस्टी वेरिफिकेशन डेस्क को सफलतापूर्वक भेज दी गई है।
+              आपकी सदस्यता का विवरण, पहचान दस्तावेज व भुगतान रसीद सत्यापन हेतु ट्रस्टी वेरिफिकेशन डेस्क को सफलतापूर्वक भेज दी गई है।
             </p>
           </div>
 
@@ -167,8 +261,8 @@ export default function ApplyMembershipPage() {
               <span className="font-extrabold text-slate-900">{currentUser?.name || guestName}</span>
             </div>
             <div className="flex flex-wrap items-center justify-between gap-1 pb-2 border-b border-slate-200">
-              <span className="text-slate-500 font-bold">Registered Email Address:</span>
-              <span className="font-extrabold text-slate-900">{currentUser?.email || guestEmail}</span>
+              <span className="text-slate-500 font-bold">Document Type Submitted:</span>
+              <span className="font-extrabold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">{documentType} (Front &amp; Back)</span>
             </div>
             <div className="flex flex-wrap items-center justify-between gap-1 pb-2 border-b border-slate-200">
               <span className="text-slate-500 font-bold">Membership Plan:</span>
@@ -204,10 +298,10 @@ export default function ApplyMembershipPage() {
               Back to Home
             </Link>
             <Link
-              href="/login"
+              href="/login?role=member"
               className="px-6 py-3 rounded-xl bg-white text-slate-800 border border-slate-300 font-extrabold text-xs hover:bg-slate-100 transition shadow-2xs"
             >
-              Go to Sign In
+              Go to Member Sign In
             </Link>
             <button
               type="button"
@@ -217,9 +311,15 @@ export default function ApplyMembershipPage() {
                 setSelectedRawFile(null);
                 setPreviewUrl('');
                 setFileName('');
+                setPhotoFile(null);
+                setPhotoPreview('');
+                setDocFrontFile(null);
+                setDocFrontPreview('');
+                setDocBackFile(null);
+                setDocBackPreview('');
                 setFormError('');
               }}
-              className="px-4 py-3 text-xs text-slate-500 hover:text-slate-800 font-bold hover:underline cursor-pointer"
+              className="px-6 py-3 rounded-xl bg-red-50 text-red-700 border border-red-200 font-extrabold text-xs hover:bg-red-100 transition cursor-pointer"
             >
               Submit Another Application
             </button>
@@ -227,6 +327,7 @@ export default function ApplyMembershipPage() {
         </div>
       ) : (
         <>
+          {/* Global Alert Notification */}
           {(formError || reduxError) && (
             <div className="p-4 rounded-2xl bg-rose-50 border-2 border-rose-300 text-rose-800 text-xs font-bold flex items-start gap-3 shadow-sm animate-in fade-in slide-in-from-top-1">
               <FiAlertTriangle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
@@ -244,7 +345,7 @@ export default function ApplyMembershipPage() {
                 <span className="text-xs font-black uppercase tracking-wider text-red-700">
                   This Email ID is used for all official communication
                 </span>
-                <Link href="/login?redirect=/apply-member" className="text-xs font-bold text-blue-600 hover:underline">
+                <Link href="/login?role=member&redirect=/apply-member" className="text-xs font-bold text-blue-600 hover:underline">
                   Already have an account? Sign in
                 </Link>
               </div>
@@ -325,23 +426,216 @@ export default function ApplyMembershipPage() {
             </div>
           )}
 
-          {/* Fraud Prevention Statutory Notice */}
-          <div className="bg-red-50/50 border border-red-200 rounded-3xl p-5 flex items-start gap-3.5 text-xs text-black">
-            <FiAlertTriangle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
-            <div className="space-y-1">
-              <strong className="block font-black text-black">Statutory Notice &amp; Anti-Fraud Advisory</strong>
-              <p className="text-black leading-relaxed font-medium">
-                Yuva Kranti Dal is a government-registered charitable trust (Section 12A &amp; 80G Certified).
-                To prevent fraud, all contributions are validated against bank account statements before credentials are generated.
-                Forged or counterfeit payment screenshots will lead to immediate permanent account debarment and statutory reporting.
-              </p>
+          {/* STEP 1: APPLICANT PHOTO & KYC DUAL-SIDED DOCUMENT UPLOADS */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-black">
+              <span className="w-5 h-5 rounded-full bg-[#0b8026] text-white flex items-center justify-center text-[11px] font-bold">1</span>
+              <span>Applicant Photo &amp; Government ID Verification (KYC)</span>
+            </div>
+
+            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-2xs space-y-6">
+              
+              {/* Row A: User Photo Upload */}
+              <div className="border-b border-slate-100 pb-6">
+                <label className="text-xs font-bold text-black mb-2 flex items-center gap-1.5">
+                  <FiCamera className="text-[#0b8026] w-4 h-4" />
+                  <span>Applicant Passport Size Photo / Profile Picture *</span>
+                </label>
+
+                <div className="flex flex-col sm:flex-row items-center gap-5">
+                  {/* Photo Preview Circle */}
+                  <div className="w-24 h-24 rounded-full border-2 border-dashed border-[#0b8026] p-1 bg-slate-50 flex items-center justify-center overflow-hidden shrink-0 shadow-xs relative">
+                    {photoPreview ? (
+                      <img
+                        src={photoPreview}
+                        alt="Applicant Preview"
+                        className="w-full h-full object-cover rounded-full"
+                      />
+                    ) : (
+                      <FiUser className="w-10 h-10 text-slate-300" />
+                    )}
+                  </div>
+
+                  <div className="flex-1 space-y-2 text-center sm:text-left">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      id="userPhotoInput"
+                      onChange={handlePhotoSelect}
+                      className="hidden"
+                    />
+                    <div className="flex flex-wrap items-center gap-2 justify-center sm:justify-start">
+                      <label
+                        htmlFor="userPhotoInput"
+                        className="px-4 py-2 rounded-xl bg-[#0b8026] hover:bg-[#075018] text-white font-bold text-xs cursor-pointer shadow-xs transition inline-flex items-center gap-1.5"
+                      >
+                        <FiUploadCloud className="w-4 h-4" />
+                        <span>{photoFile ? 'Change Photo' : 'Upload User Image'}</span>
+                      </label>
+                      {photoFile && (
+                        <button
+                          type="button"
+                          onClick={handleRemovePhoto}
+                          className="px-3 py-2 rounded-xl bg-slate-100 hover:bg-rose-50 text-rose-600 font-bold text-xs transition cursor-pointer"
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-slate-500 font-medium">
+                      Clear frontal passport photograph (JPG, PNG, WEBP up to 10MB). Used for printing on your official dual-sided ID card.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Row B: Document Type Selection */}
+              <div>
+                <label className="text-xs font-bold text-black mb-1.5 flex items-center gap-1.5">
+                  <FiShield className="text-[#0b8026] w-4 h-4" />
+                  <span>Select Government Verification Document Type *</span>
+                </label>
+                <select
+                  value={documentType}
+                  onChange={(e) => setDocumentType(e.target.value)}
+                  className="w-full sm:max-w-md p-3 text-xs border border-slate-300 rounded-xl bg-white font-semibold text-black focus:outline-none focus:ring-2 focus:ring-[#0b8026]"
+                >
+                  <option value="Aadhaar Card">Aadhaar Card (आधार कार्ड)</option>
+                  <option value="PAN Card">PAN Card (पैन कार्ड)</option>
+                  <option value="Voter ID Card">Voter ID Card (मतदाता पहचान पत्र)</option>
+                  <option value="Driving License">Driving License (ड्राइविंग लाइसेंस)</option>
+                  <option value="Passport">Passport (पासपोर्ट)</option>
+                  <option value="Other Government ID">Other Government Recognized Photo ID</option>
+                </select>
+              </div>
+
+              {/* Row C: Dual-Sided Document Uploads (Front & Back) */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
+                
+                {/* 1. FRONT SIDE UPLOAD */}
+                <div className="border border-slate-200 rounded-2xl p-4 bg-slate-50/70 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-black flex items-center gap-1.5">
+                      <FiFileText className="text-[#0b8026] w-3.5 h-3.5" />
+                      <span>{documentType} - FRONT Side *</span>
+                    </span>
+                    <span className="text-[10px] uppercase font-black px-2 py-0.5 rounded bg-emerald-100 text-[#0b8026]">
+                      Front Side (सामने)
+                    </span>
+                  </div>
+
+                  {!docFrontFile ? (
+                    <div className="border-2 border-dashed border-slate-300 hover:border-[#0b8026] rounded-xl p-5 text-center transition bg-white cursor-pointer">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        id="docFrontInput"
+                        onChange={handleDocFrontSelect}
+                        className="hidden"
+                      />
+                      <label htmlFor="docFrontInput" className="cursor-pointer space-y-2 block">
+                        <FiUploadCloud className="w-8 h-8 text-[#0b8026] mx-auto" />
+                        <div>
+                          <span className="text-xs font-bold text-[#0b8026] hover:underline block">
+                            Click to upload Front Side Scan
+                          </span>
+                          <span className="text-[10px] text-slate-500 block mt-0.5">
+                            Clear photo or scan (JPG, PNG up to 15MB)
+                          </span>
+                        </div>
+                      </label>
+                    </div>
+                  ) : (
+                    <div className="rounded-xl border border-emerald-200 bg-white p-3 space-y-2">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-bold text-slate-800 truncate max-w-50">{docFrontFile.name}</span>
+                        <button
+                          type="button"
+                          onClick={handleRemoveDocFront}
+                          className="text-rose-600 hover:text-rose-700 font-bold text-[11px] cursor-pointer"
+                        >
+                          Change
+                        </button>
+                      </div>
+                      {docFrontPreview && (
+                        <div className="rounded-lg overflow-hidden border border-slate-100 bg-slate-50 max-h-40 flex items-center justify-center">
+                          <img src={docFrontPreview} alt="Document Front Preview" className="max-h-40 w-auto object-contain" />
+                        </div>
+                      )}
+                      <div className="text-[10px] text-emerald-700 font-bold flex items-center gap-1">
+                        <FiCheckCircle className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Front Side Attached Successfully</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* 2. BACK SIDE UPLOAD */}
+                <div className="border border-slate-200 rounded-2xl p-4 bg-slate-50/70 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-black flex items-center gap-1.5">
+                      <FiFileText className="text-[#dc2626] w-3.5 h-3.5" />
+                      <span>{documentType} - BACK Side *</span>
+                    </span>
+                    <span className="text-[10px] uppercase font-black px-2 py-0.5 rounded bg-red-100 text-red-700">
+                      Back Side (पीछे)
+                    </span>
+                  </div>
+
+                  {!docBackFile ? (
+                    <div className="border-2 border-dashed border-slate-300 hover:border-red-500 rounded-xl p-5 text-center transition bg-white cursor-pointer">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        id="docBackInput"
+                        onChange={handleDocBackSelect}
+                        className="hidden"
+                      />
+                      <label htmlFor="docBackInput" className="cursor-pointer space-y-2 block">
+                        <FiUploadCloud className="w-8 h-8 text-red-600 mx-auto" />
+                        <div>
+                          <span className="text-xs font-bold text-red-600 hover:underline block">
+                            Click to upload Back Side Scan
+                          </span>
+                          <span className="text-[10px] text-slate-500 block mt-0.5">
+                            Clear photo or scan (JPG, PNG up to 15MB)
+                          </span>
+                        </div>
+                      </label>
+                    </div>
+                  ) : (
+                    <div className="rounded-xl border border-red-200 bg-white p-3 space-y-2">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-bold text-slate-800 truncate max-w-50">{docBackFile.name}</span>
+                        <button
+                          type="button"
+                          onClick={handleRemoveDocBack}
+                          className="text-rose-600 hover:text-rose-700 font-bold text-[11px] cursor-pointer"
+                        >
+                          Change
+                        </button>
+                      </div>
+                      {docBackPreview && (
+                        <div className="rounded-lg overflow-hidden border border-slate-100 bg-slate-50 max-h-40 flex items-center justify-center">
+                          <img src={docBackPreview} alt="Document Back Preview" className="max-h-40 w-auto object-contain" />
+                        </div>
+                      )}
+                      <div className="text-[10px] text-red-700 font-bold flex items-center gap-1">
+                        <FiCheckCircle className="w-3.5 h-3.5 text-red-600" />
+                        <span>Back Side Attached Successfully</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+              </div>
             </div>
           </div>
 
-          {/* Step 1: Select Plan */}
+          {/* STEP 2: SELECT MEMBERSHIP TIER */}
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-black">
-              <span className="w-5 h-5 rounded-full bg-red-600 text-white flex items-center justify-center text-[11px] font-bold">1</span>
+              <span className="w-5 h-5 rounded-full bg-red-600 text-white flex items-center justify-center text-[11px] font-bold">2</span>
               <span>Select Your Membership Tier</span>
             </div>
 
@@ -404,10 +698,10 @@ export default function ApplyMembershipPage() {
             </div>
           </div>
 
-          {/* Step 2: Payment Details (UPI QR & Bank Transfer) */}
+          {/* STEP 3: PAYMENT DETAILS (UPI QR & BANK TRANSFER) */}
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-black">
-              <span className="w-5 h-5 rounded-full bg-red-600 text-white flex items-center justify-center text-[11px] font-bold">2</span>
+              <span className="w-5 h-5 rounded-full bg-red-600 text-white flex items-center justify-center text-[11px] font-bold">3</span>
               <span>Transfer Membership Contribution (₹{Number(selectedPlan?.fee || selectedPlan?.price || 250).toLocaleString('en-IN')})</span>
             </div>
 
@@ -415,7 +709,6 @@ export default function ApplyMembershipPage() {
               {/* UPI QR Display */}
               <div className="text-center md:border-r md:border-slate-100 md:pr-8">
                 <div className="inline-block p-4 bg-white rounded-2xl border-2 border-red-500 shadow-sm mb-3">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={settings?.upiQrImage || 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=bharatiyauva@okhdfcbank%26pn=Yuva%20Kranti%20Dal%26cu=INR'}
                     alt="Trust Official UPI QR"
@@ -466,10 +759,10 @@ export default function ApplyMembershipPage() {
             </div>
           </div>
 
-          {/* Step 3: Single API Upload Screenshot & Enter UTR Form */}
+          {/* STEP 4: SUBMIT PAYMENT PROOF & FINALIZE APPLICATION */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-black">
-              <span className="w-5 h-5 rounded-full bg-red-600 text-white flex items-center justify-center text-[11px] font-bold">3</span>
+              <span className="w-5 h-5 rounded-full bg-red-600 text-white flex items-center justify-center text-[11px] font-bold">4</span>
               <span>Submit Payment Proof for Verification</span>
             </div>
 
@@ -555,7 +848,6 @@ export default function ApplyMembershipPage() {
 
                     {previewUrl && (
                       <div className="relative max-w-sm mx-auto overflow-hidden rounded-xl border border-slate-200 bg-white p-2 shadow-xs">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={previewUrl}
                           alt="Payment Screenshot Preview"
@@ -594,7 +886,7 @@ export default function ApplyMembershipPage() {
                   className="px-8 py-3 rounded-2xl bg-red-600 hover:bg-red-700 disabled:bg-slate-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none text-white font-bold text-xs shadow-md shadow-red-600/20 transition flex items-center justify-center gap-2 cursor-pointer"
                 >
                   {submitting
-                    ? 'Submitting Application...'
+                    ? 'Submitting Application & Documents...'
                     : (!isFormValid
                       ? 'Enter UTR or Attach Screenshot to Submit'
                       : 'Submit Application for Trustee Verification')}

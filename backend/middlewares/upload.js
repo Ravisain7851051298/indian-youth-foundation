@@ -70,19 +70,45 @@ const handleOptionalFileUpload = (req, res, next) => {
 
     if (req.files && req.files.length > 0) {
       req.file = req.files[0];
-      const category = req.file.category || 'general';
-      const fileUrl = `/uploads/${category}/${req.file.filename}`;
 
-      // Automatically populate relevant schema fields
-      if (!req.body.idProofUrl && !req.body.idProofDocument) {
-        req.body.idProofUrl = fileUrl;
-        req.body.idProofDocument = fileUrl;
-      }
-      if (!req.body.paymentScreenshot && !req.body.screenshot) {
-        req.body.paymentScreenshot = fileUrl;
-      }
-      if (!req.body.fileUrl && !req.body.image) {
-        req.body.fileUrl = fileUrl;
+      req.files.forEach((f) => {
+        const cat = f.category || 'general';
+        const fileUrl = `/uploads/${cat}/${f.filename}`;
+        const fname = (f.fieldname || '').toLowerCase();
+
+        if (fname.includes('photo') || fname.includes('avatar') || fname === 'userimage') {
+          req.body.photoUrl = fileUrl;
+        } else if (fname.includes('front') || fname === 'documentfront' || fname === 'idprooffront') {
+          req.body.documentFront = fileUrl;
+          if (!req.body.idProofUrl) req.body.idProofUrl = fileUrl;
+          if (!req.body.idProofDocument) req.body.idProofDocument = fileUrl;
+        } else if (fname.includes('back') || fname === 'documentback' || fname === 'idproofback') {
+          req.body.documentBack = fileUrl;
+        } else if (fname.includes('payment') || fname.includes('screenshot') || fname === 'receipt') {
+          req.body.paymentScreenshot = fileUrl;
+        } else if (fname.includes('idproof') || fname.includes('document')) {
+          if (!req.body.documentFront) req.body.documentFront = fileUrl;
+          if (!req.body.idProofUrl) req.body.idProofUrl = fileUrl;
+          if (!req.body.idProofDocument) req.body.idProofDocument = fileUrl;
+        } else {
+          if (!req.body.fileUrl) req.body.fileUrl = fileUrl;
+        }
+      });
+
+      // Backward compatibility fallback for single file upload without specific fieldname
+      if (req.files.length === 1) {
+        const defaultUrl = `/uploads/${req.file.category || 'general'}/${req.file.filename}`;
+        if (!req.body.idProofUrl && !req.body.idProofDocument && !req.body.documentFront) {
+          req.body.idProofUrl = defaultUrl;
+          req.body.idProofDocument = defaultUrl;
+          req.body.documentFront = defaultUrl;
+        }
+        if (!req.body.paymentScreenshot && !req.body.screenshot) {
+          req.body.paymentScreenshot = defaultUrl;
+        }
+        if (!req.body.fileUrl) {
+          req.body.fileUrl = defaultUrl;
+        }
       }
     }
     next();

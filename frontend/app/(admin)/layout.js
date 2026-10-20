@@ -178,7 +178,7 @@ export default function AdminLayout({ children }) {
             {!collapsed ? (
               <>
                 <div className="flex items-center gap-3 overflow-hidden">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#0b8026] to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-700/20 font-black text-white text-base shrink-0 overflow-hidden">
+                  <div className="w-10 h-10 rounded-xl bg-linear-to-tr from-[#0b8026] to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-700/20 font-black text-white text-base shrink-0 overflow-hidden">
                     {settings?.logoUrl ? (
                       /* eslint-disable-next-line @next/next/no-img-element */
                       <img
@@ -207,7 +207,7 @@ export default function AdminLayout({ children }) {
             ) : (
               <div className="flex flex-col items-center gap-2">
                 <div
-                  className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#0b8026] to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-700/20 font-black text-white text-base shrink-0 cursor-pointer overflow-hidden"
+                  className="w-10 h-10 rounded-xl bg-linear-to-tr from-[#0b8026] to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-700/20 font-black text-white text-base shrink-0 cursor-pointer overflow-hidden"
                   onClick={toggleCollapsed}
                   title="Expand sidebar"
                 >
@@ -381,12 +381,12 @@ export default function AdminLayout({ children }) {
               {/* Drawer Top Header */}
               <div className="p-4 border-b border-slate-200 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#0b8026] to-emerald-600 flex items-center justify-center font-bold text-white text-sm shadow-sm">
+                  <div className="w-9 h-9 rounded-xl bg-linear-to-tr from-[#0b8026] to-emerald-600 flex items-center justify-center font-bold text-white text-sm shadow-sm">
                     युवा
                   </div>
                   <div>
                     <div className="text-xs font-black text-black">Trustee Admin</div>
-                    <div className="text-[10px] text-slate-600 truncate max-w-[140px]">{currentUser?.name}</div>
+                    <div className="text-[10px] text-slate-600 truncate max-w-35">{currentUser?.name}</div>
                   </div>
                 </div>
                 <button
@@ -539,7 +539,7 @@ export default function AdminLayout({ children }) {
                 )}
               </div>
               <div className="hidden lg:block text-left text-xs">
-                <div className="font-extrabold text-black leading-tight truncate max-w-[130px]">
+                <div className="font-extrabold text-black leading-tight truncate max-w-32.5">
                   {currentUser?.name || 'Trustee Admin'}
                 </div>
                 <div className="text-[10px] text-slate-500 font-medium">National Trustee</div>

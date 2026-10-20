@@ -109,7 +109,7 @@ export default function BlogDetailPage({ params }) {
           <FiChevronRight className="w-3.5 h-3.5" />
           <Link href="/blogs" className="hover:text-emerald-700 transition">News &amp; Blogs</Link>
           <FiChevronRight className="w-3.5 h-3.5" />
-          <span className="text-emerald-800 truncate max-w-[200px] sm:max-w-xs">{blog.title}</span>
+          <span className="text-emerald-800 truncate max-w-50 sm:max-w-xs">{blog.title}</span>
         </nav>
 
         {/* Main Article Container */}
@@ -138,7 +138,7 @@ export default function BlogDetailPage({ params }) {
 
           {/* Featured Image */}
           {imageSrc && (
-            <div className="w-full max-h-[460px] bg-slate-100 overflow-hidden relative">
+            <div className="w-full max-h-115 bg-slate-100 overflow-hidden relative">
               <img
                 src={imageSrc}
                 alt={blog.title}

@@ -10,6 +10,9 @@ const volunteerApplicationSchema = new mongoose.Schema({
   skills: { type: mongoose.Schema.Types.Mixed, default: '' },
   availability: { type: String, default: 'Weekends' },
   interests: { type: String, default: '' },
+  documentType: { type: String, default: 'Aadhaar Card' },
+  documentFront: { type: String, default: '' },
+  documentBack: { type: String, default: '' },
   idProofUrl: { type: String, default: '' },
   idProofDocument: { type: String, default: '' },
   motivation: { type: String, default: '' },
@@ -29,7 +32,8 @@ const volunteerApplicationSchema = new mongoose.Schema({
   verifiedBy: { type: String, default: null },
   reviewedAt: { type: Date, default: null },
   reviewedBy: { type: String, default: null },
-  rejectionReason: { type: String, default: null }
+  rejectionReason: { type: String, default: null },
+  isGuest: { type: Boolean, default: false }
 }, {
   timestamps: true
 });
@@ -37,6 +41,8 @@ const volunteerApplicationSchema = new mongoose.Schema({
 volunteerApplicationSchema.pre('save', function () {
   if (this.user && !this.userId) this.userId = this.user;
   if (this.userId && !this.user) this.user = this.userId;
+  if (this.documentFront && !this.idProofUrl) this.idProofUrl = this.documentFront;
+  if (this.idProofUrl && !this.documentFront) this.documentFront = this.idProofUrl;
   if (this.idProofUrl && !this.idProofDocument) this.idProofDocument = this.idProofUrl;
   if (this.idProofDocument && !this.idProofUrl) this.idProofUrl = this.idProofDocument;
   if (this.whyJoin && !this.motivation) this.motivation = this.whyJoin;

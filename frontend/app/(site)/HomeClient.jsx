@@ -192,7 +192,7 @@ export default function HomePage() {
               type="button"
               onClick={() => setActiveTab('news')}
               className={`py-2 px-6 rounded-xl border-2 font-black text-xs sm:text-sm transition cursor-pointer shadow-xs ${activeTab === 'news'
-                ? 'border-red-600 bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-500/25 scale-102'
+                ? 'border-red-600 bg-linear-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-500/25 scale-102'
                 : 'border-red-600/60 text-red-700 hover:bg-rose-50/60'
                 }`}
             >
@@ -202,7 +202,7 @@ export default function HomePage() {
               type="button"
               onClick={() => setActiveTab('activity')}
               className={`py-2 px-6 rounded-xl border-2 font-black text-xs sm:text-sm transition cursor-pointer shadow-xs ${activeTab === 'activity'
-                ? 'border-[#0b8026] bg-gradient-to-r from-[#0b8026] to-[#075018] text-white shadow-md shadow-emerald-500/25 scale-102'
+                ? 'border-[#0b8026] bg-linear-to-r from-[#0b8026] to-[#075018] text-white shadow-md shadow-emerald-500/25 scale-102'
                 : 'border-emerald-600/60 text-[#0b8026] hover:bg-emerald-50/60'
                 }`}
             >
@@ -212,7 +212,7 @@ export default function HomePage() {
               type="button"
               onClick={() => setActiveTab('members')}
               className={`py-2 px-6 rounded-xl border-2 font-black text-xs sm:text-sm transition cursor-pointer shadow-xs ${activeTab === 'members'
-                ? 'border-[#0b8026] bg-gradient-to-r from-[#0b8026] via-rose-600 to-red-600 text-white shadow-md scale-102'
+                ? 'border-[#0b8026] bg-linear-to-r from-[#0b8026] via-rose-600 to-red-600 text-white shadow-md scale-102'
                 : 'border-emerald-600/60 text-slate-800 hover:bg-emerald-50/60'
                 }`}
             >
@@ -226,7 +226,7 @@ export default function HomePage() {
             {/* Left Column (col-span-3): Green & Red border card + Member Apply & Donate Us buttons */}
             <div className="lg:col-span-3 space-y-4">
               {/* Dual-bordered Welcome box */}
-              <div className="border-4 border-[#0b8026] bg-gradient-to-b from-emerald-50/90 via-white to-rose-50/40 rounded-2xl p-5 min-h-[220px] sm:min-h-[260px] flex flex-col justify-center items-center text-center shadow-sm relative overflow-hidden">
+              <div className="border-4 border-[#0b8026] bg-linear-to-b from-emerald-50/90 via-white to-rose-50/40 rounded-2xl p-5 min-h-55 sm:min-h-65 flex flex-col justify-center items-center text-center shadow-sm relative overflow-hidden">
                 <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-red-600 text-white mb-2 shadow-xs">
                   🇮🇳 Rashtra Hit Sarvopari
                 </span>
@@ -264,7 +264,7 @@ export default function HomePage() {
 
               <Link
                 href="/donation"
-                className="flex items-center justify-between w-full p-3.5 rounded-xl border-2 border-red-600 bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-emerald-600 hover:to-emerald-700 text-white font-extrabold text-sm shadow-md shadow-red-500/25 transition group"
+                className="flex items-center justify-between w-full p-3.5 rounded-xl border-2 border-red-600 bg-linear-to-r from-red-600 via-rose-600 to-red-700 hover:from-emerald-600 hover:to-emerald-700 text-white font-extrabold text-sm shadow-md shadow-red-500/25 transition group"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 rounded-full bg-white text-red-600 flex items-center justify-center group-hover:scale-105 transition shadow-xs">
@@ -279,7 +279,7 @@ export default function HomePage() {
             </div>
 
             {/* Middle Column (col-span-6): Dynamic content based on active tab */}
-            <div className="lg:col-span-6 bg-white border border-slate-200 rounded-xl p-5 sm:p-6 min-h-[380px] shadow-sm flex flex-col justify-between">
+            <div className="lg:col-span-6 bg-white border border-slate-200 rounded-xl p-5 sm:p-6 min-h-95 shadow-sm flex flex-col justify-between">
               {activeTab === 'news' && (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between border-b-2 border-red-100 pb-3">
@@ -306,7 +306,7 @@ export default function HomePage() {
                           <Link
                             key={bId}
                             href={`/blogs/${bId}`}
-                            className="p-3.5 bg-slate-50 hover:bg-rose-50/40 transition-colors rounded-xl border border-slate-200 hover:border-red-400 flex gap-3.5 items-start group cursor-pointer block shadow-2xs"
+                            className="p-3.5 bg-slate-50 hover:bg-rose-50/40 transition-colors rounded-xl border border-slate-200 hover:border-red-400 flex gap-3.5 items-start group cursor-pointer shadow-2xs"
                           >
                             {item.image && (
                               <div className="w-16 h-16 rounded-lg overflow-hidden shrink-0 bg-slate-200 border border-slate-200">
@@ -464,7 +464,7 @@ export default function HomePage() {
                   </div>
 
                   {members && members.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-[220px] overflow-y-auto pr-1">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-55 overflow-y-auto pr-1">
                       {members.slice(0, 6).map((m, idx) => (
                         <div
                           key={m._id || m.memberId || idx}
@@ -514,7 +514,7 @@ export default function HomePage() {
                     </span>
                     <Link
                       href={isMember ? '/profile/member' : '/apply-member'}
-                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-[#0b8026] to-[#dc2626] hover:from-[#09661f] hover:to-[#b91c1c] text-white text-xs font-bold transition shadow-xs"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-linear-to-r from-[#0b8026] to-[#dc2626] hover:from-[#09661f] hover:to-[#b91c1c] text-white text-xs font-bold transition shadow-xs"
                     >
                       <span>{isMember ? 'My Profile' : 'Apply for Member'}</span>
                       <FiArrowRight className="w-3.5 h-3.5" />
@@ -531,7 +531,7 @@ export default function HomePage() {
 
             {/* Right Column (col-span-3): Management Team Card */}
             <div className="lg:col-span-3 space-y-4">
-              <div className="bg-white border-2 border-emerald-600/30 rounded-xl p-5 shadow-sm min-h-[300px] flex flex-col justify-between">
+              <div className="bg-white border-2 border-emerald-600/30 rounded-xl p-5 shadow-sm min-h-75 flex flex-col justify-between">
                 <div>
                   <div className="w-20 h-20 mx-auto rounded-full overflow-hidden border-2 border-[#0b8026] ring-2 ring-red-500/30 p-1 bg-white mb-3 shadow-xs">
                     <img
@@ -570,7 +570,7 @@ export default function HomePage() {
 
           {/* Centered Pill Header with Green & Red Accents */}
           <div className="text-center mb-10">
-            <span className="inline-flex items-center gap-2 px-8 py-2 rounded-full border-2 border-[#0b8026] bg-gradient-to-r from-emerald-50 via-white to-rose-50 text-slate-900 font-black text-sm tracking-wide shadow-xs">
+            <span className="inline-flex items-center gap-2 px-8 py-2 rounded-full border-2 border-[#0b8026] bg-linear-to-r from-emerald-50 via-white to-rose-50 text-slate-900 font-black text-sm tracking-wide shadow-xs">
               <span className="w-2 h-2 rounded-full bg-[#0b8026]"></span>
               <span>About Us</span>
               <span className="w-2 h-2 rounded-full bg-[#dc2626]"></span>
@@ -649,7 +649,7 @@ export default function HomePage() {
 
           {/* Centered Pill Header with Green & Red Accents */}
           <div className="text-center mb-10">
-            <span className="inline-flex items-center gap-2 px-8 py-2 rounded-full border-2 border-[#0b8026] bg-gradient-to-r from-emerald-50 via-white to-rose-50 text-slate-900 font-black text-sm tracking-wide shadow-xs">
+            <span className="inline-flex items-center gap-2 px-8 py-2 rounded-full border-2 border-[#0b8026] bg-linear-to-r from-emerald-50 via-white to-rose-50 text-slate-900 font-black text-sm tracking-wide shadow-xs">
               <span className="w-2 h-2 rounded-full bg-[#0b8026]"></span>
               <span>{settings?.presidentMessageTitle || 'President Message'}</span>
               <span className="w-2 h-2 rounded-full bg-[#dc2626]"></span>
@@ -716,7 +716,7 @@ Thank you for your unwavering commitment to our cause. Together, we are truly ma
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="text-center mb-10">
-            <span className="inline-flex items-center gap-2 px-8 py-2 rounded-full border-2 border-[#0b8026] bg-gradient-to-r from-emerald-50 via-white to-rose-50 text-slate-900 font-black text-sm tracking-wide shadow-xs">
+            <span className="inline-flex items-center gap-2 px-8 py-2 rounded-full border-2 border-[#0b8026] bg-linear-to-r from-emerald-50 via-white to-rose-50 text-slate-900 font-black text-sm tracking-wide shadow-xs">
               <span className="w-2 h-2 rounded-full bg-[#0b8026]"></span>
               <span>Our Services &amp; Initiatives</span>
               <span className="w-2 h-2 rounded-full bg-[#dc2626]"></span>
@@ -751,11 +751,11 @@ Thank you for your unwavering commitment to our cause. Together, we are truly ma
                           e.currentTarget.src = '/logo.jpeg';
                         }}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent" />
+                      <div className="absolute inset-0 bg-linear-to-t from-black/75 via-transparent to-transparent" />
                       
                       <div className="absolute top-3 left-3">
                         <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider text-white shadow-xs backdrop-blur-xs ${
-                          isEven ? 'bg-gradient-to-r from-red-600 to-rose-600' : 'bg-gradient-to-r from-[#0b8026] to-emerald-700'
+                          isEven ? 'bg-linear-to-r from-red-600 to-rose-600' : 'bg-linear-to-r from-[#0b8026] to-emerald-700'
                         }`}>
                           {cat}
                         </span>
@@ -799,7 +799,7 @@ Thank you for your unwavering commitment to our cause. Together, we are truly ma
           <div className="text-center mt-8">
             <Link
               href="/services"
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-gradient-to-r from-[#0b8026] via-rose-600 to-red-600 hover:from-[#09661f] hover:to-red-700 text-white font-extrabold text-xs shadow-lg shadow-red-500/20 transition transform hover:scale-105"
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-linear-to-r from-[#0b8026] via-rose-600 to-red-600 hover:from-[#09661f] hover:to-red-700 text-white font-extrabold text-xs shadow-lg shadow-red-500/20 transition transform hover:scale-105"
             >
               <span>View All Services &amp; Initiatives</span>
               <FiChevronRight className="w-4 h-4" />
@@ -815,7 +815,7 @@ Thank you for your unwavering commitment to our cause. Together, we are truly ma
 
           {/* Centered Pill Header with Green & Red Accents */}
           <div className="text-center mb-10">
-            <span className="inline-flex items-center gap-2 px-8 py-2 rounded-full border-2 border-[#0b8026] bg-gradient-to-r from-emerald-50 via-white to-rose-50 text-slate-900 font-black text-sm tracking-wide shadow-xs">
+            <span className="inline-flex items-center gap-2 px-8 py-2 rounded-full border-2 border-[#0b8026] bg-linear-to-r from-emerald-50 via-white to-rose-50 text-slate-900 font-black text-sm tracking-wide shadow-xs">
               <span className="w-2 h-2 rounded-full bg-[#0b8026]"></span>
               <span>Our Objectives</span>
               <span className="w-2 h-2 rounded-full bg-[#dc2626]"></span>
@@ -845,7 +845,7 @@ Thank you for your unwavering commitment to our cause. Together, we are truly ma
                       e.currentTarget.src = DEFAULT_OBJECTIVES[i % DEFAULT_OBJECTIVES.length].image;
                     }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/85 via-black/40 to-transparent" />
 
                   <div className="relative z-10 text-white flex items-center justify-between">
                     <div>
@@ -876,7 +876,7 @@ Thank you for your unwavering commitment to our cause. Together, we are truly ma
 
           {/* Centered Pill Header with Red & Green Theme */}
           <div className="text-center mb-10">
-            <span className="inline-flex items-center gap-2 px-8 py-2 rounded-full border-2 border-red-600 bg-gradient-to-r from-rose-50 via-white to-emerald-50 text-slate-900 font-black text-sm tracking-wide shadow-xs">
+            <span className="inline-flex items-center gap-2 px-8 py-2 rounded-full border-2 border-red-600 bg-linear-to-r from-rose-50 via-white to-emerald-50 text-slate-900 font-black text-sm tracking-wide shadow-xs">
               <span className="w-2 h-2 rounded-full bg-red-600"></span>
               <span>YouTube Videos</span>
               <span className="w-2 h-2 rounded-full bg-[#0b8026]"></span>
@@ -913,7 +913,7 @@ Thank you for your unwavering commitment to our cause. Together, we are truly ma
 
           {/* Centered Pill Header with Green & Red Accents */}
           <div className="text-center mb-8">
-            <span className="inline-flex items-center gap-2 px-8 py-2 rounded-full border-2 border-[#0b8026] bg-gradient-to-r from-emerald-50 via-white to-rose-50 text-slate-900 font-black text-sm tracking-wide shadow-xs">
+            <span className="inline-flex items-center gap-2 px-8 py-2 rounded-full border-2 border-[#0b8026] bg-linear-to-r from-emerald-50 via-white to-rose-50 text-slate-900 font-black text-sm tracking-wide shadow-xs">
               <span className="w-2 h-2 rounded-full bg-[#0b8026]"></span>
               <span>Photo Gallery</span>
               <span className="w-2 h-2 rounded-full bg-[#dc2626]"></span>
@@ -937,7 +937,7 @@ Thank you for your unwavering commitment to our cause. Together, we are truly ma
                     e.currentTarget.src = 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600';
                   }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
                 <div className="relative z-10 text-white">
                   <h4 className="font-bold text-xs mt-1 line-clamp-1 leading-snug text-white">
                     {item.title || 'Social Impact Drive'}
@@ -971,7 +971,7 @@ Thank you for your unwavering commitment to our cause. Together, we are truly ma
 
             <Link
               href="/gallery"
-              className="inline-flex items-center px-6 py-2.5 rounded-full bg-gradient-to-r from-[#0b8026] to-[#dc2626] hover:from-[#09661f] hover:to-[#b91c1c] text-white font-extrabold text-xs shadow-md transition cursor-pointer"
+              className="inline-flex items-center px-6 py-2.5 rounded-full bg-linear-to-r from-[#0b8026] to-[#dc2626] hover:from-[#09661f] hover:to-[#b91c1c] text-white font-extrabold text-xs shadow-md transition cursor-pointer"
             >
               <span>View All Photos</span>
             </Link>
@@ -986,7 +986,7 @@ Thank you for your unwavering commitment to our cause. Together, we are truly ma
 
           {/* Centered Pill Header with Green & Red Accents */}
           <div className="text-center mb-12">
-            <span className="inline-flex items-center gap-2 px-8 py-2 rounded-full border-2 border-[#0b8026] bg-gradient-to-r from-emerald-50 via-white to-rose-50 text-slate-900 font-black text-sm tracking-wide shadow-xs">
+            <span className="inline-flex items-center gap-2 px-8 py-2 rounded-full border-2 border-[#0b8026] bg-linear-to-r from-emerald-50 via-white to-rose-50 text-slate-900 font-black text-sm tracking-wide shadow-xs">
               <span className="w-2 h-2 rounded-full bg-[#0b8026]"></span>
               <span>What People Say</span>
               <span className="w-2 h-2 rounded-full bg-[#dc2626]"></span>
@@ -1012,7 +1012,7 @@ Thank you for your unwavering commitment to our cause. Together, we are truly ma
                     }}
                   />
                 ) : (
-                  <div className="w-full h-full rounded-full bg-gradient-to-tr from-[#0b8026] to-emerald-500 flex items-center justify-center text-white text-3xl font-black shadow-inner">
+                  <div className="w-full h-full rounded-full bg-linear-to-tr from-[#0b8026] to-emerald-500 flex items-center justify-center text-white text-3xl font-black shadow-inner">
                     {approvedReviews[reviewIdx]?.name ? approvedReviews[reviewIdx].name.charAt(0).toUpperCase() : 'U'}
                   </div>
                 )}
@@ -1100,7 +1100,7 @@ Thank you for your unwavering commitment to our cause. Together, we are truly ma
 
                 {/* Official Admin / Management Reply Banner with Admin's Official Portrait / Logo Image */}
                 {approvedReviews[reviewIdx]?.adminReply && (
-                  <div className="mt-4 bg-gradient-to-br from-emerald-50/90 to-slate-50 p-4 rounded-2xl border border-emerald-200/90 text-left space-y-2 shadow-2xs">
+                  <div className="mt-4 bg-linear-to-br from-emerald-50/90 to-slate-50 p-4 rounded-2xl border border-emerald-200/90 text-left space-y-2 shadow-2xs">
                     <div className="flex items-center justify-between text-xs font-black text-slate-900 border-b border-emerald-100 pb-2">
                       <div className="flex items-center gap-2.5 text-[#0b8026]">
                         {/* Admin Image */}
@@ -1148,7 +1148,7 @@ Thank you for your unwavering commitment to our cause. Together, we are truly ma
                 <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-center gap-3">
                   <Link
                     href="/feedback"
-                    className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#0b8026] to-[#dc2626] hover:from-[#09661f] hover:to-[#b91c1c] text-white text-xs font-black transition shadow-md shadow-red-500/20 cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-linear-to-r from-[#0b8026] to-[#dc2626] hover:from-[#09661f] hover:to-[#b91c1c] text-white text-xs font-black transition shadow-md shadow-red-500/20 cursor-pointer"
                   >
                     <FiMessageSquare className="w-3.5 h-3.5" />
                     <span>View All Reviews &amp; Write Feedback</span>
@@ -1176,7 +1176,7 @@ Thank you for your unwavering commitment to our cause. Together, we are truly ma
       <section className="py-14 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
-            <span className="inline-flex items-center gap-2 px-8 py-2 rounded-full border-2 border-[#0b8026] bg-gradient-to-r from-emerald-50 via-white to-rose-50 text-slate-900 font-black text-sm tracking-wide shadow-xs">
+            <span className="inline-flex items-center gap-2 px-8 py-2 rounded-full border-2 border-[#0b8026] bg-linear-to-r from-emerald-50 via-white to-rose-50 text-slate-900 font-black text-sm tracking-wide shadow-xs">
               <span className="w-2 h-2 rounded-full bg-[#0b8026]"></span>
               <span>Locate Us</span>
               <span className="w-2 h-2 rounded-full bg-[#dc2626]"></span>

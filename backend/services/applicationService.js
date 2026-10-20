@@ -25,6 +25,10 @@ class ApplicationService {
 
     const finalScreenshot = paymentScreenshot || appData.paymentProof || appData.screenshotUrl;
     const finalUtr = utrNumber || appData.transactionId || '';
+    const finalPhoto = photoUrl || appData.userPhoto || appData.avatar || '';
+    const finalDocType = appData.documentType || 'Aadhaar Card';
+    const finalDocFront = appData.documentFront || appData.idProofUrl || '';
+    const finalDocBack = appData.documentBack || '';
 
     if (!planId) throw new Error('Please select a membership plan');
     if (!finalScreenshot && !finalUtr) throw new Error('Payment screenshot or transaction UTR is mandatory for verification');
@@ -44,7 +48,10 @@ class ApplicationService {
       if (address) user.address = address;
       if (district) user.district = district;
       if (state) user.state = state;
-      if (photoUrl) user.photoUrl = photoUrl;
+      if (finalPhoto) user.photoUrl = finalPhoto;
+      if (finalDocType) user.documentType = finalDocType;
+      if (finalDocFront) user.documentFront = finalDocFront;
+      if (finalDocBack) user.documentBack = finalDocBack;
       if (designation) user.designation = designation;
 
       user.membershipPlan = planId;
@@ -62,6 +69,7 @@ class ApplicationService {
     const application = await applicationRepository.createMembershipApp({
       user: user?._id || null,
       userId: user?._id || null,
+      isGuest: !userId,
       name: name || user?.name || '',
       email: (email || user?.email || '').toLowerCase().trim(),
       phone: (phone || user?.phone || '').trim(),
@@ -78,7 +86,11 @@ class ApplicationService {
       address: address || user?.address || '',
       district: district || user?.district || 'Aligarh',
       state: state || user?.state || 'Uttar Pradesh',
-      photoUrl: photoUrl || user?.photoUrl || '',
+      photoUrl: finalPhoto || user?.photoUrl || '',
+      documentType: finalDocType,
+      documentFront: finalDocFront,
+      documentBack: finalDocBack,
+      idProofUrl: finalDocFront,
       designation: designation || user?.designation || `${plan.title || plan.name} Member`,
       status: 'pending'
     });
@@ -105,8 +117,13 @@ class ApplicationService {
       phone
     } = appData;
 
-    const finalIdProof = idProofDocument || idProofUrl || appData.idProof;
-    if (!finalIdProof) throw new Error('Government ID proof upload is required for volunteer verification');
+    const finalPhoto = photoUrl || appData.userPhoto || appData.avatar || '';
+    const finalDocType = appData.documentType || 'Aadhaar Card';
+    const finalDocFront = appData.documentFront || idProofDocument || idProofUrl || appData.idProof || '';
+    const finalDocBack = appData.documentBack || '';
+    const finalIdProof = finalDocFront || idProofDocument || idProofUrl || appData.idProof;
+
+    if (!finalIdProof && !finalDocFront) throw new Error('Government ID proof upload is required for volunteer verification');
 
     let user = userId ? await userRepository.findById(userId) : null;
     if (!user && email) {
@@ -120,7 +137,10 @@ class ApplicationService {
       if (address) user.address = address;
       if (district) user.district = district;
       if (state) user.state = state;
-      if (photoUrl) user.photoUrl = photoUrl;
+      if (finalPhoto) user.photoUrl = finalPhoto;
+      if (finalDocType) user.documentType = finalDocType;
+      if (finalDocFront) user.documentFront = finalDocFront;
+      if (finalDocBack) user.documentBack = finalDocBack;
 
       user.status = 'pending';
       await user.save();
@@ -134,12 +154,16 @@ class ApplicationService {
     const application = await applicationRepository.createVolunteerApp({
       user: user?._id || null,
       userId: user?._id || null,
+      isGuest: !userId,
       name: name || user?.name || '',
       email: (email || user?.email || '').toLowerCase().trim(),
       phone: (phone || user?.phone || '').trim(),
       skills: Array.isArray(skills) ? skills : [skills || 'Community Outreach'],
       availability: availability || 'Weekends',
       interests: appData.interests || '',
+      documentType: finalDocType,
+      documentFront: finalDocFront,
+      documentBack: finalDocBack,
       idProofDocument: finalIdProof,
       idProofUrl: finalIdProof,
       motivation: motivation || whyJoin || '',
@@ -149,7 +173,7 @@ class ApplicationService {
       address: address || user?.address || '',
       district: district || user?.district || 'Aligarh',
       state: state || user?.state || 'Uttar Pradesh',
-      photoUrl: photoUrl || user?.photoUrl || '',
+      photoUrl: finalPhoto || user?.photoUrl || '',
       status: 'pending'
     });
 
@@ -229,16 +253,17 @@ class ApplicationService {
     const plan = app.plan ? await planRepository.findById(app.plan._id || app.plan) : null;
     const verifiedMemberId = (user && user.memberId) || await this.generateUniqueMemberId();
     let generatedPassword = null;
+    const isGuest = Boolean(app.isGuest || !app.user || !app.userId);
 
     if (!user) {
       // Auto-create new User account for guest applicant
-      const tempPass = 'IYF@' + Math.floor(100000 + Math.random() * 900000);
+      const tempPass = 'BYK@' + Math.floor(100000 + Math.random() * 900000);
       const hashedPassword = await bcrypt.hash(tempPass, 10);
       generatedPassword = tempPass;
 
       user = await userRepository.create({
         name: app.name || 'Valued Member',
-        email: app.email ? app.email.toLowerCase().trim() : `member_${verifiedMemberId.toLowerCase()}@iyf.org`,
+        email: app.email ? app.email.toLowerCase().trim() : `member_${verifiedMemberId.toLowerCase()}@yuvakrantidal.org`,
         phone: app.phone ? app.phone.trim() : '9999999999',
         password: hashedPassword,
         role: 'Member',
@@ -252,6 +277,9 @@ class ApplicationService {
         district: app.district || 'Aligarh',
         state: app.state || 'Uttar Pradesh',
         photoUrl: app.photoUrl || '',
+        documentType: app.documentType || '',
+        documentFront: app.documentFront || '',
+        documentBack: app.documentBack || '',
         feePaid: true,
         feeAmount: app.amount || app.feeAmount || (plan ? (plan.price || plan.fee || 250) : 250),
         idCardGenerated: true,
@@ -268,12 +296,23 @@ class ApplicationService {
       user.isMember = true;
       user.memberId = verifiedMemberId;
       user.designation = app.designation || (plan ? `${plan.title || plan.name} Member` : 'Verified Active Member');
+      if (app.photoUrl && !user.photoUrl) user.photoUrl = app.photoUrl;
+      if (app.documentType) user.documentType = app.documentType;
+      if (app.documentFront) user.documentFront = app.documentFront;
+      if (app.documentBack) user.documentBack = app.documentBack;
       user.feePaid = true;
       user.feeAmount = app.amount || app.feeAmount || 250;
       user.idCardGenerated = true;
       user.appointmentLetterGenerated = true;
       user.verifiedAt = new Date();
       user.verifiedBy = adminUser?.name || 'Trustee Admin';
+
+      // If applicant was a guest or account had no password, generate fresh login credentials
+      if (isGuest || !user.password) {
+        const tempPass = 'BYK@' + Math.floor(100000 + Math.random() * 900000);
+        user.password = await bcrypt.hash(tempPass, 10);
+        generatedPassword = tempPass;
+      }
     }
 
     const qrData = `https://bharatiyayuvakranti.org/verify/member/${verifiedMemberId}`;
@@ -290,15 +329,17 @@ class ApplicationService {
     app.reviewedAt = new Date();
     await app.save();
 
-    // Auto send official appointment letter, ID card & login credentials via email
+    // Auto send official appointment letter, ID card & login credentials via email asynchronously
     try {
       const emailPayload = user.toObject ? user.toObject() : { ...user };
       if (generatedPassword) {
         emailPayload.temporaryPassword = generatedPassword;
       }
-      await sendMembershipApprovalEmail(emailPayload);
+      sendMembershipApprovalEmail(emailPayload).catch(e => {
+        console.warn('Membership approval email send warning:', e.message);
+      });
     } catch (e) {
-      console.warn('Membership approval email send warning:', e.message);
+      console.warn('Membership approval email dispatch prep warning:', e.message);
     }
 
     return { application: app, user, temporaryPassword: generatedPassword };
@@ -339,16 +380,17 @@ class ApplicationService {
 
     const verifiedVolId = (user && user.volunteerId) || await this.generateUniqueVolunteerId();
     let generatedPassword = null;
+    const isGuest = Boolean(app.isGuest || !app.user || !app.userId);
 
     if (!user) {
       // Auto-create new User account for guest volunteer applicant
-      const tempPass = 'IYF@' + Math.floor(100000 + Math.random() * 900000);
+      const tempPass = 'BYK@' + Math.floor(100000 + Math.random() * 900000);
       const hashedPassword = await bcrypt.hash(tempPass, 10);
       generatedPassword = tempPass;
 
       user = await userRepository.create({
         name: app.name || 'Valued Volunteer',
-        email: app.email ? app.email.toLowerCase().trim() : `volunteer_${verifiedVolId.toLowerCase()}@iyf.org`,
+        email: app.email ? app.email.toLowerCase().trim() : `volunteer_${verifiedVolId.toLowerCase()}@yuvakrantidal.org`,
         phone: app.phone ? app.phone.trim() : '9999999999',
         password: hashedPassword,
         role: 'Volunteer',
@@ -364,6 +406,9 @@ class ApplicationService {
         district: app.district || 'Aligarh',
         state: app.state || 'Uttar Pradesh',
         photoUrl: app.photoUrl || '',
+        documentType: app.documentType || '',
+        documentFront: app.documentFront || app.idProofUrl || '',
+        documentBack: app.documentBack || '',
         feePaid: true,
         feeAmount: 0,
         idCardGenerated: true,
@@ -383,10 +428,21 @@ class ApplicationService {
         user.memberId = undefined;
       }
       user.designation = 'Active Volunteer (Youth Wing)';
+      if (app.photoUrl && !user.photoUrl) user.photoUrl = app.photoUrl;
+      if (app.documentType) user.documentType = app.documentType;
+      if (app.documentFront) user.documentFront = app.documentFront;
+      if (app.documentBack) user.documentBack = app.documentBack;
       user.idCardGenerated = true;
       user.appointmentLetterGenerated = true;
       user.verifiedAt = new Date();
       user.verifiedBy = adminUser?.name || 'Trustee Admin';
+
+      // If applicant was a guest or account had no password, generate fresh login credentials
+      if (isGuest || !user.password) {
+        const tempPass = 'BYK@' + Math.floor(100000 + Math.random() * 900000);
+        user.password = await bcrypt.hash(tempPass, 10);
+        generatedPassword = tempPass;
+      }
     }
 
     const qrData = `https://bharatiyayuvakranti.org/verify/volunteer/${verifiedVolId}`;
@@ -403,15 +459,17 @@ class ApplicationService {
     app.reviewedAt = new Date();
     await app.save();
 
-    // Auto send official offer letter, badge & login credentials via email
+    // Auto send official offer letter, badge & login credentials via email asynchronously
     try {
       const emailPayload = user.toObject ? user.toObject() : { ...user };
       if (generatedPassword) {
         emailPayload.temporaryPassword = generatedPassword;
       }
-      await sendVolunteerApprovalEmail(emailPayload);
+      sendVolunteerApprovalEmail(emailPayload).catch(e => {
+        console.warn('Volunteer approval email send warning:', e.message);
+      });
     } catch (e) {
-      console.warn('Volunteer approval email send warning:', e.message);
+      console.warn('Volunteer approval email dispatch prep warning:', e.message);
     }
 
     return { application: app, user, temporaryPassword: generatedPassword };

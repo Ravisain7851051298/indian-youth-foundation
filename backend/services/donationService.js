@@ -1,5 +1,7 @@
 const xlsx = require('xlsx');
+const bcrypt = require('bcryptjs');
 const donationRepository = require('../repositories/donationRepository');
+const userRepository = require('../repositories/userRepository');
 const Campaign = require('../models/Campaign');
 const { sendDonationApprovalEmail } = require('./emailService');
 
@@ -59,6 +61,7 @@ class DonationService {
 
     const donation = await donationRepository.create({
       donor: donorUserId || null,
+      isGuest: !donorUserId,
       donorName: finalName,
       donorEmail: finalEmail,
       donorPhone: finalPhone,
@@ -120,6 +123,44 @@ class DonationService {
       return donation;
     }
 
+    // Auto-create or ensure portal account for donor if guest
+    let user = donation.donor ? await userRepository.findById(donation.donor) : null;
+    if (!user && donation.donorEmail) {
+      user = await userRepository.findByEmail(donation.donorEmail.toLowerCase().trim());
+    }
+
+    let generatedPassword = null;
+    const isGuest = Boolean(donation.isGuest || !donation.donor);
+
+    if (!user) {
+      // Auto-create donor user account so guest donor receives portal login credentials
+      const tempPass = 'BYK@' + Math.floor(100000 + Math.random() * 900000);
+      const hashedPassword = await bcrypt.hash(tempPass, 10);
+      generatedPassword = tempPass;
+
+      user = await userRepository.create({
+        name: donation.donorName || 'Generous Donor',
+        email: donation.donorEmail ? donation.donorEmail.toLowerCase().trim() : `donor_${Date.now()}@yuvakrantidal.org`,
+        phone: donation.donorPhone ? donation.donorPhone.trim() : '9999999999',
+        password: hashedPassword,
+        role: 'Donor',
+        status: 'active',
+        address: donation.address || '',
+        verifiedAt: new Date(),
+        verifiedBy: adminUser?.name || 'Trustee Admin'
+      });
+
+      donation.donor = user._id;
+    } else if (isGuest || !user.password) {
+      // If guest donor or account has no password, generate fresh login credentials
+      const tempPass = 'BYK@' + Math.floor(100000 + Math.random() * 900000);
+      user.password = await bcrypt.hash(tempPass, 10);
+      user.status = 'active';
+      await user.save();
+      generatedPassword = tempPass;
+      donation.donor = user._id;
+    }
+
     let saved = false;
     let attempts = 0;
     while (!saved && attempts < 5) {
@@ -149,11 +190,17 @@ class DonationService {
       console.warn('⚠️ [DONATION APPROVAL] Campaign funding update notice:', campErr.message);
     }
 
-    // Send official 80G tax receipt to donor's email address safely
+    // Send official 80G tax receipt & portal login credentials to donor's email address safely & non-blocking
     try {
-      await sendDonationApprovalEmail(donation);
+      const emailPayload = donation.toObject ? donation.toObject() : { ...donation };
+      if (generatedPassword) {
+        emailPayload.temporaryPassword = generatedPassword;
+      }
+      sendDonationApprovalEmail(emailPayload).catch(emailErr => {
+        console.warn('⚠️ [DONATION APPROVAL] Email dispatch notice:', emailErr.message);
+      });
     } catch (emailErr) {
-      console.warn('⚠️ [DONATION APPROVAL] Email dispatch notice:', emailErr.message);
+      console.warn('⚠️ [DONATION APPROVAL] Email dispatch prep notice:', emailErr.message);
     }
 
     return donation;

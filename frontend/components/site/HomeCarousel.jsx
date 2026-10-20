@@ -45,7 +45,7 @@ export default function HomeCarousel({ slides = [] }) {
 
   return (
     <div
-      className="relative w-full h-[340px] sm:h-[480px] md:h-[600px] lg:h-[720px] xl:h-[800px] 2xl:h-[860px] overflow-hidden bg-slate-950 group"
+      className="relative w-full h-85 sm:h-120 md:h-150 lg:h-180 xl:h-200 2xl:h-210 overflow-hidden bg-slate-950 group"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
@@ -57,16 +57,14 @@ export default function HomeCarousel({ slides = [] }) {
         return (
           <div
             key={idx}
-            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-              isActive ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
-            }`}
+            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${isActive ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
+              }`}
           >
             <img
               src={imgUrl}
               alt={slide.title || `Yuva Kranti Dal Banner ${idx + 1}`}
-              className={`w-full h-full object-cover object-center transition-transform duration-[6000ms] ease-out ${
-                isActive ? 'scale-102' : 'scale-100'
-              }`}
+              className={`w-full h-full object-cover object-center transition-transform duration-6000 ease-out ${isActive ? 'scale-102' : 'scale-100'
+                }`}
               onError={(e) => {
                 e.currentTarget.onerror = null;
                 e.currentTarget.src = DEFAULT_SLIDES[idx % DEFAULT_SLIDES.length].imageUrl;
@@ -74,7 +72,7 @@ export default function HomeCarousel({ slides = [] }) {
             />
             {/* Subtle bottom gradient if text exists */}
             {(slide.title || slide.subtitle) && (
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent p-6 sm:p-12 text-white">
+              <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/85 via-black/35 to-transparent p-6 sm:p-12 text-white">
                 {slide.title && (
                   <h2 className="text-xl sm:text-3xl lg:text-5xl font-black drop-shadow-md tracking-tight">
                     {slide.title}
@@ -118,9 +116,8 @@ export default function HomeCarousel({ slides = [] }) {
                 key={i}
                 type="button"
                 onClick={() => setCurrentIdx(i)}
-                className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
-                  i === currentIdx ? 'w-8 bg-gradient-to-r from-[#0b8026] to-[#dc2626] shadow-md' : 'w-2 bg-white/60 hover:bg-white'
-                }`}
+                className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${i === currentIdx ? 'w-8 bg-linear-to-r from-[#0b8026] to-[#dc2626] shadow-md' : 'w-2 bg-white/60 hover:bg-white'
+                  }`}
                 aria-label={`Slide ${i + 1}`}
               />
             ))}

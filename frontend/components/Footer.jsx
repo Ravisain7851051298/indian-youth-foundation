@@ -76,7 +76,7 @@ export default function Footer() {
   return (
     <footer className="bg-slate-900 text-slate-300 font-sans relative overflow-hidden">
       {/* Top Green & Red dual gradient bar */}
-      <div className="h-1.5 w-full bg-gradient-to-r from-[#0b8026] via-rose-600 to-[#dc2626]" />
+      <div className="h-1.5 w-full bg-linear-to-r from-[#0b8026] via-rose-600 to-[#dc2626]" />
 
       {/* Decorative subtle ambient lights */}
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#0b8026]/10 rounded-full blur-3xl pointer-events-none" />
@@ -132,7 +132,7 @@ export default function Footer() {
               </h4>
               <a
                 href={`mailto:${settings?.email || 'samasyasamadhanparishad@gmail.com'}`}
-                className="text-xs sm:text-sm font-bold text-slate-200 hover:text-emerald-400 transition block truncate max-w-[220px]"
+                className="text-xs sm:text-sm font-bold text-slate-200 hover:text-emerald-400 transition block truncate max-w-55"
                 title={settings?.email || 'samasyasamadhanparishad@gmail.com'}
               >
                 {settings?.email || 'samasyasamadhanparishad@gmail.com'}

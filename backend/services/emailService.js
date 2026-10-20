@@ -209,6 +209,8 @@ const sendDonationApprovalEmail = async (data) => {
   const amount = Number(donationObj.amount) || 0;
   const panNumber = donationObj.panNumber || donationObj.pan || 'N/A';
   const campaignTitle = donationObj.campaignTitle || 'General Welfare Fund';
+  const temporaryPassword = donationObj.temporaryPassword || data.temporaryPassword || '';
+  const clientBase = (process.env.CLIENT_URL || 'http://localhost:3000').replace(/\/+$/, '');
 
   if (!to) {
     console.warn('⚠️ [EMAIL NOTICE] No recipient email found for donation approval notification.');
@@ -271,13 +273,31 @@ const sendDonationApprovalEmail = async (data) => {
           </table>
         </div>
 
+        ${temporaryPassword ? `
+        <div style="background-color: #fefce8; border: 2px dashed #ca8a04; border-radius: 10px; padding: 16px; margin: 18px 0; font-size: 13px;">
+          <h4 style="margin: 0 0 8px; color: #854d0e; font-size: 14px;">🔑 Your Donor Portal Login Credentials</h4>
+          <p style="margin: 4px 0; color: #475569;">An authenticated portal account has been created for you by the Trustee Administration. You can use these credentials to log in, view donation history, and download cumulative 80G certificates:</p>
+          <div style="background: white; border: 1px solid #fef08a; padding: 10px 14px; border-radius: 6px; margin: 8px 0;">
+            <p style="margin: 4px 0;"><strong>Login Email / Identifier:</strong> <span style="font-family: monospace; color: #0f172a; font-weight: bold;">${to}</span></p>
+            <p style="margin: 4px 0;"><strong>Initial Password:</strong> <span style="font-family: monospace; background: #fee2e2; color: #991b1b; padding: 2px 8px; border-radius: 4px; font-weight: bold; letter-spacing: 0.5px;">${temporaryPassword}</span></p>
+          </div>
+          <p style="margin: 6px 0 0; font-size: 12px; color: #854d0e;">
+            🔒 For security, please sign in and change your password in Profile Settings upon first login.
+          </p>
+        </div>
+        ` : `
+        <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; margin: 14px 0; font-size: 12.5px; color: #334155;">
+          🔐 Sign in with your registered email (<strong>${to}</strong>) to access and download all your past receipts anytime.
+        </div>
+        `}
+
         <div style="background-color: #eff6ff; border-left: 4px solid #3b82f6; padding: 12px 14px; margin: 16px 0; font-size: 12.5px; color: #1e40af; border-radius: 4px;">
           📎 <strong>PDF Receipt Attached:</strong> Your official Form 10BD / 80G tax receipt with digital seal, QR verification code, and trustee signature is attached to this email as a PDF file.
         </div>
 
         <div style="text-align: center; margin: 26px 0 16px;">
-          <a href="https://www.yuvakrantidal.com/profile/donations" style="background: #ea580c; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px; display: inline-block;">
-            View Donations & Receipts in Portal
+          <a href="${clientBase}/login?role=donor" style="background: #ea580c; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px; display: inline-block;">
+            Sign In to Donor Portal
           </a>
         </div>
       </div>
@@ -309,6 +329,7 @@ const sendMembershipApprovalEmail = async (param) => {
   const planName = memberObj.planName || memberObj.membershipPlan || memberObj.user?.membershipPlan || 'Standard Active Member';
 
   const temporaryPassword = memberObj.temporaryPassword || param.temporaryPassword || '';
+  const clientBase = (process.env.CLIENT_URL || 'http://localhost:3000').replace(/\/+$/, '');
 
   if (!to) {
     console.warn('⚠️ [EMAIL NOTICE] No recipient email found for membership approval notification.');
@@ -407,7 +428,7 @@ const sendMembershipApprovalEmail = async (param) => {
         </div>
 
         <div style="text-align: center; margin: 26px 0 16px;">
-          <a href="http://localhost:3000/login" style="background: #0f172a; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px; display: inline-block;">
+          <a href="${clientBase}/login?role=member" style="background: #0f172a; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px; display: inline-block;">
             Sign In to Member Portal
           </a>
         </div>
@@ -437,6 +458,7 @@ const sendVolunteerApprovalEmail = async (param) => {
   const volunteerId = volObj.volunteerId || volObj.memberId || volObj.user?.memberId || 'BYK-VOL-2026-PENDING';
 
   const temporaryPassword = volObj.temporaryPassword || param.temporaryPassword || '';
+  const clientBase = (process.env.CLIENT_URL || 'http://localhost:3000').replace(/\/+$/, '');
 
   if (!to) {
     console.warn('⚠️ [EMAIL NOTICE] No recipient email found for volunteer approval notification.');
@@ -527,7 +549,7 @@ const sendVolunteerApprovalEmail = async (param) => {
         </div>
 
         <div style="text-align: center; margin: 26px 0 16px;">
-          <a href="http://localhost:3000/login" style="background: #059669; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px; display: inline-block;">
+          <a href="${clientBase}/login?role=volunteer" style="background: #059669; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px; display: inline-block;">
             Access Volunteer Portal
           </a>
         </div>

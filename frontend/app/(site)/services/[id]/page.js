@@ -115,7 +115,7 @@ export default function ServiceDetailPage({ params }) {
           <FiChevronRight className="w-3.5 h-3.5" />
           <Link href="/services" className="hover:text-emerald-700 transition">Our Services</Link>
           <FiChevronRight className="w-3.5 h-3.5" />
-          <span className="text-emerald-800 truncate max-w-[200px] sm:max-w-xs">{service.titleEn || service.title}</span>
+          <span className="text-emerald-800 truncate max-w-50 sm:max-w-xs">{service.titleEn || service.title}</span>
         </nav>
 
         {/* Main Service Card */}
@@ -129,7 +129,7 @@ export default function ServiceDetailPage({ params }) {
                 alt={service.title}
                 className="w-full h-full object-cover opacity-90"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/30 to-transparent" />
               
               <div className="absolute bottom-6 left-6 right-6 text-white space-y-2">
                 <span className="inline-block px-3 py-1 rounded-full bg-emerald-600/90 text-white text-xs font-extrabold uppercase tracking-wide backdrop-blur-xs">
@@ -141,7 +141,7 @@ export default function ServiceDetailPage({ params }) {
               </div>
             </div>
           ) : (
-            <div className="p-8 sm:p-10 pb-6 border-b border-slate-100 bg-gradient-to-r from-emerald-800 to-green-700 text-white">
+            <div className="p-8 sm:p-10 pb-6 border-b border-slate-100 bg-linear-to-r from-emerald-800 to-green-700 text-white">
               <span className="inline-block px-3 py-1 rounded-full bg-white/20 text-white text-xs font-extrabold uppercase tracking-wide backdrop-blur-xs mb-3">
                 {service.category || 'Humanitarian Initiative'}
               </span>
@@ -185,7 +185,7 @@ export default function ServiceDetailPage({ params }) {
             )}
 
             {/* Helpline & Action Callouts */}
-            <div className="p-6 rounded-2xl bg-gradient-to-br from-emerald-700 to-green-800 text-white flex flex-col sm:flex-row items-center justify-between gap-6 shadow-md">
+            <div className="p-6 rounded-2xl bg-linear-to-br from-emerald-700 to-green-800 text-white flex flex-col sm:flex-row items-center justify-between gap-6 shadow-md">
               <div className="space-y-1 text-center sm:text-left">
                 <h3 className="text-lg font-black text-white">Want to support or volunteer in this cause?</h3>
                 <p className="text-xs text-emerald-100 font-medium">

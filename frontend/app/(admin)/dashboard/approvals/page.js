@@ -32,6 +32,7 @@ import {
   rejectDonation
 } from '@/store/donationSlice';
 import { fetchCampaigns } from '@/store/ngoSlice';
+import { getContentImageUrl } from '@/lib/authApi';
 
 export default function ApprovalsPage() {
   const dispatch = useDispatch();
@@ -257,21 +258,61 @@ export default function ApprovalsPage() {
                       </div>
                     </div>
 
-                    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3 flex flex-wrap items-center justify-between gap-3 text-xs">
-                      <div>
-                        <span className="text-gray-600 font-medium">Transaction UTR / Ref: </span>
-                        <span className="font-mono font-bold text-black">{app.transactionId || 'None Provided'}</span>
+                    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3 space-y-2 text-xs">
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                          <span className="text-gray-600 font-medium">Transaction UTR / Ref: </span>
+                          <span className="font-mono font-bold text-black">{app.transactionId || 'None Provided'}</span>
+                        </div>
+                        {app.documentType && (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200">
+                            {app.documentType}
+                          </span>
+                        )}
                       </div>
-                      {app.paymentScreenshot && (
-                        <button
-                          type="button"
-                          onClick={() => setPreviewImage(app.paymentScreenshot)}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs transition border border-emerald-200 cursor-pointer"
-                        >
-                          <FiEye className="w-3.5 h-3.5" />
-                          <span>View Payment Screenshot</span>
-                        </button>
-                      )}
+
+                      <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-slate-200">
+                        {app.paymentScreenshot && (
+                          <button
+                            type="button"
+                            onClick={() => setPreviewImage(getContentImageUrl(app.paymentScreenshot))}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs transition border border-emerald-200 cursor-pointer"
+                          >
+                            <FiEye className="w-3.5 h-3.5" />
+                            <span>Payment Screenshot</span>
+                          </button>
+                        )}
+                        {(app.documentFront || app.idProofUrl) && (
+                          <button
+                            type="button"
+                            onClick={() => setPreviewImage(getContentImageUrl(app.documentFront || app.idProofUrl))}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-800 font-bold text-xs transition border border-blue-200 cursor-pointer"
+                          >
+                            <FiEye className="w-3.5 h-3.5" />
+                            <span>Doc Front</span>
+                          </button>
+                        )}
+                        {app.documentBack && (
+                          <button
+                            type="button"
+                            onClick={() => setPreviewImage(getContentImageUrl(app.documentBack))}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-800 font-bold text-xs transition border border-indigo-200 cursor-pointer"
+                          >
+                            <FiEye className="w-3.5 h-3.5" />
+                            <span>Doc Back</span>
+                          </button>
+                        )}
+                        {app.photoUrl && (
+                          <button
+                            type="button"
+                            onClick={() => setPreviewImage(getContentImageUrl(app.photoUrl))}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-800 font-bold text-xs transition border border-purple-200 cursor-pointer"
+                          >
+                            <FiEye className="w-3.5 h-3.5" />
+                            <span>User Photo</span>
+                          </button>
+                        )}
+                      </div>
                     </div>
 
                     {app.notes && (
@@ -364,21 +405,44 @@ export default function ApprovalsPage() {
                       </div>
                     </div>
 
-                    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3 text-xs space-y-1">
+                    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3 text-xs space-y-1.5">
                       <p><strong>Skills & Expertise:</strong> {app.skills || 'Community Social Work'}</p>
                       <p><strong>Areas of Interest:</strong> {app.interests || 'Education & Child Welfare'}</p>
-                      {app.idProofUrl && (
-                        <div className="pt-1">
+                      {app.documentType && (
+                        <p><strong>Document Type:</strong> <span className="font-bold text-emerald-800">{app.documentType}</span></p>
+                      )}
+                      <div className="flex flex-wrap items-center gap-2 pt-1.5 border-t border-slate-200">
+                        {(app.documentFront || app.idProofUrl) && (
                           <button
                             type="button"
-                            onClick={() => setPreviewImage(app.idProofUrl)}
-                            className="inline-flex items-center gap-1 text-emerald-700 font-bold hover:underline text-xs"
+                            onClick={() => setPreviewImage(getContentImageUrl(app.documentFront || app.idProofUrl))}
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 font-bold text-[11px] border border-emerald-200 hover:bg-emerald-100 cursor-pointer"
                           >
                             <FiEye className="w-3.5 h-3.5" />
-                            <span>View Submitted ID Document</span>
+                            <span>Doc Front</span>
                           </button>
-                        </div>
-                      )}
+                        )}
+                        {app.documentBack && (
+                          <button
+                            type="button"
+                            onClick={() => setPreviewImage(getContentImageUrl(app.documentBack))}
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-50 text-blue-800 font-bold text-[11px] border border-blue-200 hover:bg-blue-100 cursor-pointer"
+                          >
+                            <FiEye className="w-3.5 h-3.5" />
+                            <span>Doc Back</span>
+                          </button>
+                        )}
+                        {app.photoUrl && (
+                          <button
+                            type="button"
+                            onClick={() => setPreviewImage(getContentImageUrl(app.photoUrl))}
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-purple-50 text-purple-800 font-bold text-[11px] border border-purple-200 hover:bg-purple-100 cursor-pointer"
+                          >
+                            <FiEye className="w-3.5 h-3.5" />
+                            <span>Volunteer Photo</span>
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
 
@@ -547,11 +611,10 @@ export default function ApprovalsPage() {
               </button>
             </div>
             <div className="max-h-[70vh] overflow-y-auto rounded-2xl border border-slate-200 bg-slate-50 flex items-center justify-center p-2">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={previewImage}
-                alt="Payment proof screenshot"
-                className="max-w-full max-h-[60vh] object-contain rounded-xl shadow-xs"
+                src={getContentImageUrl(previewImage)}
+                alt="Document proof preview"
+                className="max-w-full max-h-[65vh] object-contain rounded-xl shadow-xs"
               />
             </div>
             <div className="flex justify-end">

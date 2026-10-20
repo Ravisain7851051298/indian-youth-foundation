@@ -23,6 +23,7 @@ import {
   FiImage,
   FiLogIn,
   FiUserPlus,
+  FiUserCheck,
   FiMail,
   FiLayers
 } from 'react-icons/fi';
@@ -150,7 +151,9 @@ export default function Navbar() {
       id: 'login',
       hasDropdown: true,
       links: [
-        { label: 'Member / Volunteer Login', href: '/login', icon: FiLogIn },
+        { label: 'Volunteer Login', href: '/login?role=volunteer', icon: FiUsers },
+        { label: 'Member Login', href: '/login?role=member', icon: FiUserCheck },
+        { label: 'Admin Login', href: '/login?role=admin', icon: FiShield },
         { label: 'Apply for Membership', href: '/apply-member', icon: FiUserPlus },
         { label: 'Apply as Volunteer', href: '/apply-volunteer', icon: FiUserPlus },
       ]
@@ -160,7 +163,7 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 shadow-md font-sans bg-white">
       {/* ---------------- 1. TOP GREEN & RED THEMED BAR ---------------- */}
-      <div className="bg-gradient-to-r from-[#0b8026] via-[#08611c] to-[#dc2626] text-white py-2 px-2 sm:px-4 shadow-xs">
+      <div className="bg-linear-to-r from-[#0b8026] via-[#08611c] to-[#dc2626] text-white py-2 px-2 sm:px-4 shadow-xs">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
 
           {/* Left Social Icons */}
@@ -246,7 +249,7 @@ export default function Navbar() {
             <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full border-2 border-[#0b8026] ring-2 ring-red-500/30 p-0.5 flex items-center justify-center bg-white shrink-0 overflow-hidden shadow-sm group-hover:scale-105 transition-transform duration-300">
               <img
                 src={getContentImageUrl(settings?.logoUrl) || '/logo.jpeg'}
-                alt={settings?.ngoName || 'Yuva Kranti Dal'}
+                alt={settings?.ngoName || 'युवा क्रांति दल'}
                 className="w-full h-full object-contain"
                 onError={(e) => {
                   e.currentTarget.onerror = null;
@@ -256,8 +259,8 @@ export default function Navbar() {
             </div>
             <div className="hidden md:flex flex-col">
               <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black tracking-tight leading-tight uppercase flex items-center gap-2">
-                <span className="text-[#0b8026]">YUVA KRANTI</span>
-                <span className="text-[#dc2626]">DAL</span>
+                <span className="text-[#0b8026]">{settings?.ngoName?.substring(0, settings?.ngoName?.indexOf(' ')) || 'युवा क्रांति '}</span>
+                <span className="text-[#dc2626]">{settings?.ngoName?.substring(settings?.ngoName?.indexOf(' ') + 1) || 'दल'}</span>
               </div>
               <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 tracking-wider uppercase flex items-center gap-1.5 mt-0.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#0b8026]"></span>
@@ -295,7 +298,7 @@ export default function Navbar() {
 
             <Link
               href="/donation"
-              className="flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-emerald-600 hover:to-emerald-700 text-white font-extrabold text-xs sm:text-sm shadow-lg shadow-red-500/25 hover:shadow-emerald-500/25 transition-all duration-300 transform hover:scale-105 active:scale-95 animate-pulse"
+              className="flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-linear-to-r from-red-600 via-rose-600 to-red-700 hover:from-emerald-600 hover:to-emerald-700 text-white font-extrabold text-xs sm:text-sm shadow-lg shadow-red-500/25 hover:shadow-emerald-500/25 transition-all duration-300 transform hover:scale-105 active:scale-95 animate-pulse"
             >
               <FiHeart className="w-4 h-4 text-white fill-white shrink-0 animate-bounce" />
               <span>Donate Us</span>
@@ -324,7 +327,7 @@ export default function Navbar() {
                   }`}
                 title="Home"
               >
-                <FiHome className="w-5 h-5" />
+                Home
               </Link>
 
               {navMenuItems.map((item) => {
@@ -351,7 +354,7 @@ export default function Navbar() {
                       {isOpen && (
                         <div
                           onMouseLeave={() => setActiveDropdown(null)}
-                          className="absolute left-0 top-full mt-0 w-52 bg-white text-slate-800 rounded-b-xl shadow-xl border-t-2 border-red-600 border-x border-b border-slate-100 py-1.5 z-50 animate-in fade-in slide-in-from-top-1 duration-150"
+                          className="absolute left-0 top-full mt-0 w-52 bg-white text-slate-800 rounded-b-xl shadow-xl border-t-2 border-t-red-600 border-x border-b border-slate-100 py-1.5 z-50 animate-in fade-in slide-in-from-top-1 duration-150"
                         >
                           {item.links.map((link) => {
                             const IconComponent = link.icon;

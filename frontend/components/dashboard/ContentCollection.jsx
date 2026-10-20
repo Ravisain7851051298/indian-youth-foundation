@@ -575,7 +575,7 @@ export default function ContentCollection({ resource }) {
                             </span>
                           )}
                           {resource === "events" && item.locationAddress && (
-                            <span className="inline-flex items-center gap-1 text-[10px] text-slate-500 max-w-[220px] truncate">
+                            <span className="inline-flex items-center gap-1 text-[10px] text-slate-500 max-w-55 truncate">
                               <FiMapPin className="w-3 h-3 text-red-500 shrink-0" />
                               <span className="truncate">{item.locationAddress}</span>
                             </span>
@@ -619,7 +619,7 @@ export default function ContentCollection({ resource }) {
                             <div className="flex flex-wrap gap-1 max-w-xs">
                               {Array.isArray(item.features) && item.features.length > 0 ? (
                                 item.features.slice(0, 2).map((feat, idx) => (
-                                  <span key={idx} className="inline-block px-2 py-0.5 rounded-md text-[10px] bg-slate-100 text-slate-700 font-medium border border-slate-200 truncate max-w-[130px]" title={feat}>
+                                  <span key={idx} className="inline-block px-2 py-0.5 rounded-md text-[10px] bg-slate-100 text-slate-700 font-medium border border-slate-200 truncate max-w-32.5" title={feat}>
                                     ✓ {feat}
                                   </span>
                                 ))

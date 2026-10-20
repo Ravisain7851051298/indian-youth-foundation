@@ -74,8 +74,13 @@ class MemberService {
     return candidate;
   }
 
-  async verifyMember(id, verificationData) {
-    const user = await userRepository.findById(id);
+  async verifyMember(id, verificationData = {}) {
+    let user = (typeof id === 'string' && /^[0-9a-fA-F]{24}$/.test(id))
+      ? await userRepository.findById(id)
+      : null;
+    if (!user) {
+      user = await userRepository.findByMemberId(id);
+    }
     if (!user) throw new Error('Member not found');
 
     const { feePaid, feeAmount, designation } = verificationData;
@@ -89,14 +94,20 @@ class MemberService {
     user.idCardGenerated = true;
     user.appointmentLetterGenerated = true;
 
-    const qrData = `${process.env.CLIENT_URL}/verify/member/${user.memberId}`;
-    user.qrCodeUrl = await QRCode.toDataURL(qrData);
+    const qrData = `${process.env.CLIENT_URL || 'https://bharatiyayuvakranti.org'}/verify/member/${user.memberId}`;
+    try {
+      user.qrCodeUrl = await QRCode.toDataURL(qrData);
+    } catch (e) {
+      user.qrCodeUrl = '';
+    }
     await user.save();
 
-    // Auto send official appointment letter & verified credentials via email with PDFs
+    // Auto send official appointment letter & verified credentials via email with PDFs asynchronously
     try {
       const { sendMembershipApprovalEmail } = require('./emailService');
-      await sendMembershipApprovalEmail(user);
+      sendMembershipApprovalEmail(user).catch(e => {
+        console.warn('Membership approval email warning:', e.message);
+      });
     } catch (e) {
       console.warn('Membership approval email warning:', e.message);
     }

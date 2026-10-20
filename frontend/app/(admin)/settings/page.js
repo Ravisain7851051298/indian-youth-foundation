@@ -1724,7 +1724,7 @@ export default function SettingsPage() {
               </div>
 
               {/* ---------------- LIVE SMTP DIAGNOSTIC TESTING DESK ---------------- */}
-              <div className="p-5 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 text-white space-y-4 shadow-xl border border-slate-800/80">
+              <div className="p-5 rounded-2xl bg-linear-to-br from-slate-900 via-slate-900 to-slate-950 text-white space-y-4 shadow-xl border border-slate-800/80">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
                   <div className="flex items-center gap-2">
                     <div className="p-2 bg-emerald-700/20 text-emerald-400 rounded-xl">
@@ -1764,7 +1764,7 @@ export default function SettingsPage() {
                     disabled={testingMail || !testReceiverEmail}
                     className={`w-full sm:w-auto mt-auto sm:self-end px-6 py-2.5 rounded-xl font-black text-xs transition flex items-center justify-center gap-2 shadow-md cursor-pointer ${testingMail || !testReceiverEmail
                       ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700/50'
-                      : 'bg-gradient-to-r from-emerald-700 to-teal-700 hover:from-emerald-800 hover:to-teal-800 text-white shadow-emerald-950/50'
+                      : 'bg-linear-to-r from-emerald-700 to-teal-700 hover:from-emerald-800 hover:to-teal-800 text-white shadow-emerald-950/50'
                       }`}
                   >
                     {testingMail ? (
