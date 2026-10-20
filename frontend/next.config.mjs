@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  experimental: {
+    optimizePackageImports: ['react-icons', 'lucide-react', 'react-icons/fi', 'react-icons/fa6', 'react-icons/fa'],
+  },
   turbopack: {
     rules: {
       "*.css": {

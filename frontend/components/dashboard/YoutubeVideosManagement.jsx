@@ -18,6 +18,7 @@ import {
 import { FaYoutube } from 'react-icons/fa6';
 import toast from 'react-hot-toast';
 import { useNGO } from '@/context/NGOContext';
+import { getYoutubeEmbedUrl } from '@/lib/youtube';
 
 export default function YoutubeVideosManagement() {
   const { settings, updateSettings } = useNGO();
@@ -47,23 +48,7 @@ export default function YoutubeVideosManagement() {
   }, [settings]);
 
   // Helper to extract clean youtube embed url
-  const formatYtEmbed = (url) => {
-    if (!url) return '';
-    try {
-      if (url.includes('embed/')) return url;
-      if (url.includes('watch?v=')) {
-        const id = url.split('watch?v=')[1]?.split('&')[0];
-        return `https://www.youtube.com/embed/${id}`;
-      }
-      if (url.includes('youtu.be/')) {
-        const id = url.split('youtu.be/')[1]?.split('?')[0];
-        return `https://www.youtube.com/embed/${id}`;
-      }
-      return url;
-    } catch {
-      return url;
-    }
-  };
+  const formatYtEmbed = (url) => getYoutubeEmbedUrl(url);
 
   const handleAddVideo = () => {
     setVideos([

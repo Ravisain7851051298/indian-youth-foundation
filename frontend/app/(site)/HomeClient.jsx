@@ -25,6 +25,7 @@ import {
 } from 'react-icons/fi';
 import { useNGO } from '@/context/NGOContext';
 import { getContentImageUrl } from '@/lib/authApi';
+import { getYoutubeEmbedUrl } from '@/lib/youtube';
 
 const DEFAULT_OBJECTIVES = [
   {
@@ -101,12 +102,7 @@ export default function HomePage() {
       ];
 
   // Helper to format embed url
-  const formatYtEmbed = (url) => {
-    if (!url) return '';
-    if (url.includes('embed/')) return url;
-    const match = url.match(/(?:youtu\.be\/|v=|\/embed\/|\/watch\?v=)([^#&?]*).*/);
-    return match && match[1] ? `https://www.youtube.com/embed/${match[1]}` : url;
-  };
+  const formatYtEmbed = (url) => getYoutubeEmbedUrl(url);
 
   // Approved Reviews / Testimonials list from real backend API
   const approvedReviews =

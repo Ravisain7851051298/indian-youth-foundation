@@ -28,6 +28,7 @@ import {
 import { CONTENT_COLLECTIONS } from "@/constants/dashboard";
 import api from "@/services/api";
 import { getContentImageUrl } from "@/lib/authApi";
+import { getYoutubeEmbedUrl, getYoutubeThumbnail, isVideoItem } from "@/lib/youtube";
 
 export function getItemCategory(item) {
   if (!item) return "";
@@ -269,6 +270,24 @@ export default function ContentCollection({ resource }) {
         author: form.author || "संपादक, युवा क्रांति दल"
       };
 
+      if (resource === "gallery" || resource === "galleries") {
+        const isVid =
+          form.mediaType === "video" ||
+          Boolean(form.videoUrl) ||
+          isVideoItem({ url: form.videoUrl || form.url || "" });
+
+        payload.mediaType = isVid ? "video" : "photo";
+        if (isVid) {
+          payload.videoUrl = form.videoUrl || form.url || "";
+          payload.url = form.videoUrl || form.url || finalImages[0] || "";
+          payload.imageUrl = finalImages[0] || getYoutubeThumbnail(payload.videoUrl) || "";
+        } else {
+          payload.url = finalImages[0] || form.url || "";
+          payload.imageUrl = finalImages[0] || form.url || "";
+          payload.videoUrl = "";
+        }
+      }
+
       if (resource === "blogs" || itemCat) {
         payload.category = itemCat;
         payload.tags = Array.isArray(form.tags) && form.tags.length > 0 ? form.tags : [itemCat];
@@ -342,11 +361,7 @@ export default function ContentCollection({ resource }) {
       if (galleryCategory !== "All" && cat !== galleryCategory.toLowerCase()) {
         return false;
       }
-      const isVid =
-        item.mediaType === "video" ||
-        item.category === "video" ||
-        Boolean(item.videoUrl) ||
-        /\.(mp4|webm|mov|ogg)(\?.*)?$/i.test(item.url || "");
+      const isVid = isVideoItem(item);
       if (galleryMediaType === "Photos" && isVid) return false;
       if (galleryMediaType === "Videos" && !isVid) return false;
     }
@@ -533,19 +548,17 @@ export default function ContentCollection({ resource }) {
                 {filteredItems.map((item) => {
                   const id = item._id || item.id;
                   const thumb = item.bannerImage || (Array.isArray(item.images) && item.images[0]) || item.image || item.imageUrl || item.url;
-                  const isVid =
-                    item.mediaType === "video" ||
-                    item.category === "video" ||
-                    Boolean(item.videoUrl) ||
-                    /\.(mp4|webm|mov|ogg)(\?.*)?$/i.test(item.url || "");
+                  const isVid = isVideoItem(item);
+                  const ytThumb = isVid ? getYoutubeThumbnail(item.videoUrl || item.url) : null;
+                  const displayThumb = ytThumb || (thumb ? getContentImageUrl(thumb) : null);
 
                   return (
                     <tr key={id} className="group hover:bg-slate-50/80 transition">
                       <td className="py-3 px-3.5">
                         <div className="relative inline-block">
-                          {thumb ? (
+                          {displayThumb ? (
                             <img
-                              src={getContentImageUrl(thumb)}
+                              src={displayThumb}
                               alt={item.title || "Item"}
                               className="w-12 h-12 object-cover rounded-xl border border-slate-200"
                             />
@@ -1310,13 +1323,10 @@ export default function ContentCollection({ resource }) {
       {/* ----------------- GALLERY PREVIEW MODAL (PHOTO / VIDEO) ----------------- */}
       {galleryPreviewItem && (() => {
         const item = galleryPreviewItem;
-        const isVid =
-          item.mediaType === "video" ||
-          item.category === "video" ||
-          Boolean(item.videoUrl) ||
-          /\.(mp4|webm|mov|ogg)(\?.*)?$/i.test(item.url || "");
+        const isVid = isVideoItem(item);
+        const ytId = isVid ? getYoutubeVideoId(item.videoUrl || item.url) : null;
+        const ytEmbed = isVid ? getYoutubeEmbedUrl(item.videoUrl || item.url, true) : null;
         const mediaSrc = getContentImageUrl(item.url || item.imageUrl || item.videoUrl);
-        const youtubeMatch = (item.videoUrl || item.url || "").match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
 
         return (
           <div className="fixed inset-0 bg-black/80 backdrop-blur-xs z-50 flex items-center justify-center p-4">
@@ -1346,12 +1356,12 @@ export default function ContentCollection({ resource }) {
               {/* Media Player or Photo */}
               <div className="rounded-2xl overflow-hidden bg-black border border-slate-200">
                 {isVid ? (
-                  youtubeMatch ? (
+                  ytId ? (
                     <div className="aspect-video">
                       <iframe
-                        src={`https://www.youtube.com/embed/${youtubeMatch[1]}?autoplay=1`}
+                        src={ytEmbed}
                         title={item.title}
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                         allowFullScreen
                         className="w-full h-full border-0"
                       />
