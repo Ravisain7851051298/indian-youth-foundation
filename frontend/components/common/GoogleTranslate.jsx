@@ -99,7 +99,7 @@ export default function GoogleTranslate() {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-slate-300 hover:border-[#0b8026] bg-slate-50 hover:bg-emerald-50/50 text-slate-800 text-md font-bold transition shadow-2xs cursor-pointer group"
+        className="flex items-center gap-1.5 px-3 py-1.5 lg:py-2 rounded-full border border-slate-300 hover:border-[#0b8026] bg-slate-50 hover:bg-emerald-50/50 text-slate-800 text-md font-bold transition shadow-2xs cursor-pointer group"
         aria-label="Select Language"
       >
         <FiGlobe className="w-3.5 h-3.5 text-[#0b8026] group-hover:rotate-12 transition-transform duration-300" />
@@ -122,8 +122,8 @@ export default function GoogleTranslate() {
                   type="button"
                   onClick={() => changeLanguage(lang.code)}
                   className={`w-full flex items-center justify-between px-3 py-1.5 text-xs font-medium text-left transition cursor-pointer ${isSelected
-                      ? 'bg-emerald-50 text-[#0b8026] font-bold'
-                      : 'text-slate-700 hover:bg-slate-50 hover:text-black'
+                    ? 'bg-emerald-50 text-[#0b8026] font-bold'
+                    : 'text-slate-700 hover:bg-slate-50 hover:text-black'
                     }`}
                 >
                   <span>{lang.native}</span>

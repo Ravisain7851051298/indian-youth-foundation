@@ -301,7 +301,7 @@ export default function Navbar() {
               className="flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-linear-to-r from-red-600 via-rose-600 to-red-700 hover:from-emerald-600 hover:to-emerald-700 text-white font-extrabold text-xs sm:text-sm shadow-lg shadow-red-500/25 hover:shadow-emerald-500/25 transition-all duration-300 transform hover:scale-105 active:scale-95 animate-pulse"
             >
               <FiHeart className="w-4 h-4 text-white fill-white shrink-0 animate-bounce" />
-              <span>Donate Us</span>
+              <span className='text-sm md:text-base'>Donate Us</span>
             </Link>
 
             <GoogleTranslate />
@@ -415,20 +415,30 @@ export default function Navbar() {
             </div>
 
             {/* Mobile View Toggle */}
-            <div className="flex lg:hidden items-center justify-between w-full">
-              <Link
-                href="/"
-                className={`flex items-center gap-1 font-bold text-xs py-1.5 px-2.5 rounded-md transition ${pathname === '/' ? 'bg-red-600 text-white font-black' : 'hover:bg-[#09661f]'
-                  }`}
-              >
-                <FiHome className="w-4 h-4" />
-                <span>Home</span>
-              </Link>
+            <div className="flex lg:hidden items-center justify-between w-full gap-2">
+              <div className="flex items-center gap-2 min-w-0">
+                <Link
+                  href="/"
+                  className={`flex items-center gap-1 font-bold text-xs py-1.5 px-2.5 rounded-md transition shrink-0 ${pathname === '/' ? 'bg-red-600 text-white font-black' : 'hover:bg-[#09661f]'
+                    }`}
+                >
+                  <FiHome className="w-4 h-4" />
+                  <span>Home</span>
+                </Link>
+
+                <Link
+                  href="/"
+                  className="ml-2 mr-2 font-bold text-xl tracking-wide bg-linear-to-b from-red-800 via-red-600 to-red-800 bg-clip-text text-transparent truncate hover:opacity-90 transition drop-shadow-xs"
+                  title={settings?.ngoName || 'Yuva Kranti Dal'}
+                >
+                  {settings?.ngoName || 'Yuva Kranti Dal'}
+                </Link>
+              </div>
 
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-1.5 text-white hover:bg-red-600 rounded-lg cursor-pointer transition"
+                className="p-1.5 text-white hover:bg-red-600 rounded-lg cursor-pointer transition shrink-0"
                 aria-label="Toggle Menu"
               >
                 {mobileMenuOpen ? <FiX className="w-6 h-6" /> : <FiMenu className="w-6 h-6" />}

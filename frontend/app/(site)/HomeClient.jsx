@@ -220,7 +220,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
             {/* Left Column (col-span-3): Green & Red border card + Member Apply & Donate Us buttons */}
-            <div className="lg:col-span-3 space-y-4">
+            <div className="order-2 lg:order-1 lg:col-span-3 space-y-4">
               {/* Dual-bordered Welcome box */}
               <div className="border-4 border-[#0b8026] bg-linear-to-b from-emerald-50/90 via-white to-rose-50/40 rounded-2xl p-5 min-h-55 sm:min-h-65 flex flex-col justify-center items-center text-center shadow-sm relative overflow-hidden">
                 <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-red-600 text-white mb-2 shadow-xs">
@@ -275,7 +275,7 @@ export default function HomePage() {
             </div>
 
             {/* Middle Column (col-span-6): Dynamic content based on active tab */}
-            <div className="lg:col-span-6 bg-white border border-slate-200 rounded-xl p-5 sm:p-6 min-h-95 shadow-sm flex flex-col justify-between">
+            <div className="order-1 lg:order-2 lg:col-span-6 bg-white border border-slate-200 rounded-xl p-5 sm:p-6 min-h-95 shadow-sm flex flex-col justify-between">
               {activeTab === 'news' && (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between border-b-2 border-red-100 pb-3">
@@ -526,7 +526,7 @@ export default function HomePage() {
             </div>
 
             {/* Right Column (col-span-3): Management Team Card */}
-            <div className="lg:col-span-3 space-y-4">
+            <div className="order-3 lg:order-3 lg:col-span-3 space-y-4">
               <div className="bg-white border-2 border-emerald-600/30 rounded-xl p-5 shadow-sm min-h-75 flex flex-col justify-between">
                 <div>
                   <div className="w-20 h-20 mx-auto rounded-full overflow-hidden border-2 border-[#0b8026] ring-2 ring-red-500/30 p-1 bg-white mb-3 shadow-xs">
