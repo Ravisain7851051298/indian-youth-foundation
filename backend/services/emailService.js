@@ -744,12 +744,143 @@ const sendPasswordResetEmail = async (param1, param2) => {
   });
 };
 
+// Coordinator Appointment -> Letter & Digital ID Card Email with PDFs Attached + Credentials
+const sendCoordinatorAppointmentEmail = async (param) => {
+  const coordObj = param.toObject ? param.toObject() : param;
+  const to = coordObj.to || coordObj.email || coordObj.user?.email;
+  const name = coordObj.name || coordObj.memberName || coordObj.user?.name || 'Valued Coordinator';
+  const coordinatorId = coordObj.coordinatorId || coordObj.memberId || coordObj.user?.coordinatorId || coordObj.user?.memberId || 'BYK-COORD-2026-PENDING';
+  const role = 'Coordinator';
+  const designation = coordObj.designation || coordObj.user?.designation || 'District Youth Coordinator';
+  const temporaryPassword = coordObj.temporaryPassword || param.temporaryPassword || '';
+  const clientBase = (process.env.CLIENT_URL || 'http://localhost:3000').replace(/\/+$/, '');
+
+  if (!to) {
+    console.warn('⚠️ [EMAIL NOTICE] No recipient email found for coordinator notification.');
+    return null;
+  }
+
+  // Generate Coordinator Appointment Letter PDF & Coordinator ID Card PDF
+  let attachments = [];
+  try {
+    const [apptPdf, idCardPdf] = await Promise.all([
+      pdfService.generateAppointmentLetterPdf({ ...coordObj, role: 'Coordinator', isCoordinator: true, coordinatorId, memberId: coordinatorId, name, designation }),
+      pdfService.generateIdCardPdf({ ...coordObj, role: 'Coordinator', isCoordinator: true, coordinatorId, memberId: coordinatorId, name, designation }, 'coordinator')
+    ]);
+
+    attachments.push(
+      {
+        filename: `Coordinator_Appointment_Letter_${coordinatorId}.pdf`,
+        content: apptPdf,
+        contentType: 'application/pdf'
+      },
+      {
+        filename: `Coordinator_ID_Card_${coordinatorId}.pdf`,
+        content: idCardPdf,
+        contentType: 'application/pdf'
+      }
+    );
+  } catch (err) {
+    console.error('Error generating coordinator PDFs:', err);
+  }
+
+  const subject = `Official Coordinator Appointment Letter & ID Card Attached (${coordinatorId}) - Yuva Kranti Dal`;
+  const htmlText = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 14px; background-color: #ffffff;">
+      <div style="background: linear-gradient(135deg, #6d28d9, #4c1d95); padding: 18px; border-radius: 10px; text-align: center; color: white;">
+        <h2 style="margin: 0; font-size: 22px; letter-spacing: 0.5px;">YUVA KRANTI DAL</h2>
+        <p style="margin: 4px 0 0; font-size: 12px; opacity: 0.95;">Nationwide Non-Profit Movement • NITI Aayog Registered NGO</p>
+      </div>
+
+      <div style="padding: 20px 0; color: #1e293b;">
+        <div style="display: inline-block; background-color: #f5f3ff; border: 1px solid #ddd6fe; color: #6d28d9; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-bottom: 12px;">
+          🎉 Congratulations! Appointed as Official Foundation Coordinator
+        </div>
+
+        <p style="font-size: 15px; margin: 8px 0;">Dear <strong>${name}</strong>,</p>
+        <p style="font-size: 14px; line-height: 1.6; color: #334155;">
+          The Board of Trustees and National Executive Council of <strong>Yuva Kranti Dal</strong> are pleased to officially ratify your appointment as an <strong>Official Coordinator</strong>. You have been vested with organizational powers to lead regional youth campaigns, represent the Trust, and onboard new executive members.
+        </p>
+        
+        <div style="background-color: #faf5ff; border: 1px solid #e9d5ff; border-radius: 10px; padding: 16px; margin: 18px 0; font-size: 13px;">
+          <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+              <td style="padding: 4px 0; color: #64748b; width: 45%;"><strong>Official Coordinator ID:</strong></td>
+              <td style="padding: 4px 0; font-family: monospace; color: #6d28d9; font-weight: bold;">${coordinatorId}</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px 0; color: #64748b;"><strong>Role Assigned:</strong></td>
+              <td style="padding: 4px 0; font-weight: bold; color: #0f172a;">${role}</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px 0; color: #64748b;"><strong>Designation:</strong></td>
+              <td style="padding: 4px 0; color: #0f172a;">${designation}</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px 0; color: #64748b;"><strong>Coordination Rights:</strong></td>
+              <td style="padding: 4px 0; color: #059669; font-weight: bold;">Member Onboarding, Verification & Event Leadership</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px 0; color: #64748b;"><strong>Status:</strong></td>
+              <td style="padding: 4px 0; color: #059669; font-weight: bold;">Active, Verified & Sealed</td>
+            </tr>
+          </table>
+        </div>
+
+        ${temporaryPassword ? `
+        <div style="background-color: #fefce8; border: 2px dashed #ca8a04; border-radius: 10px; padding: 16px; margin: 18px 0; font-size: 13px;">
+          <h4 style="margin: 0 0 8px; color: #854d0e; font-size: 14px;">🔑 Your Coordinator Portal Login Credentials</h4>
+          <p style="margin: 4px 0; color: #475569;">Your authenticated portal account has been created/updated by the Administration. Use the credentials below to log in:</p>
+          <div style="background: white; border: 1px solid #fef08a; padding: 10px 14px; border-radius: 6px; margin: 8px 0;">
+            <p style="margin: 4px 0;"><strong>Login Email / Identifier:</strong> <span style="font-family: monospace; color: #0f172a; font-weight: bold;">${to}</span></p>
+            <p style="margin: 4px 0;"><strong>Initial Password:</strong> <span style="font-family: monospace; background: #ede9fe; color: #6d28d9; padding: 2px 8px; border-radius: 4px; font-weight: bold; letter-spacing: 0.5px;">${temporaryPassword}</span></p>
+          </div>
+          <p style="margin: 6px 0 0; font-size: 12px; color: #854d0e;">
+            🔒 For security, you can change your password anytime in your Profile Settings upon logging in.
+          </p>
+        </div>
+        ` : `
+        <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; margin: 14px 0; font-size: 12.5px; color: #334155;">
+          🔐 Sign in with your registered email (<strong>${to}</strong>) and password to access your dedicated Coordinator Hub.
+        </div>
+        `}
+
+        <div style="background-color: #f5f3ff; border-left: 4px solid #7c3aed; padding: 12px 14px; margin: 16px 0; font-size: 12.5px; color: #5b21b6; border-radius: 4px;">
+          📄 <strong>PDF Credentials Attached to this Email:</strong><br/>
+          • <strong>Coordinator_Appointment_Letter_${coordinatorId}.pdf</strong> (Statutory Letter of Appointment)<br/>
+          • <strong>Coordinator_ID_Card_${coordinatorId}.pdf</strong> (Dual-Sided Coordinator Identity Badge with QR Verification)
+        </div>
+
+        <div style="text-align: center; margin: 26px 0 16px;">
+          <a href="${clientBase}/login" style="background: #6d28d9; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px; display: inline-block;">
+            Sign In to Coordinator Portal
+          </a>
+        </div>
+      </div>
+
+      <div style="border-top: 1px solid #e2e8f0; padding-top: 14px; font-size: 11px; color: #94a3b8; text-align: center; line-height: 1.5;">
+        National Head Office - Krishna Vihar Pala Road Aligarh, Uttar Pradesh - 202001 | Helpline: +91 93196 98759<br/>
+        Email: samasyasamadhanparishad@gmail.com | Website: bharatiyayuvakranti.org
+      </div>
+    </div>
+  `;
+
+  return await sendEmail({
+    to,
+    subject,
+    htmlText,
+    template: 'coordinator_appointed',
+    attachments
+  });
+};
+
 module.exports = {
   sendEmail,
   testSmtpConnection,
   sendDonationApprovalEmail,
   sendMembershipApprovalEmail,
   sendVolunteerApprovalEmail,
+  sendCoordinatorAppointmentEmail,
   sendCertificateEmail,
   sendPasswordResetEmail
 };

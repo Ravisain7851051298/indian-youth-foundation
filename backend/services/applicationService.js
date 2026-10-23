@@ -20,7 +20,11 @@ class ApplicationService {
       designation,
       name,
       email,
-      phone
+      phone,
+      addedByCoordinator,
+      coordinatorName,
+      coordinatorId,
+      addedByRole
     } = appData;
 
     const finalScreenshot = paymentScreenshot || appData.paymentProof || appData.screenshotUrl;
@@ -53,6 +57,8 @@ class ApplicationService {
       if (finalDocFront) user.documentFront = finalDocFront;
       if (finalDocBack) user.documentBack = finalDocBack;
       if (designation) user.designation = designation;
+      if (addedByCoordinator) user.addedByCoordinator = addedByCoordinator;
+      if (coordinatorName) user.addedByCoordinatorName = coordinatorName;
 
       user.membershipPlan = planId;
       user.feeAmount = plan.price || plan.fee || 250;
@@ -92,6 +98,10 @@ class ApplicationService {
       documentBack: finalDocBack,
       idProofUrl: finalDocFront,
       designation: designation || user?.designation || `${plan.title || plan.name} Member`,
+      addedByCoordinator: addedByCoordinator || null,
+      coordinatorName: coordinatorName || '',
+      coordinatorId: coordinatorId || '',
+      addedByRole: addedByRole || (addedByCoordinator ? 'Coordinator' : ''),
       status: 'pending'
     });
 
@@ -312,6 +322,18 @@ class ApplicationService {
         const tempPass = 'BYK@' + Math.floor(100000 + Math.random() * 900000);
         user.password = await bcrypt.hash(tempPass, 10);
         generatedPassword = tempPass;
+      }
+    }
+
+    if (app.addedByCoordinator) {
+      user.addedByCoordinator = app.addedByCoordinator;
+      user.addedByCoordinatorName = app.coordinatorName || '';
+      try {
+        await userRepository.updateById(app.addedByCoordinator, {
+          $inc: { coordinatorRecruitsCount: 1 }
+        });
+      } catch (e) {
+        console.warn('Coordinator recruit increment warning:', e.message);
       }
     }
 

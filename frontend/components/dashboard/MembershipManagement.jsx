@@ -295,6 +295,11 @@ export default function MembershipManagement() {
                           <div>
                             <div className="font-extrabold text-black text-sm">{name}</div>
                             <div className="text-[11px] text-slate-600">{email} • {phone}</div>
+                            {(m.coordinatorName || m.addedByCoordinator) && (
+                              <div className="mt-1 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-purple-100 text-purple-900 border border-purple-200 text-[10px] font-bold">
+                                <span>⭐ Added by Coordinator: {m.coordinatorName || "Assigned"}</span>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </td>
@@ -483,6 +488,11 @@ export default function MembershipManagement() {
                     {viewModalItem.assignedMemberId && (
                       <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300">
                         {viewModalItem.assignedMemberId}
+                      </span>
+                    )}
+                    {(viewModalItem.coordinatorName || viewModalItem.addedByCoordinator) && (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-900 border border-purple-300">
+                        ⭐ Added by Coordinator: {viewModalItem.coordinatorName} {viewModalItem.coordinatorId ? `(${viewModalItem.coordinatorId})` : ''}
                       </span>
                     )}
                   </div>

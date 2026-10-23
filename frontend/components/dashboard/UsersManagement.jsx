@@ -51,6 +51,7 @@ export default function UsersManagement() {
   const [selectedAwardId, setSelectedAwardId] = useState("");
   const [awardReason, setAwardReason] = useState("");
   const [isSubmittingAward, setIsSubmittingAward] = useState(false);
+  const [promotingId, setPromotingId] = useState(null);
 
   const loadUsers = async () => {
     try {
@@ -104,6 +105,7 @@ export default function UsersManagement() {
     if (selectedRole !== "All") {
       if (selectedRole === "Member" && !(u.role === "Member" || u.isMember)) return false;
       if (selectedRole === "Volunteer" && !(u.role === "Volunteer" || u.isVolunteer)) return false;
+      if (selectedRole === "Coordinator" && !(u.role === "Coordinator" || u.isCoordinator)) return false;
       if (selectedRole === "Admin" && u.role !== "Admin") return false;
       if (selectedRole === "Donor" && u.role !== "Donor") return false;
       if (selectedRole === "TeamMember" && u.role !== "TeamMember") return false;
@@ -160,6 +162,35 @@ export default function UsersManagement() {
       toast.error(err.response?.data?.message || "Failed to delete user account");
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const handlePromoteToCoordinator = async (user) => {
+    const confirmPromote = window.confirm(`Are you sure you want to appoint "${user.name}" as an Official Coordinator? Their appointment letter and ID card will be generated and emailed.`);
+    if (!confirmPromote) return;
+    const targetUserId = user._id || user.id;
+    try {
+      setPromotingId(targetUserId);
+      let res;
+      try {
+        res = await api.post(`/coordinators/promote/${targetUserId}`, { userId: targetUserId });
+      } catch (err1) {
+        if (err1.response?.status === 404) {
+          try {
+            res = await api.post(`/users/${targetUserId}/make-coordinator`, { userId: targetUserId });
+          } catch (err2) {
+            res = await api.post('/coordinators/promote', { userId: targetUserId });
+          }
+        } else {
+          throw err1;
+        }
+      }
+      toast.success(res.data?.message || `User ${user.name} promoted to Coordinator! Letter & ID Card emailed.`);
+      loadUsers();
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to promote user to Coordinator");
+    } finally {
+      setPromotingId(null);
     }
   };
 
@@ -313,6 +344,7 @@ export default function UsersManagement() {
               className="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-black bg-slate-50 focus:outline-red-500 cursor-pointer"
             >
               <option value="All">All Roles</option>
+              <option value="Coordinator">Coordinators Only</option>
               <option value="Member">Members Only</option>
               <option value="Volunteer">Volunteers Only</option>
               <option value="Donor">Donors / Public</option>
@@ -420,20 +452,22 @@ export default function UsersManagement() {
                           <span
                             className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase inline-block border ${u.role === "Admin"
                                 ? "bg-purple-100 text-purple-800 border-purple-200"
-                                : u.role === "Member" || u.isMember
-                                  ? "bg-blue-100 text-blue-800 border-blue-200"
-                                  : u.role === "Volunteer" || u.isVolunteer
-                                    ? "bg-emerald-100 text-emerald-800 border-emerald-200"
-                                    : u.role === "TeamMember"
-                                      ? "bg-amber-100 text-amber-800 border-amber-200"
-                                      : "bg-slate-100 text-slate-700 border-slate-200"
+                                : u.role === "Coordinator" || u.isCoordinator
+                                  ? "bg-purple-600 text-white border-purple-700 shadow-xs"
+                                  : u.role === "Member" || u.isMember
+                                    ? "bg-blue-100 text-blue-800 border-blue-200"
+                                    : u.role === "Volunteer" || u.isVolunteer
+                                      ? "bg-emerald-100 text-emerald-800 border-emerald-200"
+                                      : u.role === "TeamMember"
+                                        ? "bg-amber-100 text-amber-800 border-amber-200"
+                                        : "bg-slate-100 text-slate-700 border-slate-200"
                               }`}
                           >
                             {u.role || "Donor"}
                           </span>
-                          {(u.memberId || u.volunteerId) && (
+                          {(u.coordinatorId || u.memberId || u.volunteerId) && (
                             <div className="font-mono text-[10px] font-bold text-slate-600">
-                              ID: {u.memberId || u.volunteerId}
+                              ID: {u.coordinatorId || u.memberId || u.volunteerId}
                             </div>
                           )}
                         </div>
@@ -460,6 +494,20 @@ export default function UsersManagement() {
                       {/* Actions */}
                       <td className="py-3 px-3.5 text-right whitespace-nowrap sticky right-0 bg-white group-hover:bg-slate-50 z-10 shadow-[-6px_0_10px_-2px_rgba(0,0,0,0.06)]">
                         <div className="flex items-center justify-end gap-1.5">
+                          {/* Make Coordinator Button for Non-Admins/Non-Coordinators */}
+                          {u.role !== "Admin" && u.role !== "Coordinator" && !u.isCoordinator && (
+                            <button
+                              type="button"
+                              onClick={() => handlePromoteToCoordinator(u)}
+                              disabled={promotingId === id}
+                              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-purple-50 border border-purple-200 text-purple-800 hover:bg-purple-100 font-bold text-xs shadow-2xs transition cursor-pointer disabled:opacity-50"
+                              title="Promote to Official Coordinator & Auto Email Credentials"
+                            >
+                              <FiAward className="w-3.5 h-3.5 text-purple-600" />
+                              <span>{promotingId === id ? "Appointing..." : "Make Coordinator"}</span>
+                            </button>
+                          )}
+
                           {/* Offer Award */}
                           <button
                             type="button"

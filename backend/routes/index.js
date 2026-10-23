@@ -23,6 +23,7 @@ const feedbackRoutes = require('./feedbackRoutes');
 const orgDocumentRoutes = require('./orgDocumentRoutes');
 const userRoutes = require('./userRoutes');
 const awardRoutes = require('./awardRoutes');
+const coordinatorRoutes = require('./coordinatorRoutes');
 
 // Health Check
 router.get('/health', (req, res) => {
@@ -51,6 +52,8 @@ router.use('/plans', planRoutes);
 router.use('/members', memberRoutes);
 router.use('/volunteers', volunteerRoutes);
 router.use('/volunteer', volunteerRoutes); // alias
+router.use('/coordinators', coordinatorRoutes);
+router.use('/coordinator', coordinatorRoutes); // alias
 router.use('/certificates', certificateRoutes);
 router.use('/campaigns', campaignRoutes);
 router.use('/events', eventRoutes);

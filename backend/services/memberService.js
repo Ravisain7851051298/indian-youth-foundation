@@ -142,14 +142,18 @@ class MemberService {
   }
 
   async verifyPublicMember(id) {
-    const user = await userRepository.findByMemberId(id) || (id.match(/^[0-9a-fA-F]{24}$/) ? await userRepository.findById(id) : null);
+    const user = await userRepository.findByMemberId(id) 
+      || (await User.findOne({ coordinatorId: id }))
+      || (await userRepository.findByVolunteerId(id))
+      || (id.match(/^[0-9a-fA-F]{24}$/) ? await userRepository.findById(id) : null);
     if (!user) {
-      throw new Error('Invalid Member Verification ID!');
+      throw new Error('Invalid Verification ID!');
     }
 
     return {
       name: user.name,
-      memberId: user.memberId,
+      memberId: user.coordinatorId || user.memberId || user.volunteerId,
+      coordinatorId: user.coordinatorId,
       role: user.role,
       designation: user.designation,
       status: user.status,

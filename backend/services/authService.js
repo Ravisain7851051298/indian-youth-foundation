@@ -248,9 +248,9 @@ class AuthService {
       throw new Error('Password must be at least 6 characters long.');
     }
 
-    // Prevent privilege escalation: Admin cannot be self-registered via public route
-    if (role === 'Admin') {
-      throw new Error('Admin registration is restricted. Please use the Admin Creation endpoint with X-ADMIN-SECRET-KEY.');
+    // Prevent privilege escalation: Admin and Coordinator cannot be self-registered via public route
+    if (role === 'Admin' || role === 'Coordinator') {
+      throw new Error('Registration for Admin and Coordinator roles is restricted. Coordinators can only be appointed directly by the Administration.');
     }
 
     const cleanEmail = email.toLowerCase().trim();

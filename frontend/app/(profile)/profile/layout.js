@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
@@ -28,6 +28,15 @@ import { getContentImageUrl } from '@/lib/authApi';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
+const emptySubscribe = () => () => {};
+function useIsClient() {
+  return useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
+}
+
 export default function ProfileLayout({ children }) {
   const { currentUser, logout } = useNGO();
   const reduxUser = useSelector((state) => state.auth?.user);
@@ -35,11 +44,7 @@ export default function ProfileLayout({ children }) {
   const pathname = usePathname();
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useIsClient();
 
   if (!mounted) {
     return (
@@ -81,12 +86,18 @@ export default function ProfileLayout({ children }) {
     );
   }
 
+  const isCoordinator = effectiveUser.role === 'Coordinator' || effectiveUser.isCoordinator;
   const isVerified = effectiveUser.status === 'active';
-  const isMember = effectiveUser.role === 'Member' || effectiveUser.role === 'Admin' || (!!effectiveUser.memberId && !effectiveUser.memberId.startsWith('BYK-DON-')) || effectiveUser.isMember;
-  const isVolunteer = effectiveUser.role === 'Volunteer' || effectiveUser.isVolunteer || effectiveUser.volunteerApplication?.status === 'approved' || effectiveUser.volunteerApplication?.status === 'pending' || (!!effectiveUser.volunteerId && !effectiveUser.volunteerId.startsWith('BYK-DON-'));
+  const isMember = isCoordinator || effectiveUser.role === 'Member' || effectiveUser.role === 'Admin' || (!!effectiveUser.memberId && !effectiveUser.memberId.startsWith('BYK-DON-')) || effectiveUser.isMember;
+  const isVolunteer = isCoordinator || effectiveUser.role === 'Volunteer' || effectiveUser.isVolunteer || effectiveUser.volunteerApplication?.status === 'approved' || effectiveUser.volunteerApplication?.status === 'pending' || (!!effectiveUser.volunteerId && !effectiveUser.volunteerId.startsWith('BYK-DON-'));
 
   const menuItems = [
     { label: 'Overview & Status', href: '/profile', icon: FiUser },
+    ...(isCoordinator ? [
+      { label: 'Coordinator Hub', href: '/profile/coordinator', icon: FiAward },
+      { label: 'Add New Member', href: '/profile/add-member', icon: FiUserPlus },
+      { label: 'My Added Members', href: '/profile/my-members', icon: FiUsers },
+    ] : []),
     { label: 'My Certificates', href: '/profile/certificates', icon: FiAward },
     { label: 'My Awards & Badges', href: '/profile/my-awards', icon: FiAward },
     {
@@ -101,13 +112,13 @@ export default function ProfileLayout({ children }) {
     },
     {
       label: 'Official ID Card',
-      href: isVolunteer && !isMember ? '/profile/id-card?type=volunteer' : '/profile/id-card',
+      href: isCoordinator ? '/profile/id-card?type=coordinator' : (isVolunteer && !isMember ? '/profile/id-card?type=volunteer' : '/profile/id-card'),
       icon: FiShield,
       locked: !isVerified
     },
     {
       label: 'Offer / Appointment Letter',
-      href: isVolunteer && !isMember ? '/profile/appointment-letter?type=volunteer' : '/profile/appointment-letter',
+      href: isCoordinator ? '/profile/appointment-letter?type=coordinator' : (isVolunteer && !isMember ? '/profile/appointment-letter?type=volunteer' : '/profile/appointment-letter'),
       icon: FiFileText,
       locked: !isVerified
     },
@@ -242,8 +253,12 @@ export default function ProfileLayout({ children }) {
               <p className="text-[11px] text-black font-medium mt-0.5">{effectiveUser.email}</p>
 
               <div className="mt-3 flex flex-wrap items-center justify-center gap-1.5">
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-red-100 text-[#d50000] border border-red-200">
-                  {effectiveUser.role || 'Member'}
+                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border ${
+                  isCoordinator
+                    ? 'bg-purple-100 text-purple-900 border-purple-300'
+                    : 'bg-red-100 text-[#d50000] border-red-200'
+                }`}>
+                  {isCoordinator ? 'Official Coordinator' : (effectiveUser.role || 'Member')}
                 </span>
 
                 {isVerified ? (
@@ -260,7 +275,7 @@ export default function ProfileLayout({ children }) {
               </div>
 
               <div className="mt-2 text-[11px] font-mono text-black font-semibold">
-                ID: {effectiveUser.memberId || 'Pending Assignment'}
+                ID: {effectiveUser.coordinatorId || effectiveUser.memberId || 'Pending Assignment'}
               </div>
             </div>
 

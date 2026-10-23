@@ -16,14 +16,16 @@ export default function VerificationPage() {
   let title = '';
   let details = null;
 
-  if (type === 'member' || type === 'letter' || type === 'volunteer') {
-    title = type === 'volunteer' 
-      ? 'Official Volunteer ID Card Verification' 
-      : type === 'member' 
-        ? 'Official Member ID Card Verification' 
-        : 'Official Appointment Letter Verification';
-    const found = members.find(m => m.memberId === id || m.volunteerId === id || m._id === id);
-    if (found && (found.status === 'active' || found.status === 'approved')) {
+  if (type === 'member' || type === 'letter' || type === 'volunteer' || type === 'coordinator') {
+    title = type === 'coordinator'
+      ? 'Official Area Coordinator ID Verification'
+      : type === 'volunteer' 
+        ? 'Official Volunteer ID Card Verification' 
+        : type === 'member' 
+          ? 'Official Member ID Card Verification' 
+          : 'Official Appointment Letter Verification';
+    const found = members.find(m => m.memberId === id || m.volunteerId === id || m.coordinatorId === id || m._id === id);
+    if (found && (found.status === 'active' || found.status === 'approved' || found.role === 'Coordinator' || found.isCoordinator)) {
       verified = true;
       details = (
         <div className="space-y-3 text-xs text-left bg-slate-50 p-5 rounded-2xl border border-slate-200">
@@ -40,13 +42,13 @@ export default function VerificationPage() {
             />
             <div>
               <h4 className="font-extrabold text-base text-black">{found.name}</h4>
-              <span className="text-red-600 font-bold block">{found.designation || (type === 'volunteer' ? 'Registered Volunteer' : 'Member')}</span>
-              <div className="font-mono text-slate-500 text-[11px] font-bold">{found.volunteerId || found.memberId}</div>
+              <span className="text-red-600 font-bold block">{found.designation || (type === 'coordinator' ? 'Area Youth Coordinator' : type === 'volunteer' ? 'Registered Volunteer' : 'Member')}</span>
+              <div className="font-mono text-slate-500 text-[11px] font-bold">{found.coordinatorId || found.volunteerId || found.memberId}</div>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-2.5 text-slate-700 pt-1 border-t border-slate-200/60">
             <div>Blood Group: <strong className="text-red-600 font-bold">{found.bloodGroup || 'O+'}</strong></div>
-            <div>Role: <strong className="text-black font-bold">{found.role || (type === 'volunteer' ? 'Active Volunteer' : 'Member')}</strong></div>
+            <div>Role: <strong className="text-black font-bold">{found.role || (type === 'coordinator' ? 'Area Coordinator' : type === 'volunteer' ? 'Active Volunteer' : 'Member')}</strong></div>
             <div>State: <strong className="text-black">{found.state || 'Rajasthan'}</strong></div>
             <div>Status: <strong className="text-emerald-600 font-bold">Authorized &amp; Active</strong></div>
           </div>

@@ -39,7 +39,11 @@ const membershipApplicationSchema = new mongoose.Schema({
   reviewedAt: { type: Date, default: null },
   reviewedBy: { type: String, default: null },
   rejectionReason: { type: String, default: null },
-  isGuest: { type: Boolean, default: false }
+  isGuest: { type: Boolean, default: false },
+  addedByCoordinator: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+  coordinatorName: { type: String, default: '' },
+  coordinatorId: { type: String, default: '' },
+  addedByRole: { type: String, default: '' }
 }, {
   timestamps: true
 });

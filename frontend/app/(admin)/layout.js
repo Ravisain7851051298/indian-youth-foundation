@@ -84,6 +84,7 @@ export default function AdminLayout({ children }) {
     { label: 'Awards & Honors', href: '/dashboard/awards', icon: FiAward },
     { label: 'Approvals Center', href: '/dashboard/approvals', icon: FiCheckSquare, badge: totalApprovalsPending },
     { label: 'Members Directory', href: '/dashboard/members', icon: FiUsers },
+    { label: 'Coordinators Hub', href: '/dashboard/coordinators', icon: FiAward },
     { label: 'Volunteer Wing', href: '/dashboard/volunteers', icon: FiUserCheck },
     { label: '80G Donations', href: '/dashboard/donations', icon: FiHeart },
     { label: 'Campaigns CMS', href: '/dashboard/campaigns', icon: FiFileText },

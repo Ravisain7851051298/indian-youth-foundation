@@ -429,26 +429,33 @@ async function generateAppointmentLetterPdf(user = {}) {
         dbSettings = await Setting.findOne();
       } catch (e) {}
 
-      const memberId = sanitize(user.memberId || 'BYK-MEM-2026-0001');
-      const name = sanitize(user.name || 'Executive Member');
+      const roleLower = (user.role || '').toLowerCase();
+      const isCoordinator = roleLower.includes('coordinator') || user.isCoordinator;
+      const themeColor = isCoordinator ? '#6d28d9' : '#b91c1c';
+      const defaultId = isCoordinator ? 'BYK-COORD-2026-0001' : 'BYK-MEM-2026-0001';
+      const memberId = sanitize(isCoordinator ? (user.coordinatorId || user.memberId || defaultId) : (user.memberId || defaultId));
+      const defaultName = isCoordinator ? 'Appointed Coordinator' : 'Executive Member';
+      const name = sanitize(user.name || defaultName);
       const email = sanitize(user.email || 'N/A');
       const phone = sanitize(user.phone || 'N/A');
-      const designation = sanitize(user.designation || 'Active Social Worker');
+      const defaultDesig = isCoordinator ? 'District Youth Coordinator' : 'Active Social Worker';
+      const designation = sanitize(user.designation || defaultDesig);
       const city = sanitize(user.district || user.city || 'Aligarh');
       const state = sanitize(user.state || 'Uttar Pradesh');
       const dateStr = formatDate(user.verifiedAt || new Date());
       const approvedBy = sanitize(user.verifiedBy || dbSettings?.presidentName || 'Ravi Saini (National President & Trustee)');
 
       // QR Code
-      const qrData = `https://bharatiyayuvakranti.org/verify/member/${memberId}`;
+      const verifyType = isCoordinator ? 'coordinator' : 'member';
+      const qrData = `https://bharatiyayuvakranti.org/verify/${verifyType}/${memberId}`;
       const qrBuffer = await QRCode.toBuffer(qrData, { width: 80, margin: 1 });
 
       // Outer Border
-      doc.rect(25, 25, 545, 792).lineWidth(2).strokeColor('#b91c1c').stroke();
+      doc.rect(25, 25, 545, 792).lineWidth(2).strokeColor(themeColor).stroke();
       doc.rect(29, 29, 537, 784).lineWidth(0.8).strokeColor('#cbd5e1').stroke();
 
       // Header
-      doc.font('Helvetica-Bold').fontSize(18).fillColor('#b91c1c');
+      doc.font('Helvetica-Bold').fontSize(18).fillColor(themeColor);
       doc.text('YUVA KRANTI DAL', 40, 45, { align: 'center' });
       doc.font('Helvetica-Bold').fontSize(11).fillColor('#0f172a');
       doc.text('BHARATIYA YUVA KRANTI • NATIONAL EXECUTIVE COUNCIL', 40, 68, { align: 'center' });
@@ -456,25 +463,30 @@ async function generateAppointmentLetterPdf(user = {}) {
       doc.text('Registered Public Charitable Trust • Reg. No: 421/2019 • NITI Aayog Verified NGO', 40, 83, { align: 'center' });
       doc.text('Head Office: Krishna Vihar, Pala Road, Aligarh, Uttar Pradesh - 202001 | Phone: +91 93196 98759', 40, 95, { align: 'center' });
 
-      doc.moveTo(40, 110).lineTo(555, 110).lineWidth(1.5).strokeColor('#b91c1c').stroke();
+      doc.moveTo(40, 110).lineTo(555, 110).lineWidth(1.5).strokeColor(themeColor).stroke();
 
       // Ref & Date
+      const refPrefix = isCoordinator ? 'BYK/COORD-APPT' : 'BYK/MEM-APPT';
       doc.font('Helvetica-Bold').fontSize(8.5).fillColor('#0f172a');
-      doc.text(`Ref No: BYK/MEM-APPT/2026/${memberId}`, 45, 120);
+      doc.text(`Ref No: ${refPrefix}/2026/${memberId}`, 45, 120);
       doc.text(`Date: ${dateStr}`, 440, 120);
 
       // Recipient Box
       doc.rect(40, 138, 515, 55).fillColor('#f8fafc').strokeColor('#e2e8f0').lineWidth(1).fillAndStroke();
       doc.font('Helvetica-Bold').fontSize(9).fillColor('#0f172a');
       doc.text('TO:', 50, 145);
-      doc.font('Helvetica-Bold').fontSize(9.5).fillColor('#b91c1c').text(name, 75, 145);
+      doc.font('Helvetica-Bold').fontSize(9.5).fillColor(themeColor).text(name, 75, 145);
       doc.font('Helvetica').fontSize(8.5).fillColor('#334155');
-      doc.text(`Designation: ${designation} | Official Member ID: ${memberId}`, 50, 160);
+      const idLabel = isCoordinator ? 'Official Coordinator ID' : 'Official Member ID';
+      doc.text(`Designation: ${designation} | ${idLabel}: ${memberId}`, 50, 160);
       doc.text(`Email: ${email} | Mobile: ${phone} | Location: ${city}, ${state}`, 50, 174);
 
       // Subject
+      const subjectLine = isCoordinator 
+        ? 'SUBJECT: STATUTORY LETTER OF APPOINTMENT AS REGIONAL & DISTRICT COORDINATOR' 
+        : 'SUBJECT: STATUTORY LETTER OF APPOINTMENT AS REGISTERED EXECUTIVE MEMBER';
       doc.font('Helvetica-Bold').fontSize(10).fillColor('#0f172a');
-      doc.text('SUBJECT: STATUTORY LETTER OF APPOINTMENT AS REGISTERED EXECUTIVE MEMBER', 40, 206, { underline: true });
+      doc.text(subjectLine, 40, 206, { underline: true });
 
       // Body Text
       let textY = 226;
@@ -482,19 +494,27 @@ async function generateAppointmentLetterPdf(user = {}) {
       doc.text(`Dear ${name},`, 40, textY);
 
       textY += 18;
-      const p1 = 'The Board of Trustees and the National Executive Committee of Yuva Kranti Dal (युवा क्रांति दल) are pleased to officially ratify and confirm your appointment as a Registered Member of the Foundation.';
+      const apptRoleName = isCoordinator ? 'Registered Foundation Coordinator' : 'Registered Member';
+      const p1 = `The Board of Trustees and the National Executive Committee of Yuva Kranti Dal (युवा क्रांति दल) are pleased to officially ratify and confirm your appointment as a ${apptRoleName} of the Foundation.`;
       doc.text(p1, 40, textY, { width: 515, align: 'justify' });
 
       textY += 38;
-      const p2 = `In recognition of your social contribution, public credentials, and voluntary commitment, you have been enrolled in the Official Trust Register under Member ID: ${memberId} with the designated role of "${designation}".`;
+      const p2 = isCoordinator
+        ? `In recognition of your organizational capability, leadership, and voluntary commitment, you have been enrolled in the Official Trust Register under Coordinator ID: ${memberId} with the designated role of "${designation}".`
+        : `In recognition of your social contribution, public credentials, and voluntary commitment, you have been enrolled in the Official Trust Register under Member ID: ${memberId} with the designated role of "${designation}".`;
       doc.text(p2, 40, textY, { width: 515, align: 'justify' });
 
       textY += 34;
-      doc.font('Helvetica-Bold').text('Member Privileges & Statutory Charter:', 40, textY);
+      doc.font('Helvetica-Bold').text(isCoordinator ? 'Coordinator Authorities & Statutory Charter:' : 'Member Privileges & Statutory Charter:', 40, textY);
       textY += 14;
 
       doc.font('Helvetica').fontSize(8.5);
-      const points = [
+      const points = isCoordinator ? [
+        '1. Member Onboarding & Verification: You are officially authorized to onboard, review, and register new members and youth volunteers under the trust charter.',
+        '2. Welfare Initiatives: You are empowered to plan, lead, and coordinate educational, environmental, and humanitarian programs in alignment with trust objectives.',
+        '3. Public Representation: You hold official authority to represent Yuva Kranti Dal before administrative and civic bodies within your jurisdiction.',
+        '4. Code of Governance: You shall uphold high ethical standards, transparency, and fiduciary dedication to the trust constitution.'
+      ] : [
         '1. Deliberative Standing: You are authorized to participate in official foundation assemblies, regional conventions, and social development consultations.',
         '2. Welfare Initiatives: You are empowered to plan, lead, and execute educational, environmental, and humanitarian programs in alignment with trust objectives.',
         '3. Public Representation: You hold official authority to represent the goals of Yuva Kranti Dal before administrative and civic bodies within your jurisdiction.',
@@ -566,12 +586,20 @@ async function generateIdCardPdf(user = {}, roleType = 'volunteer') {
         dbSettings = await Setting.findOne();
       } catch (e) {}
 
-      const isVolunteer = (roleType || user.role || '').toLowerCase().includes('volunteer');
-      const themeColor = isVolunteer ? '#059669' : '#b91c1c';
-      const cardTitle = isVolunteer ? 'VOLUNTEER IDENTITY CARD' : 'EXECUTIVE MEMBER IDENTITY CARD';
-      const defaultDesignation = isVolunteer ? 'Active Youth Volunteer' : 'Active Social Worker';
+      const roleLower = (roleType || user.role || '').toLowerCase();
+      const isCoordinator = roleLower.includes('coordinator') || user.isCoordinator;
+      const isVolunteer = !isCoordinator && roleLower.includes('volunteer');
+      const themeColor = isCoordinator ? '#6d28d9' : (isVolunteer ? '#059669' : '#b91c1c');
+      const cardTitle = isCoordinator ? 'COORDINATOR IDENTITY CARD' : (isVolunteer ? 'VOLUNTEER IDENTITY CARD' : 'EXECUTIVE MEMBER IDENTITY CARD');
+      const defaultDesignation = isCoordinator ? 'District Youth Coordinator' : (isVolunteer ? 'Active Youth Volunteer' : 'Active Social Worker');
 
-      const id = sanitize(isVolunteer ? (user.volunteerId || (user.memberId && user.memberId.startsWith('BYK-VOL-') ? user.memberId : 'BYK-VOL-2026-0501')) : (user.memberId || 'BYK-MEM-2026-0001'));
+      const id = sanitize(
+        isCoordinator
+          ? (user.coordinatorId || (user.memberId && user.memberId.startsWith('BYK-COORD-') ? user.memberId : (user.memberId || 'BYK-COORD-2026-0001')))
+          : (isVolunteer
+            ? (user.volunteerId || (user.memberId && user.memberId.startsWith('BYK-VOL-') ? user.memberId : 'BYK-VOL-2026-0501'))
+            : (user.memberId || 'BYK-MEM-2026-0001'))
+      );
       const name = sanitize(user.name || 'Registered Social Worker');
       const designation = sanitize(user.designation || defaultDesignation);
       const bloodGroup = sanitize(user.bloodGroup || 'O+');
@@ -580,7 +608,8 @@ async function generateIdCardPdf(user = {}, roleType = 'volunteer') {
       const location = sanitize(`${user.district || 'Aligarh'}, ${user.state || 'UP'}`);
 
       // QR Code
-      const verifyUrl = `https://bharatiyayuvakranti.org/verify/${isVolunteer ? 'volunteer' : 'member'}/${id}`;
+      const verifyType = isCoordinator ? 'coordinator' : (isVolunteer ? 'volunteer' : 'member');
+      const verifyUrl = `https://bharatiyayuvakranti.org/verify/${verifyType}/${id}`;
       const qrBuffer = await QRCode.toBuffer(verifyUrl, { width: 95, margin: 1 });
 
       // Title & Instruction at top
@@ -869,6 +898,14 @@ async function generateCertificatePdf(cert = {}) {
   });
 }
 
+function generateCoordinatorAppointmentLetterPdf(user) {
+  return generateAppointmentLetterPdf({ ...user, role: 'Coordinator', isCoordinator: true });
+}
+
+function generateCoordinatorIdCardPdf(user) {
+  return generateIdCardPdf({ ...user, role: 'Coordinator', isCoordinator: true }, 'coordinator');
+}
+
 module.exports = {
   numberToWords,
   formatDate,
@@ -877,5 +914,7 @@ module.exports = {
   generateVolunteerIdCardPdf,
   generateAppointmentLetterPdf,
   generateMemberIdCardPdf,
+  generateCoordinatorAppointmentLetterPdf,
+  generateCoordinatorIdCardPdf,
   generateCertificatePdf
 };

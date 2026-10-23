@@ -15,6 +15,7 @@ import {
   FiFileText,
   FiMail,
   FiShield,
+  FiAward,
   FiRefreshCw
 } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
@@ -245,8 +246,14 @@ export default function ApprovalsPage() {
                         ₹{Number(app.feeAmount || 0).toLocaleString('en-IN')}
                       </span>
                       <span className="text-[11px] text-gray-500">
-                        Applied: {new Date(app.appliedAt || Date.now()).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        Applied: {app.appliedAt ? new Date(app.appliedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Recently'}
                       </span>
+                      {(app.coordinatorName || app.addedByCoordinator) && (
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black tracking-wide bg-purple-100 text-purple-900 border border-purple-300 shadow-2xs">
+                          <FiAward className="w-3.5 h-3.5 text-purple-700" />
+                          <span>Added by Coordinator: <strong>{app.coordinatorName}</strong> {app.coordinatorId ? `(${app.coordinatorId})` : ''}</span>
+                        </span>
+                      )}
                     </div>
 
                     <div>
@@ -338,7 +345,7 @@ export default function ApprovalsPage() {
                       ) : (
                         <>
                           <FiCheckCircle className="w-4 h-4" />
-                          <span>Approve & Email Letter</span>
+                          <span>Final Approve & Issue ID</span>
                         </>
                       )}
                     </button>
@@ -392,7 +399,7 @@ export default function ApprovalsPage() {
                         Volunteer Wing
                       </span>
                       <span className="text-[11px] text-slate-400">
-                        Applied: {new Date(app.appliedAt || Date.now()).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        Applied: {app.appliedAt ? new Date(app.appliedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Recently'}
                       </span>
                     </div>
 
@@ -519,7 +526,7 @@ export default function ApprovalsPage() {
                         Verification Pending
                       </span>
                       <span className="text-[11px] text-slate-400">
-                        Date: {new Date(d.date || Date.now()).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        Date: {d.date ? new Date(d.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Recently'}
                       </span>
                     </div>
 
@@ -611,6 +618,7 @@ export default function ApprovalsPage() {
               </button>
             </div>
             <div className="max-h-[70vh] overflow-y-auto rounded-2xl border border-slate-200 bg-slate-50 flex items-center justify-center p-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={getContentImageUrl(previewImage)}
                 alt="Document proof preview"
