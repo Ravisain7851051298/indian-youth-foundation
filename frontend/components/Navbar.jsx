@@ -25,7 +25,8 @@ import {
   FiUserPlus,
   FiUserCheck,
   FiMail,
-  FiLayers
+  FiLayers,
+  FiBriefcase
 } from 'react-icons/fi';
 import {
   FaFacebookF,
@@ -94,6 +95,15 @@ export default function Navbar() {
     activeUser?.role === 'admin'
   );
 
+  const isCoordinator = Boolean(
+    activeUser?.isCoordinator ||
+    activeUser?.role === 'coordinator' ||
+    activeUser?.role === 'Coordinator' ||
+    activeUser?.coordinatorVerified ||
+    activeUser?.coordinatorCode ||
+    (activeUser?.coordinatorId && activeUser?.coordinatorId?.length > 0)
+  );
+
   const navMenuItems = [
     {
       label: 'About Us',
@@ -138,12 +148,16 @@ export default function Navbar() {
       hasDropdown: true,
       links: [
         { label: 'Profile Overview', href: '/profile', icon: FiUser },
+        ...(isCoordinator ? [
+          { label: 'Coordinator Hub', href: '/profile/coordinator', icon: FiBriefcase },
+          { label: 'My Members', href: '/profile/my-members', icon: FiUsers },
+        ] : []),
         { label: isMember ? 'Member Profile' : 'Apply for Membership', href: isMember ? '/profile/member' : '/apply-member', icon: FiCreditCard },
         { label: isVolunteer ? 'Volunteer Profile' : 'Apply as Volunteer', href: isVolunteer ? '/profile/volunteer' : '/apply-volunteer', icon: FiUsers },
         { label: 'Official ID Card', href: '/profile/id-card', icon: FiShield },
         { label: 'Appointment Letter', href: '/profile/appointment-letter', icon: FiFileText },
         { label: 'My Certificates', href: '/profile/certificates', icon: FiAward },
-        ...(activeUser.role === 'Admin' || activeUser.role === 'admin' ? [{ label: 'Admin Dashboard', href: '/dashboard', icon: FiLayers }] : []),
+        ...(isAdmin ? [{ label: 'Admin Dashboard', href: '/dashboard', icon: FiLayers }] : []),
         { label: 'Account Settings', href: '/profile/settings', icon: FiSettings },
       ]
     } : {
@@ -153,6 +167,7 @@ export default function Navbar() {
       links: [
         { label: 'Volunteer Login', href: '/login?role=volunteer', icon: FiUsers },
         { label: 'Member Login', href: '/login?role=member', icon: FiUserCheck },
+        { label: 'Coordinator Login', href: '/login?role=coordinator', icon: FiBriefcase },
         { label: 'Admin Login', href: '/login?role=admin', icon: FiShield },
         { label: 'Apply for Membership', href: '/apply-member', icon: FiUserPlus },
         { label: 'Apply as Volunteer', href: '/apply-volunteer', icon: FiUserPlus },
@@ -259,8 +274,11 @@ export default function Navbar() {
             </div>
             <div className="hidden md:flex flex-col">
               <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black tracking-tight leading-tight uppercase flex items-center gap-2">
-                <span className="text-[#0b8026]">{settings?.ngoName?.substring(0, settings?.ngoName?.indexOf(' ')) || 'युवा क्रांति '}</span>
-                <span className="text-[#dc2626]">{settings?.ngoName?.substring(settings?.ngoName?.indexOf(' ') + 1) || 'दल'}</span>
+                <span className="text-[#0b8026]">{settings?.ngoNameHi?.substring(0, settings?.ngoNameHi?.indexOf(' ')) || 'युवा क्रांति '}</span>
+                <span className="text-[#dc2626]">{settings?.ngoNameHi?.substring(settings?.ngoNameHi?.indexOf(' ') + 1) || 'दल'}</span>
+                <span className="text-black hidden lg:block">|</span>
+                <span className="text-[#0b8026] hidden lg:block">{settings?.ngoName?.substring(0, settings?.ngoName?.indexOf(' ')) || 'YUVA KRANTI '}</span>
+                <span className="text-[#dc2626] hidden lg:block">{settings?.ngoName?.substring(settings?.ngoName?.indexOf(' ') + 1) || 'DAL'}</span>
               </div>
               <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 tracking-wider uppercase flex items-center gap-1.5 mt-0.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#0b8026]"></span>

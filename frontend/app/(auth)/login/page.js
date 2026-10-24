@@ -3,6 +3,7 @@
 import React, { useState, Suspense, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useSelector } from 'react-redux';
 import {
   FiUser,
   FiLock,
@@ -15,7 +16,8 @@ import {
   FiUsers,
   FiUserCheck,
   FiArrowRight,
-  FiHome
+  FiHome,
+  FiBriefcase
 } from 'react-icons/fi';
 import { useNGO } from '@/context/NGOContext';
 import { getContentImageUrl } from '@/lib/authApi';
@@ -23,14 +25,15 @@ import { getContentImageUrl } from '@/lib/authApi';
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const roleParam = searchParams.get('role')?.toLowerCase() || 'member';
+  const roleParam = searchParams.get('role')?.toLowerCase() || '';
   const redirectTarget = searchParams.get('redirect');
   const isExpired = searchParams.get('expired');
-  const { login, settings } = useNGO();
+  const { login, logout, currentUser, settings } = useNGO();
+  const reduxUser = useSelector((state) => state.auth?.user);
+  const effectiveUser = reduxUser || currentUser;
 
-  const validRoles = ['volunteer', 'member', 'admin', 'donor'];
-  const initialRole = validRoles.includes(roleParam) ? roleParam : 'member';
-  const [activeRole, setActiveRole] = useState(initialRole);
+  const validRoles = ['coordinator', 'volunteer', 'member', 'admin', 'donor'];
+  const activeRole = validRoles.includes(roleParam) ? roleParam : 'general';
 
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
@@ -38,22 +41,6 @@ function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(isExpired ? 'Your session expired. Please sign in again.' : '');
   const [success, setSuccess] = useState('');
-
-  // Synchronize when URL role query param changes
-  useEffect(() => {
-    if (validRoles.includes(roleParam) && roleParam !== activeRole) {
-      setActiveRole(roleParam);
-    }
-  }, [roleParam]);
-
-  const handleRoleChange = (newRole) => {
-    setActiveRole(newRole);
-    setError('');
-    setSuccess('');
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('role', newRole);
-    router.replace(`/login?${params.toString()}`);
-  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -66,11 +53,14 @@ function LoginForm() {
 
     if (res.success) {
       const loggedUser = res.user;
-      setSuccess(`Authentication verified! Welcome back, ${loggedUser.name}.`);
+      const roleLabel = loggedUser.isCoordinator ? 'Coordinator' : (loggedUser.role || 'Member');
+      setSuccess(`Authentication verified! Welcome back, ${loggedUser.name} (${roleLabel}).`);
       setTimeout(() => {
         // Direct based on actual authenticated role and target
-        if (loggedUser.role === 'Admin' || activeRole === 'admin') {
+        if (loggedUser.role === 'Admin' || loggedUser.role === 'admin' || activeRole === 'admin') {
           router.push(redirectTarget || '/dashboard');
+        } else if (loggedUser.isCoordinator || loggedUser.role === 'coordinator' || activeRole === 'coordinator') {
+          router.push(redirectTarget || '/profile/coordinator');
         } else if (loggedUser.role === 'Donor' || activeRole === 'donor') {
           router.push(redirectTarget || '/profile/donations');
         } else {
@@ -83,6 +73,15 @@ function LoginForm() {
   };
 
   const roleConfig = {
+    coordinator: {
+      title: 'Coordinator Portal Login',
+      badge: 'Field Coordinator Desk',
+      badgeColor: 'bg-blue-50 text-blue-700 border-blue-200',
+      icon: FiBriefcase,
+      btnText: 'Sign In as Coordinator',
+      btnColor: 'bg-blue-600 hover:bg-blue-700',
+      subText: 'Official access for assigned field coordinators to manage local members & community drives.'
+    },
     volunteer: {
       title: 'Volunteer Portal Login',
       badge: 'Grassroots Volunteer Wing',
@@ -118,10 +117,19 @@ function LoginForm() {
       btnText: 'Sign In as Donor',
       btnColor: 'bg-amber-600 hover:bg-amber-700',
       subText: 'Access official 80G tax receipts and cumulative donation records.'
+    },
+    general: {
+      title: 'Official Portal Login',
+      badge: 'Unified Access Gateway',
+      badgeColor: 'bg-emerald-50 text-[#0b8026] border-emerald-200',
+      icon: FiLogIn,
+      btnText: 'Secure Sign In',
+      btnColor: 'bg-[#0b8026] hover:bg-[#08661e]',
+      subText: 'Single secure sign-in for Coordinators, Members, Volunteers, Donors & Admins.'
     }
   };
 
-  const currentConfig = roleConfig[activeRole] || roleConfig.member;
+  const currentConfig = roleConfig[activeRole] || roleConfig.general;
   const ActiveIcon = currentConfig.icon;
 
   return (
@@ -129,7 +137,7 @@ function LoginForm() {
       <div className="max-w-md w-full bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xl relative overflow-hidden">
 
         {/* Decorative Top Accent Glow */}
-        <div className={`absolute -top-24 -right-24 w-48 h-48 rounded-full blur-3xl pointer-events-none ${activeRole === 'admin' ? 'bg-red-500/10' : 'bg-[#0b8026]/10'}`}></div>
+        <div className={`absolute -top-24 -right-24 w-48 h-48 rounded-full blur-3xl pointer-events-none ${activeRole === 'admin' ? 'bg-red-500/10' : activeRole === 'coordinator' ? 'bg-blue-500/10' : 'bg-[#0b8026]/10'}`}></div>
 
         {/* Brand Banner */}
         <div className="text-center mb-5">
@@ -148,7 +156,7 @@ function LoginForm() {
             {currentConfig.title}
           </h1>
           <p className="text-xs text-slate-600 mt-1 font-medium">
-            {settings?.ngoName || 'Yuva Kranti Dal'} — Official Central Gateway
+            {currentConfig.subText}
           </p>
 
           {/* Active Role Indicator Badge */}
@@ -158,56 +166,82 @@ function LoginForm() {
           </div>
         </div>
 
-        {/* ROLE SWITCHER BUTTONS (Volunteer | Member | Admin | Donor) */}
-        <div className="mb-6 p-1 bg-slate-100 rounded-2xl grid grid-cols-2 sm:grid-cols-4 gap-1 border border-slate-200">
-          <button
-            type="button"
-            onClick={() => handleRoleChange('volunteer')}
-            className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl text-xs font-bold transition cursor-pointer ${activeRole === 'volunteer'
-              ? 'bg-white text-[#0b8026] shadow-sm font-black'
-              : 'text-slate-600 hover:text-slate-900'
-              }`}
-          >
-            <FiUsers className="w-3.5 h-3.5 shrink-0" />
-            <span>Volunteer</span>
-          </button>
+        {/* DISPLAY WHO IS CURRENTLY LOGGED IN (If Active Session Exists) */}
+        {effectiveUser && (
+          <div className="mb-6 p-4 rounded-2xl bg-slate-50 border border-slate-200 shadow-xs">
+            <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center justify-between">
+              <span>Currently Logged In As</span>
+              <span className="inline-flex items-center gap-1 text-emerald-600 font-extrabold text-[10px] bg-emerald-100/60 px-2 py-0.5 rounded-full">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                Active Session
+              </span>
+            </div>
+            <div className="flex items-center gap-3">
+              {effectiveUser.photoUrl ? (
+                <img
+                  src={getContentImageUrl(effectiveUser.photoUrl)}
+                  alt={effectiveUser.name}
+                  className="w-11 h-11 rounded-full object-cover border border-slate-300 shrink-0"
+                />
+              ) : (
+                <div className="w-11 h-11 rounded-full bg-[#0b8026] text-white flex items-center justify-center font-bold text-sm shrink-0">
+                  {(effectiveUser.name || 'U').charAt(0).toUpperCase()}
+                </div>
+              )}
+              <div className="min-w-0 flex-1">
+                <div className="font-black text-slate-900 text-sm truncate">
+                  {effectiveUser.name}
+                </div>
+                <div className="text-xs text-slate-600 truncate">
+                  {effectiveUser.email || effectiveUser.phone}
+                </div>
+                <div className="mt-1 flex items-center gap-1.5 flex-wrap">
+                  <span className="inline-block px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-[#0b8026]/10 text-[#0b8026] border border-[#0b8026]/20">
+                    {effectiveUser.role || 'Member'}
+                  </span>
+                  {effectiveUser.isCoordinator && (
+                    <span className="inline-block px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-blue-50 text-blue-700 border border-blue-200">
+                      Field Coordinator
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
 
-          <button
-            type="button"
-            onClick={() => handleRoleChange('member')}
-            className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl text-xs font-bold transition cursor-pointer ${activeRole === 'member'
-              ? 'bg-white text-[#0b8026] shadow-sm font-black'
-              : 'text-slate-600 hover:text-slate-900'
-              }`}
-          >
-            <FiUserCheck className="w-3.5 h-3.5 shrink-0" />
-            <span>Member</span>
-          </button>
+            <div className="mt-3 pt-3 border-t border-slate-200/80 flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  if (effectiveUser.role === 'Admin' || effectiveUser.role === 'admin') {
+                    router.push(redirectTarget || '/dashboard');
+                  } else if (effectiveUser.isCoordinator || effectiveUser.role === 'coordinator') {
+                    router.push(redirectTarget || '/profile/coordinator');
+                  } else if (effectiveUser.role === 'Donor') {
+                    router.push(redirectTarget || '/profile/donations');
+                  } else {
+                    router.push(redirectTarget || '/profile');
+                  }
+                }}
+                className="flex-1 py-2 px-3 rounded-xl bg-[#0b8026] hover:bg-[#08661e] text-white font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
+              >
+                <span>Continue to Portal</span>
+                <FiArrowRight className="w-3.5 h-3.5" />
+              </button>
 
-          <button
-            type="button"
-            onClick={() => handleRoleChange('donor')}
-            className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl text-xs font-bold transition cursor-pointer ${activeRole === 'donor'
-              ? 'bg-white text-amber-700 shadow-sm font-black'
-              : 'text-slate-600 hover:text-slate-900'
-              }`}
-          >
-            <FiUser className="w-3.5 h-3.5 shrink-0" />
-            <span>Donor</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleRoleChange('admin')}
-            className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl text-xs font-bold transition cursor-pointer ${activeRole === 'admin'
-              ? 'bg-white text-red-600 shadow-sm font-black'
-              : 'text-slate-600 hover:text-slate-900'
-              }`}
-          >
-            <FiShield className="w-3.5 h-3.5 shrink-0" />
-            <span>Admin</span>
-          </button>
-        </div>
+              <button
+                type="button"
+                onClick={async () => {
+                  await logout();
+                  setError('');
+                  setSuccess('Signed out successfully. You can now log into another account.');
+                }}
+                className="py-2 px-3 rounded-xl bg-slate-200 hover:bg-rose-100 text-slate-700 hover:text-rose-700 font-bold text-xs transition cursor-pointer"
+              >
+                Sign Out
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Alert Notifications */}
         {error && (
@@ -289,7 +323,7 @@ function LoginForm() {
 
           <Link
             href="/"
-            className={`w-full py-3.5 rounded-xl bg-red-600 text-white font-bold text-xs shadow-lg shadow-black/10 transition cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2`}
+            className={`w-full py-3.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-lg shadow-black/10 transition cursor-pointer flex items-center justify-center gap-2`}
           >
             <FiHome className="w-4 h-4" />
             <span>Back to Home</span>
@@ -297,6 +331,12 @@ function LoginForm() {
 
           {/* Contextual Register / Apply Links */}
           <div className="mt-6 text-center text-xs text-slate-600 border-t border-slate-200 pt-4 space-y-2">
+            {activeRole === 'coordinator' && (
+              <div className="text-[11px] text-blue-800 bg-blue-50/80 p-2.5 rounded-xl border border-blue-200/60 flex items-center justify-center gap-1.5">
+                <FiBriefcase className="w-4 h-4 text-blue-600 shrink-0" />
+                <span>Field Coordinator Access: Managed and appointed by Foundation Admin</span>
+              </div>
+            )}
             {activeRole === 'volunteer' && (
               <div>
                 Not an active volunteer yet?{' '}
