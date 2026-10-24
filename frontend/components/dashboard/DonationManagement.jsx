@@ -163,8 +163,11 @@ export default function DonationManagement() {
 
       if (qrFile) {
         const formData = new FormData();
+        formData.append("category", "settings");
         formData.append("file", qrFile);
-        const upRes = await api.post("/upload", formData);
+        const upRes = await api.post("/upload?category=settings", formData, {
+          headers: { 'x-category': 'settings', 'x-upload-category': 'settings' }
+        });
         if (upRes.data?.success && upRes.data?.url) {
           upiQrImage = upRes.data.url;
         }

@@ -101,7 +101,6 @@ export default function ProfileDonationsPage() {
       formData.append('transactionId', donateForm.transactionId);
       formData.append('category', 'payments');
       if (selectedFile) {
-        formData.append('file', selectedFile);
         formData.append('paymentScreenshot', selectedFile);
       }
 

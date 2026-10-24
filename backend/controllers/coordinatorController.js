@@ -99,8 +99,68 @@ const addMemberByCoordinator = async (req, res) => {
 
 const resendCredentials = async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id || req.body?.id || req.body?.coordinatorId || req.body?.userId;
+    if (!id) {
+      return res.status(400).json({ success: false, message: 'Coordinator ID or identifier is required.' });
+    }
     const result = await coordinatorService.resendCoordinatorCredentials(req.user, id);
+    return res.json({
+      success: true,
+      ...result
+    });
+  } catch (error) {
+    return res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+const updateMemberByCoordinator = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updatedApplication = await coordinatorService.updateMemberByCoordinator(req.user, id, req.body);
+    return res.json({
+      success: true,
+      message: 'Member details updated successfully!',
+      application: updatedApplication,
+      data: updatedApplication
+    });
+  } catch (error) {
+    return res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+const deleteMemberByCoordinator = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await coordinatorService.deleteMemberByCoordinator(req.user, id);
+    return res.json({
+      success: true,
+      ...result
+    });
+  } catch (error) {
+    return res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+const updateCoordinator = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const coordinator = await coordinatorService.updateCoordinator(req.user, id, req.body);
+    return res.json({
+      success: true,
+      message: `Coordinator profile for ${coordinator.name} updated successfully!`,
+      coordinator,
+      data: coordinator
+    });
+  } catch (error) {
+    return res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+const deleteCoordinator = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const action = req.query.action || req.body.action || (req.query.hardDelete ? 'delete' : 'revoke');
+    const result = await coordinatorService.deleteCoordinator(req.user, id, { action });
     return res.json({
       success: true,
       ...result
@@ -118,5 +178,9 @@ module.exports = {
   getMyStats,
   getMyMembers,
   addMemberByCoordinator,
-  resendCredentials
+  resendCredentials,
+  updateMemberByCoordinator,
+  deleteMemberByCoordinator,
+  updateCoordinator,
+  deleteCoordinator
 };

@@ -236,12 +236,22 @@ export default function ContentCollection({ resource }) {
       setSubmitting(true);
       setFormError("");
 
-      // 1. Upload any new files first to get URLs
+      // 1. Upload any new files first to get URLs with proper category
+      let uploadCat = 'general';
+      if (resource === 'blogs' || resource === 'news') uploadCat = 'blogs';
+      else if (resource === 'events' || resource === 'campaigns') uploadCat = 'campaigns';
+      else if (resource === 'gallery' || resource === 'galleries') uploadCat = 'gallery';
+      else if (resource === 'team-members' || resource === 'team') uploadCat = 'profiles';
+      else if (resource === 'certificates') uploadCat = 'certificates';
+
       const uploadedUrls = [];
       for (const file of newFiles) {
         const formData = new FormData();
+        formData.append("category", uploadCat);
         formData.append("file", file);
-        const upRes = await api.post("/upload", formData);
+        const upRes = await api.post(`/upload?category=${uploadCat}`, formData, {
+          headers: { 'x-category': uploadCat, 'x-upload-category': uploadCat }
+        });
         if (upRes.data?.success && upRes.data?.url) {
           uploadedUrls.push(upRes.data.url);
         }

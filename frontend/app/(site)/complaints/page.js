@@ -111,9 +111,11 @@ export default function ComplaintsPage() {
       // 1. Upload Image file if selected
       if (imageFile) {
         const imgData = new FormData();
+        imgData.append('category', 'complaints');
         imgData.append('file', imageFile);
-        imgData.append('category', 'grievances');
-        const res = await api.post('/upload', imgData);
+        const res = await api.post('/upload?category=complaints', imgData, {
+          headers: { 'x-category': 'complaints', 'x-upload-category': 'complaints' }
+        });
         if (res.data?.success && res.data?.url) {
           uploadedImageUrl = res.data.url;
         }
@@ -122,9 +124,11 @@ export default function ComplaintsPage() {
       // 2. Upload Video file if selected
       if (videoFile) {
         const vidData = new FormData();
+        vidData.append('category', 'complaints');
         vidData.append('file', videoFile);
-        vidData.append('category', 'grievances');
-        const res = await api.post('/upload', vidData);
+        const res = await api.post('/upload?category=complaints', vidData, {
+          headers: { 'x-category': 'complaints', 'x-upload-category': 'complaints' }
+        });
         if (res.data?.success && res.data?.url) {
           uploadedVideoUrl = res.data.url;
         }

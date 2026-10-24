@@ -210,7 +210,6 @@ export default function ApplyMembershipPage() {
       if (docBackFile) formData.append('documentBack', docBackFile);
 
       if (selectedRawFile) {
-        formData.append('file', selectedRawFile);
         formData.append('paymentScreenshot', selectedRawFile);
       }
 

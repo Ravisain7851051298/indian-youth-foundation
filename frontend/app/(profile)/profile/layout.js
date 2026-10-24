@@ -20,6 +20,7 @@ import {
   FiChevronRight,
   FiMenu,
   FiX,
+  FiUsers,
 } from 'react-icons/fi';
 import { GoVerified } from "react-icons/go";
 import { useNGO } from '@/context/NGOContext';
@@ -28,7 +29,7 @@ import { getContentImageUrl } from '@/lib/authApi';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
-const emptySubscribe = () => () => {};
+const emptySubscribe = () => () => { };
 function useIsClient() {
   return useSyncExternalStore(
     emptySubscribe,
@@ -253,11 +254,10 @@ export default function ProfileLayout({ children }) {
               <p className="text-[11px] text-black font-medium mt-0.5">{effectiveUser.email}</p>
 
               <div className="mt-3 flex flex-wrap items-center justify-center gap-1.5">
-                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border ${
-                  isCoordinator
-                    ? 'bg-purple-100 text-purple-900 border-purple-300'
-                    : 'bg-red-100 text-[#d50000] border-red-200'
-                }`}>
+                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider border ${isCoordinator
+                  ? 'bg-purple-100 text-purple-900 border-purple-300'
+                  : 'bg-red-100 text-[#d50000] border-red-200'
+                  }`}>
                   {isCoordinator ? 'Official Coordinator' : (effectiveUser.role || 'Member')}
                 </span>
 

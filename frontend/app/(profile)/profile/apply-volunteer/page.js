@@ -154,7 +154,6 @@ export default function ApplyVolunteerPage() {
       if (photoFile) formData.append('photo', photoFile);
       if (docFrontFile) {
         formData.append('documentFront', docFrontFile);
-        formData.append('file', docFrontFile); // for backward compatibility
       }
       if (docBackFile) formData.append('documentBack', docBackFile);
 

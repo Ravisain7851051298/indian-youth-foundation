@@ -25,19 +25,41 @@ export default function IdCardPage() {
   const searchParams = useSearchParams();
   const cardRef = useRef(null);
 
+  useEffect(() => {
+    if (refreshUser) refreshUser();
+  }, [refreshUser]);
+
+  // Membership, Coordinator & Volunteer eligibility checks (strictly prevent donor ID BYK-DON- from being treated as member)
+  const isMemberVerified = Boolean(
+    effectiveUser?.role === 'Member' ||
+    effectiveUser?.role === 'Admin' ||
+    (effectiveUser?.isMember && !effectiveUser?.memberId?.startsWith('BYK-DON-')) ||
+    (effectiveUser?.membershipApplication?.status === 'approved') ||
+    (effectiveUser?.memberId && (effectiveUser.memberId.startsWith('BYK-MEM-') || effectiveUser.memberId.startsWith('MEM-')))
+  );
+
+  const isCoordinatorVerified = Boolean(
+    effectiveUser?.role === 'Coordinator' ||
+    effectiveUser?.isCoordinator ||
+    (effectiveUser?.coordinatorId && !effectiveUser?.coordinatorId?.startsWith('BYK-DON-'))
+  );
+
+  const isVolunteerVerified = Boolean(
+    effectiveUser?.role === 'Volunteer' ||
+    effectiveUser?.isVolunteer ||
+    effectiveUser?.volunteerApplication?.status === 'approved' ||
+    (effectiveUser?.volunteerId && !effectiveUser?.volunteerId?.startsWith('BYK-DON-'))
+  );
+
   // Allow tab query: /profile/id-card?type=volunteer or ?type=member
   const paramType = searchParams.get('type');
   // Default tab: if user is coordinator, default to coordinator; else volunteer/member
-  const defaultTab = paramType 
-    ? paramType 
+  const defaultTab = paramType
+    ? paramType
     : (isCoordinatorVerified ? 'coordinator' : (isVolunteerVerified && !isMemberVerified ? 'volunteer' : 'member'));
   const [selectedTab, setSelectedTab] = useState(null);
   const activeTab = selectedTab || defaultTab;
   const setActiveTab = setSelectedTab;
-
-  useEffect(() => {
-    if (refreshUser) refreshUser();
-  }, [refreshUser]);
 
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
 
@@ -55,17 +77,17 @@ export default function IdCardPage() {
   const volunteerId = (rawVolId && !rawVolId.startsWith('BYK-DON-'))
     ? rawVolId
     : (effectiveUser?.role === 'Volunteer' && rawMemberId && !rawMemberId.startsWith('BYK-DON-')
-        ? rawMemberId
-        : `BYK-VOL-${effectiveUser?.phone ? effectiveUser.phone.slice(-4) : '2026'}`);
+      ? rawMemberId
+      : `BYK-VOL-${effectiveUser?.phone ? effectiveUser.phone.slice(-4) : '2026'}`);
 
   const memberVerificationUrl = `${origin || 'https://indianyouthfoundation.org'}/verify/member/${memberId}`;
   const coordinatorVerificationUrl = `${origin || 'https://indianyouthfoundation.org'}/verify/coordinator/${coordinatorId}`;
   const volunteerVerificationUrl = `${origin || 'https://indianyouthfoundation.org'}/verify/volunteer/${volunteerId}`;
 
-  const isCurrentCardVerified = activeTab === 'coordinator' 
-    ? isCoordinatorVerified 
-    : activeTab === 'member' 
-      ? isMemberVerified 
+  const isCurrentCardVerified = activeTab === 'coordinator'
+    ? isCoordinatorVerified
+    : activeTab === 'member'
+      ? isMemberVerified
       : isVolunteerVerified;
 
   const handlePrint = () => {
@@ -92,13 +114,12 @@ export default function IdCardPage() {
         {isCurrentCardVerified && (
           <button
             onClick={handlePrint}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-white font-bold text-xs shadow-md transition self-start sm:self-auto cursor-pointer ${
-              activeTab === 'coordinator'
-                ? 'bg-purple-600 hover:bg-purple-700 shadow-purple-600/20'
-                : activeTab === 'member'
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-white font-bold text-xs shadow-md transition self-start sm:self-auto cursor-pointer ${activeTab === 'coordinator'
+              ? 'bg-purple-600 hover:bg-purple-700 shadow-purple-600/20'
+              : activeTab === 'member'
                 ? 'bg-red-600 hover:bg-red-700 shadow-red-600/20'
                 : 'bg-indigo-600 hover:bg-indigo-700 shadow-indigo-600/20'
-            }`}
+              }`}
           >
             <FiPrinter className="w-4 h-4" />
             <span>Print {activeTab === 'coordinator' ? 'Coordinator ID Card' : activeTab === 'member' ? 'Member ID Card' : 'Volunteer ID Card'}</span>
@@ -110,11 +131,10 @@ export default function IdCardPage() {
       <div className="flex flex-wrap items-center gap-2.5 p-1.5 bg-slate-100/80 rounded-2xl border border-slate-200 max-w-2xl">
         <button
           onClick={() => setActiveTab('coordinator')}
-          className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3.5 rounded-xl text-xs font-black transition cursor-pointer ${
-            activeTab === 'coordinator'
-              ? 'bg-purple-600 text-white shadow-md'
-              : 'text-black hover:text-purple-700 hover:bg-white/60'
-          }`}
+          className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3.5 rounded-xl text-xs font-black transition cursor-pointer ${activeTab === 'coordinator'
+            ? 'bg-purple-600 text-white shadow-md'
+            : 'text-black hover:text-purple-700 hover:bg-white/60'
+            }`}
         >
           <FiShield className="w-4 h-4" />
           <span>Official Coordinator ID</span>
@@ -125,11 +145,10 @@ export default function IdCardPage() {
 
         <button
           onClick={() => setActiveTab('member')}
-          className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3.5 rounded-xl text-xs font-black transition cursor-pointer ${
-            activeTab === 'member'
-              ? 'bg-red-600 text-white shadow-md'
-              : 'text-black hover:text-red-700 hover:bg-white/60'
-          }`}
+          className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3.5 rounded-xl text-xs font-black transition cursor-pointer ${activeTab === 'member'
+            ? 'bg-red-600 text-white shadow-md'
+            : 'text-black hover:text-red-700 hover:bg-white/60'
+            }`}
         >
           <FiCreditCard className="w-4 h-4" />
           <span>Official Member ID</span>
@@ -140,11 +159,10 @@ export default function IdCardPage() {
 
         <button
           onClick={() => setActiveTab('volunteer')}
-          className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3.5 rounded-xl text-xs font-black transition cursor-pointer ${
-            activeTab === 'volunteer'
-              ? 'bg-indigo-600 text-white shadow-md'
-              : 'text-black hover:text-indigo-700 hover:bg-white/60'
-          }`}
+          className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3.5 rounded-xl text-xs font-black transition cursor-pointer ${activeTab === 'volunteer'
+            ? 'bg-indigo-600 text-white shadow-md'
+            : 'text-black hover:text-indigo-700 hover:bg-white/60'
+            }`}
         >
           <FiUserCheck className="w-4 h-4" />
           <span>Volunteer ID</span>
@@ -205,7 +223,7 @@ export default function IdCardPage() {
 
               <div ref={cardRef} className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto print:max-w-none print:m-0">
                 {/* FRONT SIDE */}
-                <div className="bg-gradient-to-b from-red-600 via-red-700 to-red-800 text-white rounded-3xl p-6 shadow-xl relative overflow-hidden flex flex-col justify-between min-h-[460px] border border-red-500">
+                <div className="bg-linear-to-b from-red-600 via-red-700 to-red-800 text-white rounded-3xl p-6 shadow-xl relative overflow-hidden flex flex-col justify-between min-h-115 border border-red-500">
                   {/* Header */}
                   <div className="text-center space-y-1 relative z-10">
                     <div className="flex items-center justify-center gap-2 mb-1">
@@ -276,7 +294,7 @@ export default function IdCardPage() {
                 </div>
 
                 {/* BACK SIDE */}
-                <div className="bg-white rounded-3xl p-6 shadow-xl relative overflow-hidden flex flex-col justify-between min-h-[460px] border border-slate-200 text-black">
+                <div className="bg-white rounded-3xl p-6 shadow-xl relative overflow-hidden flex flex-col justify-between min-h-115 border border-slate-200 text-black">
                   <div className="space-y-3">
                     <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                       <span className="text-[10px] font-black uppercase tracking-wider text-red-600">
@@ -346,7 +364,7 @@ export default function IdCardPage() {
                             e.currentTarget.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200';
                           }}
                         />
-                        <span className="text-[9px] text-black font-bold block truncate max-w-[120px]">
+                        <span className="text-[9px] text-black font-bold block truncate max-w-30">
                           {settings?.presidentName || 'National President'}
                         </span>
                       </div>
@@ -415,7 +433,7 @@ export default function IdCardPage() {
 
               <div ref={cardRef} className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto print:max-w-none print:m-0">
                 {/* FRONT SIDE (VOLUNTEER) */}
-                <div className="bg-gradient-to-b from-indigo-700 via-indigo-800 to-slate-900 text-white rounded-3xl p-6 shadow-xl relative overflow-hidden flex flex-col justify-between min-h-[460px] border border-indigo-500">
+                <div className="bg-linear-to-b from-indigo-700 via-indigo-800 to-slate-900 text-white rounded-3xl p-6 shadow-xl relative overflow-hidden flex flex-col justify-between min-h-115 border border-indigo-500">
                   {/* Header */}
                   <div className="text-center space-y-1 relative z-10">
                     <div className="flex items-center justify-center gap-2 mb-1">
@@ -488,7 +506,7 @@ export default function IdCardPage() {
                 </div>
 
                 {/* BACK SIDE (VOLUNTEER) */}
-                <div className="bg-white rounded-3xl p-6 shadow-xl relative overflow-hidden flex flex-col justify-between min-h-[460px] border border-slate-200 text-black">
+                <div className="bg-white rounded-3xl p-6 shadow-xl relative overflow-hidden flex flex-col justify-between min-h-115 border border-slate-200 text-black">
                   <div className="space-y-3">
                     <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                       <span className="text-[10px] font-black uppercase tracking-wider text-indigo-600">
@@ -558,7 +576,7 @@ export default function IdCardPage() {
                             e.currentTarget.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200';
                           }}
                         />
-                        <span className="text-[9px] text-black font-bold block truncate max-w-[120px]">
+                        <span className="text-[9px] text-black font-bold block truncate max-w-30">
                           {settings?.presidentName || 'Youth Coordinator / President'}
                         </span>
                       </div>
@@ -621,7 +639,7 @@ export default function IdCardPage() {
 
               <div ref={cardRef} className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto print:max-w-none print:m-0">
                 {/* FRONT SIDE (COORDINATOR) */}
-                <div className="bg-gradient-to-b from-purple-700 via-purple-800 to-indigo-950 text-white rounded-3xl p-6 shadow-xl relative overflow-hidden flex flex-col justify-between min-h-[460px] border border-purple-500">
+                <div className="bg-linear-to-b from-purple-700 via-purple-800 to-indigo-950 text-white rounded-3xl p-6 shadow-xl relative overflow-hidden flex flex-col justify-between min-h-115 border border-purple-500">
                   {/* Header */}
                   <div className="text-center space-y-1 relative z-10">
                     <div className="flex items-center justify-center gap-2 mb-1">
@@ -694,7 +712,7 @@ export default function IdCardPage() {
                 </div>
 
                 {/* BACK SIDE (COORDINATOR) */}
-                <div className="bg-white rounded-3xl p-6 shadow-xl relative overflow-hidden flex flex-col justify-between min-h-[460px] border border-slate-200 text-black">
+                <div className="bg-white rounded-3xl p-6 shadow-xl relative overflow-hidden flex flex-col justify-between min-h-115 border border-slate-200 text-black">
                   <div className="space-y-3">
                     <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                       <span className="text-[10px] font-black uppercase tracking-wider text-purple-700">
@@ -768,7 +786,7 @@ export default function IdCardPage() {
                             e.currentTarget.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200';
                           }}
                         />
-                        <span className="text-[9px] text-black font-bold block truncate max-w-[120px]">
+                        <span className="text-[9px] text-black font-bold block truncate max-w-30">
                           {settings?.presidentName || 'National President & Trustee'}
                         </span>
                       </div>

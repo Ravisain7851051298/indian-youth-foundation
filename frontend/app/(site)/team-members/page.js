@@ -152,9 +152,14 @@ export default function TeamMembersPage() {
     setIsUploading(true);
     try {
       const fd = new FormData();
+      fd.append('category', 'profiles');
       fd.append('file', file);
-      const res = await api.post('/upload', fd, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+      const res = await api.post('/upload?category=profiles', fd, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'x-category': 'profiles',
+          'x-upload-category': 'profiles'
+        }
       });
       if (res.data?.success && res.data?.url) {
         setForm((prev) => ({ ...prev, image: res.data.url }));
@@ -195,9 +200,14 @@ export default function TeamMembersPage() {
       if (photoFile && !finalImageUrl.startsWith('/uploads')) {
         try {
           const fd = new FormData();
+          fd.append('category', 'profiles');
           fd.append('file', photoFile);
-          const upRes = await api.post('/upload', fd, {
-            headers: { 'Content-Type': 'multipart/form-data' }
+          const upRes = await api.post('/upload?category=profiles', fd, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              'x-category': 'profiles',
+              'x-upload-category': 'profiles'
+            }
           });
           if (upRes.data?.url) {
             finalImageUrl = upRes.data.url;

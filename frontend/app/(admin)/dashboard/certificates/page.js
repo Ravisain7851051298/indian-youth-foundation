@@ -146,7 +146,7 @@ export default function AdminOrganizationCertificatesPage() {
       const sizeMb = (file.size / (1024 * 1024)).toFixed(1) + ' MB';
 
       if (uploadFile) {
-        const res = await uploadFile(file);
+        const res = await uploadFile(file, 'certificates');
         if (res.success && res.url) {
           setFormData((prev) => ({
             ...prev,
@@ -154,17 +154,20 @@ export default function AdminOrganizationCertificatesPage() {
             fileType: isPdf ? 'pdf' : 'image',
             fileSize: sizeMb
           }));
-          alert('File uploaded successfully!');
+          alert('Certificate uploaded successfully!');
         } else {
           alert(res.message || 'File upload failed');
         }
       } else {
-        // Direct FormData fallback
+        // Direct FormData fallback with certificates category
         const fd = new FormData();
+        fd.append('category', 'certificates');
+        fd.append('certificate', file);
         fd.append('file', file);
-        const res = await fetch('/api/uploads/general', {
+        const res = await fetch('/api/uploads/certificates', {
           method: 'POST',
           body: fd,
+          headers: { 'x-category': 'certificates' },
           credentials: 'include'
         });
         const d = await res.json();

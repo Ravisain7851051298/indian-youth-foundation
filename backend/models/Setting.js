@@ -180,4 +180,6 @@ Yuva Kranti Dal`
   timestamps: true
 });
 
+settingSchema.plugin(require('./plugins/fileCleanupPlugin'));
+
 module.exports = mongoose.model('Setting', settingSchema);

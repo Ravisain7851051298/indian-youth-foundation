@@ -58,7 +58,7 @@ export default function AdminProfileManagement() {
       setAvatarFile(file);
       setAvatarPreview(URL.createObjectURL(file));
 
-      const resultAction = await dispatch(uploadAndUpdateAvatar({ file, category: 'avatars' }));
+      const resultAction = await dispatch(uploadAndUpdateAvatar({ file, category: 'profiles' }));
       if (uploadAndUpdateAvatar.fulfilled.match(resultAction)) {
         const updated = resultAction.payload;
         setForm((prev) => ({ ...prev, photoUrl: updated.photoUrl }));

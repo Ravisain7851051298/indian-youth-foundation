@@ -152,9 +152,11 @@ export default function GalleryPage() {
       // Handle direct file upload if selected
       if (selectedFile) {
         const formData = new FormData();
-        formData.append('file', selectedFile);
         formData.append('category', 'gallery');
-        const upRes = await api.post('/upload', formData);
+        formData.append('file', selectedFile);
+        const upRes = await api.post('/upload?category=gallery', formData, {
+          headers: { 'x-category': 'gallery', 'x-upload-category': 'gallery' }
+        });
         if (upRes.data?.success && upRes.data?.url) {
           mediaUrl = upRes.data.url;
         }

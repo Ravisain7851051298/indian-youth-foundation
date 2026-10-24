@@ -151,8 +151,8 @@ export default function ComplaintsManagement() {
                 key={st}
                 onClick={() => setActiveStatus(st)}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap cursor-pointer ${activeStatus === st
-                    ? "bg-red-600 text-white shadow-md shadow-red-600/20"
-                    : "bg-slate-100 text-slate-700 hover:bg-red-50 hover:text-red-600"
+                  ? "bg-red-600 text-white shadow-md shadow-red-600/20"
+                  : "bg-slate-100 text-slate-700 hover:bg-red-50 hover:text-red-600"
                   }`}
               >
                 {st}
@@ -202,7 +202,7 @@ export default function ComplaintsManagement() {
                         <div className="text-[11px] text-slate-600">{t.email || t.user?.email || "-"}</div>
                       </td>
                       <td className="py-3 px-3.5 font-semibold text-slate-800 whitespace-nowrap">{t.category || "General"}</td>
-                      <td className="py-3 px-3.5 max-w-[200px]">
+                      <td className="py-3 px-3.5 max-w-50">
                         <div className="font-bold text-black line-clamp-1">{t.subject || t.title}</div>
                         <div className="text-[11px] text-slate-600 line-clamp-1">{t.description || t.message}</div>
                         <div className="flex items-center gap-1.5 mt-1">
@@ -226,10 +226,10 @@ export default function ComplaintsManagement() {
                       <td className="py-3 px-3.5 whitespace-nowrap">
                         <span
                           className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase ${status.toLowerCase().includes("resolved") || status.toLowerCase().includes("closed")
-                              ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
-                              : status.toLowerCase().includes("progress")
-                                ? "bg-blue-100 text-blue-800 border border-blue-200"
-                                : "bg-amber-100 text-amber-800 border border-amber-200"
+                            ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
+                            : status.toLowerCase().includes("progress")
+                              ? "bg-blue-100 text-blue-800 border border-blue-200"
+                              : "bg-amber-100 text-amber-800 border border-amber-200"
                             }`}
                         >
                           {status}

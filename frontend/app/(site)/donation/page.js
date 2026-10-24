@@ -179,8 +179,6 @@ function DonationContent() {
       formData.append('address', (address || currentUser?.address || '').trim());
       formData.append('category', 'payments');
       if (screenshotFile) {
-        formData.append('file', screenshotFile);
-        formData.append('screenshot', screenshotFile);
         formData.append('paymentScreenshot', screenshotFile);
       }
 

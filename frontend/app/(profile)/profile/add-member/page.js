@@ -95,17 +95,40 @@ export default function CoordinatorAddMemberPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    let category = 'documents';
+    if (fieldName === 'photoUrl' || fieldName === 'photo') {
+      category = 'profiles';
+    } else if (fieldName === 'paymentScreenshot' || fieldName === 'receipt') {
+      category = 'payments';
+    }
+
     const uploadFormData = new FormData();
+    uploadFormData.append('category', category);
     uploadFormData.append('file', file);
 
     try {
       setUploadingField(fieldName);
-      const res = await api.post('/uploads', uploadFormData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      let res;
+      try {
+        res = await api.post(`/upload?category=${category}`, uploadFormData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'x-category': category,
+            'x-upload-category': category
+          }
+        });
+      } catch (e1) {
+        res = await api.post(`/uploads?category=${category}`, uploadFormData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'x-category': category,
+            'x-upload-category': category
+          }
+        });
+      }
       const fileUrl = res.data?.url || res.data?.fileUrl || res.data?.filePath || '';
       setFormData(prev => ({ ...prev, [fieldName]: fileUrl }));
-      toast.success(`${fieldName === 'paymentScreenshot' ? 'Payment screenshot' : 'Document'} uploaded!`);
+      toast.success(`${fieldName === 'paymentScreenshot' ? 'Payment screenshot' : fieldName === 'photoUrl' ? 'Profile photo' : 'Document'} uploaded!`);
     } catch (err) {
       toast.error(err.response?.data?.message || 'File upload failed');
     } finally {

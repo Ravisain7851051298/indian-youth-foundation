@@ -15,6 +15,8 @@ const handleUpload = async (req, res) => {
       success: true,
       message: `File successfully uploaded into uploads/${category} directory`,
       url: fileUrl,
+      fileUrl: fileUrl,
+      filePath: fileUrl,
       filename: req.file.filename,
       category: category,
       size: req.file.size,

@@ -67,7 +67,7 @@ export default function ProfileSettingsPage() {
       setError('');
       setMessage('');
       
-      const resultAction = await dispatch(uploadAndUpdateAvatar({ file, category: 'avatars' }));
+      const resultAction = await dispatch(uploadAndUpdateAvatar({ file, category: 'profiles' }));
       if (uploadAndUpdateAvatar.fulfilled.match(resultAction)) {
         const updated = resultAction.payload;
         setForm(prev => ({ ...prev, photoUrl: updated.photoUrl }));

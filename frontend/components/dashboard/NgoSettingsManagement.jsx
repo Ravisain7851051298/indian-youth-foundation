@@ -130,22 +130,31 @@ export default function NgoSettingsManagement() {
 
       if (logoFile) {
         const fd = new FormData();
+        fd.append("category", "settings");
         fd.append("file", logoFile);
-        const up = await api.post("/upload", fd);
+        const up = await api.post("/upload?category=settings", fd, {
+          headers: { 'x-category': 'settings', 'x-upload-category': 'settings' }
+        });
         if (up.data?.url) logoUrl = up.data.url;
       }
 
       if (sigFile) {
         const fd = new FormData();
+        fd.append("category", "settings");
         fd.append("file", sigFile);
-        const up = await api.post("/upload", fd);
+        const up = await api.post("/upload?category=settings", fd, {
+          headers: { 'x-category': 'settings', 'x-upload-category': 'settings' }
+        });
         if (up.data?.url) presidentSignatureUrl = up.data.url;
       }
 
       if (qrFile) {
         const fd = new FormData();
+        fd.append("category", "settings");
         fd.append("file", qrFile);
-        const up = await api.post("/upload", fd);
+        const up = await api.post("/upload?category=settings", fd, {
+          headers: { 'x-category': 'settings', 'x-upload-category': 'settings' }
+        });
         if (up.data?.url) upiQrImage = up.data.url;
       }
 

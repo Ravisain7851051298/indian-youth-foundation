@@ -913,6 +913,7 @@ module.exports = {
   generateVolunteerOfferLetterPdf,
   generateVolunteerIdCardPdf,
   generateAppointmentLetterPdf,
+  generateIdCardPdf,
   generateMemberIdCardPdf,
   generateCoordinatorAppointmentLetterPdf,
   generateCoordinatorIdCardPdf,

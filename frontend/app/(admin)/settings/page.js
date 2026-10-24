@@ -154,15 +154,15 @@ export default function SettingsPage() {
 
     setUploadingField(fieldName);
     try {
-      const res = await uploadFile(file);
+      const res = await uploadFile(file, 'settings');
       if (res.success && res.url) {
         setForm(prev => ({ ...prev, [fieldName]: res.url }));
-        alert(`File uploaded successfully to ${res.url}!`);
+        toast.success(`File uploaded successfully to settings!`);
       } else {
-        alert(res.message || 'File upload failed');
+        toast.error(res.message || 'File upload failed');
       }
     } catch (err) {
-      alert('Upload error');
+      toast.error('Upload error');
     } finally {
       setUploadingField(null);
     }

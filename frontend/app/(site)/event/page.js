@@ -155,9 +155,11 @@ export default function EventPage() {
       const uploadedUrls = [];
       for (const file of newFiles) {
         const formData = new FormData();
+        formData.append('category', 'campaigns');
         formData.append('file', file);
-        formData.append('category', 'events');
-        const upRes = await api.post('/upload', formData);
+        const upRes = await api.post('/upload?category=campaigns', formData, {
+          headers: { 'x-category': 'campaigns', 'x-upload-category': 'campaigns' }
+        });
         if (upRes.data?.success && upRes.data?.url) {
           uploadedUrls.push(upRes.data.url);
         }

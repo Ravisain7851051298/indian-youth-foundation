@@ -77,9 +77,11 @@ export default function BlogsPage() {
 
       if (selectedFile) {
         const formData = new FormData();
+        formData.append('category', 'blogs');
         formData.append('file', selectedFile);
-        formData.append('category', 'news');
-        const upRes = await api.post('/upload', formData);
+        const upRes = await api.post('/upload?category=blogs', formData, {
+          headers: { 'x-category': 'blogs', 'x-upload-category': 'blogs' }
+        });
         if (upRes.data?.success && upRes.data?.url) {
           mediaUrl = upRes.data.url;
         }

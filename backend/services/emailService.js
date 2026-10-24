@@ -764,8 +764,8 @@ const sendCoordinatorAppointmentEmail = async (param) => {
   let attachments = [];
   try {
     const [apptPdf, idCardPdf] = await Promise.all([
-      pdfService.generateAppointmentLetterPdf({ ...coordObj, role: 'Coordinator', isCoordinator: true, coordinatorId, memberId: coordinatorId, name, designation }),
-      pdfService.generateIdCardPdf({ ...coordObj, role: 'Coordinator', isCoordinator: true, coordinatorId, memberId: coordinatorId, name, designation }, 'coordinator')
+      (pdfService.generateCoordinatorAppointmentLetterPdf || pdfService.generateAppointmentLetterPdf)({ ...coordObj, role: 'Coordinator', isCoordinator: true, coordinatorId, memberId: coordinatorId, name, designation }),
+      (pdfService.generateCoordinatorIdCardPdf || pdfService.generateIdCardPdf)({ ...coordObj, role: 'Coordinator', isCoordinator: true, coordinatorId, memberId: coordinatorId, name, designation }, 'coordinator')
     ]);
 
     attachments.push(

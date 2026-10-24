@@ -38,4 +38,6 @@ userAwardSchema.pre('save', function () {
   }
 });
 
+userAwardSchema.plugin(require('./plugins/fileCleanupPlugin'));
+
 module.exports = mongoose.model('UserAward', userAwardSchema);

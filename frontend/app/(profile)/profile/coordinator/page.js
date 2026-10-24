@@ -51,29 +51,8 @@ export default function CoordinatorHubPage() {
   };
 
   useEffect(() => {
-    let active = true;
     if (!isCoordinator) return;
-
-    authFetch('/coordinator/stats')
-      .then((res) => res.json())
-      .then((data) => {
-        if (!active) return;
-        if (data.success && data.data) {
-          setStats(data.data.stats || null);
-          setRecentApplications(data.data.recentApplications || []);
-        }
-      })
-      .catch((err) => {
-        if (!active) return;
-        console.warn('Failed to load coordinator stats:', err.message);
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
-
-    return () => {
-      active = false;
-    };
+    loadData();
   }, [isCoordinator]);
 
   if (!isCoordinator) {
@@ -103,7 +82,7 @@ export default function CoordinatorHubPage() {
   return (
     <div className="space-y-6">
       {/* Hero Welcome Banner */}
-      <div className="bg-gradient-to-r from-purple-900 via-purple-800 to-indigo-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
+      <div className="bg-linear-to-r from-purple-900 via-purple-800 to-indigo-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 text-purple-200 text-xs font-bold border border-white/20">
@@ -326,13 +305,12 @@ export default function CoordinatorHubPage() {
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="font-extrabold text-xs text-black">{app.name}</span>
-                    <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${
-                      app.status === 'approved'
+                    <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${app.status === 'approved'
                         ? 'bg-emerald-100 text-emerald-800'
                         : app.status === 'rejected'
                           ? 'bg-rose-100 text-rose-800'
                           : 'bg-amber-100 text-amber-800'
-                    }`}>
+                      }`}>
                       {app.status === 'approved' ? 'Approved by Admin' : (app.status === 'pending' ? 'Pending Admin Approval' : 'Rejected')}
                     </span>
                   </div>

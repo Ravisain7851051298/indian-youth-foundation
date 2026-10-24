@@ -198,15 +198,16 @@ export const updateUserProfile = createAsyncThunk(
  */
 export const uploadAndUpdateAvatar = createAsyncThunk(
   'auth/uploadAndUpdateAvatar',
-  async ({ file, category = 'avatars' }, { rejectWithValue }) => {
+  async ({ file, category = 'profiles' }, { rejectWithValue }) => {
     try {
       const formData = new FormData();
-      formData.append('file', file);
       formData.append('category', category);
+      formData.append('file', file);
 
-      const uploadRes = await api.post('/upload', formData, {
+      const uploadRes = await api.post(`/upload?category=${category}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
+          'x-category': category,
           'x-upload-category': category
         }
       });

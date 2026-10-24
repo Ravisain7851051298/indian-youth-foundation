@@ -137,8 +137,11 @@ export default function TeamMembersManagement() {
 
       if (photoFile) {
         const formData = new FormData();
+        formData.append("category", "profiles");
         formData.append("file", photoFile);
-        const upRes = await api.post("/upload", formData);
+        const upRes = await api.post("/upload?category=profiles", formData, {
+          headers: { 'x-category': 'profiles', 'x-upload-category': 'profiles' }
+        });
         if (upRes.data?.url) {
           imageUrl = upRes.data.url;
         }

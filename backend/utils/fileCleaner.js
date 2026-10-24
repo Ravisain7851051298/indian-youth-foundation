@@ -10,54 +10,126 @@ if (!fs.existsSync(uploadDir)) {
 
 // Supported category folders
 const VALID_CATEGORIES = new Set([
-  'avatars',
-  'applications',
-  'payments',
+  'profiles',
   'documents',
+  'payments',
   'certificates',
   'campaigns',
   'gallery',
-  'news',
+  'blogs',
   'settings',
-  'general'
+  'complaints',
+  'general',
+  // Backward compatibility aliases
+  'avatars',
+  'applications',
+  'news'
 ]);
 
 // Map common aliases to canonical folder names
 const CATEGORY_ALIASES = {
-  profile: 'avatars',
-  avatar: 'avatars',
-  user: 'avatars',
-  users: 'avatars',
-  team: 'avatars',
-  member: 'applications',
-  members: 'applications',
-  membership: 'applications',
-  volunteer: 'applications',
-  volunteers: 'applications',
-  idproof: 'applications',
-  payment: 'payments',
-  payments: 'payments',
-  screenshot: 'payments',
-  receipt: 'payments',
-  donation: 'payments',
-  donations: 'payments',
+  // Profiles category aliases (profile pictures, avatars, coordinator photos, team photos)
+  profile: 'profiles',
+  profiles: 'profiles',
+  avatar: 'profiles',
+  avatars: 'profiles',
+  user: 'profiles',
+  users: 'profiles',
+  photo: 'profiles',
+  photos: 'profiles',
+  photourl: 'profiles',
+  userimage: 'profiles',
+  team: 'profiles',
+  memberphoto: 'profiles',
+  coordinatorphoto: 'profiles',
+
+  // Documents category aliases (KYC, idproofs, aadhaar, pan, voter, certificates of reg, bylaws)
   document: 'documents',
   documents: 'documents',
+  doc: 'documents',
+  docs: 'documents',
+  documentfront: 'documents',
+  documentback: 'documents',
+  front: 'documents',
+  back: 'documents',
+  idproof: 'documents',
+  idproofs: 'documents',
+  kyc: 'documents',
+  idprooffront: 'documents',
+  idproofback: 'documents',
+  application: 'documents',
+  applications: 'documents',
+  membership: 'documents',
   audit: 'documents',
   audits: 'documents',
-  grievance: 'documents',
-  complaint: 'documents',
+  orgdocument: 'documents',
+  orgdocuments: 'documents',
+
+  // Payments category aliases (payment screenshots, donation proofs, fees, transaction receipts)
+  payment: 'payments',
+  payments: 'payments',
+  paymentscreenshot: 'payments',
+  screenshot: 'payments',
+  screenshots: 'payments',
+  receipt: 'payments',
+  receipts: 'payments',
+  donation: 'payments',
+  donations: 'payments',
+  fee: 'payments',
+  fees: 'payments',
+  utr: 'payments',
+  transaction: 'payments',
+
+  // Certificates category aliases
   certificate: 'certificates',
   certificates: 'certificates',
+  award: 'certificates',
+  awards: 'certificates',
+  badge: 'certificates',
+
+  // Campaigns & Events category aliases
   campaign: 'campaigns',
   campaigns: 'campaigns',
   event: 'campaigns',
   events: 'campaigns',
+  program: 'campaigns',
+  programs: 'campaigns',
+
+  // Gallery category aliases
   gallery: 'gallery',
-  news: 'news',
+  galleries: 'gallery',
+  media: 'gallery',
+  video: 'gallery',
+  videos: 'gallery',
+
+  // Blogs & News category aliases
+  blog: 'blogs',
+  blogs: 'blogs',
+  news: 'blogs',
+  story: 'blogs',
+  stories: 'blogs',
+
+  // Settings category aliases (NGO logo, official seal, president signature, upi qr)
   setting: 'settings',
   settings: 'settings',
-  logo: 'settings'
+  logo: 'settings',
+  seal: 'settings',
+  signature: 'settings',
+  officialseal: 'settings',
+  presidentsignature: 'settings',
+  qr: 'settings',
+  qrcode: 'settings',
+  upiqr: 'settings',
+  upiqrimage: 'settings',
+
+  // Complaints / Grievances category aliases
+  complaint: 'complaints',
+  complaints: 'complaints',
+  grievance: 'complaints',
+  grievances: 'complaints',
+
+  // Fallback
+  general: 'general'
 };
 
 /**
@@ -145,28 +217,26 @@ async function deleteFileByUrl(fileUrl) {
 }
 
 /**
- * Recursively scans any object/document and deletes any uploaded files found
+ * Scans an object or document and returns a Set of file URL paths stored in uploads
  * @param {object} doc Mongoose document or plain object
- * @returns {Promise<number>} number of files deleted
+ * @returns {Set<string>}
  */
-async function deleteDocumentFiles(doc) {
-  if (!doc) return 0;
-
+function extractFileUrls(doc) {
+  const urls = new Set();
+  if (!doc) return urls;
   const data = (doc && typeof doc.toObject === 'function') ? doc.toObject() : doc;
-  const urlsToDelete = new Set();
 
   function scan(val) {
     if (!val) return;
     if (typeof val === 'string') {
-      // Check if it looks like an uploads path
-      if (val.includes('/uploads/') || val.startsWith('uploads/') || /^[a-z0-9_-]+\/[a-z0-9_.-]+\.[a-z0-9]+$/i.test(val)) {
-        urlsToDelete.add(val);
+      const trimmed = val.trim();
+      if (trimmed.includes('/uploads/') || trimmed.startsWith('uploads/') || /^[a-z0-9_-]+\/[a-z0-9_.-]+\.[a-z0-9]+$/i.test(trimmed)) {
+        urls.add(trimmed);
       }
     } else if (Array.isArray(val)) {
       val.forEach(scan);
     } else if (typeof val === 'object') {
       for (const key of Object.keys(val)) {
-        // Skip mongo internal properties
         if (key === '_id' || key === '__v') continue;
         scan(val[key]);
       }
@@ -174,6 +244,17 @@ async function deleteDocumentFiles(doc) {
   }
 
   scan(data);
+  return urls;
+}
+
+/**
+ * Recursively scans any object/document and deletes any uploaded files found
+ * @param {object} doc Mongoose document or plain object
+ * @returns {Promise<number>} number of files deleted
+ */
+async function deleteDocumentFiles(doc) {
+  if (!doc) return 0;
+  const urlsToDelete = extractFileUrls(doc);
 
   let deletedCount = 0;
   for (const url of urlsToDelete) {
@@ -190,5 +271,6 @@ module.exports = {
   ensureCategoryDir,
   ensureAllCategoryDirs,
   deleteFileByUrl,
+  extractFileUrls,
   deleteDocumentFiles
 };

@@ -635,11 +635,27 @@ export function NGOProvider({ children }) {
 
   const uploadFile = useCallback(async (file, category = 'general') => {
     try {
+      // Determine best category fallback from file name if general
+      let resolvedCategory = category;
+      if (!resolvedCategory || resolvedCategory === 'general') {
+        const name = (file?.name || '').toLowerCase();
+        if (/photo|avatar|profile|headshot|selfie/i.test(name)) resolvedCategory = 'profiles';
+        else if (/payment|screenshot|receipt|utr|upi/i.test(name)) resolvedCategory = 'payments';
+        else if (/aadhaar|pan|kyc|document|voter|pdf/i.test(name)) resolvedCategory = 'documents';
+        else if (/certificate|award/i.test(name)) resolvedCategory = 'certificates';
+        else if (/logo|seal|signature/i.test(name)) resolvedCategory = 'settings';
+      }
+
       const formData = new FormData();
+      formData.append('category', resolvedCategory);
       formData.append('file', file);
-      formData.append('category', category);
-      const res = await api.post('/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data', 'x-upload-category': category }
+
+      const res = await api.post(`/upload?category=${encodeURIComponent(resolvedCategory)}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'x-category': resolvedCategory,
+          'x-upload-category': resolvedCategory
+        }
       });
       return res.data;
     } catch (e) {
