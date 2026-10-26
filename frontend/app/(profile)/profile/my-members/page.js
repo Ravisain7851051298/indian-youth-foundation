@@ -45,16 +45,13 @@ export default function MyRecruitedMembersPage() {
 
   // Edit Member Modal State
   const [editingMember, setEditingMember] = useState(null);
-  const [activeEditTab, setActiveEditTab] = useState('profile'); // 'profile', 'documents', 'payment'
+  const [activeEditTab, setActiveEditTab] = useState('profile'); // 'profile', 'payment'
   const [uploadingField, setUploadingField] = useState(null);
   const [editFormData, setEditFormData] = useState({
     name: '',
     email: '',
     phone: '',
     photoUrl: '',
-    documentType: 'Aadhaar Card',
-    documentFront: '',
-    documentBack: '',
     paymentScreenshot: '',
     bloodGroup: 'O+',
     dob: '2000-01-01',
@@ -80,9 +77,6 @@ export default function MyRecruitedMembersPage() {
       email: member.email || '',
       phone: member.phone || '',
       photoUrl: member.photoUrl || '',
-      documentType: member.documentType || 'Aadhaar Card',
-      documentFront: member.documentFront || member.idProofUrl || '',
-      documentBack: member.documentBack || '',
       paymentScreenshot: member.paymentScreenshot || member.paymentScreenshotUrl || member.screenshotUrl || '',
       bloodGroup: member.bloodGroup || 'O+',
       dob: member.dob ? member.dob.substring(0, 10) : '2000-01-01',
@@ -141,15 +135,7 @@ export default function MyRecruitedMembersPage() {
 
       setEditFormData((prev) => ({ ...prev, [fieldName]: fileUrl }));
       toast.success(
-        `${
-          fieldName === 'photoUrl'
-            ? 'Profile photo'
-            : fieldName === 'paymentScreenshot'
-              ? 'Payment screenshot'
-              : fieldName === 'documentFront'
-                ? 'Document front'
-                : 'Document back'
-        } uploaded!`
+        `${fieldName === 'photoUrl' ? 'Profile photo' : 'Payment screenshot'} uploaded!`
       );
     } catch (err) {
       toast.error(err.response?.data?.message || err.message || 'File upload failed');
@@ -485,7 +471,6 @@ export default function MyRecruitedMembersPage() {
                 <tr>
                   <th className="py-3.5 px-4">Member Profile &amp; Contact</th>
                   <th className="py-3.5 px-4">Location &amp; Blood</th>
-                  <th className="py-3.5 px-4">KYC Documents</th>
                   <th className="py-3.5 px-4">Plan &amp; Contribution</th>
                   <th className="py-3.5 px-4">Payment UTR &amp; Receipt</th>
                   <th className="py-3.5 px-4">Trustee Review Status</th>
@@ -498,8 +483,6 @@ export default function MyRecruitedMembersPage() {
                   const isApproved = member.status === 'approved';
                   const isPending = member.status === 'pending';
                   const isRejected = member.status === 'rejected';
-                  const docFront = member.documentFront || member.idProofUrl;
-                  const docBack = member.documentBack;
                   const paymentProof = member.paymentScreenshot || member.paymentScreenshotUrl || member.screenshotUrl;
 
                   return (
@@ -561,44 +544,6 @@ export default function MyRecruitedMembersPage() {
                               {member.gender}
                             </span>
                           )}
-                        </div>
-                      </td>
-
-                      {/* KYC Documents */}
-                      <td className="py-3.5 px-4">
-                        <div className="space-y-1">
-                          <span className="inline-block px-2 py-0.5 rounded-md font-bold text-[10px] bg-indigo-50 text-indigo-700 border border-indigo-200">
-                            {member.documentType || 'Aadhaar Card'}
-                          </span>
-                          <div className="flex items-center gap-1.5">
-                            {docFront ? (
-                              <button
-                                type="button"
-                                onClick={() => setPreviewImageModal({ url: docFront, title: `${applicantName} - Document Front` })}
-                                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 text-[10px] font-bold transition cursor-pointer"
-                                title="Click to preview Document Front"
-                              >
-                                <FiImage className="w-3 h-3" />
-                                <span>Front</span>
-                              </button>
-                            ) : (
-                              <span className="text-[10px] text-slate-400 italic">No Front</span>
-                            )}
-
-                            {docBack ? (
-                              <button
-                                type="button"
-                                onClick={() => setPreviewImageModal({ url: docBack, title: `${applicantName} - Document Back` })}
-                                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 text-[10px] font-bold transition cursor-pointer"
-                                title="Click to preview Document Back"
-                              >
-                                <FiImage className="w-3 h-3" />
-                                <span>Back</span>
-                              </button>
-                            ) : (
-                              <span className="text-[10px] text-slate-400 italic">No Back</span>
-                            )}
-                          </div>
                         </div>
                       </td>
 
@@ -820,75 +765,7 @@ export default function MyRecruitedMembersPage() {
               </div>
             )}
 
-            {/* Section 2: Identity Documents (KYC) */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <h5 className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                  Identity Documents (KYC)
-                </h5>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200">
-                  {selectedApplicant.documentType || 'Aadhaar Card'}
-                </span>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {/* Document Front */}
-                <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-2">
-                  <span className="text-[10px] font-bold uppercase text-slate-600 block">Document Front</span>
-                  {selectedApplicant.documentFront || selectedApplicant.idProofUrl ? (
-                    <div className="relative group border border-slate-200 rounded-xl overflow-hidden bg-white h-36 flex items-center justify-center">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={getContentImageUrl(selectedApplicant.documentFront || selectedApplicant.idProofUrl)}
-                        alt="Document Front"
-                        className="max-h-36 object-contain"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setPreviewImageModal({ url: selectedApplicant.documentFront || selectedApplicant.idProofUrl, title: `${selectedApplicant.name || selectedApplicant.fullName} - Document Front` })}
-                        className="absolute inset-0 bg-black/40 text-white font-bold text-xs flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition cursor-pointer"
-                      >
-                        <FiZoomIn className="w-4 h-4" />
-                        <span>Click to Enlarge</span>
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="h-28 border border-dashed border-slate-300 rounded-xl flex items-center justify-center text-slate-400 text-xs italic">
-                      No document front uploaded
-                    </div>
-                  )}
-                </div>
-
-                {/* Document Back */}
-                <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-2">
-                  <span className="text-[10px] font-bold uppercase text-slate-600 block">Document Back</span>
-                  {selectedApplicant.documentBack ? (
-                    <div className="relative group border border-slate-200 rounded-xl overflow-hidden bg-white h-36 flex items-center justify-center">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={getContentImageUrl(selectedApplicant.documentBack)}
-                        alt="Document Back"
-                        className="max-h-36 object-contain"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setPreviewImageModal({ url: selectedApplicant.documentBack, title: `${selectedApplicant.name || selectedApplicant.fullName} - Document Back` })}
-                        className="absolute inset-0 bg-black/40 text-white font-bold text-xs flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition cursor-pointer"
-                      >
-                        <FiZoomIn className="w-4 h-4" />
-                        <span>Click to Enlarge</span>
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="h-28 border border-dashed border-slate-300 rounded-xl flex items-center justify-center text-slate-400 text-xs italic">
-                      No document back uploaded
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Section 3: Payment Verification & Proof */}
+            {/* Section 2: Payment Verification & Proof */}
             <div className="space-y-2">
               <h5 className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
                 Payment Verification &amp; Proof
@@ -1031,17 +908,6 @@ export default function MyRecruitedMembersPage() {
               </button>
               <button
                 type="button"
-                onClick={() => setActiveEditTab('documents')}
-                className={`flex-1 py-2 px-3 rounded-xl font-bold transition whitespace-nowrap cursor-pointer text-center ${
-                  activeEditTab === 'documents'
-                    ? 'bg-white text-black shadow-xs'
-                    : 'text-slate-600 hover:text-black'
-                }`}
-              >
-                2. KYC Documents
-              </button>
-              <button
-                type="button"
                 onClick={() => setActiveEditTab('payment')}
                 className={`flex-1 py-2 px-3 rounded-xl font-bold transition whitespace-nowrap cursor-pointer text-center ${
                   activeEditTab === 'payment'
@@ -1049,7 +915,7 @@ export default function MyRecruitedMembersPage() {
                     : 'text-slate-600 hover:text-black'
                 }`}
               >
-                3. Payment &amp; Receipt
+                2. Payment &amp; Receipt
               </button>
             </div>
 
@@ -1204,144 +1070,7 @@ export default function MyRecruitedMembersPage() {
                   </div>
                 </div>
               )}
-
-              {/* TAB 2: KYC & IDENTITY DOCUMENTS */}
-              {activeEditTab === 'documents' && (
-                <div className="space-y-4 animate-in fade-in duration-200">
-                  <div>
-                    <label className="block text-xs font-bold text-black mb-1">Identity Document Type</label>
-                    <select
-                      value={editFormData.documentType}
-                      onChange={(e) => setEditFormData({ ...editFormData, documentType: e.target.value })}
-                      className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs text-black focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-medium bg-white"
-                    >
-                      {['Aadhaar Card', 'Voter ID', 'PAN Card', 'Passport', 'Driving License', 'Government ID', 'Other ID Proof'].map((doc) => (
-                        <option key={doc} value={doc}>{doc}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {/* Document Front Uploader */}
-                    <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2.5">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-black">Document Front</span>
-                        {editFormData.documentFront && (
-                          <span className="text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded font-bold border border-emerald-200">
-                            Attached
-                          </span>
-                        )}
-                      </div>
-
-                      {editFormData.documentFront ? (
-                        <div className="relative group border border-slate-200 rounded-xl overflow-hidden bg-white h-32 flex items-center justify-center">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={getContentImageUrl(editFormData.documentFront)}
-                            alt="Front Preview"
-                            className="max-h-32 object-contain"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setPreviewImageModal({ url: editFormData.documentFront, title: 'Document Front Preview' })}
-                            className="absolute inset-0 bg-black/40 text-white font-bold text-xs flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition cursor-pointer"
-                          >
-                            <FiZoomIn className="w-4 h-4" />
-                            <span>Preview</span>
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="h-32 border border-dashed border-slate-300 rounded-xl flex items-center justify-center text-slate-400 text-xs italic">
-                          No front image uploaded
-                        </div>
-                      )}
-
-                      <div className="flex items-center gap-2">
-                        <label className="flex-1 py-2 px-3 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-800 border border-purple-200 font-bold text-xs text-center cursor-pointer transition flex items-center justify-center gap-1.5 shadow-2xs">
-                          <FiUploadCloud className="w-3.5 h-3.5" />
-                          <span>{uploadingField === 'documentFront' ? 'Uploading...' : 'Upload Front'}</span>
-                          <input
-                            type="file"
-                            accept="image/*,application/pdf"
-                            disabled={uploadingField === 'documentFront'}
-                            onChange={(e) => handleFileUpload(e, 'documentFront')}
-                            className="hidden"
-                          />
-                        </label>
-                        {editFormData.documentFront && (
-                          <button
-                            type="button"
-                            onClick={() => setEditFormData({ ...editFormData, documentFront: '' })}
-                            className="px-3 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs cursor-pointer transition"
-                          >
-                            Clear
-                          </button>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Document Back Uploader */}
-                    <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2.5">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-black">Document Back</span>
-                        {editFormData.documentBack && (
-                          <span className="text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded font-bold border border-emerald-200">
-                            Attached
-                          </span>
-                        )}
-                      </div>
-
-                      {editFormData.documentBack ? (
-                        <div className="relative group border border-slate-200 rounded-xl overflow-hidden bg-white h-32 flex items-center justify-center">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={getContentImageUrl(editFormData.documentBack)}
-                            alt="Back Preview"
-                            className="max-h-32 object-contain"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setPreviewImageModal({ url: editFormData.documentBack, title: 'Document Back Preview' })}
-                            className="absolute inset-0 bg-black/40 text-white font-bold text-xs flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition cursor-pointer"
-                          >
-                            <FiZoomIn className="w-4 h-4" />
-                            <span>Preview</span>
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="h-32 border border-dashed border-slate-300 rounded-xl flex items-center justify-center text-slate-400 text-xs italic">
-                          No back image uploaded
-                        </div>
-                      )}
-
-                      <div className="flex items-center gap-2">
-                        <label className="flex-1 py-2 px-3 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-800 border border-purple-200 font-bold text-xs text-center cursor-pointer transition flex items-center justify-center gap-1.5 shadow-2xs">
-                          <FiUploadCloud className="w-3.5 h-3.5" />
-                          <span>{uploadingField === 'documentBack' ? 'Uploading...' : 'Upload Back'}</span>
-                          <input
-                            type="file"
-                            accept="image/*,application/pdf"
-                            disabled={uploadingField === 'documentBack'}
-                            onChange={(e) => handleFileUpload(e, 'documentBack')}
-                            className="hidden"
-                          />
-                        </label>
-                        {editFormData.documentBack && (
-                          <button
-                            type="button"
-                            onClick={() => setEditFormData({ ...editFormData, documentBack: '' })}
-                            className="px-3 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs cursor-pointer transition"
-                          >
-                            Clear
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* TAB 3: PAYMENT & RECEIPT SCREENSHOT */}
+              {/* TAB 2: PAYMENT & RECEIPT SCREENSHOT */}
               {activeEditTab === 'payment' && (
                 <div className="space-y-4 animate-in fade-in duration-200">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">

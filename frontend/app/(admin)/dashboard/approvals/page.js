@@ -271,11 +271,6 @@ export default function ApprovalsPage() {
                           <span className="text-gray-600 font-medium">Transaction UTR / Ref: </span>
                           <span className="font-mono font-bold text-black">{app.transactionId || 'None Provided'}</span>
                         </div>
-                        {app.documentType && (
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200">
-                            {app.documentType}
-                          </span>
-                        )}
                       </div>
 
                       <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-slate-200">
@@ -287,26 +282,6 @@ export default function ApprovalsPage() {
                           >
                             <FiEye className="w-3.5 h-3.5" />
                             <span>Payment Screenshot</span>
-                          </button>
-                        )}
-                        {(app.documentFront || app.idProofUrl) && (
-                          <button
-                            type="button"
-                            onClick={() => setPreviewImage(getContentImageUrl(app.documentFront || app.idProofUrl))}
-                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-800 font-bold text-xs transition border border-blue-200 cursor-pointer"
-                          >
-                            <FiEye className="w-3.5 h-3.5" />
-                            <span>Doc Front</span>
-                          </button>
-                        )}
-                        {app.documentBack && (
-                          <button
-                            type="button"
-                            onClick={() => setPreviewImage(getContentImageUrl(app.documentBack))}
-                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-800 font-bold text-xs transition border border-indigo-200 cursor-pointer"
-                          >
-                            <FiEye className="w-3.5 h-3.5" />
-                            <span>Doc Back</span>
                           </button>
                         )}
                         {app.photoUrl && (
@@ -415,30 +390,7 @@ export default function ApprovalsPage() {
                     <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3 text-xs space-y-1.5">
                       <p><strong>Skills & Expertise:</strong> {app.skills || 'Community Social Work'}</p>
                       <p><strong>Areas of Interest:</strong> {app.interests || 'Education & Child Welfare'}</p>
-                      {app.documentType && (
-                        <p><strong>Document Type:</strong> <span className="font-bold text-emerald-800">{app.documentType}</span></p>
-                      )}
                       <div className="flex flex-wrap items-center gap-2 pt-1.5 border-t border-slate-200">
-                        {(app.documentFront || app.idProofUrl) && (
-                          <button
-                            type="button"
-                            onClick={() => setPreviewImage(getContentImageUrl(app.documentFront || app.idProofUrl))}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 font-bold text-[11px] border border-emerald-200 hover:bg-emerald-100 cursor-pointer"
-                          >
-                            <FiEye className="w-3.5 h-3.5" />
-                            <span>Doc Front</span>
-                          </button>
-                        )}
-                        {app.documentBack && (
-                          <button
-                            type="button"
-                            onClick={() => setPreviewImage(getContentImageUrl(app.documentBack))}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-50 text-blue-800 font-bold text-[11px] border border-blue-200 hover:bg-blue-100 cursor-pointer"
-                          >
-                            <FiEye className="w-3.5 h-3.5" />
-                            <span>Doc Back</span>
-                          </button>
-                        )}
                         {app.photoUrl && (
                           <button
                             type="button"

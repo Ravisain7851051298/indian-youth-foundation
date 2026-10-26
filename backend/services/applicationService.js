@@ -30,7 +30,7 @@ class ApplicationService {
     const finalScreenshot = paymentScreenshot || appData.paymentProof || appData.screenshotUrl;
     const finalUtr = utrNumber || appData.transactionId || '';
     const finalPhoto = photoUrl || appData.userPhoto || appData.avatar || '';
-    const finalDocType = appData.documentType || 'Aadhaar Card';
+    const finalDocType = appData.documentType || '';
     const finalDocFront = appData.documentFront || appData.idProofUrl || '';
     const finalDocBack = appData.documentBack || '';
 
@@ -128,12 +128,10 @@ class ApplicationService {
     } = appData;
 
     const finalPhoto = photoUrl || appData.userPhoto || appData.avatar || '';
-    const finalDocType = appData.documentType || 'Aadhaar Card';
+    const finalDocType = appData.documentType || '';
     const finalDocFront = appData.documentFront || idProofDocument || idProofUrl || appData.idProof || '';
     const finalDocBack = appData.documentBack || '';
-    const finalIdProof = finalDocFront || idProofDocument || idProofUrl || appData.idProof;
-
-    if (!finalIdProof && !finalDocFront) throw new Error('Government ID proof upload is required for volunteer verification');
+    const finalIdProof = finalDocFront || idProofDocument || idProofUrl || appData.idProof || '';
 
     let user = userId ? await userRepository.findById(userId) : null;
     if (!user && email) {

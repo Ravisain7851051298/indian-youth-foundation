@@ -254,7 +254,6 @@ export default function MembershipManagement() {
               <thead className="bg-slate-50 border-b border-slate-200 text-black font-extrabold">
                 <tr>
                   <th className="py-3 px-3.5">Applicant</th>
-                  <th className="py-3 px-3.5">KYC Document</th>
                   <th className="py-3 px-3.5">Plan / Fee</th>
                   <th className="py-3 px-3.5">Transaction / UTR</th>
                   <th className="py-3 px-3.5">Payment Proof</th>
@@ -272,7 +271,6 @@ export default function MembershipManagement() {
                   const name = m.user?.name || m.name || "Member Applicant";
                   const email = m.user?.email || m.email || "-";
                   const phone = m.user?.phone || m.phone || "-";
-                  const docType = m.documentType || "Aadhaar Card";
                   return (
                     <tr key={id} className="group hover:bg-slate-50/80 transition">
                       <td className="py-3 px-3.5">
@@ -301,24 +299,6 @@ export default function MembershipManagement() {
                               </div>
                             )}
                           </div>
-                        </div>
-                      </td>
-                      <td className="py-3 px-3.5 whitespace-nowrap">
-                        <div className="space-y-1">
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200 block w-fit">
-                            {docType}
-                          </span>
-                          {(m.documentFront || m.documentBack || m.idProofUrl) ? (
-                            <button
-                              onClick={() => setViewModalItem(m)}
-                              className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-600 hover:text-blue-800 hover:underline cursor-pointer"
-                            >
-                              <FiEye className="w-3 h-3" />
-                              <span>Inspect Documents</span>
-                            </button>
-                          ) : (
-                            <span className="text-[10px] text-slate-400 italic">No Doc Attached</span>
-                          )}
                         </div>
                       </td>
                       <td className="py-3 px-3.5">
@@ -361,7 +341,7 @@ export default function MembershipManagement() {
                           <button
                             onClick={() => setViewModalItem(m)}
                             className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-[11px] transition cursor-pointer border border-blue-200 shadow-2xs"
-                            title="Inspect full details, photo and verification documents"
+                            title="Inspect full details, photo and payment verification"
                           >
                             <FiEye className="w-3.5 h-3.5" />
                             <span>View</span>
@@ -505,83 +485,6 @@ export default function MembershipManagement() {
                     <span><strong>District:</strong> {viewModalItem.district || viewModalItem.user?.district || "Aligarh"}</span>
                     <span><strong>State:</strong> {viewModalItem.state || viewModalItem.user?.state || "Uttar Pradesh"}</span>
                     {viewModalItem.address && <span><strong>Address:</strong> {viewModalItem.address}</span>}
-                  </div>
-                </div>
-              </div>
-
-              {/* KYC Government Documents Section (Front & Back) */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between pb-1 border-b border-slate-200">
-                  <span className="text-xs font-black uppercase tracking-wider text-black flex items-center gap-1.5">
-                    <FiShield className="text-[#0b8026] w-4 h-4" />
-                    <span>Government Verification Document ({viewModalItem.documentType || "Aadhaar Card"})</span>
-                  </span>
-                  <span className="text-[11px] font-extrabold text-[#0b8026] bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-                    {viewModalItem.documentType || "Aadhaar Card"}
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* Front Side Document */}
-                  <div className="border border-slate-200 rounded-2xl p-3.5 bg-slate-50 space-y-2">
-                    <div className="flex items-center justify-between text-xs font-bold text-black">
-                      <span className="flex items-center gap-1">
-                        <FiFileText className="text-[#0b8026] w-3.5 h-3.5" />
-                        <span>Document Front Side (सामने)</span>
-                      </span>
-                      {(viewModalItem.documentFront || viewModalItem.idProofUrl) && (
-                        <button
-                          onClick={() => setSelectedScreenshot(getContentImageUrl(viewModalItem.documentFront || viewModalItem.idProofUrl))}
-                          className="text-[10px] text-blue-600 font-extrabold hover:underline"
-                        >
-                          Zoom Full
-                        </button>
-                      )}
-                    </div>
-
-                    <div className="rounded-xl overflow-hidden border border-slate-200 bg-white h-44 flex items-center justify-center">
-                      {(viewModalItem.documentFront || viewModalItem.idProofUrl) ? (
-                        <img
-                          src={getContentImageUrl(viewModalItem.documentFront || viewModalItem.idProofUrl)}
-                          alt="Document Front"
-                          className="h-full w-full object-contain cursor-pointer hover:scale-105 transition"
-                          onClick={() => setSelectedScreenshot(getContentImageUrl(viewModalItem.documentFront || viewModalItem.idProofUrl))}
-                        />
-                      ) : (
-                        <span className="text-xs text-slate-400 italic">No Front Scan Uploaded</span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Back Side Document */}
-                  <div className="border border-slate-200 rounded-2xl p-3.5 bg-slate-50 space-y-2">
-                    <div className="flex items-center justify-between text-xs font-bold text-black">
-                      <span className="flex items-center gap-1">
-                        <FiFileText className="text-[#dc2626] w-3.5 h-3.5" />
-                        <span>Document Back Side (पीछे)</span>
-                      </span>
-                      {viewModalItem.documentBack && (
-                        <button
-                          onClick={() => setSelectedScreenshot(getContentImageUrl(viewModalItem.documentBack))}
-                          className="text-[10px] text-blue-600 font-extrabold hover:underline"
-                        >
-                          Zoom Full
-                        </button>
-                      )}
-                    </div>
-
-                    <div className="rounded-xl overflow-hidden border border-slate-200 bg-white h-44 flex items-center justify-center">
-                      {viewModalItem.documentBack ? (
-                        <img
-                          src={getContentImageUrl(viewModalItem.documentBack)}
-                          alt="Document Back"
-                          className="h-full w-full object-contain cursor-pointer hover:scale-105 transition"
-                          onClick={() => setSelectedScreenshot(getContentImageUrl(viewModalItem.documentBack))}
-                        />
-                      ) : (
-                        <span className="text-xs text-slate-400 italic">No Back Scan Uploaded</span>
-                      )}
-                    </div>
                   </div>
                 </div>
               </div>
@@ -874,7 +777,7 @@ export default function MembershipManagement() {
                   Instant Minting &amp; Delivery:
                 </p>
                 <p className="text-[11px] text-slate-600">
-                  A verifiable certificate with digital hash and QR code will be generated and made available on the member's profile and sent to their email.
+                  A verifiable certificate with digital hash and QR code will be generated and made available on the member&apos;s profile and sent to their email.
                 </p>
               </div>
 

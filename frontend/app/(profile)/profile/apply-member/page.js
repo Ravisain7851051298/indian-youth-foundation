@@ -10,8 +10,6 @@ import {
   FiAlertTriangle,
   FiTrash2,
   FiUser,
-  FiFileText,
-  FiShield,
   FiCamera,
   FiImage
 } from 'react-icons/fi';
@@ -29,7 +27,6 @@ export default function ApplyMembershipPage() {
   const [selectedPlanId, setSelectedPlanId] = useState('');
   const [transactionId, setTransactionId] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('UPI / PhonePe / GPay');
-  const [notes, setNotes] = useState('');
 
   // Guest applicant fields (active when user is not signed in)
   const [guestName, setGuestName] = useState('');
@@ -39,14 +36,9 @@ export default function ApplyMembershipPage() {
   const [guestDistrict, setGuestDistrict] = useState('Aligarh');
   const [guestState, setGuestState] = useState('Uttar Pradesh');
 
-  // KYC Verification Documents & User Photo State
+  // Applicant Photo State
   const [photoFile, setPhotoFile] = useState(null);
   const [photoPreview, setPhotoPreview] = useState('');
-  const [documentType, setDocumentType] = useState('Aadhaar Card');
-  const [docFrontFile, setDocFrontFile] = useState(null);
-  const [docFrontPreview, setDocFrontPreview] = useState('');
-  const [docBackFile, setDocBackFile] = useState(null);
-  const [docBackPreview, setDocBackPreview] = useState('');
 
   // Payment Screenshot upload state
   const [selectedRawFile, setSelectedRawFile] = useState(null);
@@ -81,46 +73,6 @@ export default function ApplyMembershipPage() {
     setPhotoPreview('');
     setPhotoFile(null);
     const input = document.getElementById('userPhotoInput');
-    if (input) input.value = '';
-  };
-
-  const handleDocFrontSelect = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > 15 * 1024 * 1024) {
-      setFormError('Document Front image must be under 15MB.');
-      return;
-    }
-    setFormError('');
-    setDocFrontFile(file);
-    setDocFrontPreview(URL.createObjectURL(file));
-  };
-
-  const handleRemoveDocFront = () => {
-    if (docFrontPreview && docFrontPreview.startsWith('blob:')) URL.revokeObjectURL(docFrontPreview);
-    setDocFrontPreview('');
-    setDocFrontFile(null);
-    const input = document.getElementById('docFrontInput');
-    if (input) input.value = '';
-  };
-
-  const handleDocBackSelect = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > 15 * 1024 * 1024) {
-      setFormError('Document Back image must be under 15MB.');
-      return;
-    }
-    setFormError('');
-    setDocBackFile(file);
-    setDocBackPreview(URL.createObjectURL(file));
-  };
-
-  const handleRemoveDocBack = () => {
-    if (docBackPreview && docBackPreview.startsWith('blob:')) URL.revokeObjectURL(docBackPreview);
-    setDocBackPreview('');
-    setDocBackFile(null);
-    const input = document.getElementById('docBackInput');
     if (input) input.value = '';
   };
 
@@ -169,16 +121,6 @@ export default function ApplyMembershipPage() {
       return;
     }
 
-    if (!docFrontFile) {
-      setFormError(`Please upload the FRONT side scan/photo of your ${documentType}.`);
-      return;
-    }
-
-    if (!docBackFile) {
-      setFormError(`Please upload the BACK side scan/photo of your ${documentType}.`);
-      return;
-    }
-
     if (!transactionId && !selectedRawFile) {
       setFormError('Please provide your Transaction UTR or select a payment screenshot');
       return;
@@ -200,14 +142,10 @@ export default function ApplyMembershipPage() {
       formData.append('paymentMethod', paymentMethod);
       formData.append('transactionId', transactionId);
       formData.append('utrNumber', transactionId);
-      formData.append('notes', notes);
       formData.append('category', 'applications');
 
-      // Append Verification Documents
-      formData.append('documentType', documentType);
+      // Append Profile Photo
       if (photoFile) formData.append('photo', photoFile);
-      if (docFrontFile) formData.append('documentFront', docFrontFile);
-      if (docBackFile) formData.append('documentBack', docBackFile);
 
       if (selectedRawFile) {
         formData.append('paymentScreenshot', selectedRawFile);
@@ -231,7 +169,7 @@ export default function ApplyMembershipPage() {
           <span>Apply for Verified Trust Membership</span>
         </h2>
         <p className="text-xs text-black mt-1 font-medium">
-          Upload KYC documents, select membership tier, and submit verification details for instant Trustee review.
+          Select membership tier and submit verification details for instant Trustee review.
         </p>
       </div>
 
@@ -258,10 +196,6 @@ export default function ApplyMembershipPage() {
             <div className="flex flex-wrap items-center justify-between gap-1 pb-2 border-b border-slate-200">
               <span className="text-slate-500 font-bold">Applicant Name:</span>
               <span className="font-extrabold text-slate-900">{currentUser?.name || guestName}</span>
-            </div>
-            <div className="flex flex-wrap items-center justify-between gap-1 pb-2 border-b border-slate-200">
-              <span className="text-slate-500 font-bold">Document Type Submitted:</span>
-              <span className="font-extrabold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">{documentType} (Front &amp; Back)</span>
             </div>
             <div className="flex flex-wrap items-center justify-between gap-1 pb-2 border-b border-slate-200">
               <span className="text-slate-500 font-bold">Membership Plan:</span>
@@ -312,10 +246,6 @@ export default function ApplyMembershipPage() {
                 setFileName('');
                 setPhotoFile(null);
                 setPhotoPreview('');
-                setDocFrontFile(null);
-                setDocFrontPreview('');
-                setDocBackFile(null);
-                setDocBackPreview('');
                 setFormError('');
               }}
               className="px-6 py-3 rounded-xl bg-red-50 text-red-700 border border-red-200 font-extrabold text-xs hover:bg-red-100 transition cursor-pointer"
@@ -425,17 +355,17 @@ export default function ApplyMembershipPage() {
             </div>
           )}
 
-          {/* STEP 1: APPLICANT PHOTO & KYC DUAL-SIDED DOCUMENT UPLOADS */}
+          {/* STEP 1: APPLICANT PHOTO */}
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-black">
               <span className="w-5 h-5 rounded-full bg-[#0b8026] text-white flex items-center justify-center text-[11px] font-bold">1</span>
-              <span>Applicant Photo &amp; Government ID Verification (KYC)</span>
+              <span>Applicant Photograph &amp; Verification</span>
             </div>
 
             <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-2xs space-y-6">
               
-              {/* Row A: User Photo Upload */}
-              <div className="border-b border-slate-100 pb-6">
+              {/* User Photo Upload */}
+              <div>
                 <label className="text-xs font-bold text-black mb-2 flex items-center gap-1.5">
                   <FiCamera className="text-[#0b8026] w-4 h-4" />
                   <span>Applicant Passport Size Photo / Profile Picture *</span>
@@ -486,147 +416,6 @@ export default function ApplyMembershipPage() {
                     </p>
                   </div>
                 </div>
-              </div>
-
-              {/* Row B: Document Type Selection */}
-              <div>
-                <label className="text-xs font-bold text-black mb-1.5 flex items-center gap-1.5">
-                  <FiShield className="text-[#0b8026] w-4 h-4" />
-                  <span>Select Government Verification Document Type *</span>
-                </label>
-                <select
-                  value={documentType}
-                  onChange={(e) => setDocumentType(e.target.value)}
-                  className="w-full sm:max-w-md p-3 text-xs border border-slate-300 rounded-xl bg-white font-semibold text-black focus:outline-none focus:ring-2 focus:ring-[#0b8026]"
-                >
-                  <option value="Aadhaar Card">Aadhaar Card (आधार कार्ड)</option>
-                  <option value="PAN Card">PAN Card (पैन कार्ड)</option>
-                  <option value="Voter ID Card">Voter ID Card (मतदाता पहचान पत्र)</option>
-                  <option value="Driving License">Driving License (ड्राइविंग लाइसेंस)</option>
-                  <option value="Passport">Passport (पासपोर्ट)</option>
-                  <option value="Other Government ID">Other Government Recognized Photo ID</option>
-                </select>
-              </div>
-
-              {/* Row C: Dual-Sided Document Uploads (Front & Back) */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
-                
-                {/* 1. FRONT SIDE UPLOAD */}
-                <div className="border border-slate-200 rounded-2xl p-4 bg-slate-50/70 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-black flex items-center gap-1.5">
-                      <FiFileText className="text-[#0b8026] w-3.5 h-3.5" />
-                      <span>{documentType} - FRONT Side *</span>
-                    </span>
-                    <span className="text-[10px] uppercase font-black px-2 py-0.5 rounded bg-emerald-100 text-[#0b8026]">
-                      Front Side (सामने)
-                    </span>
-                  </div>
-
-                  {!docFrontFile ? (
-                    <div className="border-2 border-dashed border-slate-300 hover:border-[#0b8026] rounded-xl p-5 text-center transition bg-white cursor-pointer">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        id="docFrontInput"
-                        onChange={handleDocFrontSelect}
-                        className="hidden"
-                      />
-                      <label htmlFor="docFrontInput" className="cursor-pointer space-y-2 block">
-                        <FiUploadCloud className="w-8 h-8 text-[#0b8026] mx-auto" />
-                        <div>
-                          <span className="text-xs font-bold text-[#0b8026] hover:underline block">
-                            Click to upload Front Side Scan
-                          </span>
-                          <span className="text-[10px] text-slate-500 block mt-0.5">
-                            Clear photo or scan (JPG, PNG up to 15MB)
-                          </span>
-                        </div>
-                      </label>
-                    </div>
-                  ) : (
-                    <div className="rounded-xl border border-emerald-200 bg-white p-3 space-y-2">
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="font-bold text-slate-800 truncate max-w-50">{docFrontFile.name}</span>
-                        <button
-                          type="button"
-                          onClick={handleRemoveDocFront}
-                          className="text-rose-600 hover:text-rose-700 font-bold text-[11px] cursor-pointer"
-                        >
-                          Change
-                        </button>
-                      </div>
-                      {docFrontPreview && (
-                        <div className="rounded-lg overflow-hidden border border-slate-100 bg-slate-50 max-h-40 flex items-center justify-center">
-                          <img src={docFrontPreview} alt="Document Front Preview" className="max-h-40 w-auto object-contain" />
-                        </div>
-                      )}
-                      <div className="text-[10px] text-emerald-700 font-bold flex items-center gap-1">
-                        <FiCheckCircle className="w-3.5 h-3.5 text-emerald-600" />
-                        <span>Front Side Attached Successfully</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* 2. BACK SIDE UPLOAD */}
-                <div className="border border-slate-200 rounded-2xl p-4 bg-slate-50/70 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-black flex items-center gap-1.5">
-                      <FiFileText className="text-[#dc2626] w-3.5 h-3.5" />
-                      <span>{documentType} - BACK Side *</span>
-                    </span>
-                    <span className="text-[10px] uppercase font-black px-2 py-0.5 rounded bg-red-100 text-red-700">
-                      Back Side (पीछे)
-                    </span>
-                  </div>
-
-                  {!docBackFile ? (
-                    <div className="border-2 border-dashed border-slate-300 hover:border-red-500 rounded-xl p-5 text-center transition bg-white cursor-pointer">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        id="docBackInput"
-                        onChange={handleDocBackSelect}
-                        className="hidden"
-                      />
-                      <label htmlFor="docBackInput" className="cursor-pointer space-y-2 block">
-                        <FiUploadCloud className="w-8 h-8 text-red-600 mx-auto" />
-                        <div>
-                          <span className="text-xs font-bold text-red-600 hover:underline block">
-                            Click to upload Back Side Scan
-                          </span>
-                          <span className="text-[10px] text-slate-500 block mt-0.5">
-                            Clear photo or scan (JPG, PNG up to 15MB)
-                          </span>
-                        </div>
-                      </label>
-                    </div>
-                  ) : (
-                    <div className="rounded-xl border border-red-200 bg-white p-3 space-y-2">
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="font-bold text-slate-800 truncate max-w-50">{docBackFile.name}</span>
-                        <button
-                          type="button"
-                          onClick={handleRemoveDocBack}
-                          className="text-rose-600 hover:text-rose-700 font-bold text-[11px] cursor-pointer"
-                        >
-                          Change
-                        </button>
-                      </div>
-                      {docBackPreview && (
-                        <div className="rounded-lg overflow-hidden border border-slate-100 bg-slate-50 max-h-40 flex items-center justify-center">
-                          <img src={docBackPreview} alt="Document Back Preview" className="max-h-40 w-auto object-contain" />
-                        </div>
-                      )}
-                      <div className="text-[10px] text-red-700 font-bold flex items-center gap-1">
-                        <FiCheckCircle className="w-3.5 h-3.5 text-red-600" />
-                        <span>Back Side Attached Successfully</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
               </div>
             </div>
           </div>
@@ -862,17 +651,6 @@ export default function ApplyMembershipPage() {
                 )}
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-black mb-1">Special Notes / Address Confirmation</label>
-                <input
-                  type="text"
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  placeholder="e.g. Enrolled for Aligarh youth welfare chapter..."
-                  className="w-full text-xs p-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 text-black bg-white"
-                />
-              </div>
-
               {/* Submit Button */}
               <div className="pt-3 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <span className="text-xs text-black font-semibold">
@@ -885,7 +663,7 @@ export default function ApplyMembershipPage() {
                   className="px-8 py-3 rounded-2xl bg-red-600 hover:bg-red-700 disabled:bg-slate-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none text-white font-bold text-xs shadow-md shadow-red-600/20 transition flex items-center justify-center gap-2 cursor-pointer"
                 >
                   {submitting
-                    ? 'Submitting Application & Documents...'
+                    ? 'Submitting Application...'
                     : (!isFormValid
                       ? 'Enter UTR or Attach Screenshot to Submit'
                       : 'Submit Application for Trustee Verification')}

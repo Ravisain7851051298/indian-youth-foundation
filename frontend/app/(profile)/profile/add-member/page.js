@@ -8,9 +8,7 @@ import {
   FiUserPlus,
   FiUploadCloud,
   FiCheckCircle,
-  FiShield,
   FiCreditCard,
-  FiFileText,
   FiArrowLeft,
   FiInfo,
   FiUser,
@@ -47,9 +45,6 @@ export default function CoordinatorAddMemberPage() {
     paymentMethod: 'UPI',
     utrNumber: '',
     paymentScreenshot: '',
-    documentType: 'Aadhaar Card',
-    documentFront: '',
-    documentBack: '',
     photoUrl: '',
     notes: ''
   });
@@ -211,7 +206,7 @@ export default function CoordinatorAddMemberPage() {
       <div className="bg-purple-50/80 border border-purple-200 rounded-2xl p-4 flex items-start gap-3 text-xs text-purple-950">
         <FiInfo className="w-5 h-5 text-purple-700 shrink-0 mt-0.5" />
         <div className="space-y-0.5 leading-relaxed font-medium">
-          <strong className="font-extrabold text-purple-900">Statutory Notice on Member Approvals:</strong> Members enrolled by coordinators are tagged as <span className="underline decoration-purple-600 font-bold">&quot;Added by Coordinator: {currentUser?.name}&quot;</span> in the Admin Approvals Center. The Trustee Admin will verify the payment screenshot and KYC documents before issuing the official Member ID and dual-sided identity credentials.
+          <strong className="font-extrabold text-purple-900">Statutory Notice on Member Approvals:</strong> Members enrolled by coordinators are tagged as <span className="underline decoration-purple-600 font-bold">&quot;Added by Coordinator: {currentUser?.name}&quot;</span> in the Admin Approvals Center. The Trustee Admin will verify the payment screenshot and application details before issuing the official Member ID and dual-sided identity credentials.
         </div>
       </div>
 
@@ -415,81 +410,29 @@ export default function CoordinatorAddMemberPage() {
           </div>
         </div>
 
-        {/* Section 3: Identity & KYC Documents */}
+        {/* Section 3: Member Photograph */}
         <div className="space-y-4 pt-4 border-t border-slate-200">
           <h3 className="text-sm font-black text-black uppercase tracking-wider flex items-center gap-2 pb-2 border-b border-slate-100">
-            <FiShield className="text-purple-700 w-4 h-4" />
-            <span>3. Government KYC Documents &amp; Photograph</span>
+            <FiCamera className="text-purple-700 w-4 h-4" />
+            <span>3. Member Formal Photograph</span>
           </h3>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
-            <div>
-              <label className="block font-bold text-black mb-1">Document Type</label>
-              <select
-                value={formData.documentType}
-                onChange={(e) => setFormData({ ...formData, documentType: e.target.value })}
-                className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-black bg-slate-50 focus:outline-purple-500 font-bold"
-              >
-                <option value="Aadhaar Card">Aadhaar Card</option>
-                <option value="Voter ID Card">Voter ID Card</option>
-                <option value="PAN Card">PAN Card</option>
-                <option value="Driving License">Driving License</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block font-bold text-black mb-1">Document Front Side</label>
-              <input
-                type="file"
-                accept="image/*,.pdf"
-                id="doc-front-upload"
-                onChange={(e) => handleFileUpload(e, 'documentFront')}
-                className="hidden"
-              />
-              <label
-                htmlFor="doc-front-upload"
-                className="w-full px-3 py-2.5 rounded-xl border border-dashed border-slate-300 hover:border-purple-500 bg-slate-50 hover:bg-purple-50 text-slate-700 font-bold cursor-pointer transition flex items-center justify-center gap-1.5"
-              >
-                <FiUploadCloud className="w-4 h-4 text-purple-700" />
-                <span>{uploadingField === 'documentFront' ? 'Uploading...' : (formData.documentFront ? '✓ Front Scan Attached' : 'Upload Front Scan')}</span>
-              </label>
-            </div>
-
-            <div>
-              <label className="block font-bold text-black mb-1">Document Back Side</label>
-              <input
-                type="file"
-                accept="image/*,.pdf"
-                id="doc-back-upload"
-                onChange={(e) => handleFileUpload(e, 'documentBack')}
-                className="hidden"
-              />
-              <label
-                htmlFor="doc-back-upload"
-                className="w-full px-3 py-2.5 rounded-xl border border-dashed border-slate-300 hover:border-purple-500 bg-slate-50 hover:bg-purple-50 text-slate-700 font-bold cursor-pointer transition flex items-center justify-center gap-1.5"
-              >
-                <FiUploadCloud className="w-4 h-4 text-purple-700" />
-                <span>{uploadingField === 'documentBack' ? 'Uploading...' : (formData.documentBack ? '✓ Back Scan Attached' : 'Upload Back Scan')}</span>
-              </label>
-            </div>
-
-            <div className="sm:col-span-2 lg:col-span-3">
-              <label className="block font-bold text-black mb-1">Member Passport Photo</label>
-              <input
-                type="file"
-                accept="image/*"
-                id="photo-upload"
-                onChange={(e) => handleFileUpload(e, 'photoUrl')}
-                className="hidden"
-              />
-              <label
-                htmlFor="photo-upload"
-                className="w-full px-3 py-2.5 rounded-xl border border-dashed border-slate-300 hover:border-purple-500 bg-slate-50 hover:bg-purple-50 text-slate-700 font-bold cursor-pointer transition flex items-center justify-center gap-1.5"
-              >
-                <FiCamera className="w-4 h-4 text-purple-700" />
-                <span>{uploadingField === 'photoUrl' ? 'Uploading photo...' : (formData.photoUrl ? '✓ Passport Photo Attached' : 'Upload Formal Member Photo')}</span>
-              </label>
-            </div>
+          <div className="text-xs">
+            <label className="block font-bold text-black mb-1">Member Passport Photo</label>
+            <input
+              type="file"
+              accept="image/*"
+              id="photo-upload"
+              onChange={(e) => handleFileUpload(e, 'photoUrl')}
+              className="hidden"
+            />
+            <label
+              htmlFor="photo-upload"
+              className="w-full px-3 py-2.5 rounded-xl border border-dashed border-slate-300 hover:border-purple-500 bg-slate-50 hover:bg-purple-50 text-slate-700 font-bold cursor-pointer transition flex items-center justify-center gap-1.5"
+            >
+              <FiCamera className="w-4 h-4 text-purple-700" />
+              <span>{uploadingField === 'photoUrl' ? 'Uploading photo...' : (formData.photoUrl ? '✓ Passport Photo Attached' : 'Upload Formal Member Photo')}</span>
+            </label>
           </div>
         </div>
 

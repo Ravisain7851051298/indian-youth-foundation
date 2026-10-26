@@ -7,7 +7,6 @@ import {
   FiHome,
   FiCheckSquare,
   FiLayers,
-  FiMail,
   FiSettings,
   FiLogOut,
   FiGlobe,
@@ -21,8 +20,6 @@ import {
   FiFileText,
   FiCalendar,
   FiImage,
-  FiChevronLeft,
-  FiChevronRight,
   FiSidebar,
   FiAward,
   FiActivity,
@@ -96,7 +93,6 @@ export default function AdminLayout({ children }) {
     { label: 'Membership Plans', href: '/dashboard/plans', icon: FiLayers },
     { label: 'Complaints & Enquries', href: '/dashboard/complaints', icon: FiAlertCircle, badge: pendingComplaints },
     { label: 'Review & Feedbacks', href: '/dashboard/feedback', icon: FiAlertCircle },
-    { label: 'Email Audit Logs', href: '/dashboard/email-logs', icon: FiMail },
     { label: 'Org Certificates', href: '/dashboard/certificates', icon: FiShield },
     { label: 'NGO Master Settings', href: '/settings', icon: FiSettings }
   ];
