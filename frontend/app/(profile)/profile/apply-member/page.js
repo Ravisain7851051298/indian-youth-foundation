@@ -9,13 +9,8 @@ import {
   FiCheckCircle,
   FiAlertTriangle,
   FiTrash2,
-  FiUser,
-  FiCamera,
-  FiImage,
   FiCopy,
-  FiX,
-  FiLock,
-  FiKey
+  FiX
 } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchPlans } from '@/store/planSlice';
@@ -32,28 +27,37 @@ export default function ApplyMembershipPage() {
   const [transactionId, setTransactionId] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('UPI / PhonePe / GPay');
 
-  // Guest applicant fields (active when user is not signed in)
-  const [guestName, setGuestName] = useState('');
-  const [guestEmail, setGuestEmail] = useState('');
-  const [guestPhone, setGuestPhone] = useState('');
-  const [guestBloodGroup, setGuestBloodGroup] = useState('O+');
-  const [guestDistrict, setGuestDistrict] = useState('Aligarh');
-  const [guestState, setGuestState] = useState('Uttar Pradesh');
-
-  // Applicant Photo State
-  const [photoFile, setPhotoFile] = useState(null);
-  const [photoPreview, setPhotoPreview] = useState('');
+  // Applicant fields (auto-filled if logged in, always displayed and fully editable)
+  const [applicantName, setApplicantName] = useState(currentUser?.name || '');
+  const [applicantEmail, setApplicantEmail] = useState(currentUser?.email || '');
+  const [applicantPhone, setApplicantPhone] = useState(currentUser?.phone || '');
+  const [applicantBloodGroup, setApplicantBloodGroup] = useState(currentUser?.bloodGroup || 'O+');
+  const [applicantDistrict, setApplicantDistrict] = useState(currentUser?.district || 'Aligarh');
+  const [applicantState, setApplicantState] = useState(currentUser?.state || 'Uttar Pradesh');
 
   // Payment Screenshot upload state
   const [selectedRawFile, setSelectedRawFile] = useState(null);
   const [fileName, setFileName] = useState('');
   const [previewUrl, setPreviewUrl] = useState('');
+
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [formError, setFormError] = useState('');
   const [createdCredentials, setCreatedCredentials] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [copiedId, setCopiedId] = useState(false);
   const [copiedPass, setCopiedPass] = useState(false);
+
+  // Auto-fill fields if currentUser is loaded or updates
+  useEffect(() => {
+    if (currentUser) {
+      if (currentUser.name) setApplicantName((prev) => prev || currentUser.name);
+      if (currentUser.email) setApplicantEmail((prev) => prev || currentUser.email);
+      if (currentUser.phone) setApplicantPhone((prev) => prev || currentUser.phone);
+      if (currentUser.bloodGroup) setApplicantBloodGroup((prev) => (prev && prev !== 'O+' ? prev : currentUser.bloodGroup || 'O+'));
+      if (currentUser.district) setApplicantDistrict((prev) => (prev && prev !== 'Aligarh' ? prev : currentUser.district || 'Aligarh'));
+      if (currentUser.state) setApplicantState((prev) => (prev && prev !== 'Uttar Pradesh' ? prev : currentUser.state || 'Uttar Pradesh'));
+    }
+  }, [currentUser]);
 
   const copyToClipboard = (text, type) => {
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
@@ -73,30 +77,14 @@ export default function ApplyMembershipPage() {
   }, [dispatch]);
 
   const effectivePlanId = selectedPlanId || plans[0]?._id;
-  const selectedPlan = plans.find(p => p._id === effectivePlanId) || plans[0];
-  const isFormValid = !!selectedPlan && (!!transactionId.trim() || !!selectedRawFile);
+  const selectedPlan = plans.find((p) => p._id === effectivePlanId) || plans[0];
+  const isFormValid =
+    !!selectedPlan &&
+    applicantName.trim().length > 0 &&
+    applicantPhone.trim().length >= 10 &&
+    (!!transactionId.trim() || !!selectedRawFile);
 
   // File Handlers
-  const handlePhotoSelect = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > 10 * 1024 * 1024) {
-      setFormError('Applicant photo size must be under 10MB.');
-      return;
-    }
-    setFormError('');
-    setPhotoFile(file);
-    setPhotoPreview(URL.createObjectURL(file));
-  };
-
-  const handleRemovePhoto = () => {
-    if (photoPreview && photoPreview.startsWith('blob:')) URL.revokeObjectURL(photoPreview);
-    setPhotoPreview('');
-    setPhotoFile(null);
-    const input = document.getElementById('userPhotoInput');
-    if (input) input.value = '';
-  };
-
   const handleFileSelect = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -132,18 +120,13 @@ export default function ApplyMembershipPage() {
       return;
     }
 
-    if (!currentUser && (!guestName.trim() || !guestPhone.trim())) {
-      setFormError('Please enter your Full Legal Name and 10-digit Mobile Number.');
+    if (!applicantName.trim() || !applicantPhone.trim() || applicantPhone.trim().length < 10) {
+      setFormError('Please enter your Full Legal Name and a valid 10-digit Mobile Number.');
       return;
     }
 
-    if (!photoFile && !currentUser?.photoUrl) {
-      setFormError('Please upload your User Image / Passport Photo for ID card generation.');
-      return;
-    }
-
-    if (!transactionId && !selectedRawFile) {
-      setFormError('Please provide your Transaction UTR or select a payment screenshot');
+    if (!transactionId.trim() && !selectedRawFile) {
+      setFormError('Please provide your Transaction UTR or upload a payment screenshot.');
       return;
     }
 
@@ -151,22 +134,19 @@ export default function ApplyMembershipPage() {
 
     try {
       const formData = new FormData();
-      formData.append('name', currentUser ? currentUser.name : guestName.trim());
-      formData.append('email', currentUser ? (currentUser.email || '') : (guestEmail.trim() || ''));
-      formData.append('phone', currentUser ? currentUser.phone : guestPhone.trim());
-      formData.append('bloodGroup', currentUser?.bloodGroup || guestBloodGroup);
-      formData.append('district', currentUser?.district || guestDistrict);
-      formData.append('state', currentUser?.state || guestState);
+      formData.append('name', applicantName.trim());
+      formData.append('email', applicantEmail.trim());
+      formData.append('phone', applicantPhone.trim());
+      formData.append('bloodGroup', applicantBloodGroup);
+      formData.append('district', applicantDistrict);
+      formData.append('state', applicantState);
       formData.append('planId', selectedPlan._id);
       formData.append('planName', selectedPlan.name || selectedPlan.title || 'Membership Plan');
       formData.append('feeAmount', selectedPlan.fee || selectedPlan.price || 250);
       formData.append('paymentMethod', paymentMethod);
-      formData.append('transactionId', transactionId);
-      formData.append('utrNumber', transactionId);
+      formData.append('transactionId', transactionId.trim() || (selectedRawFile ? 'SCREENSHOT_ATTACHED' : 'PENDING_VERIFICATION'));
+      formData.append('utrNumber', transactionId.trim() || (selectedRawFile ? 'SCREENSHOT_ATTACHED' : 'PENDING_VERIFICATION'));
       formData.append('category', 'applications');
-
-      // Append Profile Photo
-      if (photoFile) formData.append('photo', photoFile);
 
       if (selectedRawFile) {
         formData.append('paymentScreenshot', selectedRawFile);
@@ -176,8 +156,9 @@ export default function ApplyMembershipPage() {
 
       const creds = res?.credentials || {
         id: res?.application?.assignedMemberId || 'BYK-MEM-PENDING',
-        password: (currentUser ? currentUser.phone : guestPhone.trim()),
-        email: (currentUser ? (currentUser.email || '') : (guestEmail.trim() || ''))
+        password: applicantPhone.trim(),
+        email: applicantEmail.trim(),
+        name: applicantName.trim()
       };
 
       setCreatedCredentials(creds);
@@ -198,7 +179,7 @@ export default function ApplyMembershipPage() {
           <span>Apply for Verified Trust Membership</span>
         </h2>
         <p className="text-xs text-black mt-1 font-medium">
-          Select membership tier and submit verification details for instant Trustee review.
+          Select membership tier, make contribution via QR/Bank, and submit details for instant Trustee review.
         </p>
       </div>
 
@@ -274,17 +255,23 @@ export default function ApplyMembershipPage() {
           <div className="bg-slate-50 rounded-2xl p-4 sm:p-5 border border-slate-200 text-xs space-y-2.5">
             <div className="flex flex-wrap items-center justify-between gap-1 pb-2 border-b border-slate-200">
               <span className="text-slate-500 font-bold">Applicant Name:</span>
-              <span className="font-extrabold text-slate-900">{currentUser?.name || guestName}</span>
+              <span className="font-extrabold text-slate-900">{createdCredentials?.name || applicantName}</span>
             </div>
             <div className="flex flex-wrap items-center justify-between gap-1 pb-2 border-b border-slate-200">
               <span className="text-slate-500 font-bold">Membership Plan:</span>
-              <span className="font-extrabold text-slate-900">{selectedPlan?.name || selectedPlan?.title} (₹{selectedPlan?.fee || selectedPlan?.price || 250})</span>
+              <span className="font-extrabold text-slate-900">{selectedPlan?.name || selectedPlan?.title} (₹{Number(selectedPlan?.fee || selectedPlan?.price || 250).toLocaleString('en-IN')})</span>
             </div>
-            <div className="flex flex-wrap items-center justify-between gap-1">
+            <div className="flex flex-wrap items-center justify-between gap-1 pb-2 border-b border-slate-200">
               <span className="text-slate-500 font-bold">UTR / Payment Reference:</span>
               <code className="font-black text-emerald-800 bg-emerald-100/70 px-2.5 py-1 rounded-lg border border-emerald-300">
-                {transactionId || 'Payment Screenshot Attached'}
+                {transactionId || (fileName ? `Screenshot: ${fileName}` : 'Verification Pending')}
               </code>
+            </div>
+            <div className="flex flex-wrap items-center justify-between gap-1">
+              <span className="text-slate-500 font-bold">Status:</span>
+              <span className="font-extrabold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md">
+                Application Received • Ready for Login
+              </span>
             </div>
           </div>
 
@@ -329,8 +316,6 @@ export default function ApplyMembershipPage() {
                 setSelectedRawFile(null);
                 setPreviewUrl('');
                 setFileName('');
-                setPhotoFile(null);
-                setPhotoPreview('');
                 setFormError('');
               }}
               className="px-6 py-3 rounded-xl bg-red-50 text-red-700 border border-red-200 font-extrabold text-xs hover:bg-red-100 transition cursor-pointer"
@@ -340,7 +325,7 @@ export default function ApplyMembershipPage() {
           </div>
         </div>
       ) : (
-        <>
+        <form onSubmit={handleSubmit} className="space-y-6">
           {/* Global Alert Notification */}
           {(formError || reduxError) && (
             <div className="p-4 rounded-2xl bg-rose-50 border-2 border-rose-300 text-rose-800 text-xs font-bold flex items-start gap-3 shadow-sm animate-in fade-in slide-in-from-top-1">
@@ -352,165 +337,109 @@ export default function ApplyMembershipPage() {
             </div>
           )}
 
-          {/* Guest Applicant Details Section */}
-          {!currentUser && (
-            <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-black uppercase tracking-wider text-[#0b8026]">
-                  Email is optional. You can also add or update email from your profile.
-                </span>
-                <Link href="/login?role=member&redirect=/apply-member" className="text-xs font-bold text-blue-600 hover:underline">
-                  Already have an account? Sign in
-                </Link>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                <div>
-                  <label className="block font-bold text-black mb-1">Full Legal Name *</label>
-                  <input
-                    type="text"
-                    required
-                    value={guestName}
-                    onChange={(e) => setGuestName(e.target.value)}
-                    placeholder="Name as per Aadhaar"
-                    className="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-medium text-black focus:ring-2 focus:ring-red-500"
-                  />
+          {/* Applicant Details Section (Auto-filled if logged in, editable for new / existing users, ALWAYS displayed) */}
+          <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              {currentUser ? (
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span className="text-xs font-bold text-slate-800">
+                    Logged in as <strong className="text-[#0b8026]">{currentUser.name}</strong> • Details auto-filled (You can edit or enter new details if needed)
+                  </span>
                 </div>
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="font-bold text-black">Email Address</label>
-                    <span className="text-[10px] text-slate-500 font-semibold">(Optional)</span>
-                  </div>
-                  <input
-                    type="email"
-                    value={guestEmail}
-                    onChange={(e) => setGuestEmail(e.target.value)}
-                    placeholder="e.g. name@domain.com (optional)"
-                    className="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-medium text-black focus:ring-2 focus:ring-red-500"
-                  />
-                </div>
-                <div>
-                  <label className="block font-bold text-black mb-1">Mobile Number *</label>
-                  <input
-                    type="tel"
-                    required
-                    value={guestPhone}
-                    onChange={(e) => setGuestPhone(e.target.value)}
-                    placeholder="10-digit mobile"
-                    className="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-medium text-black focus:ring-2 focus:ring-red-500"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                <div>
-                  <label className="block font-bold text-black mb-1">Blood Group</label>
-                  <select
-                    value={guestBloodGroup}
-                    onChange={(e) => setGuestBloodGroup(e.target.value)}
-                    className="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-medium text-black"
-                  >
-                    <option value="O+">O+</option>
-                    <option value="O-">O-</option>
-                    <option value="A+">A+</option>
-                    <option value="A-">A-</option>
-                    <option value="B+">B+</option>
-                    <option value="B-">B-</option>
-                    <option value="AB+">AB+</option>
-                    <option value="AB-">AB-</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block font-bold text-black mb-1">District / City</label>
-                  <input
-                    type="text"
-                    value={guestDistrict}
-                    onChange={(e) => setGuestDistrict(e.target.value)}
-                    className="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-medium text-black"
-                  />
-                </div>
-                <div>
-                  <label className="block font-bold text-black mb-1">State</label>
-                  <input
-                    type="text"
-                    value={guestState}
-                    onChange={(e) => setGuestState(e.target.value)}
-                    className="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-medium text-black"
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* STEP 1: APPLICANT PHOTO */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-black">
-              <span className="w-5 h-5 rounded-full bg-[#0b8026] text-white flex items-center justify-center text-[11px] font-bold">1</span>
-              <span>Applicant Photograph &amp; Verification</span>
+              ) : (
+                <>
+                  <span className="text-xs font-black uppercase tracking-wider text-[#0b8026]">
+                    Email is optional. You can also add or update email from your profile.
+                  </span>
+                  <Link href="/login?role=member&redirect=/apply-member" className="text-xs font-bold text-blue-600 hover:underline">
+                    Already have an account? Sign in
+                  </Link>
+                </>
+              )}
             </div>
 
-            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-2xs space-y-6">
-              
-              {/* User Photo Upload */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
               <div>
-                <label className="text-xs font-bold text-black mb-2 flex items-center gap-1.5">
-                  <FiCamera className="text-[#0b8026] w-4 h-4" />
-                  <span>Applicant Passport Size Photo / Profile Picture *</span>
-                </label>
-
-                <div className="flex flex-col sm:flex-row items-center gap-5">
-                  {/* Photo Preview Circle */}
-                  <div className="w-24 h-24 rounded-full border-2 border-dashed border-[#0b8026] p-1 bg-slate-50 flex items-center justify-center overflow-hidden shrink-0 shadow-xs relative">
-                    {photoPreview ? (
-                      <img
-                        src={photoPreview}
-                        alt="Applicant Preview"
-                        className="w-full h-full object-cover rounded-full"
-                      />
-                    ) : (
-                      <FiUser className="w-10 h-10 text-slate-300" />
-                    )}
-                  </div>
-
-                  <div className="flex-1 space-y-2 text-center sm:text-left">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      id="userPhotoInput"
-                      onChange={handlePhotoSelect}
-                      className="hidden"
-                    />
-                    <div className="flex flex-wrap items-center gap-2 justify-center sm:justify-start">
-                      <label
-                        htmlFor="userPhotoInput"
-                        className="px-4 py-2 rounded-xl bg-[#0b8026] hover:bg-[#075018] text-white font-bold text-xs cursor-pointer shadow-xs transition inline-flex items-center gap-1.5"
-                      >
-                        <FiUploadCloud className="w-4 h-4" />
-                        <span>{photoFile ? 'Change Photo' : 'Upload User Image'}</span>
-                      </label>
-                      {photoFile && (
-                        <button
-                          type="button"
-                          onClick={handleRemovePhoto}
-                          className="px-3 py-2 rounded-xl bg-slate-100 hover:bg-rose-50 text-rose-600 font-bold text-xs transition cursor-pointer"
-                        >
-                          Remove
-                        </button>
-                      )}
-                    </div>
-                    <p className="text-[11px] text-slate-500 font-medium">
-                      Clear frontal passport photograph (JPG, PNG, WEBP up to 10MB). Used for printing on your official dual-sided ID card.
-                    </p>
-                  </div>
+                <label className="block font-bold text-black mb-1">Full Legal Name *</label>
+                <input
+                  type="text"
+                  required
+                  value={applicantName}
+                  onChange={(e) => setApplicantName(e.target.value)}
+                  placeholder="Name as per Aadhaar"
+                  className="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-medium text-black focus:ring-2 focus:ring-red-500"
+                />
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="font-bold text-black">Email Address</label>
+                  <span className="text-[10px] text-slate-500 font-semibold">(Optional)</span>
                 </div>
+                <input
+                  type="email"
+                  value={applicantEmail}
+                  onChange={(e) => setApplicantEmail(e.target.value)}
+                  placeholder="e.g. name@domain.com (optional)"
+                  className="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-medium text-black focus:ring-2 focus:ring-red-500"
+                />
+              </div>
+              <div>
+                <label className="block font-bold text-black mb-1">Mobile Number *</label>
+                <input
+                  type="tel"
+                  required
+                  value={applicantPhone}
+                  onChange={(e) => setApplicantPhone(e.target.value)}
+                  placeholder="10-digit mobile"
+                  className="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-medium text-black focus:ring-2 focus:ring-red-500"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+              <div>
+                <label className="block font-bold text-black mb-1">Blood Group</label>
+                <select
+                  value={applicantBloodGroup}
+                  onChange={(e) => setApplicantBloodGroup(e.target.value)}
+                  className="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-medium text-black"
+                >
+                  <option value="O+">O+</option>
+                  <option value="O-">O-</option>
+                  <option value="A+">A+</option>
+                  <option value="A-">A-</option>
+                  <option value="B+">B+</option>
+                  <option value="B-">B-</option>
+                  <option value="AB+">AB+</option>
+                  <option value="AB-">AB-</option>
+                </select>
+              </div>
+              <div>
+                <label className="block font-bold text-black mb-1">District / City</label>
+                <input
+                  type="text"
+                  value={applicantDistrict}
+                  onChange={(e) => setApplicantDistrict(e.target.value)}
+                  className="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-medium text-black"
+                />
+              </div>
+              <div>
+                <label className="block font-bold text-black mb-1">State</label>
+                <input
+                  type="text"
+                  value={applicantState}
+                  onChange={(e) => setApplicantState(e.target.value)}
+                  className="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-medium text-black"
+                />
               </div>
             </div>
           </div>
 
-          {/* STEP 2: SELECT MEMBERSHIP TIER */}
+          {/* STEP 1: SELECT MEMBERSHIP TIER */}
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-black">
-              <span className="w-5 h-5 rounded-full bg-red-600 text-white flex items-center justify-center text-[11px] font-bold">2</span>
+              <span className="w-5 h-5 rounded-full bg-red-600 text-white flex items-center justify-center text-[11px] font-bold">1</span>
               <span>Select Your Membership Tier</span>
             </div>
 
@@ -521,10 +450,11 @@ export default function ApplyMembershipPage() {
                   <div
                     key={plan._id}
                     onClick={() => setSelectedPlanId(plan._id)}
-                    className={`cursor-pointer rounded-3xl p-5 border transition flex flex-col justify-between ${isSelected
-                      ? 'border-red-600 ring-2 ring-red-500/20 bg-red-50/30 shadow-md'
-                      : 'border-slate-200 bg-white hover:border-red-300'
-                      }`}
+                    className={`cursor-pointer rounded-3xl p-5 border transition flex flex-col justify-between ${
+                      isSelected
+                        ? 'border-red-600 ring-2 ring-red-500/20 bg-red-50/30 shadow-md'
+                        : 'border-slate-200 bg-white hover:border-red-300'
+                    }`}
                   >
                     <div>
                       <div className="flex items-center justify-between">
@@ -555,8 +485,11 @@ export default function ApplyMembershipPage() {
                     </div>
 
                     <div className="mt-5 pt-3 border-t border-slate-100">
-                      <div className={`w-full py-2 rounded-xl text-center text-xs font-bold transition flex items-center justify-center gap-1 ${isSelected ? 'bg-red-600 text-white shadow-xs' : 'bg-slate-100 text-black hover:bg-slate-200'
-                        }`}>
+                      <div
+                        className={`w-full py-2 rounded-xl text-center text-xs font-bold transition flex items-center justify-center gap-1 ${
+                          isSelected ? 'bg-red-600 text-white shadow-xs' : 'bg-slate-100 text-black hover:bg-slate-200'
+                        }`}
+                      >
                         {isSelected ? (
                           <>
                             <FiCheck className="w-3.5 h-3.5" />
@@ -573,10 +506,10 @@ export default function ApplyMembershipPage() {
             </div>
           </div>
 
-          {/* STEP 3: PAYMENT DETAILS (UPI QR & BANK TRANSFER) */}
+          {/* STEP 2: PAYMENT DETAILS (UPI QR & BANK TRANSFER) */}
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-black">
-              <span className="w-5 h-5 rounded-full bg-red-600 text-white flex items-center justify-center text-[11px] font-bold">3</span>
+              <span className="w-5 h-5 rounded-full bg-red-600 text-white flex items-center justify-center text-[11px] font-bold">2</span>
               <span>Transfer Membership Contribution (₹{Number(selectedPlan?.fee || selectedPlan?.price || 250).toLocaleString('en-IN')})</span>
             </div>
 
@@ -634,10 +567,10 @@ export default function ApplyMembershipPage() {
             </div>
           </div>
 
-          {/* STEP 4: SUBMIT PAYMENT PROOF & FINALIZE APPLICATION */}
-          <form onSubmit={handleSubmit} className="space-y-4">
+          {/* STEP 3: SUBMIT PAYMENT PROOF & FINALIZE APPLICATION */}
+          <div className="space-y-4">
             <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-black">
-              <span className="w-5 h-5 rounded-full bg-red-600 text-white flex items-center justify-center text-[11px] font-bold">4</span>
+              <span className="w-5 h-5 rounded-full bg-red-600 text-white flex items-center justify-center text-[11px] font-bold">3</span>
               <span>Submit Payment Proof for Verification</span>
             </div>
 
@@ -649,7 +582,6 @@ export default function ApplyMembershipPage() {
                   </label>
                   <input
                     type="text"
-                    required
                     value={transactionId}
                     onChange={(e) => setTransactionId(e.target.value)}
                     placeholder="e.g. 429188291039 or UPI/429188..."
@@ -675,10 +607,10 @@ export default function ApplyMembershipPage() {
                 </div>
               </div>
 
-              {/* Screenshot Selection with Local Preview & Remove Option (Single-API) */}
+              {/* Screenshot Selection with Local Preview & Remove Option */}
               <div>
                 <label className="block text-xs font-bold text-black mb-1">
-                  Upload Payment Transfer Screenshot (PNG / JPG) *
+                  Upload Payment Transfer Screenshot (PNG / JPG)
                 </label>
 
                 {!selectedRawFile ? (
@@ -741,7 +673,7 @@ export default function ApplyMembershipPage() {
               {/* Submit Button */}
               <div className="pt-3 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <span className="text-xs text-black font-semibold">
-                  Selected: <strong className="text-red-700 font-bold">{selectedPlan?.name || selectedPlan?.title}</strong> (₹{selectedPlan?.fee || selectedPlan?.price || 250})
+                  Selected: <strong className="text-red-700 font-bold">{selectedPlan?.name || selectedPlan?.title}</strong> (₹{Number(selectedPlan?.fee || selectedPlan?.price || 250).toLocaleString('en-IN')})
                 </span>
 
                 <button
@@ -753,12 +685,12 @@ export default function ApplyMembershipPage() {
                     ? 'Submitting Application...'
                     : (!isFormValid
                       ? 'Enter UTR or Attach Screenshot to Submit'
-                      : 'Submit Application for Trustee Verification')}
+                      : 'Submit Application & Get Member ID')}
                 </button>
               </div>
             </div>
-          </form>
-        </>
+          </div>
+        </form>
       )}
 
       {/* POPUP MODAL DISPLAYING ASSIGNED MEMBER ID & PASSWORD */}

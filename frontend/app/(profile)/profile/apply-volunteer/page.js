@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   FiUserCheck,
@@ -27,22 +27,13 @@ export default function ApplyVolunteerPage() {
   const { loading } = useSelector((state) => state.applications);
   const { currentUser, settings } = useNGO();
 
-  const [skills, setSkills] = useState('Teaching & Social Work');
-  const [availability, setAvailability] = useState('Weekends & Evenings');
-  const [interests, setInterests] = useState('Child Education & Emergency Blood Donation');
-  const [whyJoin, setWhyJoin] = useState('');
-
-  // Guest applicant fields (active when user is not signed in)
-  const [guestName, setGuestName] = useState('');
-  const [guestEmail, setGuestEmail] = useState('');
-  const [guestPhone, setGuestPhone] = useState('');
-  const [guestBloodGroup, setGuestBloodGroup] = useState('O+');
-  const [guestDistrict, setGuestDistrict] = useState('Aligarh');
-  const [guestState, setGuestState] = useState('Uttar Pradesh');
-
-  // Applicant Photo State
-  const [photoFile, setPhotoFile] = useState(null);
-  const [photoPreview, setPhotoPreview] = useState('');
+  // Applicant fields (auto-filled if logged in, editable for new / existing users)
+  const [applicantName, setApplicantName] = useState(currentUser?.name || '');
+  const [applicantEmail, setApplicantEmail] = useState(currentUser?.email || '');
+  const [applicantPhone, setApplicantPhone] = useState(currentUser?.phone || '');
+  const [applicantBloodGroup, setApplicantBloodGroup] = useState(currentUser?.bloodGroup || 'O+');
+  const [applicantDistrict, setApplicantDistrict] = useState(currentUser?.district || 'Aligarh');
+  const [applicantState, setApplicantState] = useState(currentUser?.state || 'Uttar Pradesh');
 
   const [validationError, setValidationError] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -50,6 +41,18 @@ export default function ApplyVolunteerPage() {
   const [showModal, setShowModal] = useState(false);
   const [copiedId, setCopiedId] = useState(false);
   const [copiedPass, setCopiedPass] = useState(false);
+
+  // Auto-fill fields if currentUser is loaded or updates
+  useEffect(() => {
+    if (currentUser) {
+      if (currentUser.name) setApplicantName((prev) => prev || currentUser.name);
+      if (currentUser.email) setApplicantEmail((prev) => prev || currentUser.email);
+      if (currentUser.phone) setApplicantPhone((prev) => prev || currentUser.phone);
+      if (currentUser.bloodGroup) setApplicantBloodGroup((prev) => (prev && prev !== 'O+' ? prev : currentUser.bloodGroup || 'O+'));
+      if (currentUser.district) setApplicantDistrict((prev) => (prev && prev !== 'Aligarh' ? prev : currentUser.district || 'Aligarh'));
+      if (currentUser.state) setApplicantState((prev) => (prev && prev !== 'Uttar Pradesh' ? prev : currentUser.state || 'Uttar Pradesh'));
+    }
+  }, [currentUser]);
 
   const copyToClipboard = (text, type) => {
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
@@ -64,36 +67,12 @@ export default function ApplyVolunteerPage() {
     }
   };
 
-  // File Handlers
-  const handlePhotoSelect = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > 10 * 1024 * 1024) {
-      setValidationError('Applicant photo size must be under 10MB.');
-      return;
-    }
-    setValidationError('');
-    setPhotoFile(file);
-    setPhotoPreview(URL.createObjectURL(file));
-  };
-
-  const handleRemovePhoto = () => {
-    if (photoPreview && photoPreview.startsWith('blob:')) URL.revokeObjectURL(photoPreview);
-    setPhotoPreview('');
-    setPhotoFile(null);
-    const input = document.getElementById('volPhotoInput');
-    if (input) input.value = '';
-  };
+  const isFormValid = applicantName.trim().length > 0 && applicantPhone.trim().length >= 10;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!currentUser && (!guestName.trim() || !guestPhone.trim())) {
-      setValidationError('Please provide your Full Legal Name and 10-digit Mobile Number.');
-      return;
-    }
-
-    if (!photoFile && !currentUser?.photoUrl) {
-      setValidationError('Please upload applicant user photo / profile picture.');
+    if (!applicantName.trim() || !applicantPhone.trim() || applicantPhone.trim().length < 10) {
+      setValidationError('Please provide your Full Legal Name and a valid 10-digit Mobile Number.');
       return;
     }
 
@@ -101,28 +80,26 @@ export default function ApplyVolunteerPage() {
 
     try {
       const formData = new FormData();
-      formData.append('name', currentUser ? currentUser.name : guestName.trim());
-      formData.append('email', currentUser ? (currentUser.email || '') : (guestEmail.trim() || ''));
-      formData.append('phone', currentUser ? currentUser.phone : guestPhone.trim());
-      formData.append('bloodGroup', currentUser?.bloodGroup || guestBloodGroup);
-      formData.append('district', currentUser?.district || guestDistrict);
-      formData.append('state', currentUser?.state || guestState);
-      formData.append('skills', skills);
-      formData.append('availability', availability);
-      formData.append('interests', interests);
-      formData.append('motivation', whyJoin);
-      formData.append('whyJoin', whyJoin);
+      formData.append('name', applicantName.trim());
+      formData.append('email', applicantEmail.trim());
+      formData.append('phone', applicantPhone.trim());
+      formData.append('bloodGroup', applicantBloodGroup);
+      formData.append('district', applicantDistrict);
+      formData.append('state', applicantState);
+      formData.append('skills', 'Social Work & Community Outreach');
+      formData.append('availability', 'Weekends & Evenings');
+      formData.append('interests', 'Social Welfare & Field Work');
+      formData.append('motivation', 'Community Service');
+      formData.append('whyJoin', 'Community Service');
       formData.append('category', 'applications');
-
-      // Append Profile Photo
-      if (photoFile) formData.append('photo', photoFile);
 
       const res = await dispatch(submitVolunteerApplication(formData)).unwrap();
 
       const creds = res?.credentials || {
         id: res?.application?.assignedVolunteerId || 'BYK-VOL-PENDING',
-        password: (currentUser ? currentUser.phone : guestPhone.trim()),
-        email: (currentUser ? (currentUser.email || '') : (guestEmail.trim() || ''))
+        password: applicantPhone.trim(),
+        email: applicantEmail.trim(),
+        name: applicantName.trim()
       };
 
       setCreatedCredentials(creds);
@@ -153,7 +130,7 @@ export default function ApplyVolunteerPage() {
           </div>
 
           <p className="text-xs text-slate-700 leading-relaxed font-medium">
-            Thank you, <strong className="text-black">{currentUser?.name || guestName}</strong>! Your volunteer profile has been registered and forwarded to the Trustee Verification Desk.
+            Thank you, <strong className="text-black">{createdCredentials?.name || applicantName}</strong>! Your volunteer profile has been registered and forwarded to the Trustee Verification Desk.
           </p>
 
           {createdCredentials && (
@@ -244,237 +221,126 @@ export default function ApplyVolunteerPage() {
             </div>
           )}
 
-          {/* Guest User Information Inputs */}
-          {!currentUser && (
-            <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-black uppercase tracking-wider text-[#0b8026]">
-                  Email is optional. You can also add or update email from your profile.
-                </span>
-                <Link href="/login?role=volunteer&redirect=/apply-volunteer" className="text-xs font-bold text-blue-600 hover:underline">
-                  Already have an account? Sign in
-                </Link>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                <div>
-                  <label className="block font-bold text-black mb-1">Full Legal Name *</label>
-                  <input
-                    type="text"
-                    required
-                    value={guestName}
-                    onChange={(e) => setGuestName(e.target.value)}
-                    placeholder="Legal full name"
-                    className="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-medium text-black focus:ring-2 focus:ring-red-500"
-                  />
+          {/* Applicant Details Section (Auto-filled if logged in, editable for new / existing users) */}
+          <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              {currentUser ? (
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span className="text-xs font-bold text-slate-800">
+                    Logged in as <strong className="text-[#0b8026]">{currentUser.name}</strong> • Details auto-filled (You can edit or enter new details if needed)
+                  </span>
                 </div>
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="font-bold text-black">Email Address</label>
-                    <span className="text-[10px] text-slate-500 font-semibold">(Optional)</span>
-                  </div>
-                  <input
-                    type="email"
-                    value={guestEmail}
-                    onChange={(e) => setGuestEmail(e.target.value)}
-                    placeholder="e.g. name@domain.com (optional)"
-                    className="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-medium text-black focus:ring-2 focus:ring-red-500"
-                  />
-                </div>
-                <div>
-                  <label className="block font-bold text-black mb-1">Mobile Number *</label>
-                  <input
-                    type="tel"
-                    required
-                    value={guestPhone}
-                    onChange={(e) => setGuestPhone(e.target.value)}
-                    placeholder="10-digit mobile"
-                    className="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-medium text-black focus:ring-2 focus:ring-red-500"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                <div>
-                  <label className="block font-bold text-black mb-1">Blood Group</label>
-                  <select
-                    value={guestBloodGroup}
-                    onChange={(e) => setGuestBloodGroup(e.target.value)}
-                    className="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-medium text-black"
-                  >
-                    <option value="O+">O+</option>
-                    <option value="O-">O-</option>
-                    <option value="A+">A+</option>
-                    <option value="A-">A-</option>
-                    <option value="B+">B+</option>
-                    <option value="B-">B-</option>
-                    <option value="AB+">AB+</option>
-                    <option value="AB-">AB-</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block font-bold text-black mb-1">District / City</label>
-                  <input
-                    type="text"
-                    value={guestDistrict}
-                    onChange={(e) => setGuestDistrict(e.target.value)}
-                    className="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-medium text-black"
-                  />
-                </div>
-                <div>
-                  <label className="block font-bold text-black mb-1">State</label>
-                  <input
-                    type="text"
-                    value={guestState}
-                    onChange={(e) => setGuestState(e.target.value)}
-                    className="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-medium text-black"
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* STEP 1: APPLICANT USER PHOTO */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-black">
-              <span className="w-5 h-5 rounded-full bg-[#0b8026] text-white flex items-center justify-center text-[11px] font-bold">1</span>
-              <span>Volunteer Photo &amp; Profile Verification</span>
+              ) : (
+                <>
+                  <span className="text-xs font-black uppercase tracking-wider text-[#0b8026]">
+                    Email is optional. You can also add or update email from your profile.
+                  </span>
+                  <Link href="/login?role=volunteer&redirect=/apply-volunteer" className="text-xs font-bold text-blue-600 hover:underline">
+                    Already have an account? Sign in
+                  </Link>
+                </>
+              )}
             </div>
 
-            <div className="bg-slate-50/60 rounded-3xl p-6 sm:p-7 border border-slate-200 space-y-6">
-
-              {/* User Photo Upload */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
               <div>
-                <label className="text-xs font-bold text-black mb-2 flex items-center gap-1.5">
-                  <FiCamera className="text-[#0b8026] w-4 h-4" />
-                  <span>Applicant Passport Size Photo / Profile Picture *</span>
-                </label>
-
-                <div className="flex flex-col sm:flex-row items-center gap-5">
-                  {/* Photo Preview Circle */}
-                  <div className="w-24 h-24 rounded-full border-2 border-dashed border-[#0b8026] p-1 bg-white flex items-center justify-center overflow-hidden shrink-0 shadow-xs relative">
-                    {photoPreview ? (
-                      <img
-                        src={photoPreview}
-                        alt="Applicant Preview"
-                        className="w-full h-full object-cover rounded-full"
-                      />
-                    ) : (
-                      <FiUser className="w-10 h-10 text-slate-300" />
-                    )}
-                  </div>
-
-                  <div className="flex-1 space-y-2 text-center sm:text-left">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      id="volPhotoInput"
-                      onChange={handlePhotoSelect}
-                      className="hidden"
-                    />
-                    <div className="flex flex-wrap items-center gap-2 justify-center sm:justify-start">
-                      <label
-                        htmlFor="volPhotoInput"
-                        className="px-4 py-2 rounded-xl bg-[#0b8026] hover:bg-[#075018] text-white font-bold text-xs cursor-pointer shadow-xs transition inline-flex items-center gap-1.5"
-                      >
-                        <FiUploadCloud className="w-4 h-4" />
-                        <span>{photoFile ? 'Change Photo' : 'Upload Volunteer Photo'}</span>
-                      </label>
-                      {photoFile && (
-                        <button
-                          type="button"
-                          onClick={handleRemovePhoto}
-                          className="px-3 py-2 rounded-xl bg-white hover:bg-rose-50 text-rose-600 font-bold text-xs transition cursor-pointer border border-slate-200"
-                        >
-                          Remove
-                        </button>
-                      )}
-                    </div>
-                    <p className="text-[11px] text-slate-500 font-medium">
-                      Clear frontal passport photograph (JPG, PNG, WEBP up to 10MB). Used for issuing your volunteer appointment badge.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* STEP 2: VOLUNTEER SKILLS & PREFERENCES */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-black">
-              <span className="w-5 h-5 rounded-full bg-red-600 text-white flex items-center justify-center text-[11px] font-bold">2</span>
-              <span>Volunteer Skills &amp; Preferences</span>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-              <div>
-                <label className="block font-bold text-black mb-1">Key Skills &amp; Capabilities *</label>
+                <label className="block font-bold text-black mb-1">Full Legal Name *</label>
                 <input
                   type="text"
                   required
-                  value={skills}
-                  onChange={(e) => setSkills(e.target.value)}
-                  placeholder="e.g. Teaching, First Aid, Event Management..."
-                  className="w-full p-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 font-medium text-black bg-white"
+                  value={applicantName}
+                  onChange={(e) => setApplicantName(e.target.value)}
+                  placeholder="Legal full name"
+                  className="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-medium text-black focus:ring-2 focus:ring-red-500"
                 />
               </div>
-
               <div>
-                <label className="block font-bold text-black mb-1">Availability *</label>
-                <select
-                  value={availability}
-                  onChange={(e) => setAvailability(e.target.value)}
-                  className="w-full p-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 font-medium text-black bg-white"
-                >
-                  <option value="Weekends & Evenings">Weekends &amp; Evenings</option>
-                  <option value="Full-time Volunteer (Daily)">Full-time Volunteer (Daily)</option>
-                  <option value="Emergency Relief On-Call">Emergency Relief On-Call</option>
-                  <option value="Online / Remote Assistance">Online / Remote Assistance</option>
-                </select>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="font-bold text-black">Email Address</label>
+                  <span className="text-[10px] text-slate-500 font-semibold">(Optional)</span>
+                </div>
+                <input
+                  type="email"
+                  value={applicantEmail}
+                  onChange={(e) => setApplicantEmail(e.target.value)}
+                  placeholder="e.g. name@domain.com (optional)"
+                  className="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-medium text-black focus:ring-2 focus:ring-red-500"
+                />
+              </div>
+              <div>
+                <label className="block font-bold text-black mb-1">Mobile Number *</label>
+                <input
+                  type="tel"
+                  required
+                  value={applicantPhone}
+                  onChange={(e) => setApplicantPhone(e.target.value)}
+                  placeholder="10-digit mobile"
+                  className="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-medium text-black focus:ring-2 focus:ring-red-500"
+                />
               </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-black mb-1">Areas of Humanitarian Interest *</label>
-              <input
-                type="text"
-                required
-                value={interests}
-                onChange={(e) => setInterests(e.target.value)}
-                placeholder="e.g. Slum Child Education, 24x7 Blood Helpline, Women Self-Defense..."
-                className="w-full text-xs p-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 font-medium text-black bg-white"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-black mb-1">
-                Why do you want to volunteer with {settings?.ngoName || 'Yuva Kranti Dal'}? *
-              </label>
-              <textarea
-                rows={3}
-                required
-                value={whyJoin}
-                onChange={(e) => setWhyJoin(e.target.value)}
-                placeholder="Tell us about your motivation to serve society..."
-                className="w-full text-xs p-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 font-medium text-black bg-white"
-              />
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+              <div>
+                <label className="block font-bold text-black mb-1">Blood Group</label>
+                <select
+                  value={applicantBloodGroup}
+                  onChange={(e) => setApplicantBloodGroup(e.target.value)}
+                  className="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-medium text-black"
+                >
+                  <option value="O+">O+</option>
+                  <option value="O-">O-</option>
+                  <option value="A+">A+</option>
+                  <option value="A-">A-</option>
+                  <option value="B+">B+</option>
+                  <option value="B-">B-</option>
+                  <option value="AB+">AB+</option>
+                  <option value="AB-">AB-</option>
+                </select>
+              </div>
+              <div>
+                <label className="block font-bold text-black mb-1">District / City</label>
+                <input
+                  type="text"
+                  value={applicantDistrict}
+                  onChange={(e) => setApplicantDistrict(e.target.value)}
+                  className="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-medium text-black"
+                />
+              </div>
+              <div>
+                <label className="block font-bold text-black mb-1">State</label>
+                <input
+                  type="text"
+                  value={applicantState}
+                  onChange={(e) => setApplicantState(e.target.value)}
+                  className="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-medium text-black"
+                />
+              </div>
             </div>
           </div>
 
-          <div className="pt-3 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <span className="text-[11px] text-black font-semibold">
-              All credentials and identity records are cryptographically stamped upon committee audit.
-            </span>
-            <button
-              type="submit"
-              disabled={loading || (!photoFile && !currentUser?.photoUrl)}
-              className="px-7 py-3.5 rounded-2xl bg-red-600 hover:bg-red-700 disabled:bg-slate-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none text-white font-black text-xs shadow-md shadow-red-600/25 transition flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <FiUserCheck className="w-4 h-4" />
-              <span>
-                {loading ? 'Submitting Application...' : 'Submit Volunteer Application'}
+          {/* SUBMIT VOLUNTEER ENROLMENT */}
+          <div className="pt-4 border-t border-slate-100 space-y-4">
+            <div className="bg-emerald-50/70 p-4 rounded-2xl border border-emerald-200 text-xs text-emerald-900 leading-relaxed">
+              💡 <strong>Instant Volunteer Registration:</strong> Profile photo, volunteer interests, and skills can be updated anytime from your <strong>Profile Settings</strong> after logging in.
+            </div>
+
+            <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <span className="text-[11px] text-black font-semibold">
+                Official Volunteer ID &amp; Password will be generated immediately upon submission.
               </span>
-            </button>
+              <button
+                type="submit"
+                disabled={loading || !isFormValid}
+                className="px-7 py-3.5 rounded-2xl bg-red-600 hover:bg-red-700 disabled:bg-slate-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none text-white font-black text-xs shadow-md shadow-red-600/25 transition flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <FiUserCheck className="w-4 h-4" />
+                <span>
+                  {loading ? 'Submitting Application...' : 'Apply as Volunteer & Get Volunteer ID'}
+                </span>
+              </button>
+            </div>
           </div>
         </form>
       )}

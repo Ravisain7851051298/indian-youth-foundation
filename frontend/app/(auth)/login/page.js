@@ -223,6 +223,8 @@ function LoginForm() {
                     router.push(redirectTarget || '/dashboard');
                   } else if (effectiveUser.isCoordinator || effectiveUser.role === 'coordinator') {
                     router.push(redirectTarget || '/profile/coordinator');
+                  } else if (effectiveUser.role === 'Volunteer' || effectiveUser.isVolunteer) {
+                    router.push(redirectTarget || '/profile/volunteer');
                   } else if (effectiveUser.role === 'Donor') {
                     router.push(redirectTarget || '/profile/donations');
                   } else {
@@ -231,7 +233,7 @@ function LoginForm() {
                 }}
                 className="flex-1 py-2 px-3 rounded-xl bg-[#0b8026] hover:bg-[#08661e] text-white font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
               >
-                <span>Continue to Portal</span>
+                <span>Continue to Profile</span>
                 <FiArrowRight className="w-3.5 h-3.5" />
               </button>
 
