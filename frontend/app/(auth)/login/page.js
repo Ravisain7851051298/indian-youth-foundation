@@ -281,15 +281,12 @@ function LoginForm() {
               <input
                 type="text"
                 required
-                placeholder="ID (e.g. BYK-MEM-..., BYK-VOL-...), Email or Mobile"
+                placeholder="Enter your email..."
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0b8026] focus:ring-1 focus:ring-[#0b8026] text-xs font-medium transition"
               />
             </div>
-            <p className="text-[10px] text-slate-500 mt-1">
-              You can log in using your assigned ID, registered email, or mobile number.
-            </p>
           </div>
 
           <div>
@@ -301,7 +298,7 @@ function LoginForm() {
               <input
                 type={showPassword ? 'text' : 'password'}
                 required
-                placeholder="Password or your 10-digit mobile number"
+                placeholder="Enter your password..."
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0b8026] focus:ring-1 focus:ring-[#0b8026] text-xs font-medium transition"
