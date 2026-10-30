@@ -75,9 +75,9 @@ function VolunteerContent() {
             <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-sm mb-3">
               3
             </div>
-            <h4 className="font-extrabold text-black text-sm">Credentials &amp; Documents Emailed</h4>
+            <h4 className="font-extrabold text-black text-sm">Instant ID &amp; Credentials</h4>
             <p className="text-[11px] text-slate-600 mt-1">
-              Upon approval, login credentials and verified ID card are sent straight to your email.
+              Upon applying, your official ID and password are generated instantly for immediate portal access.
             </p>
           </div>
         </div>
@@ -192,7 +192,7 @@ function VolunteerContent() {
                   <div>
                     <div className="font-extrabold text-xs sm:text-sm text-black">Direct Guest Enrolment Active</div>
                     <div className="text-[11px] text-slate-600">
-                      You can apply directly without logging in. Upon admin approval, your login credentials will be emailed to you automatically.
+                      You can apply directly without logging in. Upon submitting, your official ID and password will be displayed immediately for portal access.
                     </div>
                   </div>
                 </div>

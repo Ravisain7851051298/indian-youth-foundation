@@ -16,6 +16,7 @@ export default function ProfileSettingsPage() {
   const [form, setForm] = useState({
     name: effectiveUser?.name || '',
     phone: effectiveUser?.phone || '',
+    email: effectiveUser?.email || '',
     bloodGroup: effectiveUser?.bloodGroup || 'O+',
     dob: effectiveUser?.dob || '',
     address: effectiveUser?.address || '',
@@ -36,6 +37,7 @@ export default function ProfileSettingsPage() {
         ...prev,
         name: effectiveUser.name || prev.name,
         phone: effectiveUser.phone || prev.phone,
+        email: effectiveUser.email !== undefined ? (effectiveUser.email || '') : prev.email,
         bloodGroup: effectiveUser.bloodGroup || prev.bloodGroup,
         dob: effectiveUser.dob || prev.dob,
         address: effectiveUser.address || prev.address,
@@ -49,6 +51,7 @@ export default function ProfileSettingsPage() {
   const hasChanges = (
     form.name !== (effectiveUser?.name || '') ||
     form.phone !== (effectiveUser?.phone || '') ||
+    form.email !== (effectiveUser?.email || '') ||
     form.bloodGroup !== (effectiveUser?.bloodGroup || 'O+') ||
     form.dob !== (effectiveUser?.dob || '') ||
     form.address !== (effectiveUser?.address || '') ||
@@ -225,6 +228,25 @@ export default function ProfileSettingsPage() {
                 onChange={(e) => setForm({ ...form, phone: e.target.value })}
                 className="w-full px-4 py-2.5 rounded-xl border border-slate-300 font-medium"
               />
+            </div>
+
+            <div className="sm:col-span-2">
+              <div className="flex items-center justify-between mb-1">
+                <label className="font-bold text-slate-700 block">Email Address</label>
+                <span className="text-[10px] text-slate-500 font-medium">
+                  {effectiveUser?.email ? 'Registered Email' : 'Add your Email (Optional)'}
+                </span>
+              </div>
+              <input
+                type="email"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                placeholder="e.g. yourname@domain.com (optional)"
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-300 font-medium text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#0b8026]"
+              />
+              <p className="text-[11px] text-slate-500 mt-1">
+                You can add or update your email address here. Once added, you can log in using either your Official ID, Email, or Mobile Number.
+              </p>
             </div>
 
             <div>

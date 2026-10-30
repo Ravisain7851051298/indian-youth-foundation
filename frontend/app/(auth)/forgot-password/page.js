@@ -72,7 +72,7 @@ export default function ForgotPasswordPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
               {error && (
                 <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-sm flex items-start gap-3">
-                  <FiAlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5 text-rose-600" />
+                  <FiAlertCircle className="w-5 h-5 shrink-0 mt-0.5 text-rose-600" />
                   <span>{error}</span>
                 </div>
               )}
@@ -90,7 +90,7 @@ export default function ForgotPasswordPage() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="samasyasamadhanparishad@gmail.com"
+                    placeholder="xyz123@gmail.com"
                     className="block w-full pl-10 pr-4 py-3 bg-white border border-gray-300 rounded-xl text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
                   />
                 </div>

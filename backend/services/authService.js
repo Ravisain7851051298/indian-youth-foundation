@@ -236,16 +236,28 @@ class AuthService {
       referredBy
     } = userData;
 
-    if (!name || !email || !phone || !password) {
-      throw new Error('Please provide all required fields (Name, Email, Phone, Password).');
+    const cleanEmail = email ? email.toLowerCase().trim() : undefined;
+    const cleanPhone = (phone || '').trim();
+    const effectiveEmail = cleanEmail || undefined;
+    const effectivePass = password || cleanPhone;
+
+    if (!name || !cleanPhone || !effectivePass) {
+      throw new Error('Please provide your Full Name and Mobile Number.');
     }
 
-    if (confirmPassword && password !== confirmPassword) {
+    if (confirmPassword && password && password !== confirmPassword) {
       throw new Error('Password and Confirm Password do not match.');
     }
 
-    if (password.length < 6) {
+    if (effectivePass.length < 6) {
       throw new Error('Password must be at least 6 characters long.');
+    }
+
+    if (effectiveEmail) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(effectiveEmail)) {
+        throw new Error('Please enter a valid email address.');
+      }
     }
 
     // Prevent privilege escalation: Admin and Coordinator cannot be self-registered via public route
@@ -253,12 +265,9 @@ class AuthService {
       throw new Error('Registration for Admin and Coordinator roles is restricted. Coordinators can only be appointed directly by the Administration.');
     }
 
-    const cleanEmail = email.toLowerCase().trim();
-    const cleanPhone = phone.trim();
-
-    const existingUser = await userRepository.findByEmailOrPhone(cleanEmail) || await userRepository.findByPhone(cleanPhone);
+    const existingUser = (effectiveEmail ? await userRepository.findByEmail(effectiveEmail) : null) || await userRepository.findByPhone(cleanPhone);
     if (existingUser) {
-      throw new Error('This email address or mobile number is already registered.');
+      throw new Error('This mobile number or email address is already registered.');
     }
 
     const totalUsers = await userRepository.count();
@@ -270,10 +279,10 @@ class AuthService {
 
     const settings = await settingRepository.getSettings();
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(effectivePass, 10);
     const newUser = await userRepository.create({
       name: name.trim(),
-      email: cleanEmail,
+      email: effectiveEmail,
       phone: cleanPhone,
       password: hashedPassword,
       role: assignedRole,
@@ -301,14 +310,14 @@ class AuthService {
   }
 
   /**
-   * Login with Email or Mobile Number
+   * Login with ID (Member ID, Volunteer ID, Coordinator ID, Admin ID), Email, or Mobile Number
    */
   async login(identifier, password) {
     if (!identifier || !password) {
-      throw new Error('Please enter both your registered Email/Phone and password.');
+      throw new Error('Please enter both your registered ID/Email/Phone and password.');
     }
 
-    const user = await userRepository.findByEmailOrPhone(identifier);
+    const user = await userRepository.findByIdentifier(identifier);
     if (!user) {
       throw new Error('Invalid credentials. No registered account matches these details.');
     }
@@ -318,7 +327,27 @@ class AuthService {
       throw new Error(`Your account is currently ${user.status}. Please contact the Trust administration for reinstatement.`);
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    const cleanPassword = password.toString().trim();
+    const cleanPhone = (user.phone || '').trim();
+    const cleanPhoneDigits = cleanPhone.replace(/\D/g, '');
+    const enteredDigits = cleanPassword.replace(/\D/g, '');
+
+    let isMatch = false;
+    if (user.password) {
+      try {
+        isMatch = await bcrypt.compare(cleanPassword, user.password);
+      } catch (err) {
+        isMatch = false;
+      }
+    }
+
+    // Every user (Member, Volunteer, Coordinator, Admin) can use their registered phone number as password
+    if (!isMatch && cleanPhone) {
+      if (cleanPassword === cleanPhone || (enteredDigits.length >= 10 && enteredDigits === cleanPhoneDigits)) {
+        isMatch = true;
+      }
+    }
+
     if (!isMatch) {
       throw new Error('Invalid credentials. The password entered is incorrect.');
     }
@@ -485,9 +514,28 @@ class AuthService {
       throw new Error('Unauthorized: Role modification is strictly forbidden.');
     }
 
-    const { name, phone, designation, bloodGroup, dob, address, district, state, photoUrl } = updateData;
+    const { name, phone, email, designation, bloodGroup, dob, address, district, state, photoUrl } = updateData;
     if (name) user.name = name.trim();
     if (phone) user.phone = phone.trim();
+
+    if (email !== undefined) {
+      const cleanEmail = email ? email.toLowerCase().trim() : '';
+      if (cleanEmail) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(cleanEmail)) {
+          throw new Error('Please enter a valid email address.');
+        }
+        const User = require('../models/User');
+        const existingWithEmail = await User.findOne({ email: cleanEmail, _id: { $ne: user._id } });
+        if (existingWithEmail) {
+          throw new Error('This email address is already registered to another account.');
+        }
+        user.email = cleanEmail;
+      } else {
+        user.email = undefined;
+      }
+    }
+
     // Only existing Admins can adjust their leadership designation
     if (designation && user.role === 'Admin') user.designation = designation.trim();
     if (bloodGroup) user.bloodGroup = bloodGroup;

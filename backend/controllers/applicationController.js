@@ -3,11 +3,12 @@ const applicationService = require('../services/applicationService');
 const applyMembership = async (req, res) => {
   try {
     const userId = req.user?.id || req.body?.userId || null;
-    const application = await applicationService.applyMembership(userId, req.body);
+    const result = await applicationService.applyMembership(userId, req.body);
     return res.status(201).json({
       success: true,
-      message: 'Membership application submitted successfully! Pending Trustee approval.',
-      application
+      message: 'Membership application submitted successfully! Your account and Member ID have been created.',
+      application: result.application || result,
+      credentials: result.credentials || null
     });
   } catch (error) {
     return res.status(400).json({ success: false, message: error.message });
@@ -17,11 +18,12 @@ const applyMembership = async (req, res) => {
 const applyVolunteer = async (req, res) => {
   try {
     const userId = req.user?.id || req.body?.userId || null;
-    const application = await applicationService.applyVolunteer(userId, req.body);
+    const result = await applicationService.applyVolunteer(userId, req.body);
     return res.status(201).json({
       success: true,
-      message: 'Volunteer application submitted successfully! Pending Trustee verification.',
-      application
+      message: 'Volunteer application submitted successfully! Your account and Volunteer ID have been created.',
+      application: result.application || result,
+      credentials: result.credentials || null
     });
   } catch (error) {
     return res.status(400).json({ success: false, message: error.message });

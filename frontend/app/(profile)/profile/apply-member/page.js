@@ -11,7 +11,11 @@ import {
   FiTrash2,
   FiUser,
   FiCamera,
-  FiImage
+  FiImage,
+  FiCopy,
+  FiX,
+  FiLock,
+  FiKey
 } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchPlans } from '@/store/planSlice';
@@ -46,6 +50,23 @@ export default function ApplyMembershipPage() {
   const [previewUrl, setPreviewUrl] = useState('');
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [formError, setFormError] = useState('');
+  const [createdCredentials, setCreatedCredentials] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [copiedId, setCopiedId] = useState(false);
+  const [copiedPass, setCopiedPass] = useState(false);
+
+  const copyToClipboard = (text, type) => {
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+      if (type === 'id') {
+        setCopiedId(true);
+        setTimeout(() => setCopiedId(false), 2000);
+      } else if (type === 'pass') {
+        setCopiedPass(true);
+        setTimeout(() => setCopiedPass(false), 2000);
+      }
+    }
+  };
 
   useEffect(() => {
     dispatch(fetchPlans());
@@ -111,8 +132,8 @@ export default function ApplyMembershipPage() {
       return;
     }
 
-    if (!currentUser && (!guestName.trim() || !guestEmail.trim() || !guestPhone.trim())) {
-      setFormError('Please enter your Full Legal Name, Email Address, and 10-digit Mobile Number.');
+    if (!currentUser && (!guestName.trim() || !guestPhone.trim())) {
+      setFormError('Please enter your Full Legal Name and 10-digit Mobile Number.');
       return;
     }
 
@@ -131,7 +152,7 @@ export default function ApplyMembershipPage() {
     try {
       const formData = new FormData();
       formData.append('name', currentUser ? currentUser.name : guestName.trim());
-      formData.append('email', currentUser ? currentUser.email : guestEmail.trim());
+      formData.append('email', currentUser ? (currentUser.email || '') : (guestEmail.trim() || ''));
       formData.append('phone', currentUser ? currentUser.phone : guestPhone.trim());
       formData.append('bloodGroup', currentUser?.bloodGroup || guestBloodGroup);
       formData.append('district', currentUser?.district || guestDistrict);
@@ -151,8 +172,16 @@ export default function ApplyMembershipPage() {
         formData.append('paymentScreenshot', selectedRawFile);
       }
 
-      await dispatch(submitMembershipApplication(formData)).unwrap();
+      const res = await dispatch(submitMembershipApplication(formData)).unwrap();
 
+      const creds = res?.credentials || {
+        id: res?.application?.assignedMemberId || 'BYK-MEM-PENDING',
+        password: (currentUser ? currentUser.phone : guestPhone.trim()),
+        email: (currentUser ? (currentUser.email || '') : (guestEmail.trim() || ''))
+      };
+
+      setCreatedCredentials(creds);
+      setShowModal(true);
       setFormSubmitted(true);
       setTimeout(() => dispatch(clearAppStatus()), 6000);
     } catch (err) {
@@ -181,15 +210,65 @@ export default function ApplyMembershipPage() {
 
           <div className="text-center space-y-1.5">
             <span className="inline-block px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-300">
-              Application Submitted Successfully
+              Application Submitted &amp; Member ID Generated
             </span>
             <h3 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
               सदस्यता आवेदन सफलतापूर्वक प्राप्त हुआ!
             </h3>
             <p className="text-xs sm:text-sm text-slate-600 font-medium max-w-lg mx-auto">
-              आपकी सदस्यता का विवरण, पहचान दस्तावेज व भुगतान रसीद सत्यापन हेतु ट्रस्टी वेरिफिकेशन डेस्क को सफलतापूर्वक भेज दी गई है।
+              आपकी सदस्यता का विवरण व भुगतान रसीद सत्यापन हेतु ट्रस्टी वेरिफिकेशन डेस्क को सफलतापूर्वक भेज दी गई है।
             </p>
           </div>
+
+          {/* Credentials Highlight Card */}
+          {createdCredentials && (
+            <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3">
+              <div className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center justify-between">
+                <span>Your Official Login Credentials</span>
+                <button
+                  type="button"
+                  onClick={() => setShowModal(true)}
+                  className="text-xs font-bold text-[#0b8026] hover:underline cursor-pointer"
+                >
+                  View Popup Card
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Official Member ID</span>
+                  <div className="flex items-center justify-between mt-1">
+                    <span className="font-mono font-black text-sm text-[#0b8026]">{createdCredentials.id}</span>
+                    <button
+                      type="button"
+                      onClick={() => copyToClipboard(createdCredentials.id, 'id')}
+                      className="text-xs font-bold text-slate-600 hover:text-black cursor-pointer"
+                    >
+                      {copiedId ? 'Copied!' : 'Copy'}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Password (Your Mobile Number)</span>
+                  <div className="flex items-center justify-between mt-1">
+                    <span className="font-mono font-black text-sm text-slate-900">{createdCredentials.password}</span>
+                    <button
+                      type="button"
+                      onClick={() => copyToClipboard(createdCredentials.password, 'pass')}
+                      className="text-xs font-bold text-slate-600 hover:text-black cursor-pointer"
+                    >
+                      {copiedPass ? 'Copied!' : 'Copy'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <p className="text-[11px] text-slate-600">
+                You can use this ID or your Email along with your Mobile Number as Password to log in anytime. You can also add or update your email address in your profile after signing in.
+              </p>
+            </div>
+          )}
 
           {/* Submission Details Card */}
           <div className="bg-slate-50 rounded-2xl p-4 sm:p-5 border border-slate-200 text-xs space-y-2.5">
@@ -215,26 +294,32 @@ export default function ApplyMembershipPage() {
               <span className="text-base">📧</span> एडमिन अप्रूवल के बाद क्या होगा?
             </p>
             <p className="text-emerald-900">
-              <strong>1. लॉगिन क्रेडेंशियल्स:</strong> ट्रस्टी व एडमिन द्वारा बैंक लेजर व यूटीआर वेरिफिकेशन के बाद आपके रजिस्टर्ड ईमेल (<strong className="text-black">{currentUser?.email || guestEmail}</strong>) पर आपका <strong>Portal User ID व Password</strong> स्वचालित रूप से भेज दिया जाएगा।
+              <strong>1. लॉगिन क्रेडेंशियल्स:</strong> आपका खाता व <strong>Member ID ({createdCredentials?.id || 'BYK-MEM-...'})</strong> सक्रिय हो चुका है। आप तुरंत लॉगिन कर सकते हैं।
             </p>
             <p className="text-emerald-900">
-              <strong>2. नियुक्ति पत्र व आईडी कार्ड:</strong> आधिकारिक <strong>Appointment Letter</strong> और डिजिटल क्यूआर युक्त <strong>Dual-Sided Official ID Card</strong> पीडीएफ प्रारूप में ईमेल के साथ अटैच होकर तुरंत प्राप्त होंगे।
+              <strong>2. नियुक्ति पत्र व आईडी कार्ड:</strong> आधिकारिक <strong>Appointment Letter</strong> और डिजिटल क्यूआर युक्त <strong>Dual-Sided Official ID Card</strong> बैंक लेजर व यूटीआर वेरिफिकेशन के बाद आपके पोर्टल पर सक्रिय हो जाएंगे।
             </p>
           </div>
 
           {/* Action CTAs */}
           <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
             <Link
-              href="/"
+              href="/login?role=member"
               className="px-6 py-3 rounded-xl bg-[#0b8026] text-white font-extrabold text-xs hover:bg-[#075018] transition shadow-md hover:shadow-lg"
             >
-              Back to Home
+              Sign In to Member Portal
             </Link>
             <Link
-              href="/login?role=member"
+              href="/profile"
               className="px-6 py-3 rounded-xl bg-white text-slate-800 border border-slate-300 font-extrabold text-xs hover:bg-slate-100 transition shadow-2xs"
             >
-              Go to Member Sign In
+              Go to Profile
+            </Link>
+            <Link
+              href="/"
+              className="px-6 py-3 rounded-xl bg-slate-100 text-slate-700 font-extrabold text-xs hover:bg-slate-200 transition"
+            >
+              Back to Home
             </Link>
             <button
               type="button"
@@ -271,8 +356,8 @@ export default function ApplyMembershipPage() {
           {!currentUser && (
             <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-black uppercase tracking-wider text-red-700">
-                  This Email ID is used for all official communication
+                <span className="text-xs font-black uppercase tracking-wider text-[#0b8026]">
+                  Email is optional. You can also add or update email from your profile.
                 </span>
                 <Link href="/login?role=member&redirect=/apply-member" className="text-xs font-bold text-blue-600 hover:underline">
                   Already have an account? Sign in
@@ -292,13 +377,15 @@ export default function ApplyMembershipPage() {
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-black mb-1">Email Address *</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="font-bold text-black">Email Address</label>
+                    <span className="text-[10px] text-slate-500 font-semibold">(Optional)</span>
+                  </div>
                   <input
                     type="email"
-                    required
                     value={guestEmail}
                     onChange={(e) => setGuestEmail(e.target.value)}
-                    placeholder="Credentials will be sent here"
+                    placeholder="e.g. name@domain.com (optional)"
                     className="w-full p-2.5 border border-slate-300 rounded-xl bg-white font-medium text-black focus:ring-2 focus:ring-red-500"
                   />
                 </div>
@@ -672,6 +759,114 @@ export default function ApplyMembershipPage() {
             </div>
           </form>
         </>
+      )}
+
+      {/* POPUP MODAL DISPLAYING ASSIGNED MEMBER ID & PASSWORD */}
+      {showModal && createdCredentials && (
+        <div className="fixed inset-0 z-50 bg-black/65 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative overflow-hidden animate-in zoom-in-95 duration-200 text-slate-900">
+            {/* Top decorative gradient bar */}
+            <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-[#0b8026] via-[#08661e] to-[#dc2626]" />
+
+            <button
+              type="button"
+              onClick={() => setShowModal(false)}
+              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition cursor-pointer"
+            >
+              <FiX className="w-4 h-4" />
+            </button>
+
+            <div className="text-center space-y-2 mb-6">
+              <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 border-2 border-emerald-200 flex items-center justify-center mx-auto shadow-sm">
+                <FiCheckCircle className="w-9 h-9" />
+              </div>
+              <span className="inline-block px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200">
+                Application Submitted &amp; Member ID Assigned
+              </span>
+              <h3 className="text-xl sm:text-2xl font-black text-slate-900">
+                Your Member ID &amp; Password
+              </h3>
+              <p className="text-xs text-slate-600 font-medium">
+                Please note down your official login credentials. You can login right now using your ID or Email and your Phone Number as Password!
+              </p>
+            </div>
+
+            {/* Credentials Card */}
+            <div className="bg-slate-50 rounded-2xl p-4 sm:p-5 border border-slate-200 space-y-3 mb-6">
+              {/* Member ID */}
+              <div>
+                <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1 flex items-center justify-between">
+                  <span>Official Member ID (Username)</span>
+                  <span className="text-[#0b8026] font-extrabold text-[10px]">Use this to log in</span>
+                </div>
+                <div className="flex items-center justify-between bg-white px-3.5 py-2.5 rounded-xl border border-slate-300 shadow-xs">
+                  <span className="font-mono font-black text-sm sm:text-base text-[#0b8026] tracking-wide">
+                    {createdCredentials.id}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => copyToClipboard(createdCredentials.id, 'id')}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-[#0b8026] text-xs font-bold transition border border-emerald-200 cursor-pointer"
+                  >
+                    {copiedId ? <FiCheck className="w-3.5 h-3.5 text-emerald-600" /> : <FiCopy className="w-3.5 h-3.5" />}
+                    <span>{copiedId ? 'Copied' : 'Copy'}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Password */}
+              <div>
+                <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1 flex items-center justify-between">
+                  <span>Password</span>
+                  <span className="text-red-600 font-extrabold text-[10px]">Your Mobile Number</span>
+                </div>
+                <div className="flex items-center justify-between bg-white px-3.5 py-2.5 rounded-xl border border-slate-300 shadow-xs">
+                  <span className="font-mono font-black text-sm sm:text-base text-slate-900 tracking-wide">
+                    {createdCredentials.password}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => copyToClipboard(createdCredentials.password, 'pass')}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition border border-slate-200 cursor-pointer"
+                  >
+                    {copiedPass ? <FiCheck className="w-3.5 h-3.5 text-emerald-600" /> : <FiCopy className="w-3.5 h-3.5" />}
+                    <span>{copiedPass ? 'Copied' : 'Copy'}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Registered Email */}
+              <div className="pt-1 text-xs">
+                <span className="text-slate-500 font-bold">Registered Email: </span>
+                <span className="font-medium text-slate-800">
+                  {createdCredentials.email || 'None (You can add your email anytime from your profile settings)'}
+                </span>
+              </div>
+            </div>
+
+            {/* Explanatory Info */}
+            <div className="bg-emerald-50/70 border border-emerald-200/80 rounded-2xl p-3.5 text-[11px] text-emerald-950 leading-relaxed mb-6">
+              💡 <strong>Instant Access:</strong> You can log in immediately using your <strong>Member ID ({createdCredentials.id})</strong> or <strong>Email</strong> and your <strong>Mobile Number ({createdCredentials.password})</strong> as Password. You can also add or update your email address in your profile after signing in.
+            </div>
+
+            {/* CTAs */}
+            <div className="flex flex-col sm:flex-row items-center gap-3">
+              <Link
+                href="/login?role=member"
+                className="w-full sm:flex-1 py-3 rounded-xl bg-[#0b8026] hover:bg-[#08661e] text-white text-center font-extrabold text-xs shadow-md transition"
+              >
+                Sign In to Member Portal
+              </Link>
+              <button
+                type="button"
+                onClick={() => setShowModal(false)}
+                className="w-full sm:w-auto px-5 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

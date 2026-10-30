@@ -43,30 +43,42 @@ export default function Navbar() {
   const { settings, currentUser, logout } = useNGO();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [photoError, setPhotoError] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const dropdownRef = useRef(null);
+  const profileMenuRef = useRef(null);
 
   // Mark client mount to avoid SSR hydration differences
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  // Close dropdown on outside click
+  // Close dropdowns on outside click
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setActiveDropdown(null);
+      }
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
+        setProfileMenuOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Close mobile drawer when route changes
+  // Close mobile drawer and dropdowns when route changes
   useEffect(() => {
     setMobileMenuOpen(false);
     setActiveDropdown(null);
+    setProfileMenuOpen(false);
   }, [pathname]);
+
+  // Reset photo error when photoUrl changes
+  useEffect(() => {
+    setPhotoError(false);
+  }, [currentUser?.photoUrl]);
 
   const toggleDropdown = (id) => {
     setActiveDropdown((prev) => (prev === id ? null : id));
@@ -103,6 +115,21 @@ export default function Navbar() {
     activeUser?.coordinatorCode ||
     (activeUser?.coordinatorId && activeUser?.coordinatorId?.length > 0)
   );
+
+  const profileMenuItems = [
+    { label: 'Profile Overview', href: '/profile', icon: FiUser },
+    ...(isCoordinator ? [
+      { label: 'Coordinator Hub', href: '/profile/coordinator', icon: FiBriefcase },
+      { label: 'My Members', href: '/profile/my-members', icon: FiUsers },
+    ] : []),
+    { label: isMember ? 'Member Profile' : 'Apply for Membership', href: isMember ? '/profile/member' : '/apply-member', icon: FiCreditCard },
+    { label: isVolunteer ? 'Volunteer Profile' : 'Apply as Volunteer', href: isVolunteer ? '/profile/volunteer' : '/apply-volunteer', icon: FiUsers },
+    { label: 'Official ID Card', href: '/profile/id-card', icon: FiShield },
+    { label: 'Appointment Letter', href: '/profile/appointment-letter', icon: FiFileText },
+    { label: 'My Certificates', href: '/profile/certificates', icon: FiAward },
+    ...(isAdmin ? [{ label: 'Admin Dashboard', href: '/dashboard', icon: FiLayers }] : []),
+    { label: 'Account Settings', href: '/profile/settings', icon: FiSettings },
+  ];
 
   const navMenuItems = [
     {
@@ -142,25 +169,7 @@ export default function Navbar() {
     },
     { label: 'Complains & Enquries', href: '/complaints' },
     { label: 'Feedback', href: '/feedback' },
-    activeUser ? {
-      label: activeUser.name ? `${activeUser.name.split(' ')[0]}` : 'My Profile',
-      id: 'user_profile',
-      hasDropdown: true,
-      links: [
-        { label: 'Profile Overview', href: '/profile', icon: FiUser },
-        ...(isCoordinator ? [
-          { label: 'Coordinator Hub', href: '/profile/coordinator', icon: FiBriefcase },
-          { label: 'My Members', href: '/profile/my-members', icon: FiUsers },
-        ] : []),
-        { label: isMember ? 'Member Profile' : 'Apply for Membership', href: isMember ? '/profile/member' : '/apply-member', icon: FiCreditCard },
-        { label: isVolunteer ? 'Volunteer Profile' : 'Apply as Volunteer', href: isVolunteer ? '/profile/volunteer' : '/apply-volunteer', icon: FiUsers },
-        { label: 'Official ID Card', href: '/profile/id-card', icon: FiShield },
-        { label: 'Appointment Letter', href: '/profile/appointment-letter', icon: FiFileText },
-        { label: 'My Certificates', href: '/profile/certificates', icon: FiAward },
-        ...(isAdmin ? [{ label: 'Admin Dashboard', href: '/dashboard', icon: FiLayers }] : []),
-        { label: 'Account Settings', href: '/profile/settings', icon: FiSettings },
-      ]
-    } : {
+    {
       label: 'Login',
       id: 'login',
       hasDropdown: true,
@@ -289,41 +298,142 @@ export default function Navbar() {
             </div>
           </Link>
 
-          {/* Right Actions: Admin Dashboard + Green & Red Donate Us + Google Translate */}
+          {/* Right Actions: Green & Red Donate Us + Google Translate + Profile for Logged-In User */}
           <div className="flex items-center gap-2.5 sm:gap-3">
-            {isAdmin && (
-              <Link
-                href="/dashboard"
-                id="header-admin-dashboard-btn"
-                className="hidden relative md:inline-flex items-center justify-center p-0.5 rounded-full group overflow-hidden shadow-sm transition-transform duration-300 hover:scale-105 active:scale-95"
-                title="Go to Admin Dashboard"
-              >
-                {/* 100% Guaranteed Visible Rotating Conic Gradient Border */}
-                <span
-                  className="absolute inset-[-150%] animate-[spin_3s_linear_infinite]"
-                  style={{
-                    background: 'conic-gradient(from 0deg, #0b8026 0%, #dc2626 25%, #0b8026 50%, #dc2626 75%, #0b8026 100%)'
-                  }}
-                />
-
-                {/* Inner Button Content */}
-                <span className="relative z-10 flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-white group-hover:bg-emerald-50/60 font-extrabold text-xs sm:text-sm text-[#0b8026] group-hover:text-[#075018] transition-colors duration-200">
-                  <FiLayers className="w-4 h-4 text-[#0b8026] shrink-0 group-hover:rotate-12 transition-transform duration-300" />
-                  <span>Dashboard</span>
-                </span>
-              </Link>
-            )}
-
             <Link
               href="/donation"
-              className="flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-linear-to-r from-red-600 via-rose-600 to-red-700 hover:from-emerald-600 hover:to-emerald-700 text-white font-extrabold text-xs sm:text-sm shadow-lg shadow-red-500/25 hover:shadow-emerald-500/25 transition-all duration-300 transform hover:scale-105 active:scale-95 animate-pulse"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-linear-to-r from-red-600 via-rose-600 to-red-700 hover:from-emerald-600 hover:to-emerald-700 text-white font-extrabold text-xs sm:text-sm shadow-lg shadow-red-500/25 hover:shadow-emerald-500/25 transition-all duration-300 transform hover:scale-105 active:scale-95 animate-pulse"
             >
               <FiHeart className="w-4 h-4 text-white fill-white shrink-0 animate-bounce" />
-              <span className='text-sm md:text-base'>Donate Us</span>
+              <span className='text-sm md:text-base hidden md:block'>Donate Us</span>
             </Link>
 
             <GoogleTranslate />
 
+            {/* Profile Avatar & Dropdown for Logged-In User */}
+            {activeUser && (
+              <div className="relative" ref={profileMenuRef}>
+                <button
+                  type="button"
+                  onClick={() => setProfileMenuOpen((prev) => !prev)}
+                  className="flex items-center gap-1.5 sm:gap-2 p-1 sm:px-2.5 sm:py-1 rounded-full border border-slate-200 hover:border-[#0b8026] hover:bg-emerald-50/50 transition cursor-pointer shadow-xs bg-white group"
+                  aria-label="User Account Menu"
+                  aria-expanded={profileMenuOpen}
+                >
+                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full overflow-hidden border-2 border-[#0b8026] flex items-center justify-center shrink-0 bg-emerald-50">
+                    {activeUser.photoUrl && !photoError ? (
+                      <img
+                        src={getContentImageUrl(activeUser.photoUrl)}
+                        alt={activeUser.name || 'User Profile'}
+                        className="w-full h-full object-cover"
+                        onError={() => setPhotoError(true)}
+                      />
+                    ) : (
+                      <FiUser className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-[#0b8026]" />
+                    )}
+                  </div>
+
+                  <div className="hidden sm:flex flex-col text-left leading-tight pr-1">
+                    <span className="text-xs font-bold text-slate-800 max-w-[90px] md:max-w-[120px] truncate">
+                      {activeUser.name ? activeUser.name.split(' ')[0] : 'My Profile'}
+                    </span>
+                    <span className="text-[10px] font-semibold text-[#0b8026] uppercase">
+                      {activeUser.role || 'Member'}
+                    </span>
+                  </div>
+
+                  <FiChevronDown
+                    className={`w-3.5 h-3.5 text-slate-500 transition-transform duration-200 ${profileMenuOpen ? 'rotate-180 text-[#0b8026]' : 'group-hover:text-slate-800'
+                      }`}
+                  />
+                </button>
+
+                {/* Profile Dropdown Menu */}
+                {profileMenuOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-64 bg-white text-slate-800 rounded-2xl shadow-2xl border border-slate-100 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                    {/* Header Card */}
+                    <div className="px-4 py-3 border-b border-slate-100 bg-linear-to-b from-slate-50 to-white">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-[#0b8026] shrink-0 bg-emerald-50 flex items-center justify-center shadow-xs">
+                          {activeUser.photoUrl && !photoError ? (
+                            <img
+                              src={getContentImageUrl(activeUser.photoUrl)}
+                              alt={activeUser.name || 'User'}
+                              className="w-full h-full object-cover"
+                              onError={() => setPhotoError(true)}
+                            />
+                          ) : (
+                            <FiUser className="w-5 h-5 text-[#0b8026]" />
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-black text-slate-900 truncate">
+                            {activeUser.name || 'Member'}
+                          </p>
+                          <p className="text-[11px] text-slate-500 truncate">
+                            {activeUser.email || activeUser.phone || activeUser.memberId || activeUser.volunteerId || ''}
+                          </p>
+                          <div className="mt-1 flex items-center gap-1 flex-wrap">
+                            <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-[#0b8026]/10 text-[#0b8026]">
+                              {activeUser.role || 'Member'}
+                            </span>
+                            {activeUser.isCoordinator && (
+                              <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-blue-50 text-blue-700">
+                                Coordinator
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Links List */}
+                    <div className="py-1 max-h-72 overflow-y-auto">
+                      {profileMenuItems.map((link) => {
+                        const IconComponent = link.icon;
+                        const cleanHref = link.href.split('#')[0];
+                        const isSubActive = cleanHref && cleanHref !== '/' ? pathname === cleanHref : false;
+
+                        return (
+                          <Link
+                            key={link.href + link.label}
+                            href={link.href}
+                            onClick={() => setProfileMenuOpen(false)}
+                            className={`flex items-center gap-2.5 px-4 py-2 text-xs font-semibold transition ${isSubActive
+                              ? 'bg-emerald-50 text-[#0b8026] font-bold'
+                              : 'hover:bg-emerald-50/50 text-slate-700 hover:text-[#0b8026]'
+                              }`}
+                          >
+                            {IconComponent && (
+                              <IconComponent
+                                className={`w-4 h-4 shrink-0 ${isSubActive ? 'text-[#0b8026]' : 'text-emerald-700'
+                                  }`}
+                              />
+                            )}
+                            <span>{link.label}</span>
+                          </Link>
+                        );
+                      })}
+                    </div>
+
+                    {/* Sign Out */}
+                    <div className="pt-1 mt-1 border-t border-slate-100 px-2">
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          setProfileMenuOpen(false);
+                          await logout();
+                        }}
+                        className="w-full text-left px-3 py-2 rounded-lg hover:bg-red-50 text-red-600 text-xs font-bold transition flex items-center gap-2 cursor-pointer"
+                      >
+                        <FiX className="w-4 h-4" />
+                        <span>Sign Out</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
         </div>
@@ -394,21 +504,6 @@ export default function Navbar() {
                               </Link>
                             );
                           })}
-                          {item.id === 'user_profile' && (
-                            <div className="pt-1 mt-1 border-t border-slate-100">
-                              <button
-                                type="button"
-                                onClick={async () => {
-                                  setActiveDropdown(null);
-                                  await logout();
-                                }}
-                                className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
-                              >
-                                <FiX className="w-3.5 h-3.5" />
-                                <span>Sign Out</span>
-                              </button>
-                            </div>
-                          )}
                         </div>
                       )}
                     </div>
@@ -470,6 +565,49 @@ export default function Navbar() {
       {/* ---------------- MOBILE DRAWER ---------------- */}
       {mobileMenuOpen && (
         <div className="lg:hidden bg-white text-slate-900 border-b-4 border-red-600 py-3 px-4 shadow-2xl max-h-[80vh] overflow-y-auto">
+          {activeUser && (
+            <div className="p-3 mb-3 rounded-xl bg-slate-50 border border-slate-200">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-[#0b8026] flex items-center justify-center shrink-0 bg-emerald-50 shadow-2xs">
+                  {activeUser.photoUrl && !photoError ? (
+                    <img
+                      src={getContentImageUrl(activeUser.photoUrl)}
+                      alt={activeUser.name || 'User'}
+                      className="w-full h-full object-cover"
+                      onError={() => setPhotoError(true)}
+                    />
+                  ) : (
+                    <FiUser className="w-5 h-5 text-[#0b8026]" />
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="text-xs font-black text-slate-900 truncate">
+                    {activeUser.name}
+                  </div>
+                  <div className="text-[10px] text-slate-500 truncate">
+                    {activeUser.email || activeUser.phone || activeUser.memberId || activeUser.volunteerId || ''}
+                  </div>
+                  <div className="mt-0.5 flex items-center gap-1">
+                    <span className="inline-block px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-[#0b8026]/10 text-[#0b8026]">
+                      {activeUser.role || 'Member'}
+                    </span>
+                    {activeUser.isCoordinator && (
+                      <span className="inline-block px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-blue-50 text-blue-700">
+                        Coordinator
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <Link
+                  href="/profile"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="px-2.5 py-1 text-[11px] font-bold rounded-lg bg-[#0b8026] text-white hover:bg-[#08661e] shrink-0 shadow-xs"
+                >
+                  Profile
+                </Link>
+              </div>
+            </div>
+          )}
           <div className="space-y-1 text-xs font-bold">
             <Link
               href="/"

@@ -41,6 +41,11 @@ function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(isExpired ? 'Your session expired. Please sign in again.' : '');
   const [success, setSuccess] = useState('');
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -61,6 +66,8 @@ function LoginForm() {
           router.push(redirectTarget || '/dashboard');
         } else if (loggedUser.isCoordinator || loggedUser.role === 'coordinator' || activeRole === 'coordinator') {
           router.push(redirectTarget || '/profile/coordinator');
+        } else if (loggedUser.role === 'Volunteer' || loggedUser.isVolunteer || activeRole === 'volunteer') {
+          router.push(redirectTarget || '/profile/volunteer');
         } else if (loggedUser.role === 'Donor' || activeRole === 'donor') {
           router.push(redirectTarget || '/profile/donations');
         } else {
@@ -106,7 +113,7 @@ function LoginForm() {
       badgeColor: 'bg-red-50 text-red-700 border-red-200',
       icon: FiShield,
       btnText: 'Sign In to Admin Dashboard',
-      btnColor: 'bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-700 hover:to-rose-800',
+      btnColor: 'bg-[#0b8026] hover:bg-[#08661e]',
       subText: 'Central governance, approval desk, and content operations.'
     },
     donor: {
@@ -167,7 +174,7 @@ function LoginForm() {
         </div>
 
         {/* DISPLAY WHO IS CURRENTLY LOGGED IN (If Active Session Exists) */}
-        {effectiveUser && (
+        {mounted && effectiveUser && (
           <div className="mb-6 p-4 rounded-2xl bg-slate-50 border border-slate-200 shadow-xs">
             <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center justify-between">
               <span>Currently Logged In As</span>
@@ -261,30 +268,40 @@ function LoginForm() {
         {/* LOGIN FORM */}
         <form onSubmit={handleLogin} className="space-y-4 text-xs">
           <div>
-            <label className="font-bold text-slate-800 block mb-1.5">
-              Registered Email or Mobile Number
-            </label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="font-bold text-slate-800 block">
+                Official ID or Email
+              </label>
+              <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/60">
+                Email Optional
+              </span>
+            </div>
             <div className="relative">
               <FiUser className="absolute left-3.5 top-3.5 text-slate-400 w-4 h-4" />
               <input
                 type="text"
                 required
-                placeholder="name@domain.org or 98XXXXXXXX"
+                placeholder="ID (e.g. BYK-MEM-..., BYK-VOL-...), Email or Mobile"
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0b8026] focus:ring-1 focus:ring-[#0b8026] text-xs font-medium transition"
               />
             </div>
+            <p className="text-[10px] text-slate-500 mt-1">
+              You can log in using your assigned ID, registered email, or mobile number.
+            </p>
           </div>
 
           <div>
-            <label className="font-bold text-slate-800 block mb-1.5">Password</label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="font-bold text-slate-800 block">Password</label>
+            </div>
             <div className="relative">
               <FiLock className="absolute left-3.5 top-3.5 text-slate-400 w-4 h-4" />
               <input
                 type={showPassword ? 'text' : 'password'}
                 required
-                placeholder="••••••••"
+                placeholder="Password or your 10-digit mobile number"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0b8026] focus:ring-1 focus:ring-[#0b8026] text-xs font-medium transition"

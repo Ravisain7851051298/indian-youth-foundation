@@ -1,25 +1,52 @@
+const mongoose = require('mongoose');
 const User = require('../models/User');
 
 class UserRepository {
   async findById(id) {
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) return null;
     return User.findById(id);
   }
 
   async findByEmail(email) {
+    if (!email) return null;
     return User.findOne({ email: email.toLowerCase().trim() });
   }
 
   async findByPhone(phone) {
+    if (!phone) return null;
     return User.findOne({ phone: phone.trim() });
   }
 
+  async findByIdentifier(identifier) {
+    const raw = (identifier || '').toString().trim();
+    if (!raw) return null;
+
+    const lower = raw.toLowerCase();
+    const escaped = raw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`^${escaped}$`, 'i');
+    const digits = raw.replace(/\D/g, '');
+
+    const orConditions = [
+      { email: lower },
+      { phone: raw },
+      { memberId: regex },
+      { volunteerId: regex },
+      { coordinatorId: regex }
+    ];
+
+    if (digits.length >= 10) {
+      orConditions.push({ phone: new RegExp(`${digits}$`) });
+    }
+
+    if (mongoose.Types.ObjectId.isValid(raw)) {
+      orConditions.push({ _id: raw });
+    }
+
+    return User.findOne({ $or: orConditions });
+  }
+
   async findByEmailOrPhone(identifier) {
-    return User.findOne({
-      $or: [
-        { email: identifier.toLowerCase().trim() },
-        { phone: identifier.trim() }
-      ]
-    });
+    return this.findByIdentifier(identifier);
   }
 
   async findByResetToken(token) {

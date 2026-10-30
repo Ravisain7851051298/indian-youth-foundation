@@ -2,7 +2,15 @@ const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+  email: { 
+    type: String, 
+    required: false, 
+    unique: true, 
+    sparse: true, 
+    lowercase: true, 
+    trim: true,
+    default: undefined 
+  },
   phone: { type: String, required: true, trim: true },
   password: { type: String, required: true },
   role: { 
@@ -52,6 +60,13 @@ const userSchema = new mongoose.Schema({
   notes: { type: String, default: '' }
 }, {
   timestamps: true
+});
+
+userSchema.pre('save', function (next) {
+  if (this.email === '' || !this.email) {
+    this.email = undefined;
+  }
+  if (typeof next === 'function') next();
 });
 
 userSchema.plugin(require('./plugins/fileCleanupPlugin'));

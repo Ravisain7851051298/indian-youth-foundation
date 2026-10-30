@@ -40,13 +40,63 @@ class ApplicationService {
     const plan = await planRepository.findById(planId);
     if (!plan) throw new Error('Selected membership plan not found');
 
+    const cleanEmail = email ? email.toLowerCase().trim() : undefined;
+    const cleanPhone = (phone || '').trim();
+    const effectiveEmail = cleanEmail || undefined;
+
     let user = userId ? await userRepository.findById(userId) : null;
-    if (!user && email) {
-      user = await userRepository.findByEmail(email.toLowerCase().trim());
+    if (!user && cleanPhone) {
+      user = await userRepository.findByPhone(cleanPhone);
+    }
+    if (!user && effectiveEmail) {
+      user = await userRepository.findByEmail(effectiveEmail);
     }
 
-    if (user) {
-      // Update user record with additional application info
+    if (!user) {
+      if (!name || !cleanPhone) {
+        throw new Error('Please provide your Full Legal Name and Mobile Number for membership enrollment.');
+      }
+
+      const assignedMemberId = await this.generateUniqueMemberId();
+      const hashedPassword = await bcrypt.hash(cleanPhone, 10);
+
+      user = await userRepository.create({
+        name: name.trim(),
+        email: effectiveEmail,
+        phone: cleanPhone,
+        password: hashedPassword,
+        role: 'Member',
+        status: 'pending',
+        isMember: true,
+        memberId: assignedMemberId,
+        designation: designation || (plan ? `${plan.title || plan.name} Member` : 'Member Applicant'),
+        bloodGroup: bloodGroup || 'O+',
+        dob: dob || '2000-01-01',
+        address: address || '',
+        district: district || 'Aligarh',
+        state: state || 'Uttar Pradesh',
+        photoUrl: finalPhoto || '',
+        documentType: finalDocType || '',
+        documentFront: finalDocFront || '',
+        documentBack: finalDocBack || '',
+        feePaid: true,
+        feeAmount: plan.price || plan.fee || 250,
+        membershipPlan: planId,
+        addedByCoordinator: addedByCoordinator || null,
+        addedByCoordinatorName: coordinatorName || '',
+        notes: 'Created via Membership Application'
+      });
+    } else {
+      // Update existing user record with additional application info
+      if (!user.memberId) {
+        user.memberId = await this.generateUniqueMemberId();
+      }
+      if (!user.password && cleanPhone) {
+        user.password = await bcrypt.hash(cleanPhone, 10);
+      }
+      if (effectiveEmail && !user.email) {
+        user.email = effectiveEmail;
+      }
       if (bloodGroup) user.bloodGroup = bloodGroup;
       if (dob) user.dob = dob;
       if (address) user.address = address;
@@ -63,22 +113,17 @@ class ApplicationService {
       user.membershipPlan = planId;
       user.feeAmount = plan.price || plan.fee || 250;
       user.feePaid = true;
-      user.status = 'pending';
+      if (user.status !== 'active') user.status = 'pending';
       await user.save();
-    } else {
-      // Guest applicant: check mandatory details
-      if (!name || (!email && !phone)) {
-        throw new Error('Please provide your Name, Email, and Mobile Number for membership enrollment.');
-      }
     }
 
     const application = await applicationRepository.createMembershipApp({
-      user: user?._id || null,
-      userId: user?._id || null,
+      user: user._id,
+      userId: user._id,
       isGuest: !userId,
-      name: name || user?.name || '',
-      email: (email || user?.email || '').toLowerCase().trim(),
-      phone: (phone || user?.phone || '').trim(),
+      name: name || user.name || '',
+      email: effectiveEmail || user.email || '',
+      phone: cleanPhone || user.phone || '',
       plan: planId,
       planId: plan._id?.toString() || planId,
       planName: plan.title || plan.name || 'Membership Plan',
@@ -87,17 +132,18 @@ class ApplicationService {
       paymentScreenshot: finalScreenshot || '',
       utrNumber: finalUtr,
       transactionId: finalUtr,
-      bloodGroup: bloodGroup || user?.bloodGroup || 'O+',
-      dob: dob || user?.dob || '2000-01-01',
-      address: address || user?.address || '',
-      district: district || user?.district || 'Aligarh',
-      state: state || user?.state || 'Uttar Pradesh',
-      photoUrl: finalPhoto || user?.photoUrl || '',
+      bloodGroup: bloodGroup || user.bloodGroup || 'O+',
+      dob: dob || user.dob || '2000-01-01',
+      address: address || user.address || '',
+      district: district || user.district || 'Aligarh',
+      state: state || user.state || 'Uttar Pradesh',
+      photoUrl: finalPhoto || user.photoUrl || '',
       documentType: finalDocType,
       documentFront: finalDocFront,
       documentBack: finalDocBack,
       idProofUrl: finalDocFront,
-      designation: designation || user?.designation || `${plan.title || plan.name} Member`,
+      designation: designation || user.designation || `${plan.title || plan.name} Member`,
+      assignedMemberId: user.memberId,
       addedByCoordinator: addedByCoordinator || null,
       coordinatorName: coordinatorName || '',
       coordinatorId: coordinatorId || '',
@@ -105,7 +151,16 @@ class ApplicationService {
       status: 'pending'
     });
 
-    return application;
+    return {
+      application,
+      credentials: {
+        id: user.memberId,
+        password: cleanPhone || user.phone,
+        email: user.email || '',
+        name: user.name,
+        role: 'Member'
+      }
+    };
   }
 
   async applyVolunteer(userId, appData) {
@@ -133,13 +188,62 @@ class ApplicationService {
     const finalDocBack = appData.documentBack || '';
     const finalIdProof = finalDocFront || idProofDocument || idProofUrl || appData.idProof || '';
 
+    const cleanEmail = email ? email.toLowerCase().trim() : undefined;
+    const cleanPhone = (phone || '').trim();
+    const effectiveEmail = cleanEmail || undefined;
+
     let user = userId ? await userRepository.findById(userId) : null;
-    if (!user && email) {
-      user = await userRepository.findByEmail(email.toLowerCase().trim());
+    if (!user && cleanPhone) {
+      user = await userRepository.findByPhone(cleanPhone);
+    }
+    if (!user && effectiveEmail) {
+      user = await userRepository.findByEmail(effectiveEmail);
     }
 
-    if (user) {
-      // Update user record with additional application info
+    if (!user) {
+      if (!name || !cleanPhone) {
+        throw new Error('Please provide your Full Legal Name and Mobile Number for volunteer enrollment.');
+      }
+
+      const assignedVolunteerId = await this.generateUniqueVolunteerId();
+      const hashedPassword = await bcrypt.hash(cleanPhone, 10);
+
+      user = await userRepository.create({
+        name: name.trim(),
+        email: effectiveEmail,
+        phone: cleanPhone,
+        password: hashedPassword,
+        role: 'Volunteer',
+        status: 'pending',
+        isVolunteer: true,
+        volunteerId: assignedVolunteerId,
+        volunteerWing: 'Active Grassroots Youth Volunteer',
+        volunteerStatus: 'pending',
+        designation: 'Volunteer Applicant (Youth Wing)',
+        bloodGroup: bloodGroup || 'O+',
+        dob: dob || '2000-01-01',
+        address: address || '',
+        district: district || 'Aligarh',
+        state: state || 'Uttar Pradesh',
+        photoUrl: finalPhoto || '',
+        documentType: finalDocType || '',
+        documentFront: finalDocFront || '',
+        documentBack: finalDocBack || '',
+        feePaid: true,
+        feeAmount: 0,
+        notes: 'Created via Volunteer Application'
+      });
+    } else {
+      // Update existing user record with volunteer details
+      if (!user.volunteerId) {
+        user.volunteerId = await this.generateUniqueVolunteerId();
+      }
+      if (!user.password && cleanPhone) {
+        user.password = await bcrypt.hash(cleanPhone, 10);
+      }
+      if (effectiveEmail && !user.email) {
+        user.email = effectiveEmail;
+      }
       if (bloodGroup) user.bloodGroup = bloodGroup;
       if (dob) user.dob = dob;
       if (address) user.address = address;
@@ -149,23 +253,17 @@ class ApplicationService {
       if (finalDocType) user.documentType = finalDocType;
       if (finalDocFront) user.documentFront = finalDocFront;
       if (finalDocBack) user.documentBack = finalDocBack;
-
-      user.status = 'pending';
+      if (user.status !== 'active') user.status = 'pending';
       await user.save();
-    } else {
-      // Guest applicant: check mandatory details
-      if (!name || (!email && !phone)) {
-        throw new Error('Please provide your Name, Email, and Mobile Number for volunteer enrollment.');
-      }
     }
 
     const application = await applicationRepository.createVolunteerApp({
-      user: user?._id || null,
-      userId: user?._id || null,
+      user: user._id,
+      userId: user._id,
       isGuest: !userId,
-      name: name || user?.name || '',
-      email: (email || user?.email || '').toLowerCase().trim(),
-      phone: (phone || user?.phone || '').trim(),
+      name: name || user.name || '',
+      email: effectiveEmail || user.email || '',
+      phone: cleanPhone || user.phone || '',
       skills: Array.isArray(skills) ? skills : [skills || 'Community Outreach'],
       availability: availability || 'Weekends',
       interests: appData.interests || '',
@@ -176,16 +274,26 @@ class ApplicationService {
       idProofUrl: finalIdProof,
       motivation: motivation || whyJoin || '',
       whyJoin: motivation || whyJoin || '',
-      bloodGroup: bloodGroup || user?.bloodGroup || 'O+',
-      dob: dob || user?.dob || '2000-01-01',
-      address: address || user?.address || '',
-      district: district || user?.district || 'Aligarh',
-      state: state || user?.state || 'Uttar Pradesh',
-      photoUrl: finalPhoto || user?.photoUrl || '',
+      bloodGroup: bloodGroup || user.bloodGroup || 'O+',
+      dob: dob || user.dob || '2000-01-01',
+      address: address || user.address || '',
+      district: district || user.district || 'Aligarh',
+      state: state || user.state || 'Uttar Pradesh',
+      photoUrl: finalPhoto || user.photoUrl || '',
+      assignedVolunteerId: user.volunteerId,
       status: 'pending'
     });
 
-    return application;
+    return {
+      application,
+      credentials: {
+        id: user.volunteerId,
+        password: cleanPhone || user.phone,
+        email: user.email || '',
+        name: user.name,
+        role: 'Volunteer'
+      }
+    };
   }
 
   async getMembershipApplications(filter = {}) {
@@ -264,14 +372,14 @@ class ApplicationService {
     const isGuest = Boolean(app.isGuest || !app.user || !app.userId);
 
     if (!user) {
-      // Auto-create new User account for guest applicant
-      const tempPass = 'BYK@' + Math.floor(100000 + Math.random() * 900000);
+      // Auto-create new User account for applicant
+      const tempPass = app.phone ? app.phone.trim() : ('BYK@' + Math.floor(100000 + Math.random() * 900000));
       const hashedPassword = await bcrypt.hash(tempPass, 10);
       generatedPassword = tempPass;
 
       user = await userRepository.create({
         name: app.name || 'Valued Member',
-        email: app.email ? app.email.toLowerCase().trim() : `member_${verifiedMemberId.toLowerCase()}@yuvakrantidal.org`,
+        email: app.email ? app.email.toLowerCase().trim() : undefined,
         phone: app.phone ? app.phone.trim() : '9999999999',
         password: hashedPassword,
         role: 'Member',
@@ -315,12 +423,10 @@ class ApplicationService {
       user.verifiedAt = new Date();
       user.verifiedBy = adminUser?.name || 'Trustee Admin';
 
-      // If applicant was a guest or account had no password, generate fresh login credentials
-      if (isGuest || !user.password) {
-        const tempPass = 'BYK@' + Math.floor(100000 + Math.random() * 900000);
-        user.password = await bcrypt.hash(tempPass, 10);
-        generatedPassword = tempPass;
+      if (!user.password && user.phone) {
+        user.password = await bcrypt.hash(user.phone.trim(), 10);
       }
+      generatedPassword = user.phone || 'Your registered mobile number';
     }
 
     if (app.addedByCoordinator) {
@@ -403,14 +509,14 @@ class ApplicationService {
     const isGuest = Boolean(app.isGuest || !app.user || !app.userId);
 
     if (!user) {
-      // Auto-create new User account for guest volunteer applicant
-      const tempPass = 'BYK@' + Math.floor(100000 + Math.random() * 900000);
+      // Auto-create new User account for volunteer applicant
+      const tempPass = app.phone ? app.phone.trim() : ('BYK@' + Math.floor(100000 + Math.random() * 900000));
       const hashedPassword = await bcrypt.hash(tempPass, 10);
       generatedPassword = tempPass;
 
       user = await userRepository.create({
         name: app.name || 'Valued Volunteer',
-        email: app.email ? app.email.toLowerCase().trim() : `volunteer_${verifiedVolId.toLowerCase()}@yuvakrantidal.org`,
+        email: app.email ? app.email.toLowerCase().trim() : undefined,
         phone: app.phone ? app.phone.trim() : '9999999999',
         password: hashedPassword,
         role: 'Volunteer',
@@ -457,12 +563,10 @@ class ApplicationService {
       user.verifiedAt = new Date();
       user.verifiedBy = adminUser?.name || 'Trustee Admin';
 
-      // If applicant was a guest or account had no password, generate fresh login credentials
-      if (isGuest || !user.password) {
-        const tempPass = 'BYK@' + Math.floor(100000 + Math.random() * 900000);
-        user.password = await bcrypt.hash(tempPass, 10);
-        generatedPassword = tempPass;
+      if (!user.password && user.phone) {
+        user.password = await bcrypt.hash(user.phone.trim(), 10);
       }
+      generatedPassword = user.phone || 'Your registered mobile number';
     }
 
     const qrData = `https://bharatiyayuvakranti.org/verify/volunteer/${verifiedVolId}`;
