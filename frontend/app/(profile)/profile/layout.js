@@ -18,15 +18,13 @@ import {
   FiUserPlus,
   FiUserCheck,
   FiChevronRight,
-  FiMenu,
-  FiX,
   FiUsers,
 } from 'react-icons/fi';
 import { GoVerified } from "react-icons/go";
 import { useNGO } from '@/context/NGOContext';
 import { useSelector } from 'react-redux';
 import { getContentImageUrl } from '@/lib/authApi';
-import Navbar from '@/components/Navbar';
+import ProfileHeader from '@/components/ProfileHeader';
 import Footer from '@/components/Footer';
 
 const emptySubscribe = () => () => { };
@@ -44,15 +42,14 @@ export default function ProfileLayout({ children }) {
   const effectiveUser = reduxUser || currentUser;
   const pathname = usePathname();
   const router = useRouter();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const mounted = useIsClient();
 
   if (!mounted) {
     return (
       <>
-        <Navbar />
+        <ProfileHeader />
         <div className="min-h-[75vh] flex items-center justify-center p-6 bg-slate-50">
-          <div className="w-8 h-8 border-3 border-red-600 border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-8 h-8 border-3 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
         </div>
         <Footer />
       </>
@@ -62,10 +59,10 @@ export default function ProfileLayout({ children }) {
   if (!effectiveUser) {
     return (
       <>
-        <Navbar />
+        <ProfileHeader />
         <div className="min-h-[75vh] flex items-center justify-center p-6 bg-slate-100">
           <div className="max-w-md w-full bg-white p-8 rounded-3xl shadow-xl text-center border border-slate-200">
-            <div className="w-16 h-16 bg-red-50 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold border border-red-200">
+            <div className="w-16 h-16 bg-emerald-50 text-[#0b8026] rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold border border-emerald-200">
               <FiUserPlus />
             </div>
             <h2 className="text-xl font-black text-black">Member Portal Login</h2>
@@ -135,96 +132,8 @@ export default function ProfileLayout({ children }) {
 
   return (
     <>
-      <Navbar />
+      <ProfileHeader />
       <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row">
-
-        {/* ----------------- MOBILE TOP NAVIGATION BAR ----------------- */}
-        <div className="md:hidden bg-white border-b border-slate-200 p-4 sticky top-0 z-30 flex items-center justify-between shadow-2xs">
-          <div className="flex items-center gap-3">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={getContentImageUrl(effectiveUser.photoUrl) || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'}
-              alt={effectiveUser.name}
-              className="w-9 h-9 rounded-full object-cover border border-red-500 shadow-2xs"
-              onError={(e) => {
-                e.currentTarget.onerror = null;
-                e.currentTarget.src = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150';
-              }}
-            />
-            <div>
-              <div className='flex items-center'>
-                <h3 className="font-black text-black text-xs truncate max-w-[170px]">{effectiveUser.name}</h3>
-                {effectiveUser.status === 'active' ? (
-                  <GoVerified className="w-4 h-4 text-green-500 ml-1" />
-                ) : (
-                  <FiClock className="w-4 h-4 text-slate-500" />
-                )}
-              </div>
-              <p className="text-xs text-black font-medium">{effectiveUser.email}</p>
-            </div>
-          </div>
-
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-black font-bold transition"
-            aria-label="Toggle Navigation Menu"
-          >
-            {mobileMenuOpen ? <FiX className="w-5 h-5 text-[#d50000]" /> : <FiMenu className="w-5 h-5 text-black" />}
-          </button>
-        </div>
-
-        {/* Mobile Menu Drawer */}
-        {mobileMenuOpen && (
-          <div className="md:hidden bg-white border-b border-slate-200 p-5 space-y-3 z-30 shadow-lg">
-            <nav className="space-y-1">
-              {menuItems.map((item) => {
-                const Icon = item.icon;
-                const isActive = pathname === item.href;
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition ${isActive
-                      ? 'bg-[#0b8026] text-white shadow-sm'
-                      : 'text-black hover:bg-emerald-50 hover:text-[#0b8026]'
-                      }`}
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <Icon className="w-4 h-4" />
-                      <span>{item.label}</span>
-                    </div>
-                    {item.locked && !isActive && (
-                      <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-slate-100 text-slate-500">
-                        🔒 Locked
-                      </span>
-                    )}
-                  </Link>
-                );
-              })}
-            </nav>
-
-            <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
-              {currentUser.role === 'Admin' && (
-                <Link
-                  href="/dashboard"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="text-xs font-black text-[#d50000] hover:underline flex items-center gap-1"
-                >
-                  <FiShield className="w-3.5 h-3.5" />
-                  <span>Admin View →</span>
-                </Link>
-              )}
-              <button
-                onClick={handleLogout}
-                className="px-3 py-1.5 rounded-xl bg-red-50 text-[#d50000] text-xs font-bold hover:bg-red-100 transition cursor-pointer flex items-center gap-1 ml-auto"
-              >
-                <FiLogOut className="w-3.5 h-3.5" />
-                <span>Sign Out</span>
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* ----------------- DESKTOP SIDEBAR ----------------- */}
         <aside className="hidden md:flex w-72 lg:w-80 bg-white border-r border-slate-200 shrink-0 flex-col justify-between">

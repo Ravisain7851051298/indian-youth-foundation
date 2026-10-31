@@ -27,13 +27,13 @@ export default function ApplyMembershipPage() {
   const [transactionId, setTransactionId] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('UPI / PhonePe / GPay');
 
-  // Applicant fields (auto-filled if logged in, always displayed and fully editable)
-  const [applicantName, setApplicantName] = useState(currentUser?.name || '');
-  const [applicantEmail, setApplicantEmail] = useState(currentUser?.email || '');
-  const [applicantPhone, setApplicantPhone] = useState(currentUser?.phone || '');
-  const [applicantBloodGroup, setApplicantBloodGroup] = useState(currentUser?.bloodGroup || 'O+');
-  const [applicantDistrict, setApplicantDistrict] = useState(currentUser?.district || 'Aligarh');
-  const [applicantState, setApplicantState] = useState(currentUser?.state || 'Uttar Pradesh');
+  // Applicant fields - Always blank for fresh applicant entry (no autofill)
+  const [applicantName, setApplicantName] = useState('');
+  const [applicantEmail, setApplicantEmail] = useState('');
+  const [applicantPhone, setApplicantPhone] = useState('');
+  const [applicantBloodGroup, setApplicantBloodGroup] = useState('O+');
+  const [applicantDistrict, setApplicantDistrict] = useState('Aligarh');
+  const [applicantState, setApplicantState] = useState('Uttar Pradesh');
 
   // Payment Screenshot upload state
   const [selectedRawFile, setSelectedRawFile] = useState(null);
@@ -47,17 +47,6 @@ export default function ApplyMembershipPage() {
   const [copiedId, setCopiedId] = useState(false);
   const [copiedPass, setCopiedPass] = useState(false);
 
-  // Auto-fill fields if currentUser is loaded or updates
-  useEffect(() => {
-    if (currentUser) {
-      if (currentUser.name) setApplicantName((prev) => prev || currentUser.name);
-      if (currentUser.email) setApplicantEmail((prev) => prev || currentUser.email);
-      if (currentUser.phone) setApplicantPhone((prev) => prev || currentUser.phone);
-      if (currentUser.bloodGroup) setApplicantBloodGroup((prev) => (prev && prev !== 'O+' ? prev : currentUser.bloodGroup || 'O+'));
-      if (currentUser.district) setApplicantDistrict((prev) => (prev && prev !== 'Aligarh' ? prev : currentUser.district || 'Aligarh'));
-      if (currentUser.state) setApplicantState((prev) => (prev && prev !== 'Uttar Pradesh' ? prev : currentUser.state || 'Uttar Pradesh'));
-    }
-  }, [currentUser]);
 
   const copyToClipboard = (text, type) => {
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
@@ -155,7 +144,7 @@ export default function ApplyMembershipPage() {
       const res = await dispatch(submitMembershipApplication(formData)).unwrap();
 
       const creds = res?.credentials || {
-        id: res?.application?.assignedMemberId || 'BYK-MEM-PENDING',
+        id: res?.application?.assignedMemberId || 'Pending Assignment',
         password: applicantPhone.trim(),
         email: applicantEmail.trim(),
         name: applicantName.trim()
@@ -231,7 +220,7 @@ export default function ApplyMembershipPage() {
                 </div>
 
                 <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Password (Your Mobile Number)</span>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Password (4-Digit PIN)</span>
                   <div className="flex items-center justify-between mt-1">
                     <span className="font-mono font-black text-sm text-slate-900">{createdCredentials.password}</span>
                     <button
@@ -246,7 +235,7 @@ export default function ApplyMembershipPage() {
               </div>
 
               <p className="text-[11px] text-slate-600">
-                You can use this ID or your Email along with your Mobile Number as Password to log in anytime. You can also add or update your email address in your profile after signing in.
+                You can use this 10-Digit Member ID or your Email along with your 4-Digit Password to log in anytime. You can also add or update your email address in your profile after signing in.
               </p>
             </div>
           )}
@@ -281,7 +270,7 @@ export default function ApplyMembershipPage() {
               <span className="text-base">📧</span> एडमिन अप्रूवल के बाद क्या होगा?
             </p>
             <p className="text-emerald-900">
-              <strong>1. लॉगिन क्रेडेंशियल्स:</strong> आपका खाता व <strong>Member ID ({createdCredentials?.id || 'BYK-MEM-...'})</strong> सक्रिय हो चुका है। आप तुरंत लॉगिन कर सकते हैं।
+              <strong>1. लॉगिन क्रेडेंशियल्स:</strong> आपका खाता व <strong>Member ID ({createdCredentials?.id || 'Pending'})</strong> सक्रिय हो चुका है। आप तुरंत लॉगिन कर सकते हैं।
             </p>
             <p className="text-emerald-900">
               <strong>2. नियुक्ति पत्र व आईडी कार्ड:</strong> आधिकारिक <strong>Appointment Letter</strong> और डिजिटल क्यूआर युक्त <strong>Dual-Sided Official ID Card</strong> बैंक लेजर व यूटीआर वेरिफिकेशन के बाद आपके पोर्टल पर सक्रिय हो जाएंगे।
@@ -337,26 +326,15 @@ export default function ApplyMembershipPage() {
             </div>
           )}
 
-          {/* Applicant Details Section (Auto-filled if logged in, editable for new / existing users, ALWAYS displayed) */}
+          {/* Applicant Details Section - Always blank for fresh applicant entry */}
           <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              {currentUser ? (
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                  <span className="text-xs font-bold text-slate-800">
-                    Logged in as <strong className="text-[#0b8026]">{currentUser.name}</strong> • Details auto-filled (You can edit or enter new details if needed)
-                  </span>
-                </div>
-              ) : (
-                <>
-                  <span className="text-xs font-black uppercase tracking-wider text-[#0b8026]">
-                    Email is optional. You can also add or update email from your profile.
-                  </span>
-                  <Link href="/login?role=member&redirect=/apply-member" className="text-xs font-bold text-blue-600 hover:underline">
-                    Already have an account? Sign in
-                  </Link>
-                </>
-              )}
+              <span className="text-xs font-black uppercase tracking-wider text-[#0b8026]">
+                Applicant Personal Information (Email is optional)
+              </span>
+              <span className="text-[11px] text-slate-500 font-medium">
+                Enter applicant details below
+              </span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
@@ -450,11 +428,10 @@ export default function ApplyMembershipPage() {
                   <div
                     key={plan._id}
                     onClick={() => setSelectedPlanId(plan._id)}
-                    className={`cursor-pointer rounded-3xl p-5 border transition flex flex-col justify-between ${
-                      isSelected
+                    className={`cursor-pointer rounded-3xl p-5 border transition flex flex-col justify-between ${isSelected
                         ? 'border-red-600 ring-2 ring-red-500/20 bg-red-50/30 shadow-md'
                         : 'border-slate-200 bg-white hover:border-red-300'
-                    }`}
+                      }`}
                   >
                     <div>
                       <div className="flex items-center justify-between">
@@ -486,9 +463,8 @@ export default function ApplyMembershipPage() {
 
                     <div className="mt-5 pt-3 border-t border-slate-100">
                       <div
-                        className={`w-full py-2 rounded-xl text-center text-xs font-bold transition flex items-center justify-center gap-1 ${
-                          isSelected ? 'bg-red-600 text-white shadow-xs' : 'bg-slate-100 text-black hover:bg-slate-200'
-                        }`}
+                        className={`w-full py-2 rounded-xl text-center text-xs font-bold transition flex items-center justify-center gap-1 ${isSelected ? 'bg-red-600 text-white shadow-xs' : 'bg-slate-100 text-black hover:bg-slate-200'
+                          }`}
                       >
                         {isSelected ? (
                           <>
@@ -698,7 +674,7 @@ export default function ApplyMembershipPage() {
         <div className="fixed inset-0 z-50 bg-black/65 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative overflow-hidden animate-in zoom-in-95 duration-200 text-slate-900">
             {/* Top decorative gradient bar */}
-            <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-[#0b8026] via-[#08661e] to-[#dc2626]" />
+            <div className="absolute top-0 left-0 right-0 h-2 bg-linear-to-r from-[#0b8026] via-[#08661e] to-[#dc2626]" />
 
             <button
               type="button"
@@ -719,7 +695,7 @@ export default function ApplyMembershipPage() {
                 Your Member ID &amp; Password
               </h3>
               <p className="text-xs text-slate-600 font-medium">
-                Please note down your official login credentials. You can login right now using your ID or Email and your Phone Number as Password!
+                Please note down your official login credentials. You can login right now using your 10-Digit ID or Email and your 4-Digit Password!
               </p>
             </div>
 
@@ -728,7 +704,7 @@ export default function ApplyMembershipPage() {
               {/* Member ID */}
               <div>
                 <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1 flex items-center justify-between">
-                  <span>Official Member ID (Username)</span>
+                  <span>Official Member ID (10-Digit ID)</span>
                   <span className="text-[#0b8026] font-extrabold text-[10px]">Use this to log in</span>
                 </div>
                 <div className="flex items-center justify-between bg-white px-3.5 py-2.5 rounded-xl border border-slate-300 shadow-xs">
@@ -750,7 +726,7 @@ export default function ApplyMembershipPage() {
               <div>
                 <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1 flex items-center justify-between">
                   <span>Password</span>
-                  <span className="text-red-600 font-extrabold text-[10px]">Your Mobile Number</span>
+                  <span className="text-red-600 font-extrabold text-[10px]">Your 4-Digit Password</span>
                 </div>
                 <div className="flex items-center justify-between bg-white px-3.5 py-2.5 rounded-xl border border-slate-300 shadow-xs">
                   <span className="font-mono font-black text-sm sm:text-base text-slate-900 tracking-wide">
@@ -778,7 +754,7 @@ export default function ApplyMembershipPage() {
 
             {/* Explanatory Info */}
             <div className="bg-emerald-50/70 border border-emerald-200/80 rounded-2xl p-3.5 text-[11px] text-emerald-950 leading-relaxed mb-6">
-              💡 <strong>Instant Access:</strong> You can log in immediately using your <strong>Member ID ({createdCredentials.id})</strong> or <strong>Email</strong> and your <strong>Mobile Number ({createdCredentials.password})</strong> as Password. You can also add or update your email address in your profile after signing in.
+              💡 <strong>Instant Access:</strong> You can log in immediately using your <strong>10-Digit Member ID ({createdCredentials.id})</strong> or <strong>Email/Phone</strong> and your <strong>4-Digit Password ({createdCredentials.password})</strong>. You can also add or update your email address in your profile after signing in.
             </div>
 
             {/* CTAs */}

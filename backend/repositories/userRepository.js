@@ -73,6 +73,9 @@ class UserRepository {
   }
 
   async create(userData) {
+    if (!userData.email || (typeof userData.email === 'string' && !userData.email.trim())) {
+      delete userData.email;
+    }
     const user = new User(userData);
     return user.save();
   }

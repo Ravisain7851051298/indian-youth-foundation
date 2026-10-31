@@ -2,8 +2,8 @@ const applicationService = require('../services/applicationService');
 
 const applyMembership = async (req, res) => {
   try {
-    const userId = req.user?.id || req.body?.userId || null;
-    const result = await applicationService.applyMembership(userId, req.body);
+    const submitter = req.user || null;
+    const result = await applicationService.applyMembership(submitter, req.body);
     return res.status(201).json({
       success: true,
       message: 'Membership application submitted successfully! Your account and Member ID have been created.',
@@ -17,8 +17,8 @@ const applyMembership = async (req, res) => {
 
 const applyVolunteer = async (req, res) => {
   try {
-    const userId = req.user?.id || req.body?.userId || null;
-    const result = await applicationService.applyVolunteer(userId, req.body);
+    const submitter = req.user || null;
+    const result = await applicationService.applyVolunteer(submitter, req.body);
     return res.status(201).json({
       success: true,
       message: 'Volunteer application submitted successfully! Your account and Volunteer ID have been created.',

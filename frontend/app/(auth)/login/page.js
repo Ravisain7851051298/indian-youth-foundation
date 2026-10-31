@@ -283,7 +283,7 @@ function LoginForm() {
               <input
                 type="text"
                 required
-                placeholder="Enter your email..."
+                placeholder="Enter 10-digit ID, Email, or Mobile..."
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0b8026] focus:ring-1 focus:ring-[#0b8026] text-xs font-medium transition"
@@ -300,7 +300,7 @@ function LoginForm() {
               <input
                 type={showPassword ? 'text' : 'password'}
                 required
-                placeholder="Enter your password..."
+                placeholder="Enter 4-digit PIN or password..."
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-white border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0b8026] focus:ring-1 focus:ring-[#0b8026] text-xs font-medium transition"

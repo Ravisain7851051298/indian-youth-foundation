@@ -273,8 +273,16 @@ class AuthService {
     const totalUsers = await userRepository.count();
     // Default initial registration role is 'Donor'
     const assignedRole = (role === 'Member' || role === 'Volunteer') ? role : 'Donor';
-    const prefix = assignedRole === 'Donor' ? 'DON' : (assignedRole === 'Volunteer' ? 'VOL' : 'MEM');
-    const memberId = `BYK-${prefix}-${100 + totalUsers + 1}`;
+
+    // Generate 10-digit random numeric ID
+    let memberId;
+    let idExists = true;
+    while (idExists) {
+      memberId = Math.floor(1000000000 + Math.random() * 9000000000).toString();
+      const existing = await userRepository.findByMemberId(memberId);
+      if (!existing) idExists = false;
+    }
+    const volunteerId = assignedRole === 'Volunteer' ? memberId : undefined;
     const referralCode = `BYK-${cleanPhone.slice(-4)}-${totalUsers + 1}`;
 
     const settings = await settingRepository.getSettings();
@@ -288,6 +296,7 @@ class AuthService {
       role: assignedRole,
       status: 'active',
       memberId,
+      volunteerId,
       designation: designation || (assignedRole === 'Donor' ? 'Supporter & Donor' : (assignedRole === 'Volunteer' ? 'Volunteer Applicant' : 'Member Applicant')),
       bloodGroup: bloodGroup || 'O+',
       dob: dob || '2000-01-01',
@@ -402,14 +411,28 @@ class AuthService {
     return { success: true, message: 'All active sessions for this account have been invalidated.' };
   }
 
-  async forgotPassword(email) {
-    if (!email) {
-      throw new Error('Please enter your registered email address.');
+  async forgotPassword(identifier) {
+    const raw = (identifier || '').toString().trim();
+    if (!raw) {
+      throw new Error('Please enter your registered email address or mobile number.');
     }
 
-    const user = await userRepository.findByEmail(email);
+    // Support lookup by Email, Phone number, or Member ID
+    let user = null;
+    if (raw.includes('@')) {
+      user = await userRepository.findByEmail(raw);
+    } else {
+      user = await userRepository.findByPhone(raw);
+      if (!user && raw.length >= 10) {
+        user = await userRepository.findByPhone(raw.slice(-10));
+      }
+      if (!user) {
+        user = await userRepository.findByIdentifier(raw);
+      }
+    }
+
     if (!user) {
-      throw new Error('No registered account found with this email address.');
+      throw new Error('No registered account found with this email address or mobile number.');
     }
 
     const resetToken = crypto.randomBytes(32).toString('hex');
@@ -417,16 +440,46 @@ class AuthService {
     user.resetPasswordExpires = Date.now() + 30 * 60 * 1000; // 30 mins
     await user.save();
 
-    const frontendUrl = process.env.CLIENT_URL;
-    const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}&email=${encodeURIComponent(user.email)}`;
-    await sendPasswordResetEmail({
-      to: user.email,
-      userName: user.name,
-      resetToken,
-      resetUrl
-    });
+    const frontendUrl = (process.env.CLIENT_URL || process.env.FRONTEND_URL || 'http://localhost:3000').replace(/\/+$/, '');
+    const userEmail = (user.email || '').trim();
+    const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}${userEmail ? `&email=${encodeURIComponent(userEmail)}` : ''}`;
 
-    return { message: 'Password reset link sent to your registered email address.' };
+    let emailSent = false;
+    let maskedEmail = '';
+
+    if (userEmail) {
+      const atIdx = userEmail.indexOf('@');
+      const namePart = userEmail.substring(0, atIdx);
+      const domainPart = userEmail.substring(atIdx + 1);
+      maskedEmail = namePart.length > 2
+        ? `${namePart.slice(0, 2)}***${namePart.slice(-1)}@${domainPart}`
+        : `${namePart.slice(0, 1)}***@${domainPart}`;
+
+      try {
+        await sendPasswordResetEmail({
+          to: userEmail,
+          userName: user.name,
+          resetToken,
+          resetUrl
+        });
+        emailSent = true;
+        console.log(`📧 [FORGOT PASSWORD] Reset link emailed to ${userEmail} | ResetUrl: ${resetUrl}`);
+      } catch (mailErr) {
+        console.warn('⚠️ [FORGOT PASSWORD EMAIL FAILED]:', mailErr.message);
+      }
+    } else {
+      console.log(`ℹ️ [FORGOT PASSWORD] Account found for ${user.name} (${user.phone}) without email. ResetUrl generated: ${resetUrl}`);
+    }
+
+    let message = 'Mail sent successfully to your registered email address.';
+    if (maskedEmail) {
+      message = `Mail sent successfully to registered email id (${maskedEmail}).`;
+    }
+
+    return {
+      message,
+      emailSent
+    };
   }
 
   async resetPassword(token, newPassword) {

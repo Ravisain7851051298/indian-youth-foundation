@@ -22,10 +22,10 @@ const volunteerApplicationSchema = new mongoose.Schema({
   district: { type: String, default: 'Aligarh' },
   state: { type: String, default: 'Uttar Pradesh' },
   photoUrl: { type: String, default: '' },
-  status: { 
-    type: String, 
-    enum: ['pending', 'approved', 'rejected'], 
-    default: 'pending' 
+  status: {
+    type: String,
+    enum: ['pending', 'approved', 'rejected'],
+    default: 'pending'
   },
   assignedVolunteerId: { type: String, default: null },
   verifiedAt: { type: Date, default: null },

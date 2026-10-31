@@ -52,24 +52,13 @@ class MemberService {
   }
 
   async generateUniqueMemberId() {
-    const currentYear = new Date().getFullYear();
-    const prefix = `BYK-MEM-${currentYear}-`;
-    const users = await userRepository.find({ memberId: new RegExp(`^${prefix}`) });
-    let maxSeq = 0;
-    for (const u of users) {
-      if (u.memberId) {
-        const match = u.memberId.match(/(\d+)$/);
-        if (match) {
-          const num = parseInt(match[1], 10);
-          if (!isNaN(num) && num > maxSeq) maxSeq = num;
-        }
-      }
-    }
-    let nextSeq = maxSeq + 1;
-    let candidate = `${prefix}${String(nextSeq).padStart(4, '0')}`;
-    while (await userRepository.findByMemberId(candidate)) {
-      nextSeq++;
-      candidate = `${prefix}${String(nextSeq).padStart(4, '0')}`;
+    let candidate;
+    let exists = true;
+    while (exists) {
+      // 10-digit random number between 1000000000 and 9999999999
+      candidate = Math.floor(1000000000 + Math.random() * 9000000000).toString();
+      const existing = await userRepository.findByMemberId(candidate);
+      if (!existing) exists = false;
     }
     return candidate;
   }

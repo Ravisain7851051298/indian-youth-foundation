@@ -170,27 +170,22 @@ export default function AdminLayout({ children }) {
       >
         <div className="flex flex-col h-full overflow-hidden">
           {/* Brand Header */}
-          <div className={`px-4 py-3 border-b border-slate-200 flex items-center transition-all ${collapsed ? 'justify-center flex-col gap-2' : 'justify-between'
+          <div className={`px-4 py-2.5 border-b border-slate-200 flex items-center transition-all ${collapsed ? 'justify-center flex-col gap-2' : 'justify-between'
             }`}>
             {!collapsed ? (
               <>
                 <div className="flex items-center gap-3 overflow-hidden">
-                  <div className="w-10 h-10 rounded-xl bg-linear-to-tr from-[#0b8026] to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-700/20 font-black text-white text-base shrink-0 overflow-hidden">
-                    {settings?.logoUrl ? (
-                      /* eslint-disable-next-line @next/next/no-img-element */
-                      <img
-                        src={getContentImageUrl(settings.logoUrl)}
-                        alt="Logo"
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.currentTarget.onerror = null;
-                          e.currentTarget.style.display = 'none';
-                        }}
-                      />
-                    ) : (
-                      'युवा'
-                    )}
-                  </div>
+                  <Link href="/dashboard" className="w-11 h-11 rounded-full border-2 border-[#0b8026] ring-2 ring-emerald-500/20 p-0.5 flex items-center justify-center bg-white shrink-0 overflow-hidden shadow-xs hover:scale-105 transition-transform" title="Admin Dashboard">
+                    <img
+                      src={getContentImageUrl(settings?.logoUrl) || '/logo.jpeg'}
+                      alt={settings?.ngoName || 'Yuva Kranti Dal'}
+                      className="w-full h-full object-contain"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = '/logo.jpeg';
+                      }}
+                    />
+                  </Link>
                   <div className="overflow-hidden">
                     <h2 className="text-xs font-black text-black leading-tight truncate">
                       {settings?.ngoName || 'Yuva Kranti Dal'}
@@ -204,24 +199,19 @@ export default function AdminLayout({ children }) {
             ) : (
               <div className="flex flex-col items-center gap-2">
                 <div
-                  className="w-10 h-10 rounded-xl bg-linear-to-tr from-[#0b8026] to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-700/20 font-black text-white text-base shrink-0 cursor-pointer overflow-hidden"
+                  className="w-11 h-11 rounded-full border-2 border-[#0b8026] ring-2 ring-emerald-500/20 p-0.5 flex items-center justify-center bg-white shrink-0 cursor-pointer overflow-hidden shadow-xs hover:scale-105 transition-transform"
                   onClick={toggleCollapsed}
                   title="Expand sidebar"
                 >
-                  {settings?.logoUrl ? (
-                    /* eslint-disable-next-line @next/next/no-img-element */
-                    <img
-                      src={getContentImageUrl(settings.logoUrl)}
-                      alt="Logo"
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.currentTarget.onerror = null;
-                        e.currentTarget.style.display = 'none';
-                      }}
-                    />
-                  ) : (
-                    'युवा'
-                  )}
+                  <img
+                    src={getContentImageUrl(settings?.logoUrl) || '/logo.jpeg'}
+                    alt={settings?.ngoName || 'Yuva Kranti Dal'}
+                    className="w-full h-full object-contain"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = '/logo.jpeg';
+                    }}
+                  />
                 </div>
               </div>
             )}
@@ -378,12 +368,20 @@ export default function AdminLayout({ children }) {
               {/* Drawer Top Header */}
               <div className="p-4 border-b border-slate-200 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-linear-to-tr from-[#0b8026] to-emerald-600 flex items-center justify-center font-bold text-white text-sm shadow-sm">
-                    युवा
+                  <div className="w-10 h-10 rounded-full border-2 border-[#0b8026] p-0.5 flex items-center justify-center bg-white shrink-0 overflow-hidden shadow-xs">
+                    <img
+                      src={getContentImageUrl(settings?.logoUrl) || '/logo.jpeg'}
+                      alt={settings?.ngoName || 'Yuva Kranti Dal'}
+                      className="w-full h-full object-contain"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = '/logo.jpeg';
+                      }}
+                    />
                   </div>
                   <div>
-                    <div className="text-xs font-black text-black">Trustee Admin</div>
-                    <div className="text-[10px] text-slate-600 truncate max-w-35">{currentUser?.name}</div>
+                    <div className="text-xs font-black text-black leading-tight">{settings?.ngoName || 'Yuva Kranti Dal'}</div>
+                    <div className="text-[10px] text-[#0b8026] font-bold">Trustee Admin</div>
                   </div>
                 </div>
                 <button
@@ -484,6 +482,21 @@ export default function AdminLayout({ children }) {
             >
               <FiMenu className="w-5 h-5" />
             </button>
+
+            {/* Mobile / Tablet Logo Icon */}
+            <Link href="/dashboard" className="md:hidden flex items-center shrink-0">
+              <div className="w-8 h-8 rounded-full border-2 border-[#0b8026] p-0.5 bg-white flex items-center justify-center overflow-hidden shadow-2xs">
+                <img
+                  src={getContentImageUrl(settings?.logoUrl) || '/logo.jpeg'}
+                  alt="Logo"
+                  className="w-full h-full object-contain"
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = '/logo.jpeg';
+                  }}
+                />
+              </div>
+            </Link>
 
             {/* Active Page Breadcrumb & Title */}
             <div className="min-w-0">

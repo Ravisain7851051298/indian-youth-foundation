@@ -6,7 +6,14 @@ const planRepository = require('../repositories/planRepository');
 const { sendMembershipApprovalEmail, sendVolunteerApprovalEmail } = require('./emailService');
 
 class ApplicationService {
-  async applyMembership(userId, appData) {
+  async applyMembership(submitterParam, appData) {
+    let submitter = null;
+    if (submitterParam && typeof submitterParam === 'object' && submitterParam._id) {
+      submitter = submitterParam;
+    } else if (submitterParam && typeof submitterParam === 'string') {
+      submitter = await userRepository.findById(submitterParam);
+    }
+
     const { 
       planId, 
       paymentScreenshot, 
@@ -40,30 +47,36 @@ class ApplicationService {
     const plan = await planRepository.findById(planId);
     if (!plan) throw new Error('Selected membership plan not found');
 
-    const cleanEmail = email ? email.toLowerCase().trim() : undefined;
+    const cleanEmail = email && typeof email === 'string' && email.trim() ? email.toLowerCase().trim() : undefined;
     const cleanPhone = (phone || '').trim();
-    const effectiveEmail = cleanEmail || undefined;
+    const cleanName = (name || '').trim();
 
-    let user = userId ? await userRepository.findById(userId) : null;
-    if (!user && cleanPhone) {
+    if (!cleanName || !cleanPhone) {
+      throw new Error('Please provide Full Legal Name and Mobile Number for membership enrollment.');
+    }
+
+    // RESOLVE APPLICANT USER RECORD:
+    // Lookup solely by applicant's phone or email - NEVER attach the logged-in admin or other submitter!
+    let user = null;
+    if (cleanPhone) {
       user = await userRepository.findByPhone(cleanPhone);
     }
-    if (!user && effectiveEmail) {
-      user = await userRepository.findByEmail(effectiveEmail);
+    if (!user && cleanEmail) {
+      user = await userRepository.findByEmail(cleanEmail);
     }
 
-    if (!user) {
-      if (!name || !cleanPhone) {
-        throw new Error('Please provide your Full Legal Name and Mobile Number for membership enrollment.');
-      }
+    const isAdminAccount = user && user.role === 'Admin';
 
+    // Generate 4-digit random password PIN for applicant
+    const generatedPassword = Math.floor(1000 + Math.random() * 9000).toString();
+    const hashedPassword = await bcrypt.hash(generatedPassword, 10);
+
+    if (!user || isAdminAccount) {
       const assignedMemberId = await this.generateUniqueMemberId();
-      const hashedPassword = await bcrypt.hash(cleanPhone, 10);
 
-      user = await userRepository.create({
-        name: name.trim(),
-        email: effectiveEmail,
-        phone: cleanPhone,
+      const userCreateData = {
+        name: cleanName,
+        phone: isAdminAccount ? `${cleanPhone}_mem` : cleanPhone,
         password: hashedPassword,
         role: 'Member',
         status: 'pending',
@@ -82,21 +95,32 @@ class ApplicationService {
         feePaid: true,
         feeAmount: plan.price || plan.fee || 250,
         membershipPlan: planId,
-        addedByCoordinator: addedByCoordinator || null,
-        addedByCoordinatorName: coordinatorName || '',
         notes: 'Created via Membership Application'
-      });
+      };
+
+      if (cleanEmail && !isAdminAccount) {
+        userCreateData.email = cleanEmail;
+      }
+
+      if (submitter) {
+        userCreateData.addedByCoordinator = submitter._id || submitter.id;
+        userCreateData.addedByCoordinatorName = submitter.name || '';
+      } else if (addedByCoordinator) {
+        userCreateData.addedByCoordinator = addedByCoordinator;
+        userCreateData.addedByCoordinatorName = coordinatorName || '';
+      }
+
+      user = await userRepository.create(userCreateData);
     } else {
-      // Update existing user record with additional application info
-      if (!user.memberId) {
+      // Update existing user record with additional application info (NOT Admin)
+      if (!user.memberId || !/^\d{10}$/.test(user.memberId)) {
         user.memberId = await this.generateUniqueMemberId();
       }
-      if (!user.password && cleanPhone) {
-        user.password = await bcrypt.hash(cleanPhone, 10);
+      user.password = hashedPassword;
+      if (cleanEmail) {
+        user.email = cleanEmail;
       }
-      if (effectiveEmail && !user.email) {
-        user.email = effectiveEmail;
-      }
+      if (cleanName) user.name = cleanName;
       if (bloodGroup) user.bloodGroup = bloodGroup;
       if (dob) user.dob = dob;
       if (address) user.address = address;
@@ -117,13 +141,17 @@ class ApplicationService {
       await user.save();
     }
 
+    const effectiveSubmitterId = submitter ? (submitter._id || submitter.id) : (addedByCoordinator || null);
+    const effectiveSubmitterName = submitter ? (submitter.name || '') : (coordinatorName || '');
+    const effectiveSubmitterRole = submitter ? (submitter.role || '') : (addedByRole || '');
+
     const application = await applicationRepository.createMembershipApp({
       user: user._id,
       userId: user._id,
-      isGuest: !userId,
-      name: name || user.name || '',
-      email: effectiveEmail || user.email || '',
-      phone: cleanPhone || user.phone || '',
+      isGuest: !submitter,
+      name: cleanName,
+      email: cleanEmail || '', // Never fallback to submitter/admin email!
+      phone: cleanPhone,
       plan: planId,
       planId: plan._id?.toString() || planId,
       planName: plan.title || plan.name || 'Membership Plan',
@@ -144,10 +172,10 @@ class ApplicationService {
       idProofUrl: finalDocFront,
       designation: designation || user.designation || `${plan.title || plan.name} Member`,
       assignedMemberId: user.memberId,
-      addedByCoordinator: addedByCoordinator || null,
-      coordinatorName: coordinatorName || '',
+      addedByCoordinator: effectiveSubmitterId,
+      coordinatorName: effectiveSubmitterName,
       coordinatorId: coordinatorId || '',
-      addedByRole: addedByRole || (addedByCoordinator ? 'Coordinator' : ''),
+      addedByRole: effectiveSubmitterRole,
       status: 'pending'
     });
 
@@ -155,15 +183,22 @@ class ApplicationService {
       application,
       credentials: {
         id: user.memberId,
-        password: cleanPhone || user.phone,
-        email: user.email || '',
-        name: user.name,
+        password: generatedPassword,
+        email: cleanEmail || '',
+        name: cleanName,
         role: 'Member'
       }
     };
   }
 
-  async applyVolunteer(userId, appData) {
+  async applyVolunteer(submitterParam, appData) {
+    let submitter = null;
+    if (submitterParam && typeof submitterParam === 'object' && submitterParam._id) {
+      submitter = submitterParam;
+    } else if (submitterParam && typeof submitterParam === 'string') {
+      submitter = await userRepository.findById(submitterParam);
+    }
+
     const { 
       skills, 
       availability, 
@@ -188,30 +223,36 @@ class ApplicationService {
     const finalDocBack = appData.documentBack || '';
     const finalIdProof = finalDocFront || idProofDocument || idProofUrl || appData.idProof || '';
 
-    const cleanEmail = email ? email.toLowerCase().trim() : undefined;
+    const cleanEmail = email && typeof email === 'string' && email.trim() ? email.toLowerCase().trim() : undefined;
     const cleanPhone = (phone || '').trim();
-    const effectiveEmail = cleanEmail || undefined;
+    const cleanName = (name || '').trim();
 
-    let user = userId ? await userRepository.findById(userId) : null;
-    if (!user && cleanPhone) {
+    if (!cleanName || !cleanPhone) {
+      throw new Error('Please provide Full Legal Name and Mobile Number for volunteer enrollment.');
+    }
+
+    // RESOLVE APPLICANT USER RECORD:
+    // Lookup solely by applicant's phone or email - NEVER attach the logged-in admin or other submitter!
+    let user = null;
+    if (cleanPhone) {
       user = await userRepository.findByPhone(cleanPhone);
     }
-    if (!user && effectiveEmail) {
-      user = await userRepository.findByEmail(effectiveEmail);
+    if (!user && cleanEmail) {
+      user = await userRepository.findByEmail(cleanEmail);
     }
 
-    if (!user) {
-      if (!name || !cleanPhone) {
-        throw new Error('Please provide your Full Legal Name and Mobile Number for volunteer enrollment.');
-      }
+    const isAdminAccount = user && user.role === 'Admin';
 
+    // Generate 4-digit random password PIN for volunteer applicant
+    const generatedPassword = Math.floor(1000 + Math.random() * 9000).toString();
+    const hashedPassword = await bcrypt.hash(generatedPassword, 10);
+
+    if (!user || isAdminAccount) {
       const assignedVolunteerId = await this.generateUniqueVolunteerId();
-      const hashedPassword = await bcrypt.hash(cleanPhone, 10);
 
-      user = await userRepository.create({
-        name: name.trim(),
-        email: effectiveEmail,
-        phone: cleanPhone,
+      const userCreateData = {
+        name: cleanName,
+        phone: isAdminAccount ? `${cleanPhone}_vol` : cleanPhone,
         password: hashedPassword,
         role: 'Volunteer',
         status: 'pending',
@@ -226,24 +267,34 @@ class ApplicationService {
         district: district || 'Aligarh',
         state: state || 'Uttar Pradesh',
         photoUrl: finalPhoto || '',
-        documentType: finalDocType || '',
+        documentType: finalDocType || 'Aadhaar Card',
         documentFront: finalDocFront || '',
         documentBack: finalDocBack || '',
         feePaid: true,
         feeAmount: 0,
         notes: 'Created via Volunteer Application'
-      });
+      };
+
+      if (cleanEmail && !isAdminAccount) {
+        userCreateData.email = cleanEmail;
+      }
+
+      if (submitter) {
+        userCreateData.addedByCoordinator = submitter._id || submitter.id;
+        userCreateData.addedByCoordinatorName = submitter.name || '';
+      }
+
+      user = await userRepository.create(userCreateData);
     } else {
-      // Update existing user record with volunteer details
-      if (!user.volunteerId) {
+      // Update existing user record with volunteer details (NOT Admin)
+      if (!user.volunteerId || !/^\d{10}$/.test(user.volunteerId)) {
         user.volunteerId = await this.generateUniqueVolunteerId();
       }
-      if (!user.password && cleanPhone) {
-        user.password = await bcrypt.hash(cleanPhone, 10);
+      user.password = hashedPassword;
+      if (cleanEmail) {
+        user.email = cleanEmail;
       }
-      if (effectiveEmail && !user.email) {
-        user.email = effectiveEmail;
-      }
+      if (cleanName) user.name = cleanName;
       if (bloodGroup) user.bloodGroup = bloodGroup;
       if (dob) user.dob = dob;
       if (address) user.address = address;
@@ -253,6 +304,7 @@ class ApplicationService {
       if (finalDocType) user.documentType = finalDocType;
       if (finalDocFront) user.documentFront = finalDocFront;
       if (finalDocBack) user.documentBack = finalDocBack;
+      user.isVolunteer = true;
       if (user.status !== 'active') user.status = 'pending';
       await user.save();
     }
@@ -260,14 +312,14 @@ class ApplicationService {
     const application = await applicationRepository.createVolunteerApp({
       user: user._id,
       userId: user._id,
-      isGuest: !userId,
-      name: name || user.name || '',
-      email: effectiveEmail || user.email || '',
-      phone: cleanPhone || user.phone || '',
+      isGuest: !submitter,
+      name: cleanName,
+      email: cleanEmail || '', // If blank, keep blank! Never fallback to submitter/admin!
+      phone: cleanPhone,
       skills: Array.isArray(skills) ? skills : [skills || 'Community Outreach'],
       availability: availability || 'Weekends',
       interests: appData.interests || '',
-      documentType: finalDocType,
+      documentType: finalDocType || 'Aadhaar Card',
       documentFront: finalDocFront,
       documentBack: finalDocBack,
       idProofDocument: finalIdProof,
@@ -288,9 +340,9 @@ class ApplicationService {
       application,
       credentials: {
         id: user.volunteerId,
-        password: cleanPhone || user.phone,
-        email: user.email || '',
-        name: user.name,
+        password: generatedPassword,
+        email: cleanEmail || '',
+        name: cleanName,
         role: 'Volunteer'
       }
     };
@@ -305,53 +357,25 @@ class ApplicationService {
   }
 
   async generateUniqueMemberId() {
-    const currentYear = new Date().getFullYear();
-    const prefix = `BYK-MEM-${currentYear}-`;
-    const users = await userRepository.find({ memberId: new RegExp(`^${prefix}`) });
-    let maxSeq = 1000;
-    for (const u of users) {
-      if (u.memberId) {
-        const match = u.memberId.match(/(\d+)$/);
-        if (match) {
-          const num = parseInt(match[1], 10);
-          if (!isNaN(num) && num > maxSeq) maxSeq = num;
-        }
-      }
-    }
-    let nextSeq = maxSeq + 1;
-    let candidate = `${prefix}${nextSeq}`;
-    while (await userRepository.findByMemberId(candidate)) {
-      nextSeq++;
-      candidate = `${prefix}${nextSeq}`;
+    let candidate;
+    let exists = true;
+    while (exists) {
+      // 10-digit random number between 1000000000 and 9999999999
+      candidate = Math.floor(1000000000 + Math.random() * 9000000000).toString();
+      const existing = await userRepository.findByMemberId(candidate);
+      if (!existing) exists = false;
     }
     return candidate;
   }
 
   async generateUniqueVolunteerId() {
-    const currentYear = new Date().getFullYear();
-    const prefix = `BYK-VOL-${currentYear}-`;
-    const users = await userRepository.find({ 
-      $or: [
-        { volunteerId: new RegExp(`^${prefix}`) },
-        { memberId: new RegExp(`^${prefix}`) }
-      ]
-    });
-    let maxSeq = 500;
-    for (const u of users) {
-      const idToTest = u.volunteerId || u.memberId;
-      if (idToTest) {
-        const match = idToTest.match(/(\d+)$/);
-        if (match) {
-          const num = parseInt(match[1], 10);
-          if (!isNaN(num) && num > maxSeq) maxSeq = num;
-        }
-      }
-    }
-    let nextSeq = maxSeq + 1;
-    let candidate = `${prefix}${nextSeq}`;
-    while (await userRepository.findByVolunteerId(candidate)) {
-      nextSeq++;
-      candidate = `${prefix}${nextSeq}`;
+    let candidate;
+    let exists = true;
+    while (exists) {
+      // 10-digit random number between 1000000000 and 9999999999
+      candidate = Math.floor(1000000000 + Math.random() * 9000000000).toString();
+      const existing = await userRepository.findByVolunteerId(candidate);
+      if (!existing) exists = false;
     }
     return candidate;
   }
@@ -367,7 +391,9 @@ class ApplicationService {
     }
 
     const plan = app.plan ? await planRepository.findById(app.plan._id || app.plan) : null;
-    const verifiedMemberId = (user && user.memberId) || await this.generateUniqueMemberId();
+    const verifiedMemberId = (user && user.memberId && /^\d{10}$/.test(user.memberId))
+      ? user.memberId
+      : await this.generateUniqueMemberId();
     let generatedPassword = null;
     const isGuest = Boolean(app.isGuest || !app.user || !app.userId);
 
@@ -487,7 +513,9 @@ class ApplicationService {
       user = await userRepository.findByEmail(app.email);
     }
     if (user) {
-      user.status = 'rejected';
+      if (user.role !== 'Admin') {
+        user.status = 'rejected';
+      }
       await user.save();
     }
 
@@ -504,7 +532,9 @@ class ApplicationService {
       user = await userRepository.findByEmail(app.email.toLowerCase().trim());
     }
 
-    const verifiedVolId = (user && user.volunteerId) || await this.generateUniqueVolunteerId();
+    const verifiedVolId = (user && user.volunteerId && /^\d{10}$/.test(user.volunteerId))
+      ? user.volunteerId
+      : await this.generateUniqueVolunteerId();
     let generatedPassword = null;
     const isGuest = Boolean(app.isGuest || !app.user || !app.userId);
 
@@ -609,9 +639,16 @@ class ApplicationService {
     app.reviewedAt = new Date();
     await app.save();
 
-    const user = await userRepository.findById(app.user._id || app.user);
+    const userId = app.user?._id || app.user || app.userId;
+    let user = userId ? await userRepository.findById(userId) : null;
+    if (!user && app.email) {
+      user = await userRepository.findByEmail(app.email);
+    }
     if (user) {
-      user.status = 'rejected';
+      if (user.role !== 'Admin') {
+        user.status = 'rejected';
+      }
+      user.volunteerStatus = 'rejected';
       await user.save();
     }
 

@@ -19,13 +19,17 @@ import {
   FiTrash2,
   FiExternalLink,
   FiFileText,
-  FiAward
+  FiAward,
+  FiDownload,
+  FiPrinter,
+  FiCopy
 } from "react-icons/fi";
 import api from "@/services/api";
 import { getContentImageUrl } from "@/lib/authApi";
 
 export default function VolunteerManagement() {
   const [volunteers, setVolunteers] = useState([]);
+  const [certificates, setCertificates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("all"); // 'all' | 'pending' | 'approved' | 'rejected'
   const [searchQuery, setSearchQuery] = useState("");
@@ -43,6 +47,18 @@ export default function VolunteerManagement() {
   const [certReason, setCertReason] = useState("In recognition of outstanding dedication and exemplary leadership for societal empowerment and youth volunteer services.");
   const [certRole, setCertRole] = useState("Active Youth Volunteer");
   const [issuingCert, setIssuingCert] = useState(false);
+  const [issuedCertSuccess, setIssuedCertSuccess] = useState(null);
+  const [downloadingCertId, setDownloadingCertId] = useState(null);
+
+  const loadCertificates = React.useCallback(async () => {
+    try {
+      const res = await api.get("/certificates");
+      const list = res.data?.certificates || res.data?.data || [];
+      setCertificates(Array.isArray(list) ? list : []);
+    } catch (e) {
+      console.warn("Could not load certificates:", e.message);
+    }
+  }, []);
 
   const loadData = React.useCallback(async () => {
     setLoading(true);
@@ -56,12 +72,13 @@ export default function VolunteerManagement() {
       }
       const list = res.data?.applications || res.data?.data || res.data?.volunteers || [];
       setVolunteers(Array.isArray(list) ? list : []);
+      await loadCertificates();
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to load volunteer applications");
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [loadCertificates]);
 
   useEffect(() => {
     let ignore = false;
@@ -76,6 +93,15 @@ export default function VolunteerManagement() {
         if (!ignore) {
           const list = res.data?.applications || res.data?.data || res.data?.volunteers || [];
           setVolunteers(Array.isArray(list) ? list : []);
+        }
+        try {
+          const cRes = await api.get("/certificates");
+          if (!ignore) {
+            const certList = cRes.data?.certificates || cRes.data?.data || [];
+            setCertificates(Array.isArray(certList) ? certList : []);
+          }
+        } catch (cErr) {
+          console.warn("Could not fetch initial certificates:", cErr.message);
         }
       } catch (err) {
         if (!ignore) {
@@ -155,6 +181,53 @@ export default function VolunteerManagement() {
     }
   };
 
+  const getVolunteerCertificates = React.useCallback((v) => {
+    if (!v || !certificates.length) return [];
+    const userId = (v.user?._id || v.userId || (typeof v.user === "string" ? v.user : "") || "").toString();
+    const email = (v.user?.email || v.email || "").toLowerCase().trim();
+    const volId = (v.assignedVolunteerId || v.volunteerId || v.user?.volunteerId || "").toString().trim();
+    const name = (v.user?.name || v.name || "").toLowerCase().trim();
+
+    return certificates.filter((c) => {
+      const cRecip = (c.recipient?._id || c.recipient || "").toString();
+      const cEmail = (c.recipientEmail || "").toLowerCase().trim();
+      const cRecipId = (c.recipientId || "").toString().trim();
+      const cName = (c.recipientName || "").toLowerCase().trim();
+
+      if (userId && cRecip && cRecip === userId) return true;
+      if (email && cEmail && cEmail === email) return true;
+      if (volId && cRecipId && cRecipId === volId) return true;
+      if (name && cName && cName === name && (email ? cEmail === email : true)) return true;
+      return false;
+    });
+  }, [certificates]);
+
+  const handleDownloadCertificate = async (cert) => {
+    if (!cert) return;
+    const certId = cert.certificateId || cert.certificateNo || cert._id;
+    try {
+      setDownloadingCertId(certId);
+      const res = await api.get(`/certificates/${certId}/download`, { responseType: "blob" });
+      const blob = new Blob([res.data], { type: "application/pdf" });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `Certificate_${certId}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      toast.success(`Certificate ${certId} PDF downloaded!`);
+    } catch (err) {
+      console.warn("Blob download failed, opening direct URL:", err);
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+      const cleanBase = apiBase.replace(/\/api\/?$/, "");
+      window.open(`${cleanBase}/api/certificates/${certId}/download`, "_blank");
+    } finally {
+      setDownloadingCertId(null);
+    }
+  };
+
   const handleIssueCertificate = async (e) => {
     e.preventDefault();
     if (!certModalItem) return;
@@ -171,8 +244,17 @@ export default function VolunteerManagement() {
       };
       const res = await api.post("/certificates", payload);
       if (res.data?.success) {
+        const newCert = res.data.certificate;
         toast.success("Certificate of Appreciation minted and issued to volunteer!");
+        if (newCert) {
+          setCertificates((prev) => [newCert, ...prev.filter((c) => c._id !== newCert._id && c.certificateId !== newCert.certificateId)]);
+          setIssuedCertSuccess({
+            certificate: newCert,
+            volunteer: certModalItem
+          });
+        }
         setCertModalItem(null);
+        loadCertificates();
       } else {
         toast.error(res.data?.message || "Failed to issue certificate");
       }
@@ -356,6 +438,7 @@ export default function VolunteerManagement() {
                   const phone = v.user?.phone || v.phone || "-";
                   const skillsDisplay = formatSkills(v.skills) || "Social Work & Volunteering";
                   const assignedId = v.assignedVolunteerId || v.user?.memberId;
+                  const volunteerCerts = getVolunteerCertificates(v);
 
                   return (
                     <tr key={id} className="group hover:bg-slate-50/80 transition">
@@ -469,19 +552,38 @@ export default function VolunteerManagement() {
                           )}
 
                           {isApproved && (
-                            <button
-                              onClick={() => {
-                                setCertModalItem(v);
-                                setCertRole(v.user?.designation || "Active Youth Volunteer");
-                                setCertTitle("Certificate of Appreciation for Dedicated Volunteer Service");
-                                setCertReason("In recognition of outstanding dedication, volunteer service, and societal leadership.");
-                              }}
-                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold text-[11px] transition cursor-pointer shadow-xs"
-                              title="Offer Official Certificate"
-                            >
-                              <FiAward className="w-3.5 h-3.5" />
-                              <span>Certificate</span>
-                            </button>
+                            <>
+                              {volunteerCerts.length > 0 && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleDownloadCertificate(volunteerCerts[0])}
+                                  disabled={downloadingCertId === (volunteerCerts[0].certificateId || volunteerCerts[0]._id)}
+                                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] transition cursor-pointer shadow-xs disabled:opacity-50"
+                                  title={`Download Certificate PDF (${volunteerCerts[0].certificateId || "Official PDF"})`}
+                                >
+                                  {downloadingCertId === (volunteerCerts[0].certificateId || volunteerCerts[0]._id) ? (
+                                    <FiRefreshCw className="w-3.5 h-3.5 animate-spin" />
+                                  ) : (
+                                    <FiDownload className="w-3.5 h-3.5" />
+                                  )}
+                                  <span>Cert PDF</span>
+                                </button>
+                              )}
+
+                              <button
+                                onClick={() => {
+                                  setCertModalItem(v);
+                                  setCertRole(v.user?.designation || "Active Youth Volunteer");
+                                  setCertTitle("Certificate of Appreciation for Dedicated Volunteer Service");
+                                  setCertReason("In recognition of outstanding dedication, volunteer service, and societal leadership.");
+                                }}
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold text-[11px] transition cursor-pointer shadow-xs"
+                                title="Offer Official Certificate"
+                              >
+                                <FiAward className="w-3.5 h-3.5" />
+                                <span>{volunteerCerts.length > 0 ? "Offer Again" : "Certificate"}</span>
+                              </button>
+                            </>
                           )}
 
                           <button
@@ -607,7 +709,77 @@ export default function VolunteerManagement() {
                 )}
               </div>
 
+              {/* Issued Certificates & Awards Section */}
+              {(() => {
+                const viewCerts = getVolunteerCertificates(viewModalItem);
+                if (!viewCerts || viewCerts.length === 0) return null;
+                return (
+                  <div className="bg-emerald-50/70 rounded-2xl p-4 border border-emerald-200 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="font-extrabold text-xs text-emerald-950 flex items-center gap-1.5">
+                        <FiAward className="w-4 h-4 text-[#0b8026]" />
+                        <span>Official Issued Certificates ({viewCerts.length})</span>
+                      </span>
+                      <span className="text-[10px] font-bold text-emerald-700 bg-white px-2 py-0.5 rounded-md border border-emerald-200">
+                        Active &amp; Verifiable
+                      </span>
+                    </div>
 
+                    <div className="space-y-2">
+                      {viewCerts.map((c) => {
+                        const cId = c.certificateId || c.certificateNo || c._id;
+                        return (
+                          <div
+                            key={cId}
+                            className="bg-white rounded-xl p-3 border border-emerald-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs"
+                          >
+                            <div className="space-y-0.5">
+                              <p className="font-bold text-xs text-slate-900">{c.title}</p>
+                              <div className="flex items-center gap-2 text-[10px] text-slate-500 font-mono">
+                                <span className="font-bold text-emerald-800">{cId}</span>
+                                <span>•</span>
+                                <span>{c.issueDate ? new Date(c.issueDate).toLocaleDateString("en-IN") : "Issued"}</span>
+                                {c.roleOrDesignation && (
+                                  <>
+                                    <span>•</span>
+                                    <span className="text-slate-600">{c.roleOrDesignation}</span>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-2 shrink-0">
+                              <button
+                                type="button"
+                                onClick={() => handleDownloadCertificate(c)}
+                                disabled={downloadingCertId === cId}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0b8026] hover:bg-[#075018] text-white font-bold text-xs transition cursor-pointer shadow-xs disabled:opacity-50"
+                              >
+                                {downloadingCertId === cId ? (
+                                  <FiRefreshCw className="w-3.5 h-3.5 animate-spin" />
+                                ) : (
+                                  <FiDownload className="w-3.5 h-3.5" />
+                                )}
+                                <span>Download PDF</span>
+                              </button>
+
+                              <a
+                                href={`/api/certificates/${cId}/download`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="p-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 transition"
+                                title="Open in new tab / print"
+                              >
+                                <FiExternalLink className="w-3.5 h-3.5" />
+                              </a>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })()}
 
             </div>
 
@@ -622,6 +794,24 @@ export default function VolunteerManagement() {
               </button>
 
               <div className="flex items-center gap-2">
+                {((viewModalItem.status || "pending").toLowerCase() === "approved" || (viewModalItem.status || "pending").toLowerCase() === "active") && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const v = viewModalItem;
+                      setViewModalItem(null);
+                      setCertModalItem(v);
+                      setCertRole(v.user?.designation || "Active Youth Volunteer");
+                      setCertTitle("Certificate of Appreciation for Dedicated Volunteer Service");
+                      setCertReason("In recognition of outstanding dedication, volunteer service, and societal leadership.");
+                    }}
+                    className="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-black text-xs shadow-md transition cursor-pointer flex items-center gap-1.5"
+                  >
+                    <FiAward className="w-4 h-4" />
+                    <span>Offer Official Certificate</span>
+                  </button>
+                )}
+
                 {((viewModalItem.status || "pending").toLowerCase() === "pending") && (
                   <>
                     <button
@@ -903,6 +1093,110 @@ export default function VolunteerManagement() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Post-Issue Success & Certificate PDF Download Modal */}
+      {issuedCertSuccess && (
+        <div
+          className="fixed inset-0 bg-black/70 backdrop-blur-xs z-50 flex items-center justify-center p-4 animate-in fade-in duration-150"
+          onClick={() => setIssuedCertSuccess(null)}
+        >
+          <div
+            className="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full border border-slate-200 shadow-2xl space-y-5 text-black animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="text-center space-y-2">
+              <div className="w-14 h-14 bg-emerald-100 text-[#0b8026] rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-xs border border-emerald-200">
+                <FiCheckCircle className="w-8 h-8 text-[#0b8026]" />
+              </div>
+              <h3 className="font-black text-xl text-slate-900">Certificate Minted &amp; Offered!</h3>
+              <p className="text-xs text-slate-500 font-medium max-w-sm mx-auto">
+                Official certificate has been issued and stored securely. You can now download the official high-resolution PDF for admin records.
+              </p>
+            </div>
+
+            {/* Certificate Details Card */}
+            <div className="bg-emerald-50/60 border border-emerald-200/80 rounded-2xl p-4 space-y-2.5 text-xs">
+              <div className="flex items-center justify-between pb-2 border-b border-emerald-200/60">
+                <span className="text-slate-500 font-bold">Certificate Number:</span>
+                <div className="flex items-center gap-1.5 font-mono font-black text-emerald-900 bg-white px-2 py-0.5 rounded-lg border border-emerald-200">
+                  <span>{issuedCertSuccess.certificate.certificateId || issuedCertSuccess.certificate.certificateNo}</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const cid = issuedCertSuccess.certificate.certificateId || issuedCertSuccess.certificate.certificateNo;
+                      navigator.clipboard.writeText(cid);
+                      toast.success("Certificate ID copied to clipboard!");
+                    }}
+                    title="Copy Certificate ID"
+                    className="p-1 hover:text-emerald-700 transition"
+                  >
+                    <FiCopy className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-slate-500 font-bold">Volunteer Recipient:</span>
+                <span className="font-extrabold text-slate-900">
+                  {issuedCertSuccess.certificate.recipientName || issuedCertSuccess.volunteer?.name}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-slate-500 font-bold">Designation / Role:</span>
+                <span className="font-semibold text-slate-800">
+                  {issuedCertSuccess.certificate.roleOrDesignation || "Active Youth Volunteer"}
+                </span>
+              </div>
+
+              <div className="flex items-start justify-between gap-2 pt-1 border-t border-emerald-200/60">
+                <span className="text-slate-500 font-bold shrink-0">Certificate Title:</span>
+                <span className="font-semibold text-slate-900 text-right">
+                  {issuedCertSuccess.certificate.title}
+                </span>
+              </div>
+            </div>
+
+            {/* Download Action Buttons */}
+            <div className="space-y-2 pt-1">
+              <button
+                type="button"
+                onClick={() => handleDownloadCertificate(issuedCertSuccess.certificate)}
+                disabled={downloadingCertId !== null}
+                className="w-full py-3.5 px-4 rounded-2xl bg-[#0b8026] hover:bg-[#08661e] text-white font-black text-sm shadow-lg shadow-emerald-700/20 transition cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {downloadingCertId === (issuedCertSuccess.certificate.certificateId || issuedCertSuccess.certificate._id) ? (
+                  <FiRefreshCw className="w-4 h-4 animate-spin" />
+                ) : (
+                  <FiDownload className="w-4 h-4" />
+                )}
+                <span>Download Official Certificate PDF</span>
+              </button>
+
+              <div className="grid grid-cols-2 gap-2">
+                <a
+                  href={`/api/certificates/${issuedCertSuccess.certificate.certificateId || issuedCertSuccess.certificate._id}/download`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="py-2.5 px-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs transition flex items-center justify-center gap-1.5"
+                >
+                  <FiPrinter className="w-3.5 h-3.5" />
+                  <span>View / Print PDF</span>
+                </a>
+
+                <button
+                  type="button"
+                  onClick={() => setIssuedCertSuccess(null)}
+                  className="py-2.5 px-3 rounded-xl border border-slate-300 text-slate-700 font-bold text-xs hover:bg-slate-100 transition cursor-pointer"
+                >
+                  Done &amp; Close
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

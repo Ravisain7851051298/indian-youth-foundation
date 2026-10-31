@@ -5,8 +5,6 @@ const userSchema = new mongoose.Schema({
   email: { 
     type: String, 
     required: false, 
-    unique: true, 
-    sparse: true, 
     lowercase: true, 
     trim: true,
     default: undefined 
@@ -20,7 +18,7 @@ const userSchema = new mongoose.Schema({
   },
   status: { 
     type: String, 
-    enum: ['active', 'blocked', 'deactivated', 'pending'], 
+    enum: ['active', 'blocked', 'deactivated', 'pending', 'rejected'], 
     default: 'active' 
   },
   memberId: { type: String, unique: true, sparse: true },
@@ -62,9 +60,18 @@ const userSchema = new mongoose.Schema({
   timestamps: true
 });
 
+userSchema.index(
+  { email: 1 }, 
+  { 
+    unique: true, 
+    partialFilterExpression: { email: { $type: 'string', $gt: '' } } 
+  }
+);
+
 userSchema.pre('save', function (next) {
-  if (this.email === '' || !this.email) {
+  if (!this.email || (typeof this.email === 'string' && this.email.trim() === '')) {
     this.email = undefined;
+    this.set('email', undefined);
   }
   if (typeof next === 'function') next();
 });

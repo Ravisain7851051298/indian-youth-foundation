@@ -1,22 +1,14 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import {
   FiUserCheck,
-  FiUploadCloud,
   FiCheckCircle,
-  FiTrash2,
-  FiClock,
-  FiHeart,
-  FiCamera,
-  FiUser,
   FiAlertTriangle,
   FiCopy,
   FiCheck,
   FiX,
-  FiLock,
-  FiKey
 } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
 import { submitVolunteerApplication } from '@/store/applicationSlice';
@@ -27,13 +19,13 @@ export default function ApplyVolunteerPage() {
   const { loading } = useSelector((state) => state.applications);
   const { currentUser, settings } = useNGO();
 
-  // Applicant fields (auto-filled if logged in, editable for new / existing users)
-  const [applicantName, setApplicantName] = useState(currentUser?.name || '');
-  const [applicantEmail, setApplicantEmail] = useState(currentUser?.email || '');
-  const [applicantPhone, setApplicantPhone] = useState(currentUser?.phone || '');
-  const [applicantBloodGroup, setApplicantBloodGroup] = useState(currentUser?.bloodGroup || 'O+');
-  const [applicantDistrict, setApplicantDistrict] = useState(currentUser?.district || 'Aligarh');
-  const [applicantState, setApplicantState] = useState(currentUser?.state || 'Uttar Pradesh');
+  // Applicant fields - Always blank for fresh applicant entry (no autofill)
+  const [applicantName, setApplicantName] = useState('');
+  const [applicantEmail, setApplicantEmail] = useState('');
+  const [applicantPhone, setApplicantPhone] = useState('');
+  const [applicantBloodGroup, setApplicantBloodGroup] = useState('O+');
+  const [applicantDistrict, setApplicantDistrict] = useState('Aligarh');
+  const [applicantState, setApplicantState] = useState('Uttar Pradesh');
 
   const [validationError, setValidationError] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -41,18 +33,6 @@ export default function ApplyVolunteerPage() {
   const [showModal, setShowModal] = useState(false);
   const [copiedId, setCopiedId] = useState(false);
   const [copiedPass, setCopiedPass] = useState(false);
-
-  // Auto-fill fields if currentUser is loaded or updates
-  useEffect(() => {
-    if (currentUser) {
-      if (currentUser.name) setApplicantName((prev) => prev || currentUser.name);
-      if (currentUser.email) setApplicantEmail((prev) => prev || currentUser.email);
-      if (currentUser.phone) setApplicantPhone((prev) => prev || currentUser.phone);
-      if (currentUser.bloodGroup) setApplicantBloodGroup((prev) => (prev && prev !== 'O+' ? prev : currentUser.bloodGroup || 'O+'));
-      if (currentUser.district) setApplicantDistrict((prev) => (prev && prev !== 'Aligarh' ? prev : currentUser.district || 'Aligarh'));
-      if (currentUser.state) setApplicantState((prev) => (prev && prev !== 'Uttar Pradesh' ? prev : currentUser.state || 'Uttar Pradesh'));
-    }
-  }, [currentUser]);
 
   const copyToClipboard = (text, type) => {
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
@@ -96,7 +76,7 @@ export default function ApplyVolunteerPage() {
       const res = await dispatch(submitVolunteerApplication(formData)).unwrap();
 
       const creds = res?.credentials || {
-        id: res?.application?.assignedVolunteerId || 'BYK-VOL-PENDING',
+        id: res?.application?.assignedVolunteerId || 'Pending Assignment',
         password: applicantPhone.trim(),
         email: applicantEmail.trim(),
         name: applicantName.trim()
@@ -162,7 +142,7 @@ export default function ApplyVolunteerPage() {
                 </div>
 
                 <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-2xs">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Password (Your Phone Number)</span>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase block">Password (4-Digit PIN)</span>
                   <div className="flex items-center justify-between mt-1">
                     <span className="font-mono font-black text-sm text-slate-900">{createdCredentials.password}</span>
                     <button
@@ -177,7 +157,7 @@ export default function ApplyVolunteerPage() {
               </div>
 
               <p className="text-[11px] text-slate-600">
-                You can use this ID or your Email along with your Mobile Number as Password to log in anytime. You can also add or update your email address anytime from your profile settings.
+                You can use this 10-Digit Volunteer ID or your Email along with your 4-Digit Password to log in anytime. You can also add or update your email address anytime from your profile settings.
               </p>
             </div>
           )}
@@ -221,26 +201,15 @@ export default function ApplyVolunteerPage() {
             </div>
           )}
 
-          {/* Applicant Details Section (Auto-filled if logged in, editable for new / existing users) */}
+          {/* Applicant Details Section - Always blank for fresh applicant entry */}
           <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              {currentUser ? (
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                  <span className="text-xs font-bold text-slate-800">
-                    Logged in as <strong className="text-[#0b8026]">{currentUser.name}</strong> • Details auto-filled (You can edit or enter new details if needed)
-                  </span>
-                </div>
-              ) : (
-                <>
-                  <span className="text-xs font-black uppercase tracking-wider text-[#0b8026]">
-                    Email is optional. You can also add or update email from your profile.
-                  </span>
-                  <Link href="/login?role=volunteer&redirect=/apply-volunteer" className="text-xs font-bold text-blue-600 hover:underline">
-                    Already have an account? Sign in
-                  </Link>
-                </>
-              )}
+              <span className="text-xs font-black uppercase tracking-wider text-[#0b8026]">
+                Applicant Personal Information (Email is optional)
+              </span>
+              <span className="text-[11px] text-slate-500 font-medium">
+                Enter applicant details below
+              </span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
@@ -350,7 +319,7 @@ export default function ApplyVolunteerPage() {
         <div className="fixed inset-0 z-50 bg-black/65 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative overflow-hidden animate-in zoom-in-95 duration-200 text-slate-900">
             {/* Top decorative gradient bar */}
-            <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-[#0b8026] via-[#08661e] to-[#dc2626]" />
+            <div className="absolute top-0 left-0 right-0 h-2 bg-linear-to-r from-[#0b8026] via-[#08661e] to-[#dc2626]" />
 
             <button
               type="button"
@@ -371,7 +340,7 @@ export default function ApplyVolunteerPage() {
                 Your Volunteer ID &amp; Password
               </h3>
               <p className="text-xs text-slate-600 font-medium">
-                Please note down your official login credentials. You can login right now using your ID or Email and your Phone Number as Password!
+                Please note down your official login credentials. You can login right now using your 10-Digit ID or Email and your 4-Digit Password!
               </p>
             </div>
 
@@ -380,7 +349,7 @@ export default function ApplyVolunteerPage() {
               {/* Volunteer ID */}
               <div>
                 <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1 flex items-center justify-between">
-                  <span>Volunteer ID (Username)</span>
+                  <span>Official Volunteer ID (10-Digit ID)</span>
                   <span className="text-[#0b8026] font-extrabold text-[10px]">Use this to log in</span>
                 </div>
                 <div className="flex items-center justify-between bg-white px-3.5 py-2.5 rounded-xl border border-slate-300 shadow-xs">
@@ -402,7 +371,7 @@ export default function ApplyVolunteerPage() {
               <div>
                 <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1 flex items-center justify-between">
                   <span>Password</span>
-                  <span className="text-red-600 font-extrabold text-[10px]">Your Mobile Number</span>
+                  <span className="text-red-600 font-extrabold text-[10px]">Your 4-Digit Password</span>
                 </div>
                 <div className="flex items-center justify-between bg-white px-3.5 py-2.5 rounded-xl border border-slate-300 shadow-xs">
                   <span className="font-mono font-black text-sm sm:text-base text-slate-900 tracking-wide">
@@ -430,7 +399,7 @@ export default function ApplyVolunteerPage() {
 
             {/* Explanatory Info */}
             <div className="bg-emerald-50/70 border border-emerald-200/80 rounded-2xl p-3.5 text-[11px] text-emerald-950 leading-relaxed mb-6">
-              💡 <strong>Instant Access:</strong> You can log in immediately using your <strong>Volunteer ID ({createdCredentials.id})</strong> or <strong>Email</strong> and your <strong>Mobile Number ({createdCredentials.password})</strong> as Password. You can also add or update your email address in your profile after signing in.
+              💡 <strong>Instant Access:</strong> You can log in immediately using your <strong>10-Digit Volunteer ID ({createdCredentials.id})</strong> or <strong>Email/Phone</strong> and your <strong>4-Digit Password ({createdCredentials.password})</strong>. You can also add or update your email address in your profile after signing in.
             </div>
 
             {/* CTAs */}

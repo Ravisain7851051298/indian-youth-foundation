@@ -144,7 +144,7 @@ const testSmtpConnection = async ({ host, port, user, pass, fromName, to }) => {
   };
 };
 
-const sendEmail = async ({ to, subject, htmlText, template = 'general', attachments = [] }) => {
+const sendEmail = async ({ to, subject, htmlText, text, template = 'general', attachments = [] }) => {
   let deliveryStatus = 'logged_simulated';
   const { transporter, user: smtpUser, fromName: dbFromName } = await getTransporterConfig();
 
@@ -157,10 +157,12 @@ const sendEmail = async ({ to, subject, htmlText, template = 'general', attachme
     try {
       const fromName = dbFromName || 'Yuva Kranti Dal';
       const fromEmail = smtpUser || 'samasyasamadhanparishad@gmail.com';
+      const plainText = text || (htmlText ? htmlText.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() : '');
       const mailOptions = {
         from: `"${fromName}" <${fromEmail}>`,
         to,
         subject,
+        text: plainText,
         html: htmlText
       };
 

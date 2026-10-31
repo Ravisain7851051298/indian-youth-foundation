@@ -152,8 +152,16 @@ export default function AdminSidebar({ activeRole = null }) {
         {/* Brand Header */}
         <div className="p-4 border-b border-slate-200 flex items-center justify-between">
           <div className="flex items-center gap-3 overflow-hidden">
-            <div className="w-10 h-10 rounded-xl bg-[#0b8026] flex items-center justify-center font-bold text-white shadow-md shadow-emerald-800/20 shrink-0">
-              IYF
+            <div className="w-10 h-10 rounded-full border-2 border-[#0b8026] ring-2 ring-emerald-500/20 p-0.5 flex items-center justify-center bg-white shrink-0 overflow-hidden shadow-xs">
+              <img
+                src={getContentImageUrl(settings?.logoUrl) || '/logo.jpeg'}
+                alt={settings?.ngoName || 'Yuva Kranti Dal'}
+                className="w-full h-full object-contain"
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = '/logo.jpeg';
+                }}
+              />
             </div>
             <div className="overflow-hidden">
               <h2 className="font-bold text-xs tracking-wide text-black truncate">

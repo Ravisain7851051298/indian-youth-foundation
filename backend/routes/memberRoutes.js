@@ -16,8 +16,15 @@ router.get('/public', memberController.getPublicMembers);
 router.get('/', verifyToken, requireRole(['admin', 'Admin']), memberController.getMembers);
 router.put('/:id/status', verifyToken, requireRole(['admin', 'Admin']), memberController.updateMemberStatus);
 router.put('/:id/verify', verifyToken, requireRole(['admin', 'Admin']), memberController.verifyMember);
-router.put('/:id/approve', verifyToken, requireRole(['admin', 'Admin']), applicationController.approveMembershipApplication);
-router.put('/:id/reject', verifyToken, requireRole(['admin', 'Admin']), applicationController.rejectMembershipApplication);
+router.route('/:id/approve')
+  .put(verifyToken, requireRole(['admin', 'Admin']), applicationController.approveMembershipApplication)
+  .post(verifyToken, requireRole(['admin', 'Admin']), applicationController.approveMembershipApplication)
+  .patch(verifyToken, requireRole(['admin', 'Admin']), applicationController.approveMembershipApplication);
+
+router.route('/:id/reject')
+  .put(verifyToken, requireRole(['admin', 'Admin']), applicationController.rejectMembershipApplication)
+  .post(verifyToken, requireRole(['admin', 'Admin']), applicationController.rejectMembershipApplication)
+  .patch(verifyToken, requireRole(['admin', 'Admin']), applicationController.rejectMembershipApplication);
 router.get('/export/excel', verifyToken, requireRole(['admin', 'Admin']), memberController.exportMembersExcel);
 router.delete('/:id', verifyToken, requireRole(['admin', 'Admin']), memberController.deleteMember);
 
