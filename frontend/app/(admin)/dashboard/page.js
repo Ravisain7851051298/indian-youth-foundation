@@ -453,25 +453,12 @@ export default function DashboardPage() {
       <div className="bg-white p-4 rounded-b-2xl border-b border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full border-2 border-[#0b8026] ring-2 ring-emerald-500/20 p-0.5 bg-white flex items-center justify-center overflow-hidden shadow-xs shrink-0">
-              <img
-                src={getContentImageUrl(settings?.logoUrl) || '/logo.jpeg'}
-                alt={settings?.ngoName || 'Yuva Kranti Dal'}
-                className="w-full h-full object-contain"
-                onError={(e) => {
-                  e.currentTarget.onerror = null;
-                  e.currentTarget.src = '/logo.jpeg';
-                }}
-              />
-            </div>
-            <div>
-              <h1 className="text-lg font-black text-slate-900 tracking-tight">
-                {isAdmin ? 'Admin Master Control & Analytics Hub' : 'Team Member Operations Hub'}
-              </h1>
-              <p className="text-xs text-slate-500">
-                Organization: <strong className="text-slate-800">{settings?.ngoName || 'Yuva Kranti Dal'}</strong> • National Executive &amp; Trustee Operations
-              </p>
-            </div>
+            <h1 className="text-lg font-black text-slate-900 tracking-tight">
+              {isAdmin ? 'Admin Master Control & Analytics Hub' : 'Team Member Operations Hub'}
+            </h1>
+            <p className="text-xs text-slate-500">
+              Organization: <strong className="text-slate-800">{settings?.ngoName || 'Yuva Kranti Dal'}</strong> • National Executive &amp; Trustee Operations
+            </p>
           </div>
         </div>
 
