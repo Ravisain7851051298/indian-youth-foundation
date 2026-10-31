@@ -454,11 +454,8 @@ export default function DashboardPage() {
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-lg font-black text-slate-900 tracking-tight">
-              {isAdmin ? 'Admin Master Control & Analytics Hub' : 'Team Member Operations Hub'}
+              Analytics Dashboard
             </h1>
-            <p className="text-xs text-slate-500">
-              Organization: <strong className="text-slate-800">{settings?.ngoName || 'Yuva Kranti Dal'}</strong> • National Executive &amp; Trustee Operations
-            </p>
           </div>
         </div>
 
