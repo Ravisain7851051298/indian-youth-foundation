@@ -100,7 +100,7 @@ export const clearAuthTokens = () => {
 // Create base Axios instance with credentials enabled for HTTP-only cookies
 const api = axios.create({
   baseURL: getApiBaseUrl(),
-  timeout: 25000,
+  timeout: 60000,
   withCredentials: true, // Automatically sends HTTP-Only secure cookies with every request
   headers: {
     'Content-Type': 'application/json'

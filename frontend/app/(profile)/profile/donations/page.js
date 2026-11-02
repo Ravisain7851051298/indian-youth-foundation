@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   FiHeart, 
   FiDownload, 
@@ -16,12 +16,14 @@ import { QRCodeSVG } from 'qrcode.react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchDonations, submitDonation } from '@/store/donationSlice';
 import { useNGO } from '@/context/NGOContext';
+import { printElement } from '@/lib/printElement';
 
 export default function ProfileDonationsPage() {
   const dispatch = useDispatch();
   const { donations } = useSelector((state) => state.donations);
   const { currentUser, settings } = useNGO();
 
+  const receiptRef = useRef(null);
   const [modalReceipt, setModalReceipt] = useState(null);
   const [donateModal, setDonateModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -265,7 +267,16 @@ export default function ProfileDonationsPage() {
               </h3>
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => window.print()}
+                  onClick={() => {
+                    if (receiptRef.current) {
+                      printElement(receiptRef.current, {
+                        title: `80G_Donation_Receipt_${modalReceipt.receiptNumber || modalReceipt._id}`,
+                        pageStyle: '@page { size: portrait; margin: 8mm 10mm; }'
+                      });
+                    } else {
+                      window.print();
+                    }
+                  }}
                   className="px-3.5 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs cursor-pointer"
                 >
                   <FiPrinter className="w-3.5 h-3.5" />
@@ -281,7 +292,7 @@ export default function ProfileDonationsPage() {
             </div>
 
             {/* Printable Receipt Body */}
-            <div className="border-2 border-red-600 rounded-2xl p-6 sm:p-8 space-y-6 text-black relative bg-white">
+            <div ref={receiptRef} className="printable-document border-2 border-red-600 rounded-2xl p-6 sm:p-8 space-y-6 text-black relative bg-white">
               {/* Receipt Top Letterhead */}
               <div className="text-center border-b-2 border-red-500 pb-4 space-y-1">
                 <h2 className="text-lg sm:text-xl font-black text-red-600 uppercase tracking-wide">

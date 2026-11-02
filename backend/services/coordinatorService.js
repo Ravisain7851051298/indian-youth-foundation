@@ -10,35 +10,22 @@ const { sendCoordinatorAppointmentEmail } = require('./emailService');
 
 class CoordinatorService {
   /**
-   * Generates a unique Coordinator ID with format BYK-COORD-YYYY-XXXX
+   * Generates a unique Coordinator ID as a 10-digit numeric random ID
    */
   async generateUniqueCoordinatorId() {
-    const currentYear = new Date().getFullYear();
-    const prefix = `BYK-COORD-${currentYear}-`;
-    const users = await User.find({
-      $or: [
-        { coordinatorId: new RegExp(`^${prefix}`) },
-        { memberId: new RegExp(`^${prefix}`) }
-      ]
-    });
-
-    let maxSeq = 100;
-    for (const u of users) {
-      const idToTest = u.coordinatorId || (u.memberId && u.memberId.startsWith(prefix) ? u.memberId : null);
-      if (idToTest) {
-        const match = idToTest.match(/(\d+)$/);
-        if (match) {
-          const num = parseInt(match[1], 10);
-          if (!isNaN(num) && num > maxSeq) maxSeq = num;
-        }
-      }
-    }
-
-    let nextSeq = maxSeq + 1;
-    let candidate = `${prefix}${String(nextSeq).padStart(4, '0')}`;
-    while (await User.findOne({ $or: [{ coordinatorId: candidate }, { memberId: candidate }] })) {
-      nextSeq++;
-      candidate = `${prefix}${String(nextSeq).padStart(4, '0')}`;
+    let candidate;
+    let exists = true;
+    while (exists) {
+      // 10-digit random number between 1000000000 and 9999999999
+      candidate = Math.floor(1000000000 + Math.random() * 9000000000).toString();
+      const existing = await User.findOne({
+        $or: [
+          { coordinatorId: candidate },
+          { memberId: candidate },
+          { volunteerId: candidate }
+        ]
+      });
+      if (!existing) exists = false;
     }
     return candidate;
   }
@@ -182,10 +169,10 @@ class CoordinatorService {
       generatedPassword = tempPass;
     }
 
-    if (!user.coordinatorId) {
+    if (!user.coordinatorId || !/^\d{10}$/.test(user.coordinatorId)) {
       user.coordinatorId = await this.generateUniqueCoordinatorId();
     }
-    if (!user.memberId || user.memberId.startsWith('BYK-DON-')) {
+    if (!user.memberId || !/^\d{10}$/.test(user.memberId) || user.memberId.startsWith('BYK-DON-')) {
       user.memberId = user.coordinatorId;
     }
 
@@ -247,6 +234,17 @@ class CoordinatorService {
         { isCoordinator: true }
       ]
     }).select('-password').sort({ createdAt: -1 });
+
+    // Normalize any legacy or non-10-digit IDs to 10-digit random numeric IDs
+    for (const c of coordinators) {
+      if (!c.coordinatorId || !/^\d{10}$/.test(c.coordinatorId)) {
+        c.coordinatorId = await this.generateUniqueCoordinatorId();
+        if (!c.memberId || !/^\d{10}$/.test(c.memberId)) {
+          c.memberId = c.coordinatorId;
+        }
+        await User.updateOne({ _id: c._id }, { $set: { coordinatorId: c.coordinatorId, memberId: c.memberId } });
+      }
+    }
 
     const coordinatorListWithStats = await Promise.all(
       coordinators.map(async (c) => {
@@ -320,6 +318,12 @@ class CoordinatorService {
     const coordinator = await User.findById(coordinatorUserId).select('-password');
     if (!coordinator) {
       throw new Error('Coordinator account not found.');
+    }
+
+    if (!coordinator.coordinatorId || !/^\d{10}$/.test(coordinator.coordinatorId)) {
+      coordinator.coordinatorId = await this.generateUniqueCoordinatorId();
+      coordinator.memberId = coordinator.coordinatorId;
+      await User.updateOne({ _id: coordinator._id }, { $set: { coordinatorId: coordinator.coordinatorId, memberId: coordinator.memberId } });
     }
 
     const orConditions = [

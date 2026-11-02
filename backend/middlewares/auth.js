@@ -198,7 +198,7 @@ const optionalAuth = async (req, res, next) => {
       }
     }
     if (decoded.id && decoded.id !== 'admin_master') {
-      const user = await User.findById(decoded.id).select('status role name email memberId').lean();
+      const user = await User.findById(decoded.id).select('status role name email memberId coordinatorId volunteerId isCoordinator isVolunteer isMember designation district state phone photoUrl bloodGroup address').lean();
       if (user && user.status !== 'blocked' && user.status !== 'deactivated') {
         req.user = {
           id: user._id.toString(),
@@ -206,6 +206,15 @@ const optionalAuth = async (req, res, next) => {
           name: user.name,
           email: user.email,
           memberId: user.memberId,
+          coordinatorId: user.coordinatorId,
+          volunteerId: user.volunteerId,
+          isCoordinator: user.isCoordinator,
+          isVolunteer: user.isVolunteer,
+          isMember: user.isMember,
+          designation: user.designation,
+          district: user.district,
+          state: user.state,
+          phone: user.phone,
           status: user.status
         };
       }

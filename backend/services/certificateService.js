@@ -9,30 +9,19 @@ class CertificateService {
   }
 
   async generateUniqueCertificateId() {
-    const currentYear = new Date().getFullYear();
-    const prefix = `BYK-CERT-${currentYear}-`;
-    const certs = await certificateRepository.findCertsWithPrefix(prefix);
-    let maxSeq = 0;
-    for (const c of certs) {
-      if (c.certificateId) {
-        const match = c.certificateId.match(/(\d+)$/);
-        if (match) {
-          const num = parseInt(match[1], 10);
-          if (!isNaN(num) && num > maxSeq) maxSeq = num;
-        }
-      }
-    }
-    let nextSeq = maxSeq + 1;
-    let candidate = `${prefix}${String(nextSeq).padStart(4, '0')}`;
-    while (await certificateRepository.findByCertificateId(candidate)) {
-      nextSeq++;
-      candidate = `${prefix}${String(nextSeq).padStart(4, '0')}`;
+    let candidate;
+    let exists = true;
+    while (exists) {
+      // 10-digit random number between 1000000000 and 9999999999
+      candidate = Math.floor(1000000000 + Math.random() * 9000000000).toString();
+      const existing = await certificateRepository.findByCertificateId(candidate);
+      if (!existing) exists = false;
     }
     return candidate;
   }
 
   async issueCertificate(certData, adminUser = {}) {
-    const { recipientId, recipientName, recipientEmail, title, titleHi, reason, reasonHi, roleOrDesignation } = certData;
+    const { recipientId, recipientName, recipientEmail, title, titleHi, reason, reasonHi, roleOrDesignation, category } = certData;
     if (!recipientName) throw new Error('Recipient name is required');
 
     let recipientUser = null;
@@ -47,10 +36,20 @@ class CertificateService {
       if (mongoose.Types.ObjectId.isValid(cleanId)) {
         recipientUser = await userRepository.findById(cleanId);
       }
+      if (!recipientUser && userRepository.findByIdentifier) {
+        recipientUser = await userRepository.findByIdentifier(cleanId);
+      }
       if (!recipientUser) {
         recipientUser = await userRepository.findByMemberId(cleanId);
       }
     }
+
+    const isCoordinator = (category && category.toLowerCase().includes('coordinator')) ||
+      (roleOrDesignation && roleOrDesignation.toLowerCase().includes('coordinator')) ||
+      (title && title.toLowerCase().includes('coordinator')) ||
+      (recipientUser && (recipientUser.role === 'coordinator' || !!recipientUser.coordinatorId));
+
+    const resolvedCategory = category || (isCoordinator ? 'Coordinator' : 'General');
 
     const certificateId = await this.generateUniqueCertificateId();
     const verificationUrl = `https://bharatiyayuvakranti.org/verify/certificate/${certificateId}`;
@@ -61,16 +60,17 @@ class CertificateService {
       certificateNo: certificateId,
       recipient: recipientUser ? recipientUser._id : (mongoose.Types.ObjectId.isValid(cleanId) ? cleanId : null),
       recipientName: recipientName || recipientUser?.name,
-      recipientId: recipientUser?.memberId || cleanId || '',
+      recipientId: recipientUser?.coordinatorId || recipientUser?.memberId || recipientUser?.volunteerId || cleanId || '',
       recipientEmail: cleanEmail || recipientUser?.email || '',
       recipientPhone: recipientUser?.phone || '',
-      title: title || 'Certificate of Appreciation & National Service',
-      titleHi: titleHi || 'प्रशंसा एवं राष्ट्र सेवा प्रमाण पत्र',
-      awardTitle: title || 'Certificate of Appreciation & National Service',
-      reason: reason || 'In recognition of outstanding dedication and exemplary leadership for societal empowerment.',
-      reasonHi: reasonHi || 'समाज सशक्तिकरण एवं राष्ट्र निर्माण में उत्कृष्ट योगदान के सम्मान स्वरूप।',
+      category: resolvedCategory,
+      title: title || (isCoordinator ? 'Certificate of Outstanding Leadership & Civic Coordination' : 'Certificate of Appreciation & National Service'),
+      titleHi: titleHi || (isCoordinator ? 'उत्कृष्ट नेतृत्व एवं समन्वय प्रशंसा प्रमाण पत्र' : 'प्रशंसा एवं राष्ट्र सेवा प्रमाण पत्र'),
+      awardTitle: title || (isCoordinator ? 'Certificate of Outstanding Leadership & Civic Coordination' : 'Certificate of Appreciation & National Service'),
+      reason: reason || (isCoordinator ? 'In recognition of outstanding dedication, exemplary civic leadership, and proactive coordination.' : 'In recognition of outstanding dedication and exemplary leadership for societal empowerment.'),
+      reasonHi: reasonHi || (isCoordinator ? 'समाज सशक्तिकरण एवं अनुकरणीय जिला समन्वय में उत्कृष्ट योगदान के सम्मान स्वरूप।' : 'समाज सशक्तिकरण एवं राष्ट्र निर्माण में उत्कृष्ट योगदान के सम्मान स्वरूप।'),
       description: reason || 'In recognition of outstanding dedication and exemplary leadership for societal empowerment.',
-      roleOrDesignation: roleOrDesignation || recipientUser?.designation || 'Active Social Contributor',
+      roleOrDesignation: roleOrDesignation || recipientUser?.designation || (isCoordinator ? 'District Youth Coordinator' : 'Active Social Contributor'),
       issueDate: new Date(),
       issuedBy: (adminUser && adminUser.name) ? adminUser.name : 'राष्ट्रीय अध्यक्ष (National President)',
       qrCodeUrl,
@@ -78,11 +78,10 @@ class CertificateService {
     });
 
     if (certificate.recipientEmail) {
-      try {
-        await sendCertificateEmail(certificate);
-      } catch (emailErr) {
-        console.error('⚠️ [CERTIFICATE EMAIL ERROR]:', emailErr.message);
-      }
+      // Auto send official certificate and coordinator offer letter asynchronously (non-blocking)
+      sendCertificateEmail(certificate).catch(emailErr => {
+        console.error('⚠️ [CERTIFICATE EMAIL ASYNC ERROR]:', emailErr.message);
+      });
     }
 
     return certificate;

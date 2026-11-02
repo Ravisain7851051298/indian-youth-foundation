@@ -24,6 +24,7 @@ const orgDocumentRoutes = require('./orgDocumentRoutes');
 const userRoutes = require('./userRoutes');
 const awardRoutes = require('./awardRoutes');
 const coordinatorRoutes = require('./coordinatorRoutes');
+const documentRoutes = require('./documentRoutes');
 
 // Health Check
 router.get('/health', (req, res) => {
@@ -71,6 +72,12 @@ router.use('/uploads', uploadRoutes);
 router.use('/upload', uploadRoutes); // alias
 router.use('/verify', verifyRoutes);
 router.use('/stats', statsRoutes);
+router.use('/documents', documentRoutes);
+router.use('/document', documentRoutes); // alias
+router.use('/id-card', documentRoutes); // direct alias
+router.use('/id-cards', documentRoutes); // direct alias
+router.use('/appointment-letter', documentRoutes); // direct alias
+router.use('/appointment-letters', documentRoutes); // direct alias
 
 // Additional Content Collections from shiv-gorakh-ngo
 router.use('/services', createResourceRouter('services'));

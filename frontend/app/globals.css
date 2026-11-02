@@ -52,23 +52,64 @@ textarea::placeholder {
 
 /* Print Styles for ID Card, 80G Receipt & Appointment Letter */
 @media print {
-  body {
-    background: white !important;
-    color: black !important;
+  @page {
+    size: auto;
+    margin: 8mm 10mm;
   }
 
-  .no-print {
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  html,
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+
+  /* Hide all website navigation, headers, sidebars, alerts, action buttons, tabs */
+  header,
+  nav,
+  aside,
+  footer,
+  .no-print,
+  .print\:hidden,
+  [data-no-print="true"] {
     display: none !important;
+  }
+
+  /* Make sure main content container has no margins or overflow clips in print */
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    width: 100% !important;
+    max-width: 100% !important;
   }
 
   .print-only {
     display: block !important;
   }
 
+  .printable-document {
+    box-shadow: none !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
   .print-card-container {
     box-shadow: none !important;
-    border: 1px solid #ccc !important;
-    page-break-inside: avoid;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    margin: 0 auto !important;
   }
 }
 

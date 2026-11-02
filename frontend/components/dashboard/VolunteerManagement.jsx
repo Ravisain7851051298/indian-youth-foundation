@@ -22,7 +22,8 @@ import {
   FiAward,
   FiDownload,
   FiPrinter,
-  FiCopy
+  FiCopy,
+  FiCreditCard
 } from "react-icons/fi";
 import api from "@/services/api";
 import { getContentImageUrl } from "@/lib/authApi";
@@ -225,6 +226,40 @@ export default function VolunteerManagement() {
       window.open(`${cleanBase}/api/certificates/${certId}/download`, "_blank");
     } finally {
       setDownloadingCertId(null);
+    }
+  };
+
+  const [downloadingDoc, setDownloadingDoc] = useState(null);
+
+  const handleDownloadDoc = async (v, docType) => {
+    const targetId = v.user?._id || v.userId || v.assignedVolunteerId || v._id || v.id;
+    const docKey = `${v._id || v.id}_${docType}`;
+    try {
+      setDownloadingDoc(docKey);
+      const endpoint = docType === 'id-card'
+        ? `/documents/id-card/${targetId}/download?type=volunteer`
+        : `/documents/appointment-letter/${targetId}/download?type=volunteer`;
+
+      const res = await api.get(endpoint, { responseType: 'blob' });
+      const blob = new Blob([res.data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      const volCode = v.assignedVolunteerId || targetId;
+      const filename = docType === 'id-card'
+        ? `Volunteer_IDCard_${volCode}.pdf`
+        : `Volunteer_OfferLetter_${volCode}.pdf`;
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      toast.success(`${docType === 'id-card' ? 'ID Card' : 'Offer Letter'} PDF downloaded!`);
+    } catch (err) {
+      console.warn('Blob download failed, opening direct URL:', err);
+      window.open(`/api/documents/${docType}/${targetId}/download?type=volunteer`, '_blank');
+    } finally {
+      setDownloadingDoc(null);
     }
   };
 
@@ -553,6 +588,36 @@ export default function VolunteerManagement() {
 
                           {isApproved && (
                             <>
+                              <button
+                                type="button"
+                                onClick={() => handleDownloadDoc(v, 'id-card')}
+                                disabled={downloadingDoc === `${id}_id-card`}
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold text-[11px] transition cursor-pointer shadow-xs disabled:opacity-50"
+                                title="Download Volunteer ID Card PDF"
+                              >
+                                {downloadingDoc === `${id}_id-card` ? (
+                                  <FiRefreshCw className="w-3.5 h-3.5 animate-spin" />
+                                ) : (
+                                  <FiCreditCard className="w-3.5 h-3.5" />
+                                )}
+                                <span className="hidden sm:inline">ID Card</span>
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => handleDownloadDoc(v, 'appointment-letter')}
+                                disabled={downloadingDoc === `${id}_appointment-letter`}
+                                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 font-bold text-[11px] transition cursor-pointer shadow-xs disabled:opacity-50"
+                                title="Download Volunteer Offer Letter PDF"
+                              >
+                                {downloadingDoc === `${id}_appointment-letter` ? (
+                                  <FiRefreshCw className="w-3.5 h-3.5 animate-spin" />
+                                ) : (
+                                  <FiFileText className="w-3.5 h-3.5" />
+                                )}
+                                <span className="hidden sm:inline">Offer</span>
+                              </button>
+
                               {volunteerCerts.length > 0 && (
                                 <button
                                   type="button"

@@ -4,9 +4,10 @@ const certificateRepository = require('../repositories/certificateRepository');
 
 const getCertificates = async (req, res) => {
   try {
-    const { recipientId } = req.query;
+    const { recipientId, category } = req.query;
     const query = {};
     if (recipientId) query.recipient = recipientId;
+    if (category) query.category = category;
 
     if (req.user) {
       const userRole = (req.user.role || '').toLowerCase();
@@ -17,6 +18,7 @@ const getCertificates = async (req, res) => {
         if (req.user.memberId) orConditions.push({ recipientId: req.user.memberId });
         if (req.user.volunteerId) orConditions.push({ recipientId: req.user.volunteerId });
         if (req.user.volunteerApplication?.volunteerId) orConditions.push({ recipientId: req.user.volunteerApplication.volunteerId });
+        if (req.user.coordinatorId) orConditions.push({ recipientId: req.user.coordinatorId });
         if (req.user.phone) orConditions.push({ recipientPhone: req.user.phone.trim() });
         if (req.user.name) orConditions.push({ recipientName: req.user.name.trim() });
         if (orConditions.length > 0) {

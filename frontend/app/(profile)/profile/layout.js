@@ -20,12 +20,10 @@ import {
   FiChevronRight,
   FiUsers,
 } from 'react-icons/fi';
-import { GoVerified } from "react-icons/go";
 import { useNGO } from '@/context/NGOContext';
 import { useSelector } from 'react-redux';
 import { getContentImageUrl } from '@/lib/authApi';
 import ProfileHeader from '@/components/ProfileHeader';
-import Footer from '@/components/Footer';
 
 const emptySubscribe = () => () => { };
 function useIsClient() {
@@ -51,7 +49,6 @@ export default function ProfileLayout({ children }) {
         <div className="min-h-[75vh] flex items-center justify-center p-6 bg-slate-50">
           <div className="w-8 h-8 border-3 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
         </div>
-        <Footer />
       </>
     );
   }
@@ -79,7 +76,6 @@ export default function ProfileLayout({ children }) {
             </div>
           </div>
         </div>
-        <Footer />
       </>
     );
   }
@@ -136,7 +132,7 @@ export default function ProfileLayout({ children }) {
       <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row">
 
         {/* ----------------- DESKTOP SIDEBAR ----------------- */}
-        <aside className="hidden md:flex w-72 lg:w-80 bg-white border-r border-slate-200 shrink-0 flex-col justify-between">
+        <aside className="hidden md:flex w-72 lg:w-80 bg-white border-r border-slate-200 shrink-0 flex-col justify-between print:hidden no-print">
           <div className="p-6">
             {/* User Profile Card */}
             <div className="text-center pb-6 border-b border-slate-100">
@@ -250,13 +246,12 @@ export default function ProfileLayout({ children }) {
         </aside>
 
         {/* ----------------- NESTED CONTENT VIEW ----------------- */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
-          <div className="max-w-5xl mx-auto">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto print:p-0 print:m-0 print:overflow-visible print:w-full print:max-w-none">
+          <div className="max-w-5xl mx-auto print:max-w-none print:w-full print:m-0 print:p-0">
             {children}
           </div>
         </main>
       </div>
-      <Footer />
     </>
   );
 }

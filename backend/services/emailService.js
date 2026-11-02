@@ -156,7 +156,7 @@ const sendEmail = async ({ to, subject, htmlText, text, template = 'general', at
   if (transporter) {
     try {
       const fromName = dbFromName || 'Yuva Kranti Dal';
-      const fromEmail = smtpUser || 'samasyasamadhanparishad@gmail.com';
+      const fromEmail = smtpUser;
       const plainText = text || (htmlText ? htmlText.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim() : '');
       const mailOptions = {
         from: `"${fromName}" <${fromEmail}>`,
@@ -206,13 +206,13 @@ const sendEmail = async ({ to, subject, htmlText, text, template = 'general', at
 const sendDonationApprovalEmail = async (data) => {
   const donationObj = data.toObject ? data.toObject() : data;
   const to = donationObj.to || donationObj.donorEmail || donationObj.email;
-  const donorName = donationObj.donorName || 'Generous Contributor';
-  const receiptNumber = donationObj.receiptNumber || 'BYK-80G-PENDING';
-  const amount = Number(donationObj.amount) || 0;
-  const panNumber = donationObj.panNumber || donationObj.pan || 'N/A';
-  const campaignTitle = donationObj.campaignTitle || 'General Welfare Fund';
+  const donorName = donationObj.donorName;
+  const receiptNumber = donationObj.receiptNumber;
+  const amount = Number(donationObj.amount);
+  const panNumber = donationObj.panNumber || donationObj.pan;
+  const campaignTitle = donationObj.campaignTitle;
   const temporaryPassword = donationObj.temporaryPassword || data.temporaryPassword || '';
-  const clientBase = (process.env.CLIENT_URL || 'http://localhost:3000').replace(/\/+$/, '');
+  const clientBase = (process.env.CLIENT_URL).replace(/\/+$/, '');
 
   if (!to) {
     console.warn('⚠️ [EMAIL NOTICE] No recipient email found for donation approval notification.');
@@ -306,7 +306,7 @@ const sendDonationApprovalEmail = async (data) => {
 
       <div style="border-top: 1px solid #e2e8f0; padding-top: 14px; font-size: 11px; color: #94a3b8; text-align: center; line-height: 1.5;">
         National Head Office - Krishna Vihar Pala Road Aligarh, Uttar Pradesh - 202001 | Helpline: +91 93196 98759<br/>
-        Email: samasyasamadhanparishad@gmail.com | Website: bharatiyayuvakranti.org
+        Email: yuvakrantidal@gmail.com | Website: bharatiyayuvakranti.org
       </div>
     </div>
   `;
@@ -438,7 +438,7 @@ const sendMembershipApprovalEmail = async (param) => {
 
       <div style="border-top: 1px solid #e2e8f0; padding-top: 14px; font-size: 11px; color: #94a3b8; text-align: center; line-height: 1.5;">
         National Head Office - Krishna Vihar Pala Road Aligarh, Uttar Pradesh - 202001 | Helpline: +91 93196 98759<br/>
-        Email: samasyasamadhanparishad@gmail.com | Website: bharatiyayuvakranti.org
+        Email: yuvakrantidal@gmail.com | Website: bharatiyayuvakranti.org
       </div>
     </div>
   `;
@@ -559,7 +559,7 @@ const sendVolunteerApprovalEmail = async (param) => {
 
       <div style="border-top: 1px solid #e2e8f0; padding-top: 14px; font-size: 11px; color: #94a3b8; text-align: center; line-height: 1.5;">
         National Head Office - Krishna Vihar Pala Road Aligarh, Uttar Pradesh - 202001 | Helpline: +91 93196 98759<br/>
-        Email: samasyasamadhanparishad@gmail.com | Website: bharatiyayuvakranti.org
+        Email: yuvakrantidal@gmail.com | Website: bharatiyayuvakranti.org
       </div>
     </div>
   `;
@@ -587,6 +587,10 @@ const sendCertificateEmail = async (param) => {
     return null;
   }
 
+  const isCoordinator = (certObj.category === 'Coordinator') ||
+    (certObj.roleOrDesignation && certObj.roleOrDesignation.toLowerCase().includes('coordinator')) ||
+    (awardTitle && awardTitle.toLowerCase().includes('coordinator'));
+
   // Generate Certificate PDF
   let attachments = [];
   try {
@@ -603,38 +607,81 @@ const sendCertificateEmail = async (param) => {
       content: certPdf,
       contentType: 'application/pdf'
     });
+
+    // If Coordinator, also attach the Official Coordinator Offer / Appointment Letter PDF
+    if (isCoordinator) {
+      try {
+        const coordId = certObj.recipientId || certificateNo;
+        const offerPdf = await (pdfService.generateCoordinatorAppointmentLetterPdf || pdfService.generateAppointmentLetterPdf)({
+          ...certObj,
+          role: 'Coordinator',
+          isCoordinator: true,
+          coordinatorId: coordId,
+          memberId: coordId,
+          name: recipientName,
+          designation: certObj.roleOrDesignation || 'District Youth Coordinator'
+        });
+        attachments.push({
+          filename: `Coordinator_Offer_Letter_${coordId}.pdf`,
+          content: offerPdf,
+          contentType: 'application/pdf'
+        });
+      } catch (coordPdfErr) {
+        console.error('Error generating coordinator offer letter PDF attachment:', coordPdfErr);
+      }
+    }
   } catch (err) {
     console.error('Error generating certificate PDF:', err);
   }
 
-  const subject = `Certificate of Appreciation Awarded & Attached (${certificateNo}) - Yuva Kranti Dal`;
+  const subject = isCoordinator
+    ? `Official Coordinator Certificate & Offer Letter Attached (${certificateNo}) - Yuva Kranti Dal`
+    : `Certificate of Appreciation Awarded & Attached (${certificateNo}) - Yuva Kranti Dal`;
+
+  const headerBg = isCoordinator
+    ? 'linear-gradient(135deg, #6d28d9, #4c1d95)'
+    : 'linear-gradient(135deg, #c2410c, #d97706)';
+  const badgeBg = isCoordinator ? '#f3e8ff' : '#fef3c7';
+  const badgeBorder = isCoordinator ? '#d8b4fe' : '#fde68a';
+  const badgeColor = isCoordinator ? '#6b21a8' : '#92400e';
+  const badgeText = isCoordinator ? '🎖️ Coordinator Citation & Formal Offer Letter' : '🎖️ National Citation Conferred';
+  const brandColor = isCoordinator ? '#6d28d9' : '#c2410c';
+
   const htmlText = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 14px; background-color: #ffffff;">
-      <div style="background: linear-gradient(135deg, #c2410c, #d97706); padding: 18px; border-radius: 10px; text-align: center; color: white;">
+      <div style="background: ${headerBg}; padding: 18px; border-radius: 10px; text-align: center; color: white;">
         <h2 style="margin: 0; font-size: 22px; letter-spacing: 0.5px;">YUVA KRANTI DAL</h2>
-        <p style="margin: 4px 0 0; font-size: 12px; opacity: 0.95;">National Honours & Civic Recognition Council</p>
+        <p style="margin: 4px 0 0; font-size: 12px; opacity: 0.95;">${isCoordinator ? 'Leadership Wing • Coordinators Council' : 'National Honours & Civic Recognition Council'}</p>
       </div>
 
       <div style="padding: 20px 0; color: #1e293b;">
-        <div style="display: inline-block; background-color: #fef3c7; border: 1px solid #fde68a; color: #92400e; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-bottom: 12px;">
-          🎖️ National Citation Conferred
+        <div style="display: inline-block; background-color: ${badgeBg}; border: 1px solid ${badgeBorder}; color: ${badgeColor}; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-bottom: 12px;">
+          ${badgeText}
         </div>
 
         <p style="font-size: 15px; margin: 8px 0;">Dear <strong>${recipientName}</strong>,</p>
         <p style="font-size: 14px; line-height: 1.6; color: #334155;">
-          The National Executive Council of <strong>Yuva Kranti Dal</strong> is proud to confer upon you the official citation: <strong>"${awardTitle}"</strong>.
+          ${isCoordinator
+      ? `The Board of Trustees and National Executive Committee of <strong>Yuva Kranti Dal</strong> are pleased to confer upon you this official citation and recognition in your leadership capacity as <strong>${certObj.roleOrDesignation || 'District Youth Coordinator'}</strong>.`
+      : `The National Executive Council of <strong>Yuva Kranti Dal</strong> is proud to confer upon you the official citation: <strong>"${awardTitle}"</strong>.`
+    }
         </p>
         
         <div style="background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; padding: 16px; margin: 18px 0; font-size: 13px;">
           <table style="width: 100%; border-collapse: collapse;">
             <tr>
               <td style="padding: 4px 0; color: #64748b; width: 45%;"><strong>Certificate Number:</strong></td>
-              <td style="padding: 4px 0; font-family: monospace; color: #c2410c; font-weight: bold;">${certificateNo}</td>
+              <td style="padding: 4px 0; font-family: monospace; color: ${brandColor}; font-weight: bold;">${certificateNo}</td>
             </tr>
             <tr>
               <td style="padding: 4px 0; color: #64748b;"><strong>Citation Title:</strong></td>
               <td style="padding: 4px 0; font-weight: bold; color: #0f172a;">${awardTitle}</td>
             </tr>
+            ${certObj.recipientId ? `
+            <tr>
+              <td style="padding: 4px 0; color: #64748b;"><strong>Coordinator / Recipient ID:</strong></td>
+              <td style="padding: 4px 0; font-family: monospace; color: #0f172a; font-weight: bold;">${certObj.recipientId}</td>
+            </tr>` : ''}
             <tr>
               <td style="padding: 4px 0; color: #64748b;"><strong>Commendation:</strong></td>
               <td style="padding: 4px 0; color: #334155;">${reason}</td>
@@ -642,12 +689,14 @@ const sendCertificateEmail = async (param) => {
           </table>
         </div>
 
-        <div style="background-color: #fffbeb; border-left: 4px solid #d97706; padding: 12px 14px; margin: 16px 0; font-size: 12.5px; color: #92400e; border-radius: 4px;">
-          📜 <strong>PDF Certificate Attached:</strong> Your high-resolution printable Certificate of Appreciation carrying the official Trust Seal, QR verification code, and President's signature is attached to this email.
+        <div style="background-color: ${isCoordinator ? '#f5f3ff' : '#fffbeb'}; border-left: 4px solid ${brandColor}; padding: 12px 14px; margin: 16px 0; font-size: 12.5px; color: ${isCoordinator ? '#5b21b6' : '#92400e'}; border-radius: 4px;">
+          📜 <strong>PDF Documents Attached:</strong><br/>
+          • <strong>Certificate_${certificateNo}.pdf</strong> (Official Printable Certificate of Honor with QR verification)<br/>
+          ${isCoordinator ? `• <strong>Coordinator_Offer_Letter_${certObj.recipientId || certificateNo}.pdf</strong> (Formal Appointment & Offer Letter)` : ''}
         </div>
 
         <div style="text-align: center; margin: 26px 0 16px;">
-          <a href="https://www.yuvakrantidal.com/certificates?view=${certificateNo}" style="background: #c2410c; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px; display: inline-block;">
+          <a href="https://www.yuvakrantidal.com/certificates?view=${certificateNo}" style="background: ${brandColor}; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px; display: inline-block;">
             Verify Certificate on Portal
           </a>
         </div>
@@ -655,7 +704,7 @@ const sendCertificateEmail = async (param) => {
 
       <div style="border-top: 1px solid #e2e8f0; padding-top: 14px; font-size: 11px; color: #94a3b8; text-align: center; line-height: 1.5;">
         National Head Office - Krishna Vihar Pala Road Aligarh, Uttar Pradesh - 202001 | Helpline: +91 93196 98759<br/>
-        Email: samasyasamadhanparishad@gmail.com | Website: bharatiyayuvakranti.org
+        Email: yuvakrantidal@gmail.com | Website: bharatiyayuvakranti.org
       </div>
     </div>
   `;
@@ -733,7 +782,7 @@ const sendPasswordResetEmail = async (param1, param2) => {
 
       <div style="border-top: 1px solid #e2e8f0; padding-top: 14px; font-size: 11px; color: #94a3b8; text-align: center; line-height: 1.5;">
         National Head Office - Krishna Vihar Pala Road Aligarh, Uttar Pradesh - 202001 | Helpline: +91 93196 98759<br/>
-        Email: samasyasamadhanparishad@gmail.com | Website: bharatiyayuvakranti.org
+        Email: yuvakrantidal@gmail.com | Website: bharatiyayuvakranti.org
       </div>
     </div>
   `;
@@ -751,7 +800,11 @@ const sendCoordinatorAppointmentEmail = async (param) => {
   const coordObj = param.toObject ? param.toObject() : param;
   const to = coordObj.to || coordObj.email || coordObj.user?.email;
   const name = coordObj.name || coordObj.memberName || coordObj.user?.name || 'Valued Coordinator';
-  const coordinatorId = coordObj.coordinatorId || coordObj.memberId || coordObj.user?.coordinatorId || coordObj.user?.memberId || 'BYK-COORD-2026-PENDING';
+  const rawId = coordObj.coordinatorId || coordObj.user?.coordinatorId || coordObj.memberId || coordObj.user?.memberId;
+  const cleanId = rawId && /^\d{10}$/.test(String(rawId).trim())
+    ? String(rawId).trim()
+    : (rawId ? String(rawId).replace(/\D/g, '').slice(-10).padStart(10, '1') : Math.floor(1000000000 + Math.random() * 9000000000).toString());
+  const coordinatorId = cleanId;
   const role = 'Coordinator';
   const designation = coordObj.designation || coordObj.user?.designation || 'District Youth Coordinator';
   const temporaryPassword = coordObj.temporaryPassword || param.temporaryPassword || '';
@@ -862,7 +915,7 @@ const sendCoordinatorAppointmentEmail = async (param) => {
 
       <div style="border-top: 1px solid #e2e8f0; padding-top: 14px; font-size: 11px; color: #94a3b8; text-align: center; line-height: 1.5;">
         National Head Office - Krishna Vihar Pala Road Aligarh, Uttar Pradesh - 202001 | Helpline: +91 93196 98759<br/>
-        Email: samasyasamadhanparishad@gmail.com | Website: bharatiyayuvakranti.org
+        Email: yuvakrantidal@gmail.com | Website: bharatiyayuvakranti.org
       </div>
     </div>
   `;

@@ -131,11 +131,11 @@ export default function Footer() {
                 Official Email Desk
               </h4>
               <a
-                href={`mailto:${settings?.email || 'samasyasamadhanparishad@gmail.com'}`}
+                href={`mailto:${settings?.email || 'yuvakrantidal@gmail.com'}`}
                 className="text-xs sm:text-sm font-bold text-slate-200 hover:text-emerald-400 transition block truncate max-w-55"
-                title={settings?.email || 'samasyasamadhanparishad@gmail.com'}
+                title={settings?.email || 'yuvakrantidal@gmail.com'}
               >
-                {settings?.email || 'samasyasamadhanparishad@gmail.com'}
+                {settings?.email || 'yuvakrantidal@gmail.com'}
               </a>
               <span className="text-[11px] text-slate-400 font-medium block">
                 Prompt response within 24 working hours

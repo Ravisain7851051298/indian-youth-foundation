@@ -38,7 +38,7 @@ Donors and registered members maintain the right to review their records, reques
   return (
     <div className="min-h-screen bg-slate-50 py-16 selection:bg-emerald-600 selection:text-white">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* Header */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100 text-emerald-800 font-extrabold text-xs mb-3 border border-emerald-200">
@@ -68,7 +68,7 @@ Donors and registered members maintain the right to review their records, reques
             <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-2.5 font-medium text-xs">
               <div className="flex items-center gap-2 text-slate-800">
                 <FiMail className="w-4 h-4 text-emerald-700 shrink-0" />
-                <span>Grievance Email: <a href={`mailto:${settings?.email || 'samasyasamadhanparishad@gmail.com'}`} className="text-emerald-700 font-bold underline">{settings?.email || 'samasyasamadhanparishad@gmail.com'}</a></span>
+                <span>Grievance Email: <a href={`mailto:${settings?.email || 'yuvakrantidal@gmail.com'}`} className="text-emerald-700 font-bold underline">{settings?.email || 'yuvakrantidal@gmail.com'}</a></span>
               </div>
               <div className="flex items-center gap-2 text-slate-800">
                 <FiPhone className="w-4 h-4 text-emerald-700 shrink-0" />

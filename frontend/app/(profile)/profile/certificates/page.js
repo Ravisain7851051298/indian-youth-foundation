@@ -17,12 +17,14 @@ import {
   FiShield,
   FiX,
   FiEye,
-  FiCheck
+  FiCheck,
+  FiRefreshCw
 } from 'react-icons/fi';
 import { QRCodeSVG } from 'qrcode.react';
 import { useNGO } from '@/context/NGOContext';
 import { getContentImageUrl } from '@/lib/authApi';
 import api from '@/services/api';
+import { printElement } from '@/lib/printElement';
 
 export default function ProfileCertificatesPage() {
   const { currentUser, settings } = useNGO();
@@ -31,6 +33,30 @@ export default function ProfileCertificatesPage() {
   const [hasError, setHasError] = useState(false);
   const [filter, setFilter] = useState('all'); // 'all', 'volunteer', 'member', 'awards'
   const [previewCert, setPreviewCert] = useState(null);
+  const [downloadingCertId, setDownloadingCertId] = useState(null);
+
+  const handleDownloadCertificate = async (cert) => {
+    if (!cert) return;
+    const certId = cert.certificateId || cert.certificateNo || cert._id;
+    try {
+      setDownloadingCertId(certId);
+      const res = await api.get(`/certificates/${certId}/download`, { responseType: 'blob' });
+      const blob = new Blob([res.data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `Certificate_${certId}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.warn('Blob certificate download failed, trying direct link:', err);
+      window.open(`/api/certificates/${certId}/download`, '_blank');
+    } finally {
+      setDownloadingCertId(null);
+    }
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -64,21 +90,27 @@ export default function ProfileCertificatesPage() {
 
   // Helper to categorize a certificate
   const getCertCategory = (cert) => {
-    const text = `${cert.category || ''} ${cert.title || ''} ${cert.reason || ''}`.toLowerCase();
-    if (text.includes('volunteer') || text.includes('drive') || text.includes('camp') || text.includes('field') || text.includes('relief')) {
+    const cat = (cert.category || '').toLowerCase();
+    const text = `${cert.category || ''} ${cert.title || ''} ${cert.reason || ''} ${cert.roleOrDesignation || ''}`.toLowerCase();
+    if (cat === 'coordinator' || text.includes('coordinator') || text.includes('co-ordinator')) {
+      return 'coordinator';
+    }
+    if (cat === 'volunteer' || text.includes('volunteer') || text.includes('drive') || text.includes('camp') || text.includes('field') || text.includes('relief')) {
       return 'volunteer';
     }
-    if (text.includes('member') || text.includes('membership') || text.includes('council') || text.includes('trustee')) {
+    if (cat === 'member' || text.includes('member') || text.includes('membership') || text.includes('council') || text.includes('trustee')) {
       return 'member';
     }
     return 'awards';
   };
 
+  const coordinatorCerts = certificates.filter(c => getCertCategory(c) === 'coordinator');
   const volunteerCerts = certificates.filter(c => getCertCategory(c) === 'volunteer');
   const memberCerts = certificates.filter(c => getCertCategory(c) === 'member');
   const otherCerts = certificates.filter(c => getCertCategory(c) === 'awards');
 
   const filteredCerts = certificates.filter(c => {
+    if (filter === 'coordinator') return getCertCategory(c) === 'coordinator';
     if (filter === 'volunteer') return getCertCategory(c) === 'volunteer';
     if (filter === 'member') return getCertCategory(c) === 'member';
     if (filter === 'awards') return getCertCategory(c) === 'awards';
@@ -86,156 +118,72 @@ export default function ProfileCertificatesPage() {
   });
 
   const handlePrint = (cert) => {
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) {
-      window.print();
-      return;
-    }
-    const logoSrc = getContentImageUrl(settings?.logoUrl) || 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=120';
-    const sealSrc = getContentImageUrl(settings?.officialSealUrl) || 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=200';
-    const sigSrc = getContentImageUrl(settings?.presidentSignatureUrl) || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200';
-    const presidentName = settings?.presidentName || cert.issuedBy || 'Ravi Saini (National President & Trustee)';
+    if (!cert) return;
+    const logoSrc = getContentImageUrl(settings?.logoUrl);
+    const sealSrc = getContentImageUrl(settings?.officialSealUrl);
+    const sigSrc = getContentImageUrl(settings?.presidentSignatureUrl);
+    const presidentName = settings?.presidentName || cert.issuedBy;
     const dateFormatted = new Date(cert.issueDate || cert.createdAt || Date.now()).toLocaleDateString('en-IN', {
       day: '2-digit',
       month: 'short',
       year: 'numeric'
     });
 
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>Certificate of Appreciation - ${cert.certificateId || ''}</title>
-          <style>
-            @page { size: landscape A4; margin: 0; }
-            * { box-sizing: border-box; }
-            body { 
-              font-family: 'Times New Roman', serif, system-ui; 
-              margin: 0; 
-              padding: 24px; 
-              background: #fdfbf7; 
-              color: #0f172a; 
-              display: flex; 
-              align-items: center; 
-              justify-content: center; 
-              min-height: 100vh;
-            }
-            .cert-outer {
-              border: 8px solid #7f1d1d;
-              outline: 3px solid #d97706;
-              padding: 28px 40px;
-              background: #fff;
-              position: relative;
-              max-width: 1050px;
-              width: 100%;
-              box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-              text-align: center;
-            }
-            .corner {
-              position: absolute;
-              width: 24px;
-              height: 24px;
-              border: 2px solid #b45309;
-              background: #fef3c7;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              font-size: 14px;
-              color: #b45309;
-            }
-            .tl { top: 6px; left: 6px; }
-            .tr { top: 6px; right: 6px; }
-            .bl { bottom: 6px; left: 6px; }
-            .br { bottom: 6px; right: 6px; }
-            .header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-            .logo-img { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; border: 2px solid #7f1d1d; }
-            .shield-box { border: 2px solid #b45309; background: #fef3c7; padding: 6px 12px; border-radius: 8px; text-align: center; }
-            .shield-title { font-size: 11px; font-weight: bold; color: #9a3412; }
-            .shield-sub { font-size: 9px; color: #475569; }
-            h1 { font-size: 26px; color: #7f1d1d; margin: 0; letter-spacing: 1px; font-weight: 900; }
-            h2 { font-size: 14px; color: #0f172a; margin: 4px 0; font-weight: bold; }
-            .meta { font-size: 10px; color: #64748b; margin: 0; }
-            .ribbon {
-              background: #7f1d1d;
-              color: #ffffff;
-              padding: 8px 30px;
-              display: inline-block;
-              font-size: 16px;
-              font-weight: bold;
-              letter-spacing: 1.5px;
-              margin: 14px auto 8px;
-              border: 1px solid #fde047;
-              border-radius: 4px;
-            }
-            .cert-id { font-size: 11px; font-weight: bold; color: #b45309; font-family: monospace; }
-            .presentation { font-size: 13px; font-style: italic; color: #475569; margin: 12px 0 4px; }
-            .recipient { font-size: 30px; font-weight: 900; color: #0f172a; margin: 6px 0; text-decoration: underline; text-decoration-color: #d97706; }
-            .role { font-size: 13px; font-weight: bold; color: #059669; margin-bottom: 8px; }
-            .reason { font-size: 13px; line-height: 1.5; color: #334155; max-width: 800px; margin: 0 auto 16px; }
-            .footer-row { display: flex; align-items: flex-end; justify-content: space-between; border-top: 1px solid #e2e8f0; padding-top: 16px; margin-top: 10px; }
-            .sign-img { height: 42px; object-fit: contain; }
-            .seal-img { width: 68px; height: 68px; object-fit: contain; }
-          </style>
-        </head>
-        <body>
-          <div class="cert-outer">
-            <div class="corner tl">✦</div>
-            <div class="corner tr">✦</div>
-            <div class="corner bl">✦</div>
-            <div class="corner br">✦</div>
+    const certHtml = `
+      <div style="border: 8px solid #7f1d1d; outline: 3px solid #d97706; padding: 28px 40px; background: #fff; position: relative; max-width: 1050px; width: 100%; box-shadow: none; text-align: center; margin: 0 auto; box-sizing: border-box; font-family: 'Times New Roman', serif;">
+        <div style="position: absolute; width: 24px; height: 24px; border: 2px solid #b45309; background: #fef3c7; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #b45309; top: 6px; left: 6px;">✦</div>
+        <div style="position: absolute; width: 24px; height: 24px; border: 2px solid #b45309; background: #fef3c7; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #b45309; top: 6px; right: 6px;">✦</div>
+        <div style="position: absolute; width: 24px; height: 24px; border: 2px solid #b45309; background: #fef3c7; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #b45309; bottom: 6px; left: 6px;">✦</div>
+        <div style="position: absolute; width: 24px; height: 24px; border: 2px solid #b45309; background: #fef3c7; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #b45309; bottom: 6px; right: 6px;">✦</div>
 
-            <div class="header-row">
-              <img src="${logoSrc}" class="logo-img" alt="Logo" />
-              <div>
-                <h1>${settings?.ngoName || 'YUVA KRANTI DAL'}</h1>
-                <h2>${settings?.ngoNameHi || 'युवा क्रांति दल (राष्ट्रीय सामाजिक न्यास)'}</h2>
-                <p class="meta">Registered Public Charitable Trust • Reg. No: ${settings?.registrationNo || '421/2019'} • 12A & 80G Certified NGO</p>
-                <p class="meta">NITI Aayog Darpan ID: ${settings?.nitiAayogDarpanId || 'RJ/2022/0319482'} • PAN: ${settings?.panNo || 'AAATB4321Q'}</p>
-              </div>
-              <div class="shield-box">
-                <div class="shield-title">12A / 80G</div>
-                <div class="shield-sub">VERIFIED TRUST</div>
-              </div>
-            </div>
-
-            <div class="ribbon">${cert.title || 'CERTIFICATE OF APPRECIATION & CITATION'}</div>
-            <div class="cert-id">Official Conformance No: ${cert.certificateId || ''}</div>
-
-            <div class="presentation">This certificate of honor is proudly and gratefully conferred upon</div>
-            <div class="recipient">${cert.recipientName || currentUser?.name || 'Honored Contributor'}</div>
-            <div class="role">[ ${cert.roleOrDesignation || 'Active Social Worker'} ]</div>
-            <div class="reason">${cert.reason || 'In recognition of outstanding dedication, exemplary leadership, and selfless service towards societal welfare and youth empowerment.'}</div>
-
-            <div class="footer-row">
-              <div style="text-align: left;">
-                <div style="font-size: 11px; font-weight: bold; color: #0f172a;">Date of Conformance:</div>
-                <div style="font-size: 11px; color: #475569;">${dateFormatted}</div>
-                <div style="font-size: 10px; color: #059669; font-weight: bold; margin-top: 4px; display: inline-flex; align-items: center; gap: 4px;">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                  <span>Digitally Authenticated</span>
-                </div>
-              </div>
-
-              <div>
-                <img src="${sealSrc}" class="seal-img" alt="Seal" />
-                <div style="font-size: 9px; font-weight: bold; color: #7f1d1d; text-transform: uppercase;">Official Seal</div>
-              </div>
-
-              <div style="text-align: right;">
-                <img src="${sigSrc}" class="sign-img" alt="Signature" /><br/>
-                <strong style="font-size: 12px; color: #0f172a;">${presidentName}</strong><br/>
-                <span style="font-size: 10px; color: #475569;">National President & Board of Trustees</span>
-              </div>
-            </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+          <img src="${logoSrc}" style="width: 64px; height: 64px; border-radius: 50%; object-fit: cover; border: 2px solid #7f1d1d;" alt="Logo" />
+          <div>
+            <h1 style="font-size: 26px; color: #7f1d1d; margin: 0; letter-spacing: 1px; font-weight: 900;">${settings?.ngoName || 'YUVA KRANTI DAL'}</h1>
+            <h2 style="font-size: 14px; color: #1e293b; margin: 2px 0 4px; font-weight: bold;">${settings?.ngoNameHi || 'युवा क्रांति दल (राष्ट्रीय सामाजिक न्यास)'}</h2>
+            <p style="font-size: 10px; color: #475569; margin: 2px 0;">Registered Public Charitable Trust • Reg. No: ${settings?.registrationNo || '421/2019'} • 12A & 80G Certified NGO</p>
+            <p style="font-size: 10px; color: #475569; margin: 2px 0;">NITI Aayog Darpan ID: ${settings?.nitiAayogDarpanId || 'RJ/2022/0319482'} • PAN: ${settings?.panNo || 'AAATB4321Q'}</p>
           </div>
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
-    printWindow.focus();
-    setTimeout(() => {
-      printWindow.print();
-    }, 400);
+          <div style="border: 2px solid #b45309; background: #fef3c7; padding: 6px 12px; border-radius: 8px; text-align: center;">
+            <div style="font-size: 11px; font-weight: bold; color: #9a3412;">12A / 80G</div>
+            <div style="font-size: 9px; color: #475569;">VERIFIED TRUST</div>
+          </div>
+        </div>
+
+        <div style="display: inline-block; background: #7f1d1d; color: #fff; padding: 6px 24px; font-weight: bold; font-size: 14px; letter-spacing: 2px; border: 1px solid #d97706; margin: 6px 0;">${cert.title || 'CERTIFICATE OF APPRECIATION & CITATION'}</div>
+        <div style="font-family: monospace; font-weight: 700; color: #78350f; font-size: 13px; margin: 6px 0;">Certificate ID: ${cert.certificateId || ''}${cert.recipientId ? ` &nbsp;|&nbsp; Beneficiary ID: ${cert.recipientId}` : ''}</div>
+
+        <div style="font-size: 13px; color: #475569; font-style: italic; margin: 10px 0 4px;">This certificate of honor is proudly and gratefully conferred upon</div>
+        <div style="font-size: 28px; font-weight: 900; color: #0f172a; margin: 6px 0; border-bottom: 2px solid #d97706; display: inline-block; padding-bottom: 4px;">${cert.recipientName || currentUser?.name || 'Honored Contributor'}</div>
+        <div style="font-size: 13px; font-weight: bold; color: #065f46; margin: 4px 0 10px;">[ ${cert.roleOrDesignation || 'Active Social Worker'} ]</div>
+        <div style="font-size: 13px; line-height: 1.6; color: #334155; max-width: 850px; margin: 8px auto 18px;">${cert.reason || 'In recognition of outstanding dedication, exemplary leadership, and selfless service towards societal welfare and youth empowerment.'}</div>
+
+        <div style="display: flex; align-items: flex-end; justify-content: space-between; margin-top: 16px; border-top: 1px solid #fde68a; padding-top: 14px;">
+          <div style="text-align: left;">
+            <div style="font-size: 11px; font-weight: bold; color: #0f172a;">Date of Conformance:</div>
+            <div style="font-size: 11px; color: #475569;">${dateFormatted}</div>
+            <div style="font-size: 10px; color: #059669; font-weight: bold; margin-top: 4px;">✔ Digitally Authenticated</div>
+          </div>
+
+          <div>
+            <img src="${sealSrc}" style="width: 58px; height: 58px; object-fit: contain; margin: 0 auto;" alt="Seal" />
+            <div style="font-size: 9px; font-weight: bold; color: #7f1d1d; text-transform: uppercase;">Official Seal</div>
+          </div>
+
+          <div style="text-align: right;">
+            <img src="${sigSrc}" style="height: 38px; object-fit: contain; margin-bottom: 2px;" alt="Signature" /><br/>
+            <strong style="font-size: 12px; color: #0f172a;">${presidentName}</strong><br/>
+            <span style="font-size: 10px; color: #475569;">National President & Board of Trustees</span>
+          </div>
+        </div>
+      </div>
+    `;
+
+    printElement(certHtml, {
+      landscape: true,
+      title: `Certificate_${cert.certificateId || 'Honor'}`,
+      pageStyle: '@page { size: landscape A4; margin: 6mm; }'
+    });
   };
 
   const isDonor = currentUser?.role?.toLowerCase() === 'donor';
@@ -243,7 +191,7 @@ export default function ProfileCertificatesPage() {
   return (
     <div className="space-y-8">
       {/* Page Header */}
-      <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4 print:hidden no-print">
         <div>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 text-amber-800 text-xs font-bold mb-2 border border-amber-200">
             <FiAward className="w-3.5 h-3.5 text-amber-600" />
@@ -267,23 +215,36 @@ export default function ProfileCertificatesPage() {
 
       {/* ----------------- CATEGORY FILTER TABS ----------------- */}
       {certificates.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 print:hidden no-print">
           <button
             onClick={() => setFilter('all')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${filter === 'all'
-                ? 'bg-black text-white shadow-sm'
-                : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
+              ? 'bg-black text-white shadow-sm'
+              : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
               }`}
           >
             <FiFilter className="w-3.5 h-3.5" />
             <span>All Certificates ({certificates.length})</span>
           </button>
 
+          {(coordinatorCerts.length > 0 || currentUser?.role?.toLowerCase() === 'coordinator') && (
+            <button
+              onClick={() => setFilter('coordinator')}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${filter === 'coordinator'
+                ? 'bg-purple-700 text-white shadow-sm'
+                : 'bg-white text-slate-700 hover:bg-purple-50 border border-slate-200'
+                }`}
+            >
+              <FiShield className="w-3.5 h-3.5" />
+              <span>Coordinator Certificates ({coordinatorCerts.length})</span>
+            </button>
+          )}
+
           <button
             onClick={() => setFilter('volunteer')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${filter === 'volunteer'
-                ? 'bg-indigo-600 text-white shadow-sm'
-                : 'bg-white text-slate-700 hover:bg-indigo-50 border border-slate-200'
+              ? 'bg-indigo-600 text-white shadow-sm'
+              : 'bg-white text-slate-700 hover:bg-indigo-50 border border-slate-200'
               }`}
           >
             <FiUserCheck className="w-3.5 h-3.5" />
@@ -293,8 +254,8 @@ export default function ProfileCertificatesPage() {
           <button
             onClick={() => setFilter('member')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${filter === 'member'
-                ? 'bg-emerald-600 text-white shadow-sm'
-                : 'bg-white text-slate-700 hover:bg-emerald-50 border border-slate-200'
+              ? 'bg-emerald-600 text-white shadow-sm'
+              : 'bg-white text-slate-700 hover:bg-emerald-50 border border-slate-200'
               }`}
           >
             <FiCreditCard className="w-3.5 h-3.5" />
@@ -305,8 +266,8 @@ export default function ProfileCertificatesPage() {
             <button
               onClick={() => setFilter('awards')}
               className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${filter === 'awards'
-                  ? 'bg-amber-600 text-white shadow-sm'
-                  : 'bg-white text-slate-700 hover:bg-amber-50 border border-slate-200'
+                ? 'bg-amber-600 text-white shadow-sm'
+                : 'bg-white text-slate-700 hover:bg-amber-50 border border-slate-200'
                 }`}
             >
               <FiAward className="w-3.5 h-3.5" />
@@ -376,7 +337,7 @@ export default function ProfileCertificatesPage() {
               <p className="text-xs text-black leading-relaxed font-medium">
                 Official certificates are conferred for field volunteer drives, emergency blood donations, or constitutional membership milestones by the Board of Trustees.
               </p>
-              <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
+              {/* <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
                 <Link
                   href="/profile/apply-volunteer"
                   className="px-5 py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-xs hover:bg-indigo-700 transition shadow-md"
@@ -389,7 +350,7 @@ export default function ProfileCertificatesPage() {
                 >
                   Apply for Membership
                 </Link>
-              </div>
+              </div> */}
             </div>
           )}
         </div>
@@ -398,6 +359,7 @@ export default function ProfileCertificatesPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {filteredCerts.map((cert) => {
             const cat = getCertCategory(cert);
+            const isCoordinatorBadge = cat === 'coordinator';
             const isVolunteerBadge = cat === 'volunteer';
             const isMemberBadge = cat === 'member';
 
@@ -406,28 +368,39 @@ export default function ProfileCertificatesPage() {
                 key={cert._id}
                 className="bg-white rounded-3xl border border-slate-200 p-6 shadow-2xs flex flex-col justify-between relative overflow-hidden"
               >
-                <div className={`absolute top-0 right-0 w-28 h-28 ${isVolunteerBadge ? 'bg-indigo-500/10' : (isMemberBadge ? 'bg-emerald-500/10' : 'bg-amber-500/10')
+                <div className={`absolute top-0 right-0 w-28 h-28 ${isCoordinatorBadge ? 'bg-purple-500/10' : (isVolunteerBadge ? 'bg-indigo-500/10' : (isMemberBadge ? 'bg-emerald-500/10' : 'bg-amber-500/10'))
                   } rounded-bl-full pointer-events-none`} />
 
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-3">
                     <div className="flex items-center gap-2">
                       <span className="text-[10px] font-black px-2.5 py-1 rounded-lg bg-slate-100 text-slate-800 border border-slate-200 font-mono">
-                        ID: {cert.certificateId}
+                        Cert ID: {cert.certificateId}
                       </span>
-                      {isVolunteerBadge && (
+                      {cert.recipientId && (
+                        <span className="text-[10px] font-black px-2 py-1 rounded-lg bg-slate-50 text-slate-600 border border-slate-200 font-mono">
+                          User ID: {cert.recipientId}
+                        </span>
+                      )}
+                      {isCoordinatorBadge && (
+                        <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-purple-100 text-purple-800 border border-purple-200 flex items-center gap-1">
+                          <FiShield className="w-3 h-3 text-purple-600" />
+                          <span>Coordinator Honor</span>
+                        </span>
+                      )}
+                      {!isCoordinatorBadge && isVolunteerBadge && (
                         <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800 border border-indigo-200 flex items-center gap-1">
                           <FiUserCheck className="w-3 h-3 text-indigo-600" />
                           <span>Volunteer Service</span>
                         </span>
                       )}
-                      {isMemberBadge && (
+                      {!isCoordinatorBadge && isMemberBadge && (
                         <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 flex items-center gap-1">
                           <FiCreditCard className="w-3 h-3 text-emerald-600" />
                           <span>Member Honor</span>
                         </span>
                       )}
-                      {!isVolunteerBadge && !isMemberBadge && (
+                      {!isCoordinatorBadge && !isVolunteerBadge && !isMemberBadge && (
                         <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200 flex items-center gap-1">
                           <FiAward className="w-3 h-3 text-amber-600" />
                           <span>Citation</span>
@@ -476,16 +449,19 @@ export default function ProfileCertificatesPage() {
                       <FiEye className="w-3.5 h-3.5" />
                       <span>View</span>
                     </button>
-                    <a
-                      href={`/api/certificates/${cert.certificateId || cert._id}/download`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold transition flex items-center gap-1 shadow-xs cursor-pointer"
+                    <button
+                      onClick={() => handleDownloadCertificate(cert)}
+                      disabled={downloadingCertId === (cert.certificateId || cert.certificateNo || cert._id)}
+                      className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-black disabled:bg-slate-400 text-white text-xs font-bold transition flex items-center gap-1 shadow-xs cursor-pointer"
                       title="Download Official PDF Certificate"
                     >
-                      <FiDownload className="w-3.5 h-3.5" />
+                      {downloadingCertId === (cert.certificateId || cert.certificateNo || cert._id) ? (
+                        <FiRefreshCw className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <FiDownload className="w-3.5 h-3.5" />
+                      )}
                       <span>PDF</span>
-                    </a>
+                    </button>
                     <button
                       onClick={() => handlePrint(cert)}
                       className="p-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition flex items-center gap-1 shadow-xs cursor-pointer"
@@ -521,15 +497,19 @@ export default function ProfileCertificatesPage() {
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <a
-                  href={`/api/certificates/${previewCert.certificateId || previewCert._id}/download`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
+                <button
+                  onClick={() => handleDownloadCertificate(previewCert)}
+                  disabled={downloadingCertId === (previewCert.certificateId || previewCert.certificateNo || previewCert._id)}
+                  className="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 disabled:bg-amber-300 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-sm cursor-pointer"
+                  title="Download Official PDF Certificate"
                 >
-                  <FiDownload className="w-3.5 h-3.5" />
+                  {downloadingCertId === (previewCert.certificateId || previewCert.certificateNo || previewCert._id) ? (
+                    <FiRefreshCw className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <FiDownload className="w-3.5 h-3.5" />
+                  )}
                   <span className="hidden sm:inline">Download PDF</span>
-                </a>
+                </button>
                 <button
                   onClick={() => handlePrint(previewCert)}
                   className="px-3.5 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-sm cursor-pointer"
@@ -548,7 +528,7 @@ export default function ProfileCertificatesPage() {
 
             {/* Framed Certificate Canvas */}
             <div className="p-4 sm:p-8 bg-amber-50/30 overflow-x-auto">
-              <div className="min-w-[680px] bg-white border-8 border-red-900 outline-4 outline-amber-600 rounded-lg p-8 sm:p-10 relative text-center shadow-lg">
+              <div className="min-w-170 bg-white border-8 border-red-900 outline-4 outline-amber-600 rounded-lg p-8 sm:p-10 relative text-center shadow-lg">
                 {/* 4 Corner Medallions */}
                 <div className="absolute top-2 left-2 w-6 h-6 border border-amber-600 bg-amber-100 flex items-center justify-center text-amber-800 text-xs font-bold">✦</div>
                 <div className="absolute top-2 right-2 w-6 h-6 border border-amber-600 bg-amber-100 flex items-center justify-center text-amber-800 text-xs font-bold">✦</div>
@@ -559,12 +539,12 @@ export default function ProfileCertificatesPage() {
                 <div className="flex items-center justify-between gap-4 mb-4 pb-3 border-b border-amber-200">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={getContentImageUrl(settings?.logoUrl) || 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=120'}
+                    src={getContentImageUrl(settings?.logoUrl) || '/logo.jpeg'}
                     alt="Logo"
                     className="w-16 h-16 rounded-full object-cover border-2 border-red-900 shadow-sm"
                     onError={(e) => {
                       e.currentTarget.onerror = null;
-                      e.currentTarget.src = 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=120';
+                      e.currentTarget.src = '/logo.jpeg';
                     }}
                   />
                   <div>
@@ -596,7 +576,7 @@ export default function ProfileCertificatesPage() {
                 </div>
 
                 <div className="text-[11px] font-mono font-bold text-amber-800 mb-3">
-                  Official Conformance No: {previewCert.certificateId}
+                  Certificate ID: {previewCert.certificateId}{previewCert.recipientId ? ` • Beneficiary ID: ${previewCert.recipientId}` : ''}
                 </div>
 
                 {/* Presentation */}
@@ -648,12 +628,12 @@ export default function ProfileCertificatesPage() {
                   <div className="text-center">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={getContentImageUrl(settings?.officialSealUrl) || 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=200'}
+                      src={getContentImageUrl(settings?.officialSealUrl)}
                       alt="Official Seal"
                       className="w-14 h-14 object-contain mx-auto"
                       onError={(e) => {
                         e.currentTarget.onerror = null;
-                        e.currentTarget.src = 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=200';
+                        e.currentTarget.src = '';
                       }}
                     />
                     <span className="text-[9px] font-bold text-red-900 uppercase tracking-wider mt-1 block">
@@ -665,12 +645,12 @@ export default function ProfileCertificatesPage() {
                   <div className="text-right">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={getContentImageUrl(settings?.presidentSignatureUrl) || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200'}
+                      src={getContentImageUrl(settings?.presidentSignatureUrl) || ''}
                       alt="Signature"
                       className="h-9 object-contain ml-auto"
                       onError={(e) => {
                         e.currentTarget.onerror = null;
-                        e.currentTarget.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200';
+                        e.currentTarget.src = '';
                       }}
                     />
                     <div className="mt-0.5">

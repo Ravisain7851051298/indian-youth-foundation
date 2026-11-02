@@ -11,12 +11,16 @@ import {
   FiCreditCard,
   FiUserCheck,
   FiArrowRight,
-  FiHeart
+  FiHeart,
+  FiDownload,
+  FiRefreshCw
 } from 'react-icons/fi';
 import { QRCodeSVG } from 'qrcode.react';
 import { useSelector } from 'react-redux';
 import { useNGO } from '@/context/NGOContext';
 import { getContentImageUrl } from '@/lib/authApi';
+import api from '@/services/api';
+import { printElement } from '@/lib/printElement';
 
 export default function IdCardPage() {
   const { currentUser, settings, refreshUser } = useNGO();
@@ -58,27 +62,40 @@ export default function IdCardPage() {
     ? paramType
     : (isCoordinatorVerified ? 'coordinator' : (isVolunteerVerified && !isMemberVerified ? 'volunteer' : 'member'));
   const [selectedTab, setSelectedTab] = useState(null);
+  const [downloadingPdf, setDownloadingPdf] = useState(false);
   const activeTab = selectedTab || defaultTab;
   const setActiveTab = setSelectedTab;
 
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
 
+  const cleanTenDigit = (val, phoneFallback) => {
+    if (!val) {
+      const p = phoneFallback ? String(phoneFallback).replace(/\D/g, '') : '';
+      return p.length >= 10 ? p.slice(-10) : '1000000001';
+    }
+    const str = String(val).trim();
+    if (/^\d{10}$/.test(str)) return str;
+    const digits = str.replace(/\D/g, '');
+    if (digits.length >= 10) return digits.slice(-10);
+    const p = phoneFallback ? String(phoneFallback).replace(/\D/g, '') : '';
+    if (p.length >= 10) return p.slice(-10);
+    return (digits + '0000000000').slice(0, 10);
+  };
+
   const rawMemberId = effectiveUser?.memberId;
   const memberId = (rawMemberId && !rawMemberId.startsWith('BYK-DON-'))
-    ? rawMemberId
-    : (effectiveUser?.membershipApplication?.assignedMemberId || 'MEM-PENDING');
+    ? (/^\d{10}$/.test(rawMemberId) ? rawMemberId : cleanTenDigit(rawMemberId, effectiveUser?.phone))
+    : (effectiveUser?.membershipApplication?.assignedMemberId || cleanTenDigit(effectiveUser?.phone, '1000000001'));
 
   const rawCoordId = effectiveUser?.coordinatorId || (effectiveUser?.role === 'Coordinator' && rawMemberId && !rawMemberId.startsWith('BYK-DON-') ? rawMemberId : null);
   const coordinatorId = (rawCoordId && !rawCoordId.startsWith('BYK-DON-'))
-    ? rawCoordId
-    : `BYK-COORD-${effectiveUser?.phone ? effectiveUser.phone.slice(-4) : '2026'}`;
+    ? (/^\d{10}$/.test(rawCoordId) ? rawCoordId : cleanTenDigit(rawCoordId, effectiveUser?.phone))
+    : cleanTenDigit(effectiveUser?.phone, '1000000001');
 
   const rawVolId = effectiveUser?.volunteerId || effectiveUser?.volunteerApplication?.assignedVolunteerId || effectiveUser?.volunteerApplication?.volunteerId;
   const volunteerId = (rawVolId && !rawVolId.startsWith('BYK-DON-'))
-    ? rawVolId
-    : (effectiveUser?.role === 'Volunteer' && rawMemberId && !rawMemberId.startsWith('BYK-DON-')
-      ? rawMemberId
-      : `BYK-VOL-${effectiveUser?.phone ? effectiveUser.phone.slice(-4) : '2026'}`);
+    ? (/^\d{10}$/.test(rawVolId) ? rawVolId : cleanTenDigit(rawVolId, effectiveUser?.phone))
+    : cleanTenDigit(effectiveUser?.phone, '1000000501');
 
   const memberVerificationUrl = `${origin || 'https://indianyouthfoundation.org'}/verify/member/${memberId}`;
   const coordinatorVerificationUrl = `${origin || 'https://indianyouthfoundation.org'}/verify/coordinator/${coordinatorId}`;
@@ -91,13 +108,47 @@ export default function IdCardPage() {
       : isVolunteerVerified;
 
   const handlePrint = () => {
-    window.print();
+    if (cardRef.current) {
+      const docLabel = activeTab === 'coordinator'
+        ? `Coordinator_${coordinatorId}`
+        : activeTab === 'volunteer'
+          ? `Volunteer_${volunteerId}`
+          : `Member_${memberId}`;
+      printElement(cardRef.current, {
+        title: `ID_Card_${docLabel}`,
+        pageStyle: '@page { size: auto; margin: 8mm; }'
+      });
+    } else {
+      window.print();
+    }
+  };
+
+  const handleDownloadPdf = async () => {
+    try {
+      setDownloadingPdf(true);
+      const res = await api.get(`/documents/id-card/download?type=${activeTab}`, { responseType: 'blob' });
+      const blob = new Blob([res.data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      const label = activeTab === 'coordinator' ? `Coordinator_${coordinatorId}` : (activeTab === 'volunteer' ? `Volunteer_${volunteerId}` : `Member_${memberId}`);
+      link.setAttribute('download', `ID_Card_${label}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.warn('Blob download error, opening direct link:', err);
+      window.open(`/api/documents/id-card/download?type=${activeTab}`, '_blank');
+    } finally {
+      setDownloadingPdf(false);
+    }
   };
 
   return (
     <div className="space-y-6">
       {/* Page Title & Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 print:hidden no-print">
         <div>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-red-700 text-xs font-bold mb-2 border border-red-200">
             <FiShield className="w-3.5 h-3.5 text-red-600" />
@@ -112,23 +163,34 @@ export default function IdCardPage() {
         </div>
 
         {isCurrentCardVerified && (
-          <button
-            onClick={handlePrint}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-white font-bold text-xs shadow-md transition self-start sm:self-auto cursor-pointer ${activeTab === 'coordinator'
-              ? 'bg-purple-600 hover:bg-purple-700 shadow-purple-600/20'
-              : activeTab === 'member'
-                ? 'bg-red-600 hover:bg-red-700 shadow-red-600/20'
-                : 'bg-indigo-600 hover:bg-indigo-700 shadow-indigo-600/20'
-              }`}
-          >
-            <FiPrinter className="w-4 h-4" />
-            <span>Print {activeTab === 'coordinator' ? 'Coordinator ID Card' : activeTab === 'member' ? 'Member ID Card' : 'Volunteer ID Card'}</span>
-          </button>
+          <div className="flex flex-wrap items-center gap-2.5 self-start sm:self-auto">
+            <button
+              onClick={handleDownloadPdf}
+              disabled={downloadingPdf}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-white font-bold text-xs shadow-md transition cursor-pointer disabled:opacity-50 ${activeTab === 'coordinator'
+                ? 'bg-purple-700 hover:bg-purple-800 shadow-purple-700/20'
+                : activeTab === 'member'
+                  ? 'bg-red-700 hover:bg-red-800 shadow-red-700/20'
+                  : 'bg-emerald-700 hover:bg-emerald-800 shadow-emerald-700/20'
+                }`}
+            >
+              {downloadingPdf ? <FiRefreshCw className="w-4 h-4 animate-spin" /> : <FiDownload className="w-4 h-4" />}
+              <span>Download ID Card PDF</span>
+            </button>
+
+            <button
+              onClick={handlePrint}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-2xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs transition cursor-pointer shadow-xs"
+            >
+              <FiPrinter className="w-4 h-4" />
+              <span>Print Badge</span>
+            </button>
+          </div>
         )}
       </div>
 
       {/* ----------------- TRI-ROLE ID CARD SWITCHER TABS ----------------- */}
-      <div className="flex flex-wrap items-center gap-2.5 p-1.5 bg-slate-100/80 rounded-2xl border border-slate-200 max-w-2xl">
+      <div className="flex flex-wrap items-center gap-2.5 p-1.5 bg-slate-100/80 rounded-2xl border border-slate-200 max-w-2xl print:hidden no-print">
         <button
           onClick={() => setActiveTab('coordinator')}
           className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3.5 rounded-xl text-xs font-black transition cursor-pointer ${activeTab === 'coordinator'
@@ -214,14 +276,14 @@ export default function IdCardPage() {
           ) : (
             /* Unlocked Official Member ID Card (Red & Burgundy Theme) */
             <div className="space-y-6">
-              <div className="bg-emerald-50 border border-emerald-300 text-emerald-900 p-4 rounded-2xl flex items-center gap-3 text-xs font-semibold max-w-4xl mx-auto">
+              <div className="bg-emerald-50 border border-emerald-300 text-emerald-900 p-4 rounded-2xl flex items-center gap-3 text-xs font-semibold max-w-4xl mx-auto print:hidden no-print">
                 <FiCheckCircle className="w-5 h-5 text-emerald-600 shrink-0" />
                 <span>
                   Official Foundation Member ID Card is verified and active. Scan the QR code with any mobile camera to verify credentials in real-time.
                 </span>
               </div>
 
-              <div ref={cardRef} className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto print:max-w-none print:m-0">
+              <div ref={cardRef} className="printable-document print-card-container grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto print:max-w-none print:m-0 print:gap-4">
                 {/* FRONT SIDE */}
                 <div className="bg-linear-to-b from-red-600 via-red-700 to-red-800 text-white rounded-3xl p-6 shadow-xl relative overflow-hidden flex flex-col justify-between min-h-115 border border-red-500">
                   {/* Header */}
@@ -372,7 +434,7 @@ export default function IdCardPage() {
 
                     <div className="text-[9px] text-slate-700 text-center leading-tight font-medium">
                       Head Office: {settings?.address || 'Krishna Vihar Pala Road Aligarh, Uttar Pradesh'}<br />
-                      Helpline: {settings?.phone || '+91 93196 98759'} • {settings?.email || 'samasyasamadhanparishad@gmail.com'}
+                      Helpline: {settings?.phone || '+91 93196 98759'} • {settings?.email || 'yuvakrantidal@gmail.com'}
                     </div>
                   </div>
                 </div>
@@ -424,14 +486,14 @@ export default function IdCardPage() {
           ) : (
             /* Unlocked Official Volunteer ID Card (Navy & Indigo Theme) */
             <div className="space-y-6">
-              <div className="bg-indigo-50 border border-indigo-300 text-indigo-900 p-4 rounded-2xl flex items-center gap-3 text-xs font-semibold max-w-4xl mx-auto">
+              <div className="bg-indigo-50 border border-indigo-300 text-indigo-900 p-4 rounded-2xl flex items-center gap-3 text-xs font-semibold max-w-4xl mx-auto print:hidden no-print">
                 <FiCheckCircle className="w-5 h-5 text-indigo-600 shrink-0" />
                 <span>
                   Official Grassroots Volunteer ID Card is verified and active. Field coordinators or authorities can scan the QR code to verify ground authorization.
                 </span>
               </div>
 
-              <div ref={cardRef} className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto print:max-w-none print:m-0">
+              <div ref={cardRef} className="printable-document print-card-container grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto print:max-w-none print:m-0 print:gap-4">
                 {/* FRONT SIDE (VOLUNTEER) */}
                 <div className="bg-linear-to-b from-indigo-700 via-indigo-800 to-slate-900 text-white rounded-3xl p-6 shadow-xl relative overflow-hidden flex flex-col justify-between min-h-115 border border-indigo-500">
                   {/* Header */}
@@ -584,7 +646,7 @@ export default function IdCardPage() {
 
                     <div className="text-[9px] text-slate-700 text-center leading-tight font-medium">
                       Head Office: {settings?.address || 'Krishna Vihar Pala Road Aligarh, Uttar Pradesh'}<br />
-                      Helpline: {settings?.phone || '+91 93196 98759'} • {settings?.email || 'samasyasamadhanparishad@gmail.com'}
+                      Helpline: {settings?.phone || '+91 93196 98759'} • {settings?.email || 'yuvakrantidal@gmail.com'}
                     </div>
                   </div>
                 </div>
@@ -630,14 +692,14 @@ export default function IdCardPage() {
           ) : (
             /* Unlocked Official Coordinator ID Card (Purple & Deep Indigo Theme) */
             <div className="space-y-6">
-              <div className="bg-purple-50 border border-purple-300 text-purple-900 p-4 rounded-2xl flex items-center gap-3 text-xs font-semibold max-w-4xl mx-auto">
+              <div className="bg-purple-50 border border-purple-300 text-purple-900 p-4 rounded-2xl flex items-center gap-3 text-xs font-semibold max-w-4xl mx-auto print:hidden no-print">
                 <FiCheckCircle className="w-5 h-5 text-purple-600 shrink-0" />
                 <span>
                   Official Area Coordinator ID Card is verified and active. You are officially authorized to recruit members and lead regional social drives.
                 </span>
               </div>
 
-              <div ref={cardRef} className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto print:max-w-none print:m-0">
+              <div ref={cardRef} className="printable-document print-card-container grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto print:max-w-none print:m-0 print:gap-4">
                 {/* FRONT SIDE (COORDINATOR) */}
                 <div className="bg-linear-to-b from-purple-700 via-purple-800 to-indigo-950 text-white rounded-3xl p-6 shadow-xl relative overflow-hidden flex flex-col justify-between min-h-115 border border-purple-500">
                   {/* Header */}
@@ -794,7 +856,7 @@ export default function IdCardPage() {
 
                     <div className="text-[9px] text-slate-700 text-center leading-tight font-medium">
                       Head Office: {settings?.address || 'Krishna Vihar Pala Road Aligarh, Uttar Pradesh'}<br />
-                      Helpline: {settings?.phone || '+91 93196 98759'} • {settings?.email || 'samasyasamadhanparishad@gmail.com'}
+                      Helpline: {settings?.phone || '+91 93196 98759'} • {settings?.email || 'yuvakrantidal@gmail.com'}
                     </div>
                   </div>
                 </div>

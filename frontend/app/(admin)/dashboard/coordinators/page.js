@@ -29,7 +29,8 @@ import {
   FiEyeOff,
   FiCopy,
   FiCheck,
-  FiUploadCloud
+  FiUploadCloud,
+  FiDownload
 } from 'react-icons/fi';
 import api from '@/services/api';
 import { getContentImageUrl } from '@/lib/authApi';
@@ -109,6 +110,116 @@ export default function CoordinatorsManagementPage() {
   const [resendingId, setResendingId] = useState(null);
   const [approvingMemberId, setApprovingMemberId] = useState(null);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [downloadingDoc, setDownloadingDoc] = useState(null);
+
+  // Offer Certificate states
+  const [certModalCoord, setCertModalCoord] = useState(null);
+  const [certTitle, setCertTitle] = useState('Certificate of Outstanding Leadership & Civic Coordination');
+  const [certTitleHi, setCertTitleHi] = useState('उत्कृष्ट नेतृत्व एवं समन्वय प्रशंसा प्रमाण पत्र');
+  const [certRole, setCertRole] = useState('District Youth Coordinator');
+  const [certReason, setCertReason] = useState('In high recognition of exemplary leadership, proactive community outreach, and exceptional coordination of youth initiatives for national development.');
+  const [certReasonHi, setCertReasonHi] = useState('समाज सशक्तिकरण एवं अनुकरणीय जिला समन्वय में उत्कृष्ट योगदान के सम्मान स्वरूप।');
+  const [isIssuingCert, setIsIssuingCert] = useState(false);
+  const [issuedCertResult, setIssuedCertResult] = useState(null);
+  const [downloadingCertPdf, setDownloadingCertPdf] = useState(false);
+
+  const openOfferCertModal = (coord) => {
+    setCertModalCoord(coord);
+    setCertTitle('Certificate of Outstanding Leadership & Civic Coordination');
+    setCertTitleHi('उत्कृष्ट नेतृत्व एवं समन्वय प्रशंसा प्रमाण पत्र');
+    setCertRole(coord.designation || 'District Youth Coordinator');
+    setCertReason('In high recognition of exemplary leadership, proactive community outreach, and exceptional coordination of youth initiatives for national development.');
+    setCertReasonHi('समाज सशक्तिकरण एवं अनुकरणीय जिला समन्वय में उत्कृष्ट योगदान के सम्मान स्वरूप।');
+    setIssuedCertResult(null);
+  };
+
+  const handleIssueCertSubmit = async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!certModalCoord) return;
+    try {
+      setIsIssuingCert(true);
+      const payload = {
+        recipientId: certModalCoord.coordinatorId || certModalCoord.memberId || certModalCoord._id,
+        recipientName: certModalCoord.name,
+        recipientEmail: certModalCoord.email,
+        recipientPhone: certModalCoord.phone,
+        title: certTitle,
+        titleHi: certTitleHi,
+        roleOrDesignation: certRole,
+        reason: certReason,
+        reasonHi: certReasonHi,
+        category: 'Coordinator'
+      };
+
+      const res = await api.post('/certificates', payload);
+      if (res.data?.success) {
+        toast.success(res.data.message || 'Certificate offered and sent via email!');
+        setIssuedCertResult(res.data.certificate);
+      } else {
+        toast.error(res.data?.message || 'Failed to offer certificate');
+      }
+    } catch (err) {
+      console.error('Certificate issue error:', err);
+      const errMsg = err.response?.data?.message || (err.code === 'ECONNABORTED' ? 'Request timed out, but certificate was created. Please check profile.' : 'Failed to issue certificate');
+      toast.error(errMsg);
+    } finally {
+      setIsIssuingCert(false);
+    }
+  };
+
+  const handleDownloadIssuedCert = async (cert) => {
+    if (!cert) return;
+    const certId = cert.certificateId || cert.certificateNo || cert._id;
+    try {
+      setDownloadingCertPdf(true);
+      const res = await api.get(`/certificates/${certId}/download`, { responseType: 'blob' });
+      const blob = new Blob([res.data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `Coordinator_Certificate_${certId}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      toast.success('Certificate PDF downloaded!');
+    } catch (err) {
+      window.open(`/api/certificates/${certId}/download`, '_blank');
+    } finally {
+      setDownloadingCertPdf(false);
+    }
+  };
+
+  const handleDownloadDoc = async (coord, docType) => {
+    const targetId = coord._id || coord.id || coord.coordinatorId;
+    const docKey = `${targetId}_${docType}`;
+    try {
+      setDownloadingDoc(docKey);
+      const endpoint = docType === 'id-card'
+        ? `/documents/id-card/${targetId}/download?type=coordinator`
+        : `/documents/appointment-letter/${targetId}/download?type=coordinator`;
+
+      const res = await api.get(endpoint, { responseType: 'blob' });
+      const blob = new Blob([res.data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      const filename = docType === 'id-card'
+        ? `Coordinator_IDCard_${coord.coordinatorId || targetId}.pdf`
+        : `Coordinator_Appointment_${coord.coordinatorId || targetId}.pdf`;
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      toast.success(`${docType === 'id-card' ? 'ID Card' : 'Appointment Letter'} PDF downloaded!`);
+    } catch (err) {
+      console.warn('Blob download failed, opening direct URL:', err);
+      window.open(`/api/documents/${docType}/${targetId}/download?type=coordinator`, '_blank');
+    } finally {
+      setDownloadingDoc(null);
+    }
+  };
 
   const handleUploadPhoto = async (e, isEdit = false) => {
     const file = e.target.files?.[0];
@@ -304,9 +415,10 @@ export default function CoordinatorsManagementPage() {
         district: newCoordData.district,
         state: newCoordData.state,
         designation: newCoordData.designation,
-        coordinatorId: res.data?.coordinator?.coordinatorId || 'BYK-COORD'
+        coordinatorId: res.data?.coordinator?.coordinatorId || '1000000001'
       };
-      const finalTempPassword = res.data?.temporaryPassword || newCoordData.password || 'BYK@' + Math.floor(100000 + Math.random() * 900000);
+      const randomSuffix = Date.now().toString().slice(-6);
+      const finalTempPassword = res.data?.temporaryPassword || newCoordData.password || `BYK@${randomSuffix}`;
       setCreatedResultModal({
         coordinator: createdCoord,
         temporaryPassword: finalTempPassword
@@ -710,6 +822,46 @@ export default function CoordinatorsManagementPage() {
                           >
                             <FiEdit2 className="w-3.5 h-3.5" />
                             <span>Edit</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => openOfferCertModal(c)}
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-purple-100 hover:bg-purple-200 text-purple-900 border border-purple-300 font-bold text-xs transition cursor-pointer shadow-2xs"
+                            title="Offer Leadership Certificate to Coordinator (sent via email & visible on profile)"
+                          >
+                            <FiAward className="w-3.5 h-3.5 text-purple-700" />
+                            <span>Certificate</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            disabled={downloadingDoc === `${id}_id-card`}
+                            onClick={() => handleDownloadDoc(c, 'id-card')}
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-purple-50 text-purple-800 hover:bg-purple-100 border border-purple-200 font-bold text-xs transition cursor-pointer disabled:opacity-50 shadow-2xs"
+                            title="Download Official Coordinator ID Card PDF"
+                          >
+                            {downloadingDoc === `${id}_id-card` ? (
+                              <FiRefreshCw className="w-3.5 h-3.5 animate-spin" />
+                            ) : (
+                              <FiCreditCard className="w-3.5 h-3.5" />
+                            )}
+                            <span className="hidden sm:inline">ID Card</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            disabled={downloadingDoc === `${id}_appointment-letter`}
+                            onClick={() => handleDownloadDoc(c, 'appointment-letter')}
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-amber-50 text-amber-900 hover:bg-amber-100 border border-amber-200 font-bold text-xs transition cursor-pointer disabled:opacity-50 shadow-2xs"
+                            title="Download Official Appointment Letter PDF"
+                          >
+                            {downloadingDoc === `${id}_appointment-letter` ? (
+                              <FiRefreshCw className="w-3.5 h-3.5 animate-spin" />
+                            ) : (
+                              <FiFileText className="w-3.5 h-3.5" />
+                            )}
+                            <span className="hidden sm:inline">Letter</span>
                           </button>
 
                           <button
@@ -1599,6 +1751,201 @@ export default function CoordinatorsManagementPage() {
                 Done &amp; Close
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ----------------- MODAL 6: OFFER CERTIFICATE TO COORDINATOR ----------------- */}
+      {certModalCoord && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs overflow-y-auto">
+          <div className="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 my-8">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-200">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold">
+                  <FiAward className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-black">Offer Coordinator Certificate &amp; Citation</h3>
+                  <p className="text-[11px] text-slate-500">Confer official honor &amp; auto-email appointment offer letter with PDF.</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setCertModalCoord(null)}
+                className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center cursor-pointer transition"
+              >
+                <FiX className="w-4 h-4" />
+              </button>
+            </div>
+
+            {issuedCertResult ? (
+              <div className="mt-5 space-y-4">
+                <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0 mt-0.5">
+                    <FiCheck className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-black text-emerald-900">Certificate Successfully Offered &amp; Dispatched!</h4>
+                    <p className="text-xs text-emerald-700 mt-1">
+                      Official Certificate PDF and Coordinator Offer Letter have been emailed to <strong>{issuedCertResult.recipientEmail || certModalCoord.email}</strong> and are now visible under their Profile Certificates desk.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2 text-xs">
+                  <div className="flex justify-between py-1 border-b border-slate-200/60">
+                    <span className="text-slate-500 font-bold">Certificate Number:</span>
+                    <span className="font-mono font-black text-purple-800">{issuedCertResult.certificateNo || issuedCertResult.certificateId}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-200/60">
+                    <span className="text-slate-500 font-bold">Recipient:</span>
+                    <span className="font-bold text-black">{issuedCertResult.recipientName}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-200/60">
+                    <span className="text-slate-500 font-bold">Coordinator ID:</span>
+                    <span className="font-mono font-bold text-slate-700">{issuedCertResult.recipientId}</span>
+                  </div>
+                  <div className="flex justify-between py-1">
+                    <span className="text-slate-500 font-bold">Citation Title:</span>
+                    <span className="font-bold text-black">{issuedCertResult.title}</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-end gap-2 pt-2">
+                  <button
+                    type="button"
+                    disabled={downloadingCertPdf}
+                    onClick={() => handleDownloadIssuedCert(issuedCertResult)}
+                    className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-xs flex items-center gap-1.5 transition cursor-pointer disabled:opacity-50"
+                  >
+                    {downloadingCertPdf ? <FiRefreshCw className="w-3.5 h-3.5 animate-spin" /> : <FiDownload className="w-3.5 h-3.5" />}
+                    <span>Download PDF</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCertModalCoord(null);
+                      setIssuedCertResult(null);
+                    }}
+                    className="px-5 py-2.5 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-bold text-xs shadow-md transition cursor-pointer"
+                  >
+                    Done &amp; Close
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <form onSubmit={handleIssueCertSubmit} className="mt-5 space-y-4">
+                {/* Coordinator Summary Card */}
+                <div className="p-3.5 rounded-2xl bg-purple-50/70 border border-purple-200 flex items-center justify-between gap-3 text-xs">
+                  <div>
+                    <div className="font-bold text-purple-950 text-sm">{certModalCoord.name}</div>
+                    <div className="text-purple-700 font-mono text-[11px] mt-0.5">ID: {certModalCoord.coordinatorId || certModalCoord.memberId || 'N/A'} • {certModalCoord.email || 'No email registered'}</div>
+                  </div>
+                  <span className="px-2.5 py-1 rounded-full bg-purple-200 text-purple-900 font-black text-[10px] uppercase">
+                    Coordinator
+                  </span>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-black mb-1">
+                    Certificate Citation Title (English) <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={certTitle}
+                    onChange={(e) => setCertTitle(e.target.value)}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs text-black focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600"
+                    placeholder="e.g. Certificate of Outstanding Leadership & Civic Coordination"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-black mb-1">
+                    Certificate Citation Title (Hindi)
+                  </label>
+                  <input
+                    type="text"
+                    value={certTitleHi}
+                    onChange={(e) => setCertTitleHi(e.target.value)}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs text-black focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600"
+                    placeholder="e.g. उत्कृष्ट नेतृत्व एवं समन्वय प्रशंसा प्रमाण पत्र"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-black mb-1">
+                    Coordinator Designation / Wing Role <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={certRole}
+                    onChange={(e) => setCertRole(e.target.value)}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs text-black focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600"
+                    placeholder="e.g. District Youth Coordinator"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-black mb-1">
+                    Commendation / Reason for Award (English) <span className="text-rose-500">*</span>
+                  </label>
+                  <textarea
+                    rows={3}
+                    required
+                    value={certReason}
+                    onChange={(e) => setCertReason(e.target.value)}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs text-black focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600 leading-relaxed"
+                    placeholder="Describe specific achievements, initiatives organized, or leadership accomplishments..."
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-black mb-1">
+                    Commendation / Reason (Hindi)
+                  </label>
+                  <input
+                    type="text"
+                    value={certReasonHi}
+                    onChange={(e) => setCertReasonHi(e.target.value)}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs text-black focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600"
+                    placeholder="समाज सशक्तिकरण एवं अनुकरणीय जिला समन्वय में उत्कृष्ट योगदान..."
+                  />
+                </div>
+
+                <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-[11px] text-amber-900">
+                  📧 <strong>Email &amp; Profile Dispatch:</strong> When offered, the Certificate PDF and official appointment offer letter will be automatically dispatched to <strong>{certModalCoord.email || 'the coordinator email'}</strong> and will immediately display on their profile at <code>/profile/certificates</code> under the <strong>Coordinator</strong> tab.
+                </div>
+
+                <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-200">
+                  <button
+                    type="button"
+                    onClick={() => setCertModalCoord(null)}
+                    className="px-4 py-2 rounded-xl text-slate-700 bg-slate-100 hover:bg-slate-200 font-bold text-xs transition cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isIssuingCert}
+                    className="px-5 py-2 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-bold text-xs shadow-md shadow-purple-700/20 transition cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+                  >
+                    {isIssuingCert ? (
+                      <>
+                        <FiRefreshCw className="w-3.5 h-3.5 animate-spin" />
+                        <span>Offering Certificate...</span>
+                      </>
+                    ) : (
+                      <>
+                        <FiAward className="w-3.5 h-3.5" />
+                        <span>Offer &amp; Email Certificate</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </div>
       )}

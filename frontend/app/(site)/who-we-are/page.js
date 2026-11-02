@@ -42,13 +42,13 @@ Empathy in Action: Rapid, unconditional grassroots aid for every vulnerable citi
   const visionContent = settings?.whoWeAreVision || fallbackVision;
   const valuesContent = settings?.whoWeAreValues || fallbackValues;
 
-  const bannerImg = settings?.whoWeAreBannerUrl 
-    ? getContentImageUrl(settings.whoWeAreBannerUrl) 
+  const bannerImg = settings?.whoWeAreBannerUrl
+    ? getContentImageUrl(settings.whoWeAreBannerUrl)
     : 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1200&auto=format&fit=crop&q=80';
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 selection:bg-emerald-600 selection:text-white">
-      
+
       {/* ---------------- 1. HERO SECTION ---------------- */}
       <section className="relative overflow-hidden bg-gradient-to-b from-emerald-50/70 via-white to-slate-50 py-16 sm:py-24 border-b border-emerald-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -97,7 +97,7 @@ Empathy in Action: Rapid, unconditional grassroots aid for every vulnerable citi
       <section className="py-16 sm:py-20 bg-white border-b border-slate-200">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-            
+
             {/* Left: Dynamic Story */}
             <div className="lg:col-span-7 space-y-6">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-200">
@@ -235,7 +235,7 @@ Empathy in Action: Rapid, unconditional grassroots aid for every vulnerable citi
       <section className="py-16 sm:py-20 bg-white border-b border-slate-200">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            
+
             <div className="lg:col-span-5 space-y-4">
               <span className="text-xs font-black uppercase tracking-wider text-emerald-800 bg-emerald-100 px-3 py-1 rounded-full">
                 Core Philosophy
@@ -290,7 +290,7 @@ Empathy in Action: Rapid, unconditional grassroots aid for every vulnerable citi
                 <span>{settings?.phone || '+91 93196 98759'}</span>
               </a>
               <a
-                href={`mailto:${settings?.email || 'samasyasamadhanparishad@gmail.com'}`}
+                href={`mailto:${settings?.email || 'yuvakrantidal@gmail.com'}`}
                 className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs transition shadow-md shadow-emerald-700/20"
               >
                 <FiMail className="w-3.5 h-3.5" />

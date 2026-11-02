@@ -115,15 +115,15 @@ function drawVectorShield(doc, x, y, width = 42, height = 50, color = '#b45309')
   const w = width;
   const h = height;
   doc.lineWidth(1.5).strokeColor(color).fillColor('#fef3c7');
-  
+
   // Shield path
   doc.moveTo(x, y)
-     .lineTo(x + w, y)
-     .lineTo(x + w, y + h * 0.55)
-     .quadraticCurveTo(x + w * 0.5, y + h, x + w * 0.5, y + h)
-     .quadraticCurveTo(x, y + h * 0.55, x, y + h * 0.55)
-     .closePath()
-     .fillAndStroke();
+    .lineTo(x + w, y)
+    .lineTo(x + w, y + h * 0.55)
+    .quadraticCurveTo(x + w * 0.5, y + h, x + w * 0.5, y + h)
+    .quadraticCurveTo(x, y + h * 0.55, x, y + h * 0.55)
+    .closePath()
+    .fillAndStroke();
 
   // Shield inner star/badge text
   doc.font('Helvetica-Bold').fontSize(6.5).fillColor('#9a3412');
@@ -196,7 +196,7 @@ async function generateDonationReceiptPdf(donation = {}) {
       doc.font('Helvetica').fontSize(8.5).fillColor('#475569');
       doc.text('Registered Public Charitable Trust • Reg. No: 421/2019 • Section 12A & 80G Certified', 40, 83, { align: 'center' });
       doc.text('Head Office: Krishna Vihar, Pala Road, Aligarh, Uttar Pradesh - 202001 | Phone: +91 93196 98759', 40, 95, { align: 'center' });
-      doc.text('Email: samasyasamadhanparishad@gmail.com | Website: bharatiyayuvakranti.org', 40, 107, { align: 'center' });
+      doc.text('Email: yuvakrantidal@gmail.com | Website: bharatiyayuvakranti.org', 40, 107, { align: 'center' });
 
       // Saffron Divider
       doc.moveTo(40, 122).lineTo(555, 122).lineWidth(1.5).strokeColor('#ea580c').stroke();
@@ -304,7 +304,8 @@ async function generateVolunteerOfferLetterPdf(user = {}) {
       doc.on('data', b => buffers.push(b));
       doc.on('end', () => resolve(Buffer.concat(buffers)));
 
-      const volunteerId = sanitize(user.volunteerId || (user.memberId && user.memberId.startsWith('BYK-VOL-') ? user.memberId : 'BYK-VOL-2026-0501'));
+      const defaultVolId = String(Math.floor(1000000000 + Math.random() * 9000000000));
+      const volunteerId = sanitize(user.volunteerId || (/^\d{10}$/.test(user.memberId) ? user.memberId : defaultVolId));
       const name = sanitize(user.name || 'Dedicated Volunteer');
       const email = sanitize(user.email || 'N/A');
       const phone = sanitize(user.phone || 'N/A');
@@ -328,7 +329,7 @@ async function generateVolunteerOfferLetterPdf(user = {}) {
       doc.text('BHARATIYA YUVA KRANTI • VOLUNTEER WING', 40, 68, { align: 'center' });
       doc.font('Helvetica').fontSize(8.5).fillColor('#475569');
       doc.text('Registered Public Charitable Trust • Reg. No: 421/2019 • Dedicated to National Youth Service', 40, 83, { align: 'center' });
-      doc.text('Head Office: Krishna Vihar, Pala Road, Aligarh, Uttar Pradesh - 202001 | Email: samasyasamadhanparishad@gmail.com', 40, 95, { align: 'center' });
+      doc.text('Head Office: Krishna Vihar, Pala Road, Aligarh, Uttar Pradesh - 202001 | Email: yuvakrantidal@gmail.com', 40, 95, { align: 'center' });
 
       doc.moveTo(40, 110).lineTo(555, 110).lineWidth(1.5).strokeColor('#059669').stroke();
 
@@ -427,13 +428,14 @@ async function generateAppointmentLetterPdf(user = {}) {
       let dbSettings = null;
       try {
         dbSettings = await Setting.findOne();
-      } catch (e) {}
+      } catch (e) { }
 
       const roleLower = (user.role || '').toLowerCase();
       const isCoordinator = roleLower.includes('coordinator') || user.isCoordinator;
       const themeColor = isCoordinator ? '#6d28d9' : '#b91c1c';
-      const defaultId = isCoordinator ? 'BYK-COORD-2026-0001' : 'BYK-MEM-2026-0001';
-      const memberId = sanitize(isCoordinator ? (user.coordinatorId || user.memberId || defaultId) : (user.memberId || defaultId));
+      const defaultId = String(Math.floor(1000000000 + Math.random() * 9000000000));
+      const rawId = isCoordinator ? (user.coordinatorId || user.memberId) : (user.memberId);
+      const memberId = sanitize((rawId && !rawId.startsWith('BYK-DON-')) ? rawId : defaultId);
       const defaultName = isCoordinator ? 'Appointed Coordinator' : 'Executive Member';
       const name = sanitize(user.name || defaultName);
       const email = sanitize(user.email || 'N/A');
@@ -482,8 +484,8 @@ async function generateAppointmentLetterPdf(user = {}) {
       doc.text(`Email: ${email} | Mobile: ${phone} | Location: ${city}, ${state}`, 50, 174);
 
       // Subject
-      const subjectLine = isCoordinator 
-        ? 'SUBJECT: STATUTORY LETTER OF APPOINTMENT AS REGIONAL & DISTRICT COORDINATOR' 
+      const subjectLine = isCoordinator
+        ? 'SUBJECT: STATUTORY LETTER OF APPOINTMENT AS REGIONAL & DISTRICT COORDINATOR'
         : 'SUBJECT: STATUTORY LETTER OF APPOINTMENT AS REGISTERED EXECUTIVE MEMBER';
       doc.font('Helvetica-Bold').fontSize(10).fillColor('#0f172a');
       doc.text(subjectLine, 40, 206, { underline: true });
@@ -584,7 +586,7 @@ async function generateIdCardPdf(user = {}, roleType = 'volunteer') {
       let dbSettings = null;
       try {
         dbSettings = await Setting.findOne();
-      } catch (e) {}
+      } catch (e) { }
 
       const roleLower = (roleType || user.role || '').toLowerCase();
       const isCoordinator = roleLower.includes('coordinator') || user.isCoordinator;
@@ -593,12 +595,13 @@ async function generateIdCardPdf(user = {}, roleType = 'volunteer') {
       const cardTitle = isCoordinator ? 'COORDINATOR IDENTITY CARD' : (isVolunteer ? 'VOLUNTEER IDENTITY CARD' : 'EXECUTIVE MEMBER IDENTITY CARD');
       const defaultDesignation = isCoordinator ? 'District Youth Coordinator' : (isVolunteer ? 'Active Youth Volunteer' : 'Active Social Worker');
 
+      const defaultId = String(Math.floor(1000000000 + Math.random() * 9000000000));
       const id = sanitize(
         isCoordinator
-          ? (user.coordinatorId || (user.memberId && user.memberId.startsWith('BYK-COORD-') ? user.memberId : (user.memberId || 'BYK-COORD-2026-0001')))
+          ? (user.coordinatorId || (user.memberId && !user.memberId.startsWith('BYK-DON-') ? user.memberId : defaultId))
           : (isVolunteer
-            ? (user.volunteerId || (user.memberId && user.memberId.startsWith('BYK-VOL-') ? user.memberId : 'BYK-VOL-2026-0501'))
-            : (user.memberId || 'BYK-MEM-2026-0001'))
+            ? (user.volunteerId || (user.memberId && !user.memberId.startsWith('BYK-DON-') ? user.memberId : defaultId))
+            : (user.memberId && !user.memberId.startsWith('BYK-DON-') ? user.memberId : defaultId))
       );
       const name = sanitize(user.name || 'Registered Social Worker');
       const designation = sanitize(user.designation || defaultDesignation);
@@ -764,9 +767,11 @@ async function generateCertificatePdf(cert = {}) {
       let dbSettings = null;
       try {
         dbSettings = await Setting.findOne();
-      } catch (e) {}
+      } catch (e) { }
 
-      const certId = sanitize(cert.certificateId || cert.certificateNo || 'BYK-CERT-2026-0001');
+      const defaultCertId = String(Math.floor(1000000000 + Math.random() * 9000000000));
+      const certId = sanitize(cert.certificateId || cert.certificateNo || defaultCertId);
+      const recipientId = sanitize(cert.recipientId || (cert.recipient?.coordinatorId || cert.recipient?.memberId || cert.recipient?.volunteerId || ''));
       const recipientName = sanitize(cert.recipientName || 'Distinguished Contributor');
       const title = sanitize(cert.title || 'Certificate of Appreciation & National Service');
       const reason = sanitize(cert.reason || 'In recognition of outstanding dedication, exemplary leadership, and selfless service towards societal welfare and youth empowerment.');
@@ -824,9 +829,12 @@ async function generateCertificatePdf(cert = {}) {
       doc.font('Helvetica-Bold').fontSize(15).fillColor('#ffffff');
       doc.text('CERTIFICATE OF APPRECIATION & CITATION', 160, 114, { align: 'center', width: w - 320 });
 
-      // Certificate ID
+      // Certificate ID & Beneficiary ID
       doc.font('Helvetica-Bold').fontSize(8.5).fillColor('#b45309');
-      doc.text(`Official Conformance No: ${certId}`, 50, 148, { align: 'center', width: w - 100 });
+      const certIdLine = recipientId
+        ? `Certificate ID: ${certId}   |   Beneficiary / Member ID: ${recipientId}`
+        : `Official Conformance No: ${certId}`;
+      doc.text(certIdLine, 50, 148, { align: 'center', width: w - 100 });
 
       // Presentation Line
       doc.font('Helvetica-Oblique').fontSize(11).fillColor('#475569');

@@ -5,24 +5,17 @@ import toast from "react-hot-toast";
 import {
   FiCheck,
   FiCheckCircle,
-  FiClock,
-  FiDownload,
   FiEye,
-  FiMail,
-  FiPhone,
   FiRefreshCw,
   FiSearch,
   FiShield,
   FiTrash2,
   FiUser,
-  FiUsers,
   FiX,
   FiXCircle,
   FiAlertCircle,
   FiAward,
   FiFileText,
-  FiCamera,
-  FiExternalLink,
   FiCreditCard
 } from "react-icons/fi";
 import api from "@/services/api";
@@ -48,6 +41,39 @@ export default function MembershipManagement() {
   const [certReason, setCertReason] = useState("In recognition of dedicated membership, institutional support, and community leadership.");
   const [certRole, setCertRole] = useState("Official Member");
   const [issuingCert, setIssuingCert] = useState(false);
+  const [downloadingDoc, setDownloadingDoc] = useState(null);
+
+  const handleDownloadDoc = async (m, docType) => {
+    const targetId = m.user?._id || m.userId || m.assignedMemberId || m._id || m.id;
+    const docKey = `${m._id || m.id}_${docType}`;
+    try {
+      setDownloadingDoc(docKey);
+      const endpoint = docType === 'id-card'
+        ? `/documents/id-card/${targetId}/download?type=member`
+        : `/documents/appointment-letter/${targetId}/download?type=member`;
+
+      const res = await api.get(endpoint, { responseType: 'blob' });
+      const blob = new Blob([res.data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      const memCode = m.assignedMemberId || targetId;
+      const filename = docType === 'id-card'
+        ? `Member_IDCard_${memCode}.pdf`
+        : `Member_Appointment_${memCode}.pdf`;
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      toast.success(`${docType === 'id-card' ? 'ID Card' : 'Appointment Letter'} PDF downloaded!`);
+    } catch (err) {
+      console.warn('Blob download failed, opening direct URL:', err);
+      window.open(`/api/documents/${docType}/${targetId}/download?type=member`, '_blank');
+    } finally {
+      setDownloadingDoc(null);
+    }
+  };
 
   const loadData = async () => {
     setLoading(true);
@@ -368,19 +394,47 @@ export default function MembershipManagement() {
                             </>
                           )}
                           {(status.toLowerCase() === "approved" || status.toLowerCase() === "active") && (
-                            <button
-                              onClick={() => {
-                                setCertModalItem(m);
-                                setCertRole(m.user?.designation || m.planName || "Official Foundation Member");
-                                setCertTitle("Certificate of Official Membership & Recognition");
-                                setCertReason("In honor of official membership, lifelong commitment to community welfare, and support of the Yuva Kranti Dal.");
-                              }}
-                              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold text-[11px] transition cursor-pointer shadow-xs"
-                              title="Offer Official Member Certificate"
-                            >
-                              <FiAward className="w-3.5 h-3.5" />
-                              <span>Certificate</span>
-                            </button>
+                            <>
+                              <button
+                                onClick={() => handleDownloadDoc(m, 'id-card')}
+                                disabled={downloadingDoc === `${id}_id-card`}
+                                className="inline-flex items-center gap-1 px-2 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold text-[11px] transition cursor-pointer shadow-2xs disabled:opacity-50"
+                                title="Download Member ID Card PDF"
+                              >
+                                {downloadingDoc === `${id}_id-card` ? (
+                                  <FiRefreshCw className="w-3.5 h-3.5 animate-spin" />
+                                ) : (
+                                  <FiCreditCard className="w-3.5 h-3.5" />
+                                )}
+                                <span className="hidden sm:inline">ID Card</span>
+                              </button>
+                              <button
+                                onClick={() => handleDownloadDoc(m, 'appointment-letter')}
+                                disabled={downloadingDoc === `${id}_appointment-letter`}
+                                className="inline-flex items-center gap-1 px-2 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 font-bold text-[11px] transition cursor-pointer shadow-2xs disabled:opacity-50"
+                                title="Download Member Appointment Letter PDF"
+                              >
+                                {downloadingDoc === `${id}_appointment-letter` ? (
+                                  <FiRefreshCw className="w-3.5 h-3.5 animate-spin" />
+                                ) : (
+                                  <FiFileText className="w-3.5 h-3.5" />
+                                )}
+                                <span className="hidden sm:inline">Letter</span>
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setCertModalItem(m);
+                                  setCertRole(m.user?.designation || m.planName || "Official Foundation Member");
+                                  setCertTitle("Certificate of Official Membership & Recognition");
+                                  setCertReason("In honor of official membership, lifelong commitment to community welfare, and support of the Yuva Kranti Dal.");
+                                }}
+                                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold text-[11px] transition cursor-pointer shadow-xs"
+                                title="Offer Official Member Certificate"
+                              >
+                                <FiAward className="w-3.5 h-3.5" />
+                                <span>Certificate</span>
+                              </button>
+                            </>
                           )}
                           <button
                             onClick={() => setDeleteModalItem(m)}
@@ -423,10 +477,10 @@ export default function MembershipManagement() {
 
               <div className="flex items-center gap-2">
                 <span className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase ${(viewModalItem.status || "pending").toLowerCase() === "approved"
-                    ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
-                    : (viewModalItem.status || "pending").toLowerCase() === "rejected"
-                      ? "bg-rose-100 text-rose-800 border border-rose-200"
-                      : "bg-amber-100 text-amber-800 border border-amber-200"
+                  ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
+                  : (viewModalItem.status || "pending").toLowerCase() === "rejected"
+                    ? "bg-rose-100 text-rose-800 border border-rose-200"
+                    : "bg-amber-100 text-amber-800 border border-amber-200"
                   }`}>
                   {viewModalItem.status || "pending"}
                 </span>

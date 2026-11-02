@@ -20,6 +20,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { useNGO } from '@/context/NGOContext';
 import { getContentImageUrl } from '@/lib/authApi';
 import api from '@/services/api';
+import { printElement } from '@/lib/printElement';
 
 const TIER_THEMES = {
   Gold: {
@@ -117,12 +118,7 @@ export default function MyAwardsPage() {
   };
 
   const handlePrintCitation = (badge) => {
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) {
-      window.print();
-      return;
-    }
-    const theme = TIER_THEMES[badge.award?.tier] || TIER_THEMES.Gold;
+    if (!badge) return;
     const recipient = badge.user?.name || currentUser?.name || 'Honored Recipient';
     const awardTitle = badge.award?.title || 'Honorary Award Badge';
     const dateFormatted = new Date(badge.awardedDate || badge.createdAt || Date.now()).toLocaleDateString('en-IN', {
@@ -133,7 +129,7 @@ export default function MyAwardsPage() {
     const logoSrc = getContentImageUrl(settings?.logoUrl) || 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=120';
     const presidentName = settings?.presidentName || 'Ravi Saini (National President & Board of Trustees)';
 
-    printWindow.document.write(`
+    const citationHtml = `
       <!DOCTYPE html>
       <html>
         <head>
@@ -260,18 +256,19 @@ export default function MyAwardsPage() {
           </div>
         </body>
       </html>
-    `);
-    printWindow.document.close();
-    printWindow.focus();
-    setTimeout(() => {
-      printWindow.print();
-    }, 400);
+    `;
+
+    printElement(citationHtml, {
+      landscape: true,
+      title: `Award_Citation_${badge.badgeNumber}`,
+      pageStyle: '@page { size: landscape A4; margin: 6mm; }'
+    });
   };
 
   return (
     <div className="space-y-8">
       {/* ----------------- TOP HERO BANNER ----------------- */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-red-900 via-red-800 to-black text-white p-6 sm:p-8 rounded-3xl shadow-lg border border-red-950">
+      <div className="relative overflow-hidden bg-gradient-to-r from-red-900 via-red-800 to-black text-white p-6 sm:p-8 rounded-3xl shadow-lg border border-red-950 print:hidden no-print">
         <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-amber-500/10 rounded-full blur-2xl pointer-events-none" />
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="space-y-2">
